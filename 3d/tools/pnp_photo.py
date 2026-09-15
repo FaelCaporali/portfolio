@@ -1,6 +1,6 @@
 # Pose da câmera da foto em relação ao modelo (PnP) usando landmarks 3D (raycast) e 2D (foto). Varre a focal.
 import json, sys, numpy as np, cv2
-V='/data/portfolio-3d'
+V='/home/fael/projects/portfolio/3d'
 lm3=json.load(open(f'{V}/analise/lm3d_v07.json')); L=json.load(open(f'{V}/analise/landmarks.json'))['ref-15.jpg']
 W,H=L['size']; P2=np.array(L['pts'])[:468,:2]
 # escala da foto no landmarks.json (foi redimensionada para máx 2000 px); a foto original é 2368x4208

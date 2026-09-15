@@ -1,5 +1,5 @@
 import json, math, numpy as np
-D=json.load(open('/data/portfolio-3d/analise/landmarks.json'))
+D=json.load(open('/home/fael/projects/portfolio/3d/analise/landmarks.json'))
 def metrics(name):
     d=D[name]; P=np.array(d['pts'])[:,:2]
     # corrigir roll: alinhar linha dos olhos (cantos externos 33 e 263) na horizontal

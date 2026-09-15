@@ -32,7 +32,7 @@ Fontes verificadas em 2026-09-14: release do Meshroom no GitHub, realityscan.com
 4. 100 a 150 fotos em três órbitas completas: altura dos olhos, ~30° acima, ~20° abaixo. Passo de ~8° entre fotos, sobreposição de 70%.
 5. Distância constante de 60–80 cm. Inclua a cabeça inteira, pescoço e topo dos ombros em todas as fotos.
 6. Extra: 10 fotos de detalhe (orelhas, nuca, queixo por baixo) mantendo a mesma exposição.
-7. Cópia das fotos para esta máquina (`~/portfolio-captura/2026-xx-xx/`) para a rota Meshroom.
+7. Cópia das fotos para esta máquina (`3d/captura/2026-xx-xx/`) para a rota Meshroom.
 
 ### Referência para expressões e variantes
 Fotos adicionais, mesma luz: sorriso, choro (cara de choro), foco/concentração, surpresa; de frente e 3/4. Servem de referência para esculpir as shape keys. Fotos das tatuagens em alta resolução, planas, para virar decal.

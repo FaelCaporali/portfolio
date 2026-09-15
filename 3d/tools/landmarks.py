@@ -3,11 +3,11 @@ import numpy as np, cv2
 import mediapipe as mp
 from mediapipe.tasks import python as mpp
 from mediapipe.tasks.python import vision
-A='/data/portfolio-3d/analise'
+A='/home/fael/projects/portfolio/3d/analise'
 opts=vision.FaceLandmarkerOptions(base_options=mpp.BaseOptions(model_asset_path=f'{A}/face_landmarker.task'),
     output_face_blendshapes=True, output_facial_transformation_matrixes=True, num_faces=3, running_mode=vision.RunningMode.IMAGE)
 lm=vision.FaceLandmarker.create_from_options(opts)
-files=sorted(glob.glob('/data/portfolio-3d/referencias/upload-02/ref-*.jpg'))+sorted(glob.glob('/data/portfolio-3d/referencias/ref-0*.jpg'))
+files=sorted(glob.glob('/home/fael/projects/portfolio/3d/referencias/upload-02/ref-*.jpg'))+sorted(glob.glob('/home/fael/projects/portfolio/3d/referencias/ref-0*.jpg'))
 out={}
 for f in files:
     img=cv2.imread(f); h,w=img.shape[:2]
