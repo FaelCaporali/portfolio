@@ -1,7 +1,7 @@
 # Pose da câmera da foto em relação ao modelo (PnP) usando landmarks 3D (raycast) e 2D (foto). Varre a focal.
 import json, sys, numpy as np, cv2
 V='/home/fael/projects/portfolio/3d'
-lm3=json.load(open(f'{V}/analise/lm3d_v07.json')); L=json.load(open(f'{V}/analise/landmarks.json'))['ref-15.jpg']
+lm3=json.load(open(sys.argv[1] if len(sys.argv)>1 else f'{V}/analise/lm3d_v07.json')); L=json.load(open(f'{V}/analise/landmarks.json'))['ref-15.jpg']
 W,H=L['size']; P2=np.array(L['pts'])[:468,:2]
 # escala da foto no landmarks.json (foi redimensionada para máx 2000 px); a foto original é 2368x4208
 img_w,img_h=2368,4208; sx=img_w/W; sy=img_h/H; P2=P2*[sx,sy]
@@ -19,4 +19,4 @@ for f in np.linspace(1200,4200,61):
     if best is None or med<best[0]: best=(med,f,rvec.ravel().tolist(),tvec.ravel().tolist(),len(inl),float(np.mean(err)))
 med,f,rvec,tvec,ninl,mean=best
 print("PNP focal_px=%.0f  erro mediano=%.1f px  médio=%.1f px  inliers=%d/%d"%(f,med,mean,ninl,len(ids)))
-json.dump({'f':f,'rvec':rvec,'tvec':tvec,'w':img_w,'h':img_h},open(f'{V}/analise/pnp_ref15.json','w'))
+json.dump({'f':f,'rvec':rvec,'tvec':tvec,'w':img_w,'h':img_h},open(sys.argv[2] if len(sys.argv)>2 else f'{V}/analise/pnp_ref15.json','w'))
