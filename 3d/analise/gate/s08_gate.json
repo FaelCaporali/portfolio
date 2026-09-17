@@ -1,0 +1,65 @@
+{
+ "eyeBlinkRight": {
+  "dmax_mm": 6.926218513399363,
+  "rmax": 2.70780348777771,
+  "n15": 878,
+  "n3": 0,
+  "passa": true
+ },
+ "eyeBlinkLeft": {
+  "dmax_mm": 8.241490460932255,
+  "rmax": 3.2718803882598877,
+  "n15": 1442,
+  "n3": 1,
+  "passa": true
+ },
+ "mouthSmileLeft": {
+  "dmax_mm": 5.373766180127859,
+  "rmax": 10.186529159545898,
+  "n15": 46,
+  "n3": 15,
+  "passa": true
+ },
+ "mouthSmileRight": {
+  "dmax_mm": 5.374800879508257,
+  "rmax": 5.959340572357178,
+  "n15": 47,
+  "n3": 9,
+  "passa": true
+ },
+ "browInnerUp": {
+  "dmax_mm": 5.023724865168333,
+  "rmax": 1.3909531831741333,
+  "n15": 0,
+  "n3": 0,
+  "passa": true
+ },
+ "browOuterUpLeft": {
+  "dmax_mm": 5.21325645968318,
+  "rmax": 1.4126499891281128,
+  "n15": 0,
+  "n3": 0,
+  "passa": true
+ },
+ "browOuterUpRight": {
+  "dmax_mm": 5.2576023153960705,
+  "rmax": 1.4204156398773193,
+  "n15": 0,
+  "n3": 0,
+  "passa": true
+ },
+ "browDownLeft": {
+  "dmax_mm": 3.849524073302746,
+  "rmax": 1.38360595703125,
+  "n15": 0,
+  "n3": 0,
+  "passa": true
+ },
+ "browDownRight": {
+  "dmax_mm": 3.851961577311158,
+  "rmax": 1.3702055215835571,
+  "n15": 0,
+  "n3": 0,
+  "passa": true
+ }
+}
