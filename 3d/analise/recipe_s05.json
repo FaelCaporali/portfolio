@@ -1,0 +1,474 @@
+[
+ {
+  "op": "restore",
+  "args": [
+   [
+    -74,
+    30,
+    188
+   ],
+   42,
+   "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+   1.0
+  ],
+  "note": "lado D alto: desfaz estreitamento da S02 (t\u00eampora achatada)"
+ },
+ {
+  "op": "restore",
+  "args": [
+   [
+    74,
+    30,
+    188
+   ],
+   42,
+   "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+   1.0
+  ],
+  "note": "lado E alto: idem"
+ },
+ {
+  "op": "restore",
+  "args": [
+   [
+    98,
+    75,
+    205
+   ],
+   45,
+   "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+   1.0
+  ],
+  "note": "F6 t\u00eampora: desfaz afundamento da S02"
+ },
+ {
+  "op": "smooth",
+  "args": [
+   [
+    72,
+    40,
+    208
+   ],
+   34,
+   0.6,
+   12
+  ],
+  "note": "F6 borda da restaura\u00e7\u00e3o"
+ },
+ {
+  "op": "smooth",
+  "args": [
+   [
+    0,
+    -8,
+    215
+   ],
+   16,
+   0.6,
+   10
+  ],
+  "note": "F2 vinco da testa"
+ },
+ {
+  "op": "smooth",
+  "args": [
+   [
+    0,
+    -2,
+    234
+   ],
+   26,
+   0.7,
+   30
+  ],
+  "note": "F2 rachadura da testa (sem alcan\u00e7ar sobrancelhas)"
+ },
+ {
+  "op": "grab",
+  "args": [
+   [
+    38,
+    -4,
+    203
+   ],
+   18,
+   [
+    0,
+    2.5,
+    0
+   ]
+  ],
+  "note": "F2 sobrancelha E recua 2,5 mm (estava 5 mm \u00e0 frente)"
+ },
+ {
+  "op": "grab",
+  "args": [
+   [
+    27,
+    -11,
+    202
+   ],
+   13,
+   [
+    0,
+    2.5,
+    0
+   ]
+  ],
+  "note": "F2 sobrancelha E parte interna recua"
+ },
+ {
+  "op": "smooth",
+  "args": [
+   [
+    0,
+    -6,
+    222
+   ],
+   26,
+   0.3,
+   4
+  ],
+  "note": "F2 acabamento testa"
+ },
+ {
+  "op": "bandpass",
+  "mask": "hair",
+  "args": [
+   80,
+   120,
+   0.6,
+   8
+  ],
+  "note": "F3 cabelo passa-banda (tira relevo, mant\u00e9m volume)"
+ },
+ {
+  "op": "mirror",
+  "args": [
+   [
+    -36,
+    12,
+    181
+   ],
+   14,
+   0.8
+  ],
+  "note": "F1 olho D espelho delicado"
+ },
+ {
+  "op": "inflate",
+  "args": [
+   [
+    -36,
+    10,
+    180
+   ],
+   9,
+   -0.8
+  ],
+  "note": "F1 devolve profundidade da cavidade D"
+ },
+ {
+  "op": "smooth",
+  "args": [
+   [
+    -36,
+    12,
+    181
+   ],
+   16,
+   0.2,
+   3
+  ],
+  "note": "F1 transi\u00e7\u00e3o"
+ },
+ {
+  "op": "grab",
+  "args": [
+   [
+    1,
+    -22,
+    156
+   ],
+   14,
+   [
+    0,
+    -1.2,
+    0
+   ]
+  ],
+  "note": "F4 dorso avan\u00e7a 1,2 mm (perfil ref-12)"
+ },
+ {
+  "op": "grab",
+  "args": [
+   [
+    1,
+    -30,
+    137
+   ],
+   11,
+   [
+    0,
+    -2.0,
+    1.2
+   ]
+  ],
+  "note": "F4 ponta avan\u00e7a e sobe (n\u00e3o ca\u00edda)"
+ },
+ {
+  "op": "grab",
+  "args": [
+   [
+    1,
+    -25,
+    127
+   ],
+   7,
+   [
+    0,
+    -0.6,
+    1.8
+   ]
+  ],
+  "note": "F4 columela sobe"
+ },
+ {
+  "op": "smooth",
+  "args": [
+   [
+    1,
+    -26,
+    133
+   ],
+   14,
+   0.2,
+   3
+  ],
+  "note": "F4 transi\u00e7\u00e3o"
+ },
+ {
+  "op": "subsurf",
+  "args": [
+   1
+  ],
+  "note": "Catmull-Clark 1 (densidade para detalhe)"
+ },
+ {
+  "op": "smooth_mask",
+  "mask": "beard",
+  "args": [
+   0.5,
+   150,
+   false,
+   14
+  ],
+  "note": "F5 barba uniforme (regi\u00e3o geom\u00e9trica)"
+ },
+ {
+  "op": "subsurf",
+  "args": [
+   1
+  ],
+  "note": "Catmull-Clark 2 (262 mil v) para detalhe do nariz"
+ },
+ {
+  "op": "inflate",
+  "args": [
+   [
+    18,
+    -8,
+    126
+   ],
+   7,
+   1.2
+  ],
+  "kwargs": {
+   "ndir": [
+    1,
+    -0.6,
+    0
+   ],
+   "ndot": 0.2
+  },
+  "note": "F4 asa E para fora"
+ },
+ {
+  "op": "smooth",
+  "args": [
+   [
+    0,
+    -19,
+    123
+   ],
+   11,
+   0.5,
+   15
+  ],
+  "note": "F4 limpa dobra nariz-l\u00e1bio"
+ },
+ {
+  "op": "smooth",
+  "args": [
+   [
+    -9,
+    -15,
+    123
+   ],
+   7,
+   0.5,
+   10
+  ],
+  "note": "F4 limpa dobra D"
+ },
+ {
+  "op": "grab_n",
+  "args": [
+   [
+    -2.6,
+    -20,
+    124
+   ],
+   3.5,
+   [
+    0,
+    -0.45,
+    -0.45
+   ],
+   [
+    0,
+    -0.3,
+    -1
+   ],
+   0.4
+  ],
+  "note": "F4 p\u00e9 D da columela"
+ },
+ {
+  "op": "grab_n",
+  "args": [
+   [
+    2.6,
+    -20,
+    124
+   ],
+   3.5,
+   [
+    0,
+    -0.45,
+    -0.45
+   ],
+   [
+    0,
+    -0.3,
+    -1
+   ],
+   0.4
+  ],
+  "note": "F4 p\u00e9 E da columela"
+ },
+ {
+  "op": "crease_n",
+  "args": [
+   [
+    0,
+    -18.5,
+    122
+   ],
+   [
+    0,
+    -22,
+    125.5
+   ],
+   0.9,
+   0.7,
+   [
+    0,
+    -0.6,
+    -0.8
+   ],
+   [
+    0,
+    -0.3,
+    -1
+   ],
+   0.4
+  ],
+  "note": "F4 faca"
+ },
+ {
+  "op": "grab_n",
+  "args": [
+   [
+    -2.6,
+    -20,
+    124
+   ],
+   3.5,
+   [
+    0,
+    -0.35,
+    -0.35
+   ],
+   [
+    0,
+    -0.3,
+    -1
+   ],
+   0.4
+  ],
+  "note": "F4 p\u00e9 D 2"
+ },
+ {
+  "op": "grab_n",
+  "args": [
+   [
+    2.6,
+    -20,
+    124
+   ],
+   3.5,
+   [
+    0,
+    -0.35,
+    -0.35
+   ],
+   [
+    0,
+    -0.3,
+    -1
+   ],
+   0.4
+  ],
+  "note": "F4 p\u00e9 E 2"
+ },
+ {
+  "op": "crease_n",
+  "args": [
+   [
+    0,
+    -18.5,
+    122
+   ],
+   [
+    0,
+    -22,
+    125.5
+   ],
+   0.8,
+   0.7,
+   [
+    0,
+    -0.6,
+    -0.8
+   ],
+   [
+    0,
+    -0.3,
+    -1
+   ],
+   0.4
+  ],
+  "note": "F4 faca 2"
+ }
+]

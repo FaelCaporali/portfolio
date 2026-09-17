@@ -111,7 +111,7 @@ def op_subdivide(c=None, r=None, cuts=1):
     bmesh.ops.subdivide_edges(bm, edges=es, cuts=cuts, use_grid_fill=True, use_only_quads=False)
     bmesh.ops.triangulate(bm, faces=[f for f in bm.faces if len(f.verts) > 4])
     bm.to_mesh(me); bm.free(); me.update(); _log('subdivide', c=c, r=r, cuts=cuts); return len(me.vertices)
-def op_crease(p0, p1, sigma, depth, r_end, ndir=None, ndot=0.3):
+def op_crease(p0, p1, sigma, depth, r_end, ndir=None, ndot=0.3, fixed_dir=None):
     """Pincel Crease: sulco ao longo do segmento p0->p1 (mm). Perfil gaussiano (sigma mm) pela distância ao segmento
     medida só em x (faca vertical no plano x = x do segmento), profundidade 'depth' mm para dentro da normal,
     decaimento nas pontas (r_end mm além do segmento)."""
@@ -121,4 +121,74 @@ def op_crease(p0, p1, sigma, depth, r_end, ndir=None, ndot=0.3):
     # só a superfície próxima do segmento (em y/z) e sem passar das pontas
     tr = ((V - a) @ ab)/(ab @ ab); over = np.maximum(np.maximum(-tr, tr - 1)*np.linalg.norm(ab), 0)
     w = np.exp(-(dx/(sigma/1000))**2) * np.exp(-(dq/0.004)**2) * np.clip(1 - over/(r_end/1000), 0, 1) * _nfilt(N, ndir, ndot)
-    _set(V - w[:, None]*N*depth/1000); _log('crease', p0=p0, p1=p1, sigma=sigma, depth=depth); return int((w > 0.1).sum())
+    D = N if fixed_dir is None else np.tile(np.array(fixed_dir, float)/np.linalg.norm(fixed_dir), (len(V), 1))
+    _set(V - w[:, None]*D*depth/1000); _log('crease', p0=p0, p1=p1, sigma=sigma, depth=depth, fixed_dir=fixed_dir); return int((w > 0.1).sum())
+def replay(recipe_json, base_blend, out_blend, upto=None):
+    """Reaplica uma receita curada (lista de {op, args, kwargs, mask?}) sobre base_blend e salva out_blend.
+    mask: 'hair' | 'beard' (seleções por vértice calculadas na hora). Retorna o log de cada passo."""
+    bpy.ops.wm.open_mainfile(filepath=os.path.abspath(base_blend)); R = json.load(open(recipe_json)); rep = []
+    for k, st in enumerate(R[:upto]):
+        f = globals()['op_' + st['op']]; kw = dict(st.get('kwargs', {}))
+        if st.get('mask'): kw_mask = sel_mask(st['mask']); r = f(kw_mask, *st.get('args', []), **kw)
+        else: r = f(*st.get('args', []), **kw)
+        rep.append((k, st['op'], st.get('note', ''), r))
+    bpy.ops.wm.save_as_mainfile(filepath=os.path.abspath(out_blend)); return rep
+def sel_mask(name):
+    V = _V()
+    if name == 'hair':
+        lum = vert_lum()
+        return (lum < 0.35) & ~((V[:, 2] < 0.125) & (V[:, 1] < 0.07)) & ~((V[:, 1] < 0.02) & (V[:, 2] < 0.22)) & (V[:, 2] > 0.03)
+    if name == 'beard':
+        m = (V[:, 2] < 0.118) & (V[:, 2] > 0.03) & (V[:, 1] < 0.045)
+        return m & (np.linalg.norm((V - np.array([0.002, -0.02, 0.1]))*[1, 1, 1.3], axis=1) > 0.021)
+    raise KeyError(name)
+def op_subsurf(levels=1):
+    o = _ob(); bpy.context.view_layer.objects.active = o; o.select_set(True)
+    m = o.modifiers.new('CC', 'SUBSURF'); m.subdivision_type = 'CATMULL_CLARK'; m.levels = levels; m.uv_smooth = 'PRESERVE_BOUNDARIES'
+    with bpy.context.temp_override(object=o, active_object=o): bpy.ops.object.modifier_apply(modifier='CC')
+    for p in o.data.polygons: p.use_smooth = True
+    return len(o.data.vertices)
+def op_bandpass(mask, it_detail=80, it_low=120, strength=0.6, feather=8):
+    """Remove relevos (calombos/sulcos) SEM encolher: d = suavizado - original; o encolhimento é a parte de baixa
+    frequência de d (d suavizado no grafo); aplica d - d_baixa. Mantém a silhueta e deixa a superfície uniforme."""
+    V = _V(); E = _edges(); n = len(V); w = mask.astype(float)
+    for _ in range(feather): w = 0.5*w + 0.5*_lap(w[:, None], E, n)[:, 0]
+    S = V.copy(); ws = w[:, None]*strength
+    for _ in range(it_detail): S = S + ws*(_lap(S, E, n) - S)
+    d = S - V; dl = d.copy()
+    for _ in range(it_low): dl = 0.5*dl + 0.5*_lap(dl, E, n)
+    _set(V + d - dl*w[:, None]); _log('bandpass', n=int(mask.sum()), it_detail=it_detail, it_low=it_low)
+    return dict(n=int(mask.sum()), d_med=float(np.median(np.linalg.norm(d[mask], axis=1))*1000), net_med=float(np.median(np.linalg.norm((d - dl)[mask], axis=1))*1000))
+def op_grab(c, r, delta_mm):
+    """Pincel Grab/Move: translada a esfera por delta (mm) com decaimento suave."""
+    V = _V(); w = _w(V, c, r); _set(V + w[:, None]*np.array(delta_mm)/1000); _log('grab', c=c, r=r, delta=delta_mm); return int((w > 0).sum())
+def vert_tex_lum():
+    """Luminância (0-1) da textura ATUAL por vértice, amostrada pelo UV (média dos loops). Serve para achar
+    narinas, olhos e boca na posição em que a textura realmente os desenha."""
+    o = _ob(); me = o.data; img = None
+    for nd in me.materials[0].node_tree.nodes:
+        if nd.type == 'TEX_IMAGE' and nd.image: img = nd.image; break
+    W, H = img.size; px = np.empty(W*H*4, np.float32); img.pixels.foreach_get(px); px = px.reshape(H, W, 4)
+    lum_img = px[..., :3] @ np.array([0.299, 0.587, 0.114], np.float32)
+    uv = np.empty(len(me.loops)*2); me.uv_layers.active.data.foreach_get('uv', uv); uv = uv.reshape(-1, 2)
+    lv = np.empty(len(me.loops), np.int64); me.loops.foreach_get('vertex_index', lv)
+    ix = np.clip((uv[:, 0]*W).astype(int), 0, W-1); iy = np.clip((uv[:, 1]*H).astype(int), 0, H-1)
+    s = np.bincount(lv, lum_img[iy, ix], minlength=len(me.vertices)); c = np.bincount(lv, minlength=len(me.vertices))
+    return s/np.maximum(c, 1)
+def _wsmooth(w, it=4):
+    E = _edges(); n = len(w)
+    for _ in range(it): w = 0.5*w + 0.5*_lap(w[:, None], E, n)[:, 0]
+    return w
+def op_grab_n(c, r, delta_mm, ndir, ndot=0.3, wit=4):
+    """Grab só na superfície cuja normal aponta para ndir; peso esfumado no grafo (sem alternância/dentes)."""
+    me = _ob().data; V = _V(); N = np.empty(len(V)*3); me.vertices.foreach_get('normal', N); N = N.reshape(-1, 3)
+    w = _wsmooth(_w(V, c, r)*_nfilt(N, ndir, ndot), wit)
+    _set(V + w[:, None]*np.array(delta_mm)/1000); _log('grab_n', c=c, r=r, delta=delta_mm, ndir=ndir); return int((w > 0.05).sum())
+def op_crease_n(p0, p1, sigma, depth, fixed_dir, ndir, ndot=0.3, wit=4):
+    """Sulco em direção fixa, só na superfície voltada para ndir, peso esfumado."""
+    me = _ob().data; V = _V(); N = np.empty(len(V)*3); me.vertices.foreach_get('normal', N); N = N.reshape(-1, 3)
+    a, b = np.array(p0)/1000, np.array(p1)/1000; ab = b - a; t = np.clip(((V - a) @ ab)/(ab @ ab), 0, 1)
+    Q = a + t[:, None]*ab; dx = np.abs(V[:, 0] - Q[:, 0]); dq = np.linalg.norm((V - Q)[:, 1:], axis=1)
+    w = np.exp(-(dx/(sigma/1000))**2)*np.exp(-(dq/0.003)**2)*_nfilt(N, ndir, ndot); w = _wsmooth(w, wit)
+    d = np.array(fixed_dir, float); d /= np.linalg.norm(d)
+    _set(V - w[:, None]*d*depth/1000); _log('crease_n', p0=p0, p1=p1, sigma=sigma, depth=depth); return int((w > 0.1).sum())
