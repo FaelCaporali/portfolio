@@ -6,7 +6,9 @@ from mathutils import Matrix
 a = sys.argv[sys.argv.index("--")+1:]; foto, out, blends = a[0], a[1], a[2:]
 p = json.load(open(f'analise/pnp/{foto}.json')); D = json.load(open(f'analise/gate/olhos_foto_{foto}.json')); P = np.array(D['P'])
 W, H = D['w'], D['h']; k = W/p['w']
-E = P[[33, 133, 362, 263, 159, 145, 386, 374]]; x0, y0 = E.min(0); x1, y1 = E.max(0); mx, my = 0.22*(x1-x0), 1.3*(y1-y0)
+REG = os.environ.get('R_REGION', 'eyes')                           # eyes | mouth | face
+IDS = dict(eyes=[33, 133, 362, 263, 159, 145, 386, 374], mouth=[61, 291, 2, 18, 0, 17], face=[10, 152, 234, 454])[REG]
+E = P[IDS]; x0, y0 = E.min(0); x1, y1 = E.max(0); mx, my = dict(eyes=(0.22, 1.3), mouth=(0.45, 0.35), face=(0.08, 0.08))[REG]; mx, my = mx*(x1-x0), my*(y1-y0)
 bx = [max(0, x0-mx)/W, min(W, x1+mx)/W, max(0, y0-my)/H, min(H, y1+my)/H]
 tmp = []
 for bf in blends:
