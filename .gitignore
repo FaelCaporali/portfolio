@@ -13,3 +13,7 @@ dist
 !3d/export/r01/r01q_t.blend
 !3d/export/r01/r01p_patch.jpg
 *.blend1
+
+# caches e quadros temporários
+__pycache__/
+3d/renders/*.frames/
