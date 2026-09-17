@@ -42,11 +42,16 @@ def lower_lid_rise(s, P, k, H_lo=0.007, taper=0.004):
 def pulls(name, L):
     mm = 0.001; out = []
     def side(tag): return (1, 'L') if tag.endswith('Left') else (-1, 'R')          # x positivo = lado esquerdo dele
-    if name.startswith('mouthSmile'):
+    if name.startswith('mouthSmile') and name != 'mouthSmileFix':
         sx, t = side(name)
         out += [(L['corner'+t], np.array([sx*4.4, 2.2, 5.2])*mm, 0.029, False),     # zigomático maior: canto sobe, abre e recua
                 (L['cheek'+t], np.array([sx*1.3, -2.8, 3.6])*mm, 0.026, False),      # bochecha: sobe e avança
                 (L['malar'+t], np.array([sx*0.5, -1.4, 2.6])*mm, 0.019, False)]      # orbicular (AU6): bolsa malar sobe contra o olho
+    elif name == 'mouthSmileFix':                                                  # CORRETIVA (S11): entra com min(SmileLeft, SmileRight). Sozinha não significa nada.
+        # Sorriso de um lado só foi aprovado e não muda. Com os dois lados, os cantos sobem 5,2 mm e o centro fica parado: a linha dos lábios vira um "U".
+        # A corretiva baixa 1,7 mm e abre 1 mm cada canto, e sobe o centro da boca 1,6 mm (o lábio superior sobe no sorriso de verdade).
+        mid = (L['lipUp'] + L['lipLo'])/2
+        out += [(L['cornerL'], np.array([1.0, 0.2, -1.7])*mm, 0.029, False), (L['cornerR'], np.array([-1.0, 0.2, -1.7])*mm, 0.029, False), (mid, np.array([0, 0.3, 1.6])*mm, 0.021, False)]
     elif name == 'browInnerUp':
         out += [(L['browInR'], np.array([0.6, 0, 5.0])*mm, 0.017, True), (L['browInL'], np.array([-0.6, 0, 5.0])*mm, 0.017, True), (L['glabella'], np.array([0, 0, 3.0])*mm, 0.016, True)]
     elif name.startswith('browOuterUp'):
@@ -55,7 +60,7 @@ def pulls(name, L):
         sx, t = side(name); out += [(L['browMid'+t], np.array([-sx*1.2, -0.7, -3.2])*mm, 0.018, True), (L['browIn'+t], np.array([-sx*1.6, -0.9, -3.4])*mm, 0.015, True)]
     return out
 
-NAMES = ['mouthSmileLeft', 'mouthSmileRight', 'browInnerUp', 'browOuterUpLeft', 'browOuterUpRight', 'browDownLeft', 'browDownRight']
+NAMES = ['mouthSmileLeft', 'mouthSmileRight', 'mouthSmileFix', 'browInnerUp', 'browOuterUpLeft', 'browOuterUpRight', 'browDownLeft', 'browDownRight']
 LID = {'mouthSmileLeft': ('E', 1.00), 'mouthSmileRight': ('D', 1.00)}              # pálpebra inferior sobe 60% do que sobe no piscar (~1,3 mm)
 
 def displacement(name, P, L, lm=None):
@@ -81,5 +86,8 @@ def build_all():
         if name in LID:
             s, k = LID[name]; so = bpy.data.objects['Sombra_'+s]; sm = so.data
             if name in sm.shape_keys.key_blocks: so.shape_key_remove(sm.shape_keys.key_blocks[name])
-            P = np.array([v.co[:] for v in sm.vertices]); P2 = P.copy(); P2[:, 2] += lower_lid_rise(s, P, k); P2[:, 1] = E._ysph(s, P2[:, 0], P2[:, 2], E.R_EYE + 0.0003)
+            P = np.array([v.co[:] for v in sm.vertices]); P2 = P.copy(); dz_ = lower_lid_rise(s, P, k); P2[:, 2] += dz_
+            if hasattr(E, 'guide'):                                   # S09+: a sombra anda sobre o FUNDO do olho (globo + folha de conjuntiva). Sobre a esfera ela ia para trás da folha no canto e a sombra sumia ali ao sorrir (mancha clara, S11)
+                mv_ = np.abs(dz_) > 1e-7; P2[mv_, 1] = P[mv_, 1] + (E.guide(s, P2[mv_, 0], P2[mv_, 2]) - E.guide(s, P[mv_, 0], P[mv_, 2]))   # por diferença: quem foi recuado para trás da pele no canto continua recuado
+            else: P2[:, 1] = E._ysph(s, P2[:, 0], P2[:, 2], E.R_EYE + 0.0003)
             kb2 = so.shape_key_add(name=name, from_mix=False); kb2.data.foreach_set('co', P2.astype(np.float32).ravel())

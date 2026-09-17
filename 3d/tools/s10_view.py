@@ -5,9 +5,11 @@ import bpy, sys, os, math, json, numpy as np
 from mathutils import Vector, Matrix
 a = sys.argv[sys.argv.index("--")+1:]; out = os.path.abspath(a[0]); clay = 'clay' in a
 ROOT = '/home/fael/projects/portfolio/3d/'
-CEN = json.load(open(ROOT + 'analise/gate/olhos_centro_%s.json' % ('s10' if 's10' in bpy.data.filepath else 's09')))
+CEN = json.load(open(ROOT + 'analise/gate/olhos_centro_%s.json' % ('s09' if 's09' in bpy.data.filepath else 's10')))
 sc = bpy.context.scene
-for k_ in [x for x in os.environ.get('KEYS', '').split(',') if x]:                # KEYS=eyeBlinkLeft,eyeBlinkRight: confere a pose de perto
+_K = [x for x in os.environ.get('KEYS', '').split(',') if x]
+if 'mouthSmileLeft' in _K and 'mouthSmileRight' in _K: _K.append('mouthSmileFix')
+for k_ in _K:                # KEYS=eyeBlinkLeft,eyeBlinkRight: confere a pose de perto
     for o_ in bpy.data.objects:
         if o_.type == 'MESH' and o_.data.shape_keys and k_ in o_.data.shape_keys.key_blocks: o_.data.shape_keys.key_blocks[k_].value = 1.0
 for o in list(sc.objects):
@@ -35,6 +37,8 @@ def shot(target, yaw, pitch, scale, f, clip=0.01):
     d = Matrix.Rotation(math.radians(yaw), 3, 'Z') @ Matrix.Rotation(math.radians(pitch), 3, 'X') @ Vector((0, -1, 0))
     cam.location = t + d*0.5; cam.rotation_euler = (-d).to_track_quat('-Z', 'Y').to_euler(); cam.data.clip_start = clip; cam.data.clip_end = 2
     sc.render.filepath = f; sc.render.image_settings.file_format = 'PNG'; bpy.ops.render.render(write_still=True)
+for s_ in 'DE':                                                     # GAZE=graus: gira os globos (olhar para o lado), como a animação faz
+    if os.environ.get('GAZE') and 'Olho_'+s_ in bpy.data.objects: bpy.data.objects['Olho_'+s_].rotation_euler[2] += math.radians(float(os.environ['GAZE']))
 tmp = os.environ.get('CLAUDE_JOB_DIR', '/tmp') + '/tmp/s10v_'
 rows = []
 for s, sg in (('D', -1), ('E', 1)):

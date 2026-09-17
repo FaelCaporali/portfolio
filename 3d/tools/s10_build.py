@@ -2,11 +2,13 @@
 S07 -> textura no lugar, bigode, lábio inferior discreto (arcada retraída), olho D = E espelhado, cirurgia dos olhos, expressões. Salva no NEUTRO."""
 import bpy, os, sys, importlib
 ROOT = '/home/fael/projects/portfolio/3d/'
-def run(expr=True):
+def run(expr=True, name='s10', head=False):
     os.environ['S_EYE'] = 's10_eye'
-    bpy.ops.wm.open_mainfile(filepath=ROOT + 'blend/busto-s07.blend'); bpy.ops.wm.save_as_mainfile(filepath=ROOT + 'blend/busto-s10.blend')
+    bpy.ops.wm.open_mainfile(filepath=ROOT + 'blend/busto-s07.blend'); bpy.ops.wm.save_as_mainfile(filepath=ROOT + 'blend/busto-%s.blend' % name)
     import s09_face, s10_face; importlib.reload(s09_face); F = importlib.reload(s10_face)
     F.F9.restore_xz(); F.F9.moustache(); F.lower_lip(); F.mirror_eye()
+    if head:
+        import s11_head; importlib.reload(s11_head).dome()            # S11: crânio arredondado e laterais estreitas (só cabelo)
     c = ROOT + 'analise/gate/olhos_centro_s10.json'
     if os.path.exists(c): os.remove(c)
     import s10_eye; E = importlib.reload(s10_eye)

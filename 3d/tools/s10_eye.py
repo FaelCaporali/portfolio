@@ -13,7 +13,10 @@ _tex0 = B.eye_texture
 B.eye_texture = lambda **k: _tex0(path=ROOT + 'export/s10/olho_tex.png', **k)
 
 # fundo do olho mais claro que no S09: de perfil o olho lia como buraco (parede, folha e esclera quase da mesma cor escura)
-B.COL['sclera_far'] = (112, 72, 64); CONJ_IN, CONJ_MED, CONJ_LAT = (112, 72, 64), (134, 80, 70), (108, 68, 60)
+# S11: a esclera tem UMA cor só (o globo gira; se ela escurecesse longe da íris, ao olhar de lado apareceria um degrau contra a folha, que é fixa).
+# Quem escurece junto às pálpebras é a calota de sombra, presa a elas.
+B.COL['sclera_far'] = B.COL['sclera']; CONJ_IN, CONJ_MED, CONJ_LAT = B.COL['sclera'], (120, 62, 52), (100, 62, 54)
+CONJ_BACK = 0.00035; SHELL_LIFT = 0.00045      # folha atrás e calota à frente do fundo G: 0,8 mm de folga. Com 0,3 mm a interpolação das duas malhas se cruzava e a sombra não cobria a folha
 
 def _branches(Q):
     i0, i1 = Q[:, 0].argmin(), Q[:, 0].argmax(); a, b = sorted((i0, i1)); c1 = Q[a:b+1]; c2 = np.r_[Q[b:], Q[:a+1]]
@@ -74,6 +77,16 @@ def cut(s, shrink=0.0003, reach=0.0025):
     print("CUT %s: %d faces removidas, %d de %d vertices de borda encostados (media %.2f, max %.2f mm); desvio da borda a curva: media %.3f, max %.3f mm, >0,15 mm: %d" % (s, len(dead), len(mv), len(Bv), np.mean(mv)*1000, np.max(mv)*1000, dev.mean(), dev.max(), (dev > 0.15).sum()))
 B.cut = cut
 
+def _conj(s):
+    o = B.conj(s, col_in=CONJ_IN, col_med=CONJ_MED, col_lat=CONJ_LAT)
+    for v in o.data.vertices: v.co.y += CONJ_BACK
+    nt = o.data.materials[0].node_tree; em = next(n for n in nt.nodes if n.type == 'EMISSION')
+    if not any(n.type == 'ATTRIBUTE' for n in nt.nodes):                # medido no S11: com o nó Color Attribute o EEVEE não desenha a sombra transparente sobre a folha (degrau de 20% contra o globo)
+        for l in list(nt.links):
+            if l.to_node == em: nt.links.remove(l)
+        a = nt.nodes.new('ShaderNodeAttribute'); a.attribute_type = 'GEOMETRY'; a.attribute_name = 'cor'; nt.links.new(a.outputs['Color'], em.inputs['Color'])
+    o.data.update(); return o
+
 def tuck(nm, gap=0.0006):
     """Nenhum vértice de malha interna do olho pode ficar na frente da pele: fora da abertura, vai para trás da pele."""
     ob = bpy.data.objects[nm]; sk = bpy.data.objects['Busto']; me, bm = B._bm(); bvh = BVHTree.FromBMesh(bm); bm.free(); n = 0; worst = 0.0
@@ -85,11 +98,18 @@ def tuck(nm, gap=0.0006):
 
 def _fix_shadow_key(s):
     so = bpy.data.objects['Sombra_'+s]; kb = so.data.shape_keys.key_blocks; n = len(so.data.vertices); A = np.empty(n*3, np.float32); K = A.copy()
-    kb[0].data.foreach_get('co', A); kb[B.ARKIT[s]].data.foreach_get('co', K); A = A.reshape(-1, 3); K = K.reshape(-1, 3); still = np.abs(K[:, 2] - A[:, 2]) < 1e-6; K[still] = A[still]
+    kb[0].data.foreach_get('co', A); kb[B.ARKIT[s]].data.foreach_get('co', K); A = A.reshape(-1, 3); K = K.reshape(-1, 3); still = np.abs(K[:, 2] - A[:, 2]) < 1e-6; K[~still, 1] -= (SHELL_LIFT - 0.0003); K[still] = A[still]
     kb[B.ARKIT[s]].data.foreach_set('co', K.ravel())
 
+def shell(s, **k):
+    """Mesma interface do s09 (a versão web chama E.shell e E.blink): calota com a folga do S11 e sempre atrás da pele."""
+    k.setdefault('lift', SHELL_LIFT); o = B.shell(s, **k); tuck('Sombra_'+s); return o
+
+def blink(s):
+    B.blink(s); _fix_shadow_key(s)
+
 def build(s, cx, cz, pitch=-5.0, yaw=0.0):
-    B.center(s, cx, cz); B.polar(s); B.subdiv(s); cut(s); B.rim(s); B.flat_materials(); B.wall_material(s); B.ball(s, pitch=pitch, yaw=yaw); B.conj(s, col_in=CONJ_IN, col_med=CONJ_MED, col_lat=CONJ_LAT); B.shell(s); tuck('Conj_'+s); tuck('Sombra_'+s); B.blink(s); _fix_shadow_key(s)
+    B.center(s, cx, cz); B.polar(s); B.subdiv(s); cut(s); B.rim(s); B.flat_materials(); B.wall_material(s); B.ball(s, pitch=pitch, yaw=yaw); _conj(s); tuck('Conj_'+s); shell(s); blink(s)
     for nm in ('Olho_', 'Conj_', 'Sombra_'): bpy.data.objects[nm+s].parent = bpy.data.objects['Busto']
 
-globals().update({k: getattr(B, k) for k in dir(B) if not k.startswith('__') and k not in ('cut', 'build', 'B')})
+globals().update({k: getattr(B, k) for k in dir(B) if not k.startswith('__') and k not in ('cut', 'build', 'shell', 'blink', 'B')})

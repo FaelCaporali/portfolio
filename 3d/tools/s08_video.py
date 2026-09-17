@@ -10,7 +10,7 @@ for e in ('BLENDER_EEVEE_NEXT', 'BLENDER_EEVEE'):
 for mv_ in bpy.data.materials:                                       # material de exportação com cor por vértice (conjuntiva) vira emissão para a conferência
     if mv_.use_nodes and mv_.name == 'Conjuntiva' and not any(n_.type == 'EMISSION' for n_ in mv_.node_tree.nodes):
         vc_ = next(n_ for n_ in mv_.node_tree.nodes if n_.type == 'VERTEX_COLOR'); oo_ = next(n_ for n_ in mv_.node_tree.nodes if n_.type == 'OUTPUT_MATERIAL')
-        ee_ = mv_.node_tree.nodes.new('ShaderNodeEmission'); mv_.node_tree.links.new(vc_.outputs['Color'], ee_.inputs['Color']); mv_.node_tree.links.new(ee_.outputs[0], oo_.inputs['Surface'])
+        ee_ = mv_.node_tree.nodes.new('ShaderNodeEmission'); at_ = mv_.node_tree.nodes.new('ShaderNodeAttribute'); at_.attribute_type = 'GEOMETRY'; at_.attribute_name = vc_.layer_name; mv_.node_tree.links.new(at_.outputs['Color'], ee_.inputs['Color'])   # nó Attribute: com o nó Color Attribute o EEVEE não aplica a sombra transparente por cima (S11); mv_.node_tree.links.new(ee_.outputs[0], oo_.inputs['Surface'])
 sc.view_settings.view_transform = 'Standard'; sc.render.resolution_x, sc.render.resolution_y = 720, 720; sc.render.image_settings.file_format = 'PNG'
 if sc.world: sc.world.use_nodes = False; sc.world.color = (0.035, 0.035, 0.045)
 for o in list(sc.objects):
@@ -29,10 +29,12 @@ def state(t):
     su = pulse(t, 6.8, 7.1, 7.7, 8.1); k['browInnerUp'] = 0.8*su; k['browOuterUpLeft'] = max(k['browOuterUpLeft'], su); k['browOuterUpRight'] = su
     co = pulse(t, 8.1, 8.5, 9.2, 9.6); k['browDownLeft'] = co; k['browDownRight'] = co
     wk = pulse(t, 9.5, 9.6, 9.75, 9.95)
+    k['mouthSmileFix'] = min(k['mouthSmileLeft'], k['mouthSmileRight'])                # corretiva do sorriso bilateral
     k['eyeBlinkLeft'] = max(b, 0.18*co); k['eyeBlinkRight'] = max(b, 0.18*co, wk)
     return th, k
 N = int(10*FPS)
-for f in range(N):
+ONLY = [int(float(x)*FPS) for x in os.environ.get('FRAMES', '').split(',') if x]      # FRAMES=1.5,2.5: só esses instantes, como PNG, sem mp4
+for f in (ONLY or range(N)):
     t = f/FPS; th, k = state(t); r = math.radians(th)
     cam.location = (math.sin(r)*1.25, 0.10 - math.cos(r)*1.25, 0.175); cam.rotation_euler = (math.radians(90), 0, r)
     for o in MESH:
@@ -40,6 +42,7 @@ for f in range(N):
     for s in 'DE':
         g = G0[s]; bpy.data.objects['Olho_'+s].rotation_euler = (g[0], 0, g[2] + max(-0.4, min(0.4, r)))
     sc.render.filepath = os.path.join(tmp, '%04d.png' % f); bpy.ops.render.render(write_still=True)
+if ONLY: print('QUADROS', tmp); sys.exit()
 subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-framerate', str(FPS), '-i', os.path.join(tmp, '%04d.png'), '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '18', out], check=True)
 for f in (0.0, 3.0, 5.9, 7.4, 8.8, 9.68): shutil.copy(os.path.join(tmp, '%04d.png' % int(f*FPS)), out.replace('.mp4', '_t%04.1f.png' % f))
 shutil.rmtree(tmp); print("VIDEO", out)
