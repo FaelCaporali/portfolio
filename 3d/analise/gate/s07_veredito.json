@@ -1,0 +1,240 @@
+{
+ "eye-left-closure": {
+  "aprovada": false,
+  "motivo": "visual: a palpebra arrasta a iris pintada no scan; vira borrao, nao olho fechado",
+  "n3": 10,
+  "rmax": 4.1,
+  "desloc_mm": 4.6
+ },
+ "eye-left-opened-up": {
+  "aprovada": false,
+  "motivo": "visual: a palpebra arrasta a iris pintada no scan; vira borrao, nao olho fechado",
+  "n3": 14,
+  "rmax": 6.9,
+  "desloc_mm": 8.3
+ },
+ "eye-left-slit": {
+  "aprovada": false,
+  "motivo": "visual: a palpebra arrasta a iris pintada no scan; vira borrao, nao olho fechado",
+  "n3": 15,
+  "rmax": 4.3,
+  "desloc_mm": 4.0
+ },
+ "eye-right-closure": {
+  "aprovada": false,
+  "motivo": "visual: a palpebra arrasta a iris pintada no scan; vira borrao, nao olho fechado",
+  "n3": 7,
+  "rmax": 4.4,
+  "desloc_mm": 5.7
+ },
+ "eye-right-opened-up": {
+  "aprovada": false,
+  "motivo": "visual: a palpebra arrasta a iris pintada no scan; vira borrao, nao olho fechado",
+  "n3": 5,
+  "rmax": 4.6,
+  "desloc_mm": 4.9
+ },
+ "eye-right-slit": {
+  "aprovada": false,
+  "motivo": "visual: a palpebra arrasta a iris pintada no scan; vira borrao, nao olho fechado",
+  "n3": 0,
+  "rmax": 2.8,
+  "desloc_mm": 3.9
+ },
+ "eyebrows-left-down": {
+  "aprovada": true,
+  "motivo": "esticamento dentro do limite e conferido na folha",
+  "n3": 0,
+  "rmax": 1.2,
+  "desloc_mm": 5.4
+ },
+ "eyebrows-left-extern-up": {
+  "aprovada": true,
+  "motivo": "esticamento dentro do limite e conferido na folha",
+  "n3": 0,
+  "rmax": 1.6,
+  "desloc_mm": 7.4
+ },
+ "eyebrows-left-inner-up": {
+  "aprovada": true,
+  "motivo": "esticamento dentro do limite e conferido na folha",
+  "n3": 0,
+  "rmax": 1.3,
+  "desloc_mm": 4.1
+ },
+ "eyebrows-left-up": {
+  "aprovada": true,
+  "motivo": "esticamento dentro do limite e conferido na folha",
+  "n3": 0,
+  "rmax": 1.4,
+  "desloc_mm": 4.6
+ },
+ "eyebrows-right-down": {
+  "aprovada": true,
+  "motivo": "esticamento dentro do limite e conferido na folha",
+  "n3": 0,
+  "rmax": 1.2,
+  "desloc_mm": 5.4
+ },
+ "eyebrows-right-extern-up": {
+  "aprovada": true,
+  "motivo": "esticamento dentro do limite e conferido na folha",
+  "n3": 0,
+  "rmax": 1.5,
+  "desloc_mm": 7.2
+ },
+ "eyebrows-right-inner-up": {
+  "aprovada": true,
+  "motivo": "esticamento dentro do limite e conferido na folha",
+  "n3": 0,
+  "rmax": 1.3,
+  "desloc_mm": 4.1
+ },
+ "eyebrows-right-up": {
+  "aprovada": true,
+  "motivo": "esticamento dentro do limite e conferido na folha",
+  "n3": 0,
+  "rmax": 1.4,
+  "desloc_mm": 4.6
+ },
+ "mouth-compression": {
+  "aprovada": false,
+  "motivo": "visual: linha da boca ondula e bigode entorta; alvo generico do MPFB, nao e expressao dele",
+  "n3": 1,
+  "rmax": 3.1,
+  "desloc_mm": 7.9
+ },
+ "mouth-corner-puller": {
+  "aprovada": false,
+  "motivo": "visual: linha da boca ondula e bigode entorta; alvo generico do MPFB, nao e expressao dele",
+  "n3": 1,
+  "rmax": 3.2,
+  "desloc_mm": 12.0
+ },
+ "mouth-depression-retraction": {
+  "aprovada": false,
+  "motivo": "rasga a textura: 259 arestas esticam mais de 3x (labios se separam sem cavidade de boca)",
+  "n3": 259,
+  "rmax": 20.2,
+  "desloc_mm": 9.5
+ },
+ "mouth-depression": {
+  "aprovada": false,
+  "motivo": "visual: linha da boca ondula e bigode entorta; alvo generico do MPFB, nao e expressao dele",
+  "n3": 1,
+  "rmax": 3.3,
+  "desloc_mm": 7.2
+ },
+ "mouth-elevation": {
+  "aprovada": false,
+  "motivo": "rasga a textura: 70 arestas esticam mais de 3x (labios se separam sem cavidade de boca)",
+  "n3": 70,
+  "rmax": 7.0,
+  "desloc_mm": 6.9
+ },
+ "mouth-eversion": {
+  "aprovada": false,
+  "motivo": "rasga a textura: 26 arestas esticam mais de 3x (labios se separam sem cavidade de boca)",
+  "n3": 26,
+  "rmax": 7.1,
+  "desloc_mm": 5.5
+ },
+ "mouth-open": {
+  "aprovada": false,
+  "motivo": "rasga a textura: 619 arestas esticam mais de 3x (labios se separam sem cavidade de boca)",
+  "n3": 619,
+  "rmax": 45.4,
+  "desloc_mm": 33.4
+ },
+ "mouth-parling": {
+  "aprovada": false,
+  "motivo": "rasga a textura: 53 arestas esticam mais de 3x (labios se separam sem cavidade de boca)",
+  "n3": 53,
+  "rmax": 8.1,
+  "desloc_mm": 3.2
+ },
+ "mouth-part-later": {
+  "aprovada": false,
+  "motivo": "rasga a textura: 386 arestas esticam mais de 3x (labios se separam sem cavidade de boca)",
+  "n3": 386,
+  "rmax": 25.5,
+  "desloc_mm": 11.5
+ },
+ "mouth-protusion": {
+  "aprovada": false,
+  "motivo": "rasga a textura: 319 arestas esticam mais de 3x (labios se separam sem cavidade de boca)",
+  "n3": 319,
+  "rmax": 26.6,
+  "desloc_mm": 15.3
+ },
+ "mouth-pursing": {
+  "aprovada": false,
+  "motivo": "visual: linha da boca ondula e bigode entorta; alvo generico do MPFB, nao e expressao dele",
+  "n3": 11,
+  "rmax": 5.2,
+  "desloc_mm": 13.3
+ },
+ "mouth-retraction": {
+  "aprovada": false,
+  "motivo": "visual: linha da boca ondula e bigode entorta; alvo generico do MPFB, nao e expressao dele",
+  "n3": 0,
+  "rmax": 2.5,
+  "desloc_mm": 7.3
+ },
+ "mouth-upward-retraction": {
+  "aprovada": false,
+  "motivo": "rasga a textura: 158 arestas esticam mais de 3x (labios se separam sem cavidade de boca)",
+  "n3": 158,
+  "rmax": 12.6,
+  "desloc_mm": 9.9
+ },
+ "neck-platysma": {
+  "aprovada": false,
+  "motivo": "rasga a textura: 45 arestas esticam mais de 3x (labios se separam sem cavidade de boca)",
+  "n3": 45,
+  "rmax": 8.2,
+  "desloc_mm": 10.4
+ },
+ "nose-compression": {
+  "aprovada": true,
+  "motivo": "esticamento dentro do limite e conferido na folha",
+  "n3": 0,
+  "rmax": 1.2,
+  "desloc_mm": 1.4
+ },
+ "nose-depression": {
+  "aprovada": true,
+  "motivo": "esticamento dentro do limite e conferido na folha",
+  "n3": 0,
+  "rmax": 1.4,
+  "desloc_mm": 3.7
+ },
+ "nose-left-dilatation": {
+  "aprovada": true,
+  "motivo": "esticamento dentro do limite e conferido na folha",
+  "n3": 0,
+  "rmax": 1.6,
+  "desloc_mm": 1.3
+ },
+ "nose-left-elevation": {
+  "aprovada": true,
+  "motivo": "esticamento dentro do limite e conferido na folha",
+  "n3": 0,
+  "rmax": 2.0,
+  "desloc_mm": 4.4
+ },
+ "nose-right-dilatation": {
+  "aprovada": true,
+  "motivo": "esticamento dentro do limite e conferido na folha",
+  "n3": 0,
+  "rmax": 1.3,
+  "desloc_mm": 1.3
+ },
+ "nose-right-elevation": {
+  "aprovada": true,
+  "motivo": "esticamento dentro do limite e conferido na folha",
+  "n3": 0,
+  "rmax": 1.9,
+  "desloc_mm": 4.3
+ }
+}

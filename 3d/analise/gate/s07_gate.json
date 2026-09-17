@@ -1,0 +1,240 @@
+{
+ "eye-left-closure": {
+  "dmax_mm": 4.581798799335957,
+  "rmax": 4.107382297515869,
+  "n15": 124,
+  "n3": 10,
+  "passa": true
+ },
+ "eye-left-opened-up": {
+  "dmax_mm": 8.330612443387508,
+  "rmax": 6.858534812927246,
+  "n15": 104,
+  "n3": 14,
+  "passa": true
+ },
+ "eye-left-slit": {
+  "dmax_mm": 4.043026827275753,
+  "rmax": 4.2502570152282715,
+  "n15": 137,
+  "n3": 15,
+  "passa": true
+ },
+ "eye-right-closure": {
+  "dmax_mm": 5.69530762732029,
+  "rmax": 4.439432144165039,
+  "n15": 210,
+  "n3": 7,
+  "passa": true
+ },
+ "eye-right-opened-up": {
+  "dmax_mm": 4.853877704590559,
+  "rmax": 4.5626749992370605,
+  "n15": 91,
+  "n3": 5,
+  "passa": true
+ },
+ "eye-right-slit": {
+  "dmax_mm": 3.8916629273444414,
+  "rmax": 2.7611186504364014,
+  "n15": 98,
+  "n3": 0,
+  "passa": true
+ },
+ "eyebrows-left-down": {
+  "dmax_mm": 5.440830253064632,
+  "rmax": 1.2282975912094116,
+  "n15": 0,
+  "n3": 0,
+  "passa": true
+ },
+ "eyebrows-left-extern-up": {
+  "dmax_mm": 7.428011391311884,
+  "rmax": 1.6475584506988525,
+  "n15": 1,
+  "n3": 0,
+  "passa": true
+ },
+ "eyebrows-left-inner-up": {
+  "dmax_mm": 4.069569520652294,
+  "rmax": 1.3105227947235107,
+  "n15": 0,
+  "n3": 0,
+  "passa": true
+ },
+ "eyebrows-left-up": {
+  "dmax_mm": 4.644111264497042,
+  "rmax": 1.3915679454803467,
+  "n15": 0,
+  "n3": 0,
+  "passa": true
+ },
+ "eyebrows-right-down": {
+  "dmax_mm": 5.427449941635132,
+  "rmax": 1.2244250774383545,
+  "n15": 0,
+  "n3": 0,
+  "passa": true
+ },
+ "eyebrows-right-extern-up": {
+  "dmax_mm": 7.23867304623127,
+  "rmax": 1.4717872142791748,
+  "n15": 0,
+  "n3": 0,
+  "passa": true
+ },
+ "eyebrows-right-inner-up": {
+  "dmax_mm": 4.08379128202796,
+  "rmax": 1.2933799028396606,
+  "n15": 0,
+  "n3": 0,
+  "passa": true
+ },
+ "eyebrows-right-up": {
+  "dmax_mm": 4.605880007147789,
+  "rmax": 1.4282710552215576,
+  "n15": 0,
+  "n3": 0,
+  "passa": true
+ },
+ "mouth-compression": {
+  "dmax_mm": 7.920083589851856,
+  "rmax": 3.1273410320281982,
+  "n15": 90,
+  "n3": 1,
+  "passa": true
+ },
+ "mouth-corner-puller": {
+  "dmax_mm": 11.968339793384075,
+  "rmax": 3.2107815742492676,
+  "n15": 373,
+  "n3": 1,
+  "passa": true
+ },
+ "mouth-depression-retraction": {
+  "dmax_mm": 9.499885141849518,
+  "rmax": 20.175464630126953,
+  "n15": 529,
+  "n3": 259,
+  "passa": false
+ },
+ "mouth-depression": {
+  "dmax_mm": 7.220089435577393,
+  "rmax": 3.322852849960327,
+  "n15": 172,
+  "n3": 1,
+  "passa": true
+ },
+ "mouth-elevation": {
+  "dmax_mm": 6.946325302124023,
+  "rmax": 7.043190002441406,
+  "n15": 336,
+  "n3": 70,
+  "passa": false
+ },
+ "mouth-eversion": {
+  "dmax_mm": 5.509351380169392,
+  "rmax": 7.1384453773498535,
+  "n15": 185,
+  "n3": 26,
+  "passa": false
+ },
+ "mouth-open": {
+  "dmax_mm": 33.427804708480835,
+  "rmax": 45.42949295043945,
+  "n15": 3116,
+  "n3": 619,
+  "passa": false
+ },
+ "mouth-parling": {
+  "dmax_mm": 3.183308057487011,
+  "rmax": 8.115351676940918,
+  "n15": 230,
+  "n3": 53,
+  "passa": false
+ },
+ "mouth-part-later": {
+  "dmax_mm": 11.470254510641098,
+  "rmax": 25.536054611206055,
+  "n15": 747,
+  "n3": 386,
+  "passa": false
+ },
+ "mouth-protusion": {
+  "dmax_mm": 15.295962803065777,
+  "rmax": 26.566133499145508,
+  "n15": 723,
+  "n3": 319,
+  "passa": false
+ },
+ "mouth-pursing": {
+  "dmax_mm": 13.319592922925949,
+  "rmax": 5.152434349060059,
+  "n15": 783,
+  "n3": 11,
+  "passa": true
+ },
+ "mouth-retraction": {
+  "dmax_mm": 7.302460260689259,
+  "rmax": 2.532881736755371,
+  "n15": 45,
+  "n3": 0,
+  "passa": true
+ },
+ "mouth-upward-retraction": {
+  "dmax_mm": 9.89597663283348,
+  "rmax": 12.604283332824707,
+  "n15": 537,
+  "n3": 158,
+  "passa": false
+ },
+ "neck-platysma": {
+  "dmax_mm": 10.448150336742401,
+  "rmax": 8.223742485046387,
+  "n15": 550,
+  "n3": 45,
+  "passa": false
+ },
+ "nose-compression": {
+  "dmax_mm": 1.4204835752025247,
+  "rmax": 1.1697016954421997,
+  "n15": 0,
+  "n3": 0,
+  "passa": true
+ },
+ "nose-depression": {
+  "dmax_mm": 3.677154891192913,
+  "rmax": 1.436360478401184,
+  "n15": 0,
+  "n3": 0,
+  "passa": true
+ },
+ "nose-left-dilatation": {
+  "dmax_mm": 1.3121386291459203,
+  "rmax": 1.5687355995178223,
+  "n15": 1,
+  "n3": 0,
+  "passa": true
+ },
+ "nose-left-elevation": {
+  "dmax_mm": 4.355383571237326,
+  "rmax": 1.9538041353225708,
+  "n15": 14,
+  "n3": 0,
+  "passa": true
+ },
+ "nose-right-dilatation": {
+  "dmax_mm": 1.2964308261871338,
+  "rmax": 1.3284043073654175,
+  "n15": 0,
+  "n3": 0,
+  "passa": true
+ },
+ "nose-right-elevation": {
+  "dmax_mm": 4.324241075664759,
+  "rmax": 1.8737928867340088,
+  "n15": 12,
+  "n3": 0,
+  "passa": true
+ }
+}
