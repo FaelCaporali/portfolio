@@ -49,6 +49,7 @@ for mat in bpy.data.materials:
     elif mat.name == 'Conjuntiva':
         b = principled(mat); ca = mat.node_tree.nodes.new('ShaderNodeVertexColor'); ca.layer_name = 'cor'; mat.node_tree.links.new(ca.outputs['Color'], b.inputs['Base Color'])
     elif mat.name == 'ParedePalpebra': principled(mat, col=((62/255)**2.2, (28/255)**2.2, (25/255)**2.2, 1))
+    elif mat.name == 'ParedePalpebraSup': principled(mat, col=((40/255)**2.2, (18/255)**2.2, (16/255)**2.2, 1))
     elif img: principled(mat, img=img)
 for s in 'DE':
     sm = bpy.data.objects['Sombra_'+s].data; src_ = sm.color_attributes['sombra']; al = np.array([d.color[0] for d in src_.data])

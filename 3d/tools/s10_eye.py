@@ -16,6 +16,7 @@ B.eye_texture = lambda **k: _tex0(path=ROOT + 'export/s10/olho_tex.png', **k)
 # S11: a esclera tem UMA cor só (o globo gira; se ela escurecesse longe da íris, ao olhar de lado apareceria um degrau contra a folha, que é fixa).
 # Quem escurece junto às pálpebras é a calota de sombra, presa a elas.
 B.COL['sclera_far'] = B.COL['sclera']; CONJ_IN, CONJ_MED, CONJ_LAT = B.COL['sclera'], (120, 62, 52), (100, 62, 54)
+UPPER_WALL = False                                   # S12 liga (s10_build)
 CONJ_BACK = 0.00035; SHELL_LIFT = 0.00045      # folha atrás e calota à frente do fundo G: 0,8 mm de folga. Com 0,3 mm a interpolação das duas malhas se cruzava e a sombra não cobria a folha
 
 def _branches(Q):
@@ -108,8 +109,24 @@ def shell(s, **k):
 def blink(s):
     B.blink(s); _fix_shadow_key(s)
 
+def wall_upper(s, col=(40, 18, 16)):
+    """S12: vista de baixo, a parede da pálpebra SUPERIOR (3 a 9 mm de profundidade, pálpebra encapuzada) aparecia como uma faixa cor de vinho de bordas duras.
+    Ela passa a ter a cor da sombra dos cílios, e lê como sombra da pálpebra. De frente a parede não aparece (é paralela ao olhar): nada muda de frente."""
+    ob = bpy.data.objects['Busto']; me = ob.data; m = bpy.data.materials.get('ParedePalpebraSup')
+    if not m:
+        m = bpy.data.materials.new('ParedePalpebraSup'); m.use_nodes = True; nt = m.node_tree; nt.nodes.clear(); em = nt.nodes.new('ShaderNodeEmission')
+        em.inputs['Color'].default_value = tuple((c/255.0)**2.2 for c in col) + (1,); o = nt.nodes.new('ShaderNodeOutputMaterial'); nt.links.new(em.outputs[0], o.inputs['Surface']); m.diffuse_color = tuple(c/255.0 for c in col) + (1,)
+    names = [x.name for x in me.materials]
+    if m.name not in names: me.materials.append(m); names.append(m.name)
+    mi, m0 = names.index(m.name), names.index('ParedePalpebra'); xs, zu, zl = B._margins(s); cx = B.CEN[s][0]; n = 0
+    for p_ in me.polygons:
+        if p_.material_index == m0 and abs(p_.center.x - cx) < 0.03:
+            zm = 0.5*(np.interp(p_.center.x, xs, zu) + np.interp(p_.center.x, xs, zl))
+            if p_.center.z > zm: p_.material_index = mi; n += 1
+    me.update(); print("PAREDE SUP %s: %d faces" % (s, n))
+
 def build(s, cx, cz, pitch=-5.0, yaw=0.0):
-    B.center(s, cx, cz); B.polar(s); B.subdiv(s); cut(s); B.rim(s); B.flat_materials(); B.wall_material(s); B.ball(s, pitch=pitch, yaw=yaw); _conj(s); tuck('Conj_'+s); shell(s); blink(s)
+    B.center(s, cx, cz); B.polar(s); B.subdiv(s); cut(s); B.rim(s); B.flat_materials(); B.wall_material(s); (wall_upper(s) if UPPER_WALL else None); B.ball(s, pitch=pitch, yaw=yaw); _conj(s); tuck('Conj_'+s); shell(s); blink(s)
     for nm in ('Olho_', 'Conj_', 'Sombra_'): bpy.data.objects[nm+s].parent = bpy.data.objects['Busto']
 
 globals().update({k: getattr(B, k) for k in dir(B) if not k.startswith('__') and k not in ('cut', 'build', 'shell', 'blink', 'B')})

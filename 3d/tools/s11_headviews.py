@@ -5,10 +5,10 @@ from mathutils import Vector, Matrix
 out = os.path.abspath(sys.argv[sys.argv.index("--")+1]); sc = bpy.context.scene
 for o in list(sc.objects):
     if o.type in ('LIGHT', 'CAMERA'): bpy.data.objects.remove(o)
-cam = bpy.data.objects.new('C', bpy.data.cameras.new('C')); sc.collection.objects.link(cam); sc.camera = cam; cam.data.type = 'ORTHO'; cam.data.ortho_scale = 0.34
+cam = bpy.data.objects.new('C', bpy.data.cameras.new('C')); sc.collection.objects.link(cam); sc.camera = cam; cam.data.type = 'ORTHO'; cam.data.ortho_scale = 0.40
 sc.render.resolution_x = sc.render.resolution_y = 640; sc.view_settings.view_transform = 'Standard'; sc.render.film_transparent = False
 sc.render.engine = 'BLENDER_WORKBENCH'; sh = sc.display.shading; tmp = os.environ.get('CLAUDE_JOB_DIR', '/tmp') + '/tmp/hv_'; files = []
-VIEWS = [('frente', 0, 0), ('3/4', 40, 0), ('perfil E', 90, 0), ('costas', 180, 0), ('topo', 0, -89.9)]
+VIEWS = [('frente', 0, 0), ('3/4', 40, 0), ('perfil E', 90, 0), ('perfil D', -90, 0), ('costas', 180, 0), ('topo', 0, -89.9), ('orelha E 3/4 tras', 130, 0), ('orelha D 3/4 tras', -130, 0)]
 for mode in ('tex', 'clay'):
     if mode == 'tex': sh.light = 'FLAT'; sh.color_type = 'TEXTURE'
     else: sh.light = 'STUDIO'; sh.color_type = 'SINGLE'; sh.single_color = (0.75, 0.72, 0.70); sh.show_cavity = True
