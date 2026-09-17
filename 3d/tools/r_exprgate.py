@@ -35,6 +35,10 @@ for m_ in bpy.data.materials:                                       # pele sem l
     t_ = next((n_ for n_ in m_.node_tree.nodes if n_.type == 'TEX_IMAGE'), None); o_ = next((n_ for n_ in m_.node_tree.nodes if n_.type == 'OUTPUT_MATERIAL'), None)
     if t_ and o_:
         em_ = m_.node_tree.nodes.new('ShaderNodeEmission'); m_.node_tree.links.new(t_.outputs['Color'], em_.inputs['Color']); m_.node_tree.links.new(em_.outputs[0], o_.inputs['Surface'])
+for mv_ in bpy.data.materials:                                       # material de exportação com cor por vértice (conjuntiva) vira emissão para a conferência
+    if mv_.use_nodes and mv_.name == 'Conjuntiva' and not any(n_.type == 'EMISSION' for n_ in mv_.node_tree.nodes):
+        vc_ = next(n_ for n_ in mv_.node_tree.nodes if n_.type == 'VERTEX_COLOR'); oo_ = next(n_ for n_ in mv_.node_tree.nodes if n_.type == 'OUTPUT_MATERIAL')
+        ee_ = mv_.node_tree.nodes.new('ShaderNodeEmission'); mv_.node_tree.links.new(vc_.outputs['Color'], ee_.inputs['Color']); mv_.node_tree.links.new(ee_.outputs[0], oo_.inputs['Surface'])
 sc.view_settings.view_transform = 'Standard'; sc.render.film_transparent = False
 if sc.world: sc.world.use_nodes = False; sc.world.color = (1, 1, 1)
 OTHERS = [x for x in bpy.data.objects if x.type == 'MESH' and x is not o and x.data.shape_keys]

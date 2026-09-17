@@ -5,7 +5,8 @@ import bpy, sys, os, numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 a = sys.argv[sys.argv.index("--")+1:]; src, outb, outg = a[0], os.path.abspath(a[1]), os.path.abspath(a[2]); ratio = float(a[3]) if len(a) > 3 else 0.10
 bpy.ops.wm.open_mainfile(filepath=os.path.abspath(src))
-import s08_eye as E, s08_expr as X
+import importlib
+E = importlib.import_module(os.environ.get('S_EYE', 's08_eye')); import s08_expr as X
 ob = bpy.data.objects['Busto']; me = ob.data; bpy.context.view_layer.objects.active = ob
 ob.shape_key_clear(); n0 = len(me.vertices)
 V = np.array([v.co[:] for v in me.vertices]); L = X.landmarks(); w = np.ones(n0)
@@ -45,6 +46,8 @@ for mat in bpy.data.materials:
         b = principled(mat, col=(0.016, 0.004, 0.003, 1)); ca = mat.node_tree.nodes.new('ShaderNodeVertexColor'); ca.layer_name = 'Col'; mat.node_tree.links.new(ca.outputs['Alpha'], b.inputs['Alpha'])
         try: mat.surface_render_method = 'BLENDED'
         except Exception: mat.blend_method = 'BLEND'
+    elif mat.name == 'Conjuntiva':
+        b = principled(mat); ca = mat.node_tree.nodes.new('ShaderNodeVertexColor'); ca.layer_name = 'cor'; mat.node_tree.links.new(ca.outputs['Color'], b.inputs['Base Color'])
     elif mat.name == 'ParedePalpebra': principled(mat, col=((62/255)**2.2, (28/255)**2.2, (25/255)**2.2, 1))
     elif img: principled(mat, img=img)
 for s in 'DE':

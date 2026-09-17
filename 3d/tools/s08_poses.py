@@ -6,6 +6,10 @@ bpy.ops.wm.open_mainfile(filepath=os.path.abspath(src)); sc = bpy.context.scene
 for e in ('BLENDER_EEVEE_NEXT', 'BLENDER_EEVEE'):
     try: sc.render.engine = e; break
     except TypeError: pass
+for mv_ in bpy.data.materials:                                       # material de exportação com cor por vértice (conjuntiva) vira emissão para a conferência
+    if mv_.use_nodes and mv_.name == 'Conjuntiva' and not any(n_.type == 'EMISSION' for n_ in mv_.node_tree.nodes):
+        vc_ = next(n_ for n_ in mv_.node_tree.nodes if n_.type == 'VERTEX_COLOR'); oo_ = next(n_ for n_ in mv_.node_tree.nodes if n_.type == 'OUTPUT_MATERIAL')
+        ee_ = mv_.node_tree.nodes.new('ShaderNodeEmission'); mv_.node_tree.links.new(vc_.outputs['Color'], ee_.inputs['Color']); mv_.node_tree.links.new(ee_.outputs[0], oo_.inputs['Surface'])
 sc.view_settings.view_transform = 'Standard'; sc.render.resolution_x, sc.render.resolution_y = 560, 700
 if sc.world: sc.world.use_nodes = False; sc.world.color = (0.05, 0.05, 0.06)
 for m_ in bpy.data.materials:                                       # materiais de exportação (Principled) viram emissão só para esta conferência

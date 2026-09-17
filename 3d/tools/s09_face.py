@@ -42,12 +42,14 @@ def restore_xz(nose_c=(0, -25, 138), nose_r=24, feather=8):
     N = V.copy(); N[:, 0] += w*D[:, 0]; N[:, 2] += w*D[:, 1]
     # a profundidade é reavaliada NA SUPERFÍCIE ESCULPIDA no novo (x, z): sem isso sobra micro-ruga (inclinação x deslize)
     import bmesh; from mathutils import Vector; from mathutils.bvhtree import BVHTree
-    bm = bmesh.new(); bm.from_mesh(_ob().data); bvh = BVHTree.FromBMesh(bm); bm.free(); nfix = 0
+    bm = bmesh.new(); bm.from_mesh(_ob().data); bvh = BVHTree.FromBMesh(bm); bm.free(); nfix = 0; nrev_ = 0
     for i in np.nonzero(np.hypot(*(N - V)[:, [0, 2]].T) > 2e-5)[0]:
         h = bvh.ray_cast(Vector((N[i, 0], -1.0, N[i, 2])), Vector((0, 1, 0)))
-        if h[0] is not None and abs(h[0].y - V[i, 1]) < 0.0010: N[i, 1] = h[0].y; nfix += 1      # salto maior = o raio pegou outra camada (borda de barba): mantém a profundidade antiga
-    nrev = 0
-    _set(N); print("   profundidade reavaliada: %d vertices; devolvidos ao original por esticar aresta: %d" % (nfix, nrev))
+        lim = 0.0008 + 1.5*float(np.hypot(N[i, 0] - V[i, 0], N[i, 2] - V[i, 2]))                  # tolerância proporcional ao deslize: em flanco inclinado a profundidade muda de verdade
+        if h[0] is not None and abs(h[0].y - V[i, 1]) < lim: N[i, 1] = h[0].y; nfix += 1
+        else: N[i] = V[i]; nrev_ += 1                                                         # o raio pegou outra camada (borda de barba): o vértice não se move; NUNCA deixar vértice fora da superfície
+    mv = np.nonzero(np.linalg.norm(N - V, axis=1) > 2e-5)[0]; off = np.array([bvh.find_nearest(Vector(N[i]))[3] for i in mv]) if len(mv) else np.zeros(1)
+    _set(N); print("   profundidade reavaliada na superficie: %d vertices; nao movidos (outra camada): %d; distancia a superficie esculpida: max %.3f mm, >0,1 mm: %d" % (nfix, nrev_, off.max()*1000, (off > 1e-4).sum()))
     m = np.hypot(*(N - V)[:, [0, 2]].T)*1000; print("RESTORE_XZ: %d vertices voltaram, media %.2f mm, max %.2f mm" % ((m > 0.01).sum(), m[m > 0.01].mean(), m.max()))
 
 # ------------------------------------------------------------------ 2. bigode cobre o lábio superior
@@ -78,3 +80,22 @@ def lower_lip(A=2.4, groove=1.0, sulcus=0.9):
     dy += sulcus*np.exp(-0.5*((z - (zb - 2.5))/2.2)**2)*tap                            # sulco mentolabial
     dy = np.where(front, dy, 0.0); V[:, 1] += dy/1000; _set(V)
     print("LOWER_LIP: %d vertices; para a frente ate %.2f mm, para tras ate %.2f mm" % ((np.abs(dy) > 1e-3).sum(), -dy.min(), dy.max()))
+
+# ------------------------------------------------------------------ 4. abertura do olho (F1: olho D deformado no scan)
+def eye_open(s='D', up=0.6, lo=0.5, H_up=9.0, H_lo=6.0):
+    """Na foto (ref-15, ref-21) as duas aberturas são iguais; no scan a do olho D é 15% mais baixa que a do E.
+    Campo vertical: a margem superior sobe `up` mm e a inferior desce `lo` mm no meio da fenda, zero nos cantos; a pele da
+    pálpebra acompanha com queda suave. O contorno traçado recebe o MESMO campo e vai para olhos_contorno_s09.json."""
+    C = json.load(open(ROOT + 'analise/gate/olhos_contorno_mao.json')); Q = np.array(C[s], float); i0, i1 = Q[:, 0].argmin(), Q[:, 0].argmax(); a, b = sorted((i0, i1))
+    c1 = Q[a:b+1]; c2 = np.r_[Q[b:], Q[:a+1]]; upc, loc = (c1, c2) if c1[:, 1].mean() > c2[:, 1].mean() else (c2, c1)
+    upc = upc[np.argsort(upc[:, 0])]; loc = loc[np.argsort(loc[:, 0])]; xa, xb = Q[:, 0].min(), Q[:, 0].max()
+    def field(x, z):
+        fr = np.clip((x - xa)/(xb - xa), 0, 1); bx = np.sin(np.pi*fr)**0.8; zu = np.interp(x, upc[:, 0], upc[:, 1]); zl = np.interp(x, loc[:, 0], loc[:, 1])
+        above = up*bx*(1 - _ss((z - zu)/H_up)); below = -lo*bx*(1 - _ss((zl - z)/H_lo)); sp = np.clip((z - zl)/np.maximum(zu - zl, 1e-6), 0, 1)
+        return np.where(z >= zu, above, np.where(z <= zl, below, -lo*bx + sp*(up + lo)*bx))
+    V = _V(); x, y, z = V[:, 0]*1000, V[:, 1]*1000, V[:, 2]*1000; reg = (x > xa - 1) & (x < xb + 1) & (y < 30) & (z > Q[:, 1].min() - H_lo) & (z < Q[:, 1].max() + H_up)
+    dz = np.where(reg, field(x, z), 0.0); V[:, 2] += dz/1000; _set(V)
+    Q2 = Q.copy(); Q2[:, 1] += field(Q[:, 0], Q[:, 1] + np.where(Q[:, 1] >= np.interp(Q[:, 0], upc[:, 0], upc[:, 1]) - 1e-6, 1e-6, -1e-6)); C[s] = Q2.round(2).tolist()
+    if 'olhos_contorno_s09' not in C.get('_doc', ''): C['_doc'] = C.get('_doc', '') + ' | olhos_contorno_s09: olho D com a abertura igualada a do E (s09_face.eye_open)'
+    json.dump(C, open(ROOT + 'analise/gate/olhos_contorno_s09.json', 'w'), indent=1)
+    h0 = (upc[:, 1].max() - loc[:, 1].min()); print("EYE_OPEN %s: %d vertices; abertura %.1f -> %.1f mm (olho E: 10.9 mm em 34.0 de largura; D tem %.1f de largura)" % (s, (np.abs(dz) > 1e-4).sum(), h0, h0 + up + lo, xb - xa))

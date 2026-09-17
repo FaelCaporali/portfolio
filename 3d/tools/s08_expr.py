@@ -6,7 +6,8 @@ Nomes ARKit. As sombras dos olhos recebem a mesma chave para seguir as pálpebra
 import bpy, json, math, numpy as np
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
-import s08_eye as E
+import os, importlib
+E = importlib.import_module(os.environ.get('S_EYE', 's08_eye'))          # S09: S_EYE=s09_eye
 ROOT = E.ROOT; W, S, CZ = 2400, 0.26, 0.165
 LM = dict(cornerR=61, cornerL=291, cheekR=205, cheekL=425, browInR=107, browInL=336, browMidR=105, browMidL=334, browOutR=70, browOutL=300,
           glabella=9, alaR=129, alaL=358, lipUp=0, lipLo=17, chin=152, foreheadR=67, foreheadL=297, malarR=117, malarL=346)
