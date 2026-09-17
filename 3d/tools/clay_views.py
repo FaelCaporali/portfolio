@@ -5,6 +5,8 @@ import bpy, sys, os, math, numpy as np
 from mathutils import Vector
 a = sys.argv[sys.argv.index("--")+1:]; out, tgt, dist, label, blends = a[0], Vector([float(v)/1000 for v in a[1].split(',')]), float(a[2]), a[3], a[4:]
 VIEWS = [('frente', 0, 0), ('3/4 D', -40, 0), ('perfil D', -90, 0), ('3/4 E', 40, 0), ('perfil E', 90, 0), ('baixo', 0, -45)]
+if os.environ.get('CV_SIDE'): VIEWS = [('perfil D', -90, 0), ('perfil E', 90, 0), ('topo', 0, 89), ('costas', 180, 0)]
+if os.environ.get('CV_BACK'): VIEWS = [('costas', 180, 0), ('3/4 costas D', -135, 0), ('3/4 costas E', 135, 0), ('perfil D', -90, 0), ('topo', 0, 80), ('costas alto', 180, 40)]
 tmp = os.path.join(os.path.dirname(os.path.abspath(out)), '_cv'); os.makedirs(tmp, exist_ok=True); files = []
 for bi, bf in enumerate(blends):
     bpy.ops.wm.open_mainfile(filepath=os.path.abspath(bf)); sc = bpy.context.scene; ob = bpy.data.objects['Busto']
