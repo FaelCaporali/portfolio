@@ -182,7 +182,7 @@ def shell(s, a_up=0.92, a_lo=0.50, a_med=0.92, a_lat=0.75, width=0.85, power=0.9
     pálpebra superior e no canto medial, como na foto (a esclera dele nunca é clara junto às pálpebras)."""
     nm = 'Sombra_'+s
     if nm in bpy.data.objects: bpy.data.objects.remove(bpy.data.objects[nm])
-    Q, _ = hole(s, shrink=0.0001); step = max(1, len(Q)//160); Q = Q[::step]; n = len(Q); cx, yc, cz = CEN[s]; ctr = Q.mean(0); Rl = R_EYE + lift
+    Q, _ = hole(s, shrink=-0.0005); step = max(1, len(Q)//200); Q = Q[::step]; n = len(Q); cx, yc, cz = CEN[s]; ctr = Q.mean(0); Rl = R_EYE + lift
     bm = bmesh.new(); col = bm.loops.layers.float_color.new('sombra'); V = []; A = []
     ang = np.arctan2(Q[:, 1]-ctr[1], (Q[:, 0]-ctr[0])*(1 if s == 'E' else -1))          # 0 = medial... espelhado por lado
     for r in range(rings+1):
@@ -242,3 +242,70 @@ def paint_caruncle(s, col=(96, 44, 36), col_lat=(52, 26, 22), mix=0.80, path=ROO
 
 def build(s, cx, cz, pitch=-5.0, yaw=0.0):
     center(s, cx, cz); subdiv(s); cut(s); rim(s); flat_materials(); paint_caruncle(s); ball(s, pitch=pitch, yaw=yaw); shell(s)
+
+# ---------------------------------------------------------------- piscar (shape key anatômica)
+ARKIT = {'D': 'eyeBlinkRight', 'E': 'eyeBlinkLeft'}
+def _margins(s):
+    """z da margem superior e inferior em função de x, pelo contorno COMPLETO da fenda (inclui a carúncula pintada: ao fechar,
+    as pálpebras se encontram até o canto medial e a escondem)."""
+    Q = spline(s, shrink=0.0003); i0, i1 = Q[:, 0].argmin(), Q[:, 0].argmax(); a, b = sorted((i0, i1))
+    c1 = Q[a:b+1]; c2 = np.r_[Q[b:], Q[:a+1]]; up, lo = (c1, c2) if c1[:, 1].mean() > c2[:, 1].mean() else (c2, c1)
+    up = up[np.argsort(up[:, 0])]; lo = lo[np.argsort(lo[:, 0])]; xs = np.linspace(Q[:, 0].min(), Q[:, 0].max(), 200)
+    zu = np.interp(xs, up[:, 0], up[:, 1]); zl = np.interp(xs, lo[:, 0], lo[:, 1]); return xs, np.maximum(zu, zl), np.minimum(zu, zl)
+
+def _blink_field(s, X, Z, share_lo=0.22, H_up=0.011, H_lo=0.007, taper=0.004, overlap=0.00015):
+    """Deslocamento vertical do fechamento para pontos (X, Z). Devolve dz e um rótulo: 1 pálpebra sup., -1 inf., 0 abertura."""
+    xs, zu, zl = _margins(s); xe = np.clip(X, xs[0], xs[-1]); out = np.maximum(np.abs(X - xe), 0.0)
+    g = 1 - np.clip(out/taper, 0, 1)**2*(3 - 2*np.clip(out/taper, 0, 1))                       # some além dos cantos
+    ZU = np.interp(xe, xs, zu); ZL = np.interp(xe, xs, zl); ZC = ZL + share_lo*(ZU - ZL)
+    sm = lambda u: 1 - np.clip(u, 0, 1)**2*(3 - 2*np.clip(u, 0, 1))
+    dz = np.zeros_like(Z); lab = np.zeros(len(Z), int)
+    up = Z >= ZU; lo = Z <= ZL; mid = ~up & ~lo
+    open_ = (ZU - ZL) > 2*overlap                                                              # nos cantos não há o que sobrepor
+    dz[up] = -((ZU - ZC) + overlap*open_)[up]*sm((Z - ZU)[up]/H_up); lab[up] = 1
+    dz[lo] = ((ZC - ZL) + overlap*open_)[lo]*sm((ZL - Z)[lo]/H_lo); lab[lo] = -1
+    sp = np.where(ZU - ZL > 1e-9, (Z - ZL)/np.maximum(ZU - ZL, 1e-9), 0.5); dz[mid] = (ZC - Z)[mid]   # dentro da abertura: colapsa na linha de fechamento
+    return dz*g, lab
+
+def _ysph(s, X, Z, R=None, kmax=0.98):
+    cx, yc, cz = CEN[s]; R = R or R_EYE; d2 = np.minimum((X-cx)**2 + (Z-cz)**2, (kmax*R)**2); return yc - np.sqrt(R**2 - d2)
+
+def blink(s):
+    ob = bpy.data.objects['Busto']; me = ob.data; cx, yc, cz = CEN[s]
+    if not me.shape_keys: ob.shape_key_add(name='Basis')
+    name = ARKIT[s]
+    if name in me.shape_keys.key_blocks: ob.shape_key_remove(me.shape_keys.key_blocks[name])
+    n = len(me.vertices); V = np.empty(n*3, np.float32); me.shape_keys.key_blocks[0].data.foreach_get('co', V); V = V.reshape(-1, 3).astype(np.float64)
+    N = np.empty(n*3, np.float32); me.vertices.foreach_get('normal', N); N = N.reshape(-1, 3)
+    gi = ob.vertex_groups['borda_'+s].index; wall = np.array([any(g.group == gi for g in v.groups) for v in me.vertices])
+    reg = (np.abs(V[:, 0]-cx) < 0.026) & (V[:, 2] > cz-0.020) & (V[:, 2] < cz+0.020) & (V[:, 1] < yc) & ((N[:, 1] < 0.35) | wall)
+    idx = np.nonzero(reg)[0]; X, Y, Z = V[idx, 0], V[idx, 1], V[idx, 2]
+    dz, lab = _blink_field(s, X, Z); Zn = Z + dz
+    h = _ysph(s, X, Z, kmax=0.72) - Y; Yn = _ysph(s, X, Zn, kmax=0.72) - h   # guia: só a zona central do globo; perto da silhueta a pálpebra mantém a própria profundidade
+    #                                          # mantém a espessura original da pálpebra sobre o globo
+    w_ = wall[idx]; Yn[w_] = _ysph(s, X[w_], Zn[w_]) + 0.0004
+    mv = np.abs(dz) > 1e-6; Yn[~mv] = Y[~mv]
+    K = V.copy(); K[idx, 1] = Yn; K[idx, 2] = Zn
+    kb = ob.shape_key_add(name=name, from_mix=False); kb.data.foreach_set('co', K.astype(np.float32).ravel())
+    d = np.linalg.norm(K - V, axis=1); print("BLINK %s (%s): %d vertices movem, max %.1f mm (sup. desce ate %.1f, inf. sobe ate %.1f mm)" % (s, name, (d > 1e-6).sum(), d.max()*1000, -dz[lab == 1].min()*1000 if (lab == 1).any() else 0, dz[lab == -1].max()*1000 if (lab == -1).any() else 0))
+    # a sombra acompanha as pálpebras
+    so = bpy.data.objects['Sombra_'+s]; sm_ = so.data
+    if not sm_.shape_keys: so.shape_key_add(name='Basis')
+    if name in sm_.shape_keys.key_blocks: so.shape_key_remove(sm_.shape_keys.key_blocks[name])
+    S = np.array([v.co[:] for v in sm_.vertices]); dzs, _ = _blink_field(s, S[:, 0], S[:, 2]); S2 = S.copy(); S2[:, 2] += dzs; S2[:, 1] = _ysph(s, S2[:, 0], S2[:, 2], R_EYE + 0.0003)
+    kb2 = so.shape_key_add(name=name, from_mix=False); kb2.data.foreach_set('co', S2.astype(np.float32).ravel())
+
+
+def wall_material(s, col=(62, 28, 25)):
+    """Paredes internas das pálpebras com material próprio (carne escura), em vez do pixel da margem esticado."""
+    ob = bpy.data.objects['Busto']; me = ob.data; m = bpy.data.materials.get('ParedePalpebra')
+    if not m:
+        m = bpy.data.materials.new('ParedePalpebra'); m.use_nodes = True; nt = m.node_tree; nt.nodes.clear()
+        em = nt.nodes.new('ShaderNodeEmission'); em.inputs['Color'].default_value = tuple((c/255.0)**2.2 for c in col) + (1,); o = nt.nodes.new('ShaderNodeOutputMaterial'); nt.links.new(em.outputs[0], o.inputs['Surface'])
+        m.diffuse_color = tuple(c/255.0 for c in col) + (1,)
+    if m.name not in [x.name for x in me.materials]: me.materials.append(m)
+    mi = [x.name for x in me.materials].index(m.name); gi = ob.vertex_groups['borda_'+s].index
+    inb = np.array([any(g.group == gi for g in v.groups) for v in me.vertices]); n = 0
+    for p_ in me.polygons:
+        if any(inb[i] for i in p_.vertices): p_.material_index = mi; n += 1
+    me.update(); print("PAREDE %s: %d faces com material proprio" % (s, n))
