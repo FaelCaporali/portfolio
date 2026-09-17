@@ -81,7 +81,7 @@ ec_r = np.mean([lmV(k) for k in (33, 133, 159, 145)], 0); ec_l = np.mean([lmV(k)
 mc = np.mean([lmV(k) for k in (61, 291, 13, 14)], 0)
 dr = np.linalg.norm(P - ec_r, axis=1); dl = np.linalg.norm(P - ec_l, axis=1)
 er = np.linalg.norm(lmV(33) - lmV(133))/2; el = np.linalg.norm(lmV(362) - lmV(263))/2
-soft_eye = ((dr < er*0.95) | (dl < el*0.95))
+EYS = float(os.environ.get('R_EYE_SOFT', '0.95')); soft_eye = ((dr < er*EYS) | (dl < el*EYS))
 ear = np.zeros(len(V), bool); ear[[i for i in range(NB)]] = False
 ears_g = H['g_idx'][list(H['g_names']).index('ears')]; ear[ears_g] = True
 zmin_t = min(v.co.z for v in sc.data.vertices)

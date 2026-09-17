@@ -9,13 +9,25 @@ if os.environ.get('CV_SIDE'): VIEWS = [('perfil D', -90, 0), ('perfil E', 90, 0)
 if os.environ.get('CV_BACK'): VIEWS = [('costas', 180, 0), ('3/4 costas D', -135, 0), ('3/4 costas E', 135, 0), ('perfil D', -90, 0), ('topo', 0, 80), ('costas alto', 180, 40)]
 tmp = os.path.join(os.path.dirname(os.path.abspath(out)), '_cv'); os.makedirs(tmp, exist_ok=True); files = []
 for bi, bf in enumerate(blends):
-    bpy.ops.wm.open_mainfile(filepath=os.path.abspath(bf)); sc = bpy.context.scene; ob = bpy.data.objects['Busto']
+    bpy.ops.wm.open_mainfile(filepath=os.path.abspath(bf)); sc = bpy.context.scene; ob = bpy.data.objects.get('Busto') or [o for o in bpy.data.objects if o.type == 'MESH'][0]
     for o in list(sc.objects):
         if o.type in ('LIGHT', 'CAMERA'): bpy.data.objects.remove(o)
-    sc.render.engine = 'BLENDER_WORKBENCH'; sh = sc.display.shading; sh.light = 'FLAT' if (os.environ.get('CV_TEX') or os.environ.get('CV_VCOL')) else 'STUDIO'; sh.color_type = 'VERTEX' if os.environ.get('CV_VCOL') else ('TEXTURE' if os.environ.get('CV_TEX') else 'SINGLE')
-    sh.single_color = (0.78, 0.76, 0.74); sh.show_cavity = False; sc.render.resolution_x = sc.render.resolution_y = 420
-    sc.view_settings.view_transform = 'Standard'; sc.render.film_transparent = False
-    sc.world = sc.world or bpy.data.worlds.new('W')
+    if os.environ.get('CV_MAT'):
+        try: sc.render.engine = 'BLENDER_EEVEE_NEXT'
+        except TypeError: sc.render.engine = 'BLENDER_EEVEE'
+        w = sc.world or bpy.data.worlds.new('W'); sc.world = w; w.use_nodes = True
+        bg = next(n for n in w.node_tree.nodes if n.type == 'BACKGROUND'); bg.inputs[0].default_value = (0.35, 0.36, 0.38, 1); bg.inputs[1].default_value = 1.2
+        for nm_, loc, en in (('S1', (0.6, -0.8, 0.9), 3.0), ('S2', (-0.8, -0.5, 0.4), 1.5)):
+            lt = bpy.data.lights.new(nm_, 'AREA'); lt.energy = en*40; lt.size = 1.2
+            lo = bpy.data.objects.new(nm_, lt); lo.location = loc; sc.collection.objects.link(lo)
+            lo.rotation_euler = (-Vector(loc)).to_track_quat('-Z', 'Y').to_euler()
+        sc.view_settings.view_transform = 'Standard'; sc.render.film_transparent = False
+        sc.render.resolution_x = sc.render.resolution_y = 420
+    else:
+     sc.render.engine = 'BLENDER_WORKBENCH'; sh = sc.display.shading; sh.light = 'FLAT' if (os.environ.get('CV_TEX') or os.environ.get('CV_VCOL')) else 'STUDIO'; sh.color_type = 'VERTEX' if os.environ.get('CV_VCOL') else ('TEXTURE' if os.environ.get('CV_TEX') else 'SINGLE')
+     sh.single_color = (0.78, 0.76, 0.74); sh.show_cavity = False; sc.render.resolution_x = sc.render.resolution_y = 420
+     sc.view_settings.view_transform = 'Standard'; sc.render.film_transparent = False
+     sc.world = sc.world or bpy.data.worlds.new('W')
     cam = bpy.data.objects.new('C', bpy.data.cameras.new('C')); sc.collection.objects.link(cam); sc.camera = cam; cam.data.lens = 85
     for vi, (nm, yaw, pitch) in enumerate(VIEWS):
         y, p = math.radians(yaw), math.radians(pitch)

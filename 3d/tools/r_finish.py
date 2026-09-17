@@ -106,17 +106,31 @@ for i in np.nonzero(inner)[0]:
     q = bvh.find_nearest(Vector(P[i]), 0.03)
     if q[0] is not None and (Vector(P[i]) - q[0]).dot(q[1]) > -0.001: P[i] = (q[0] - q[1]*0.0015)[:]; npush += 1
 me.vertices.foreach_set('co', P.astype(np.float32).ravel()); me.update(); print("R_FINISH internos empurrados para dentro:", npush)
-# globos oculares: esfera ajustada aos vértices do helper de cada olho
-Ve = np.array([v.co[:] for v in eo.data.vertices]); cen = Ve[:, 0] > 0
-bpy.data.objects.remove(eo); eyes_objs = []
-for side, sel in (('E', cen), ('D', ~cen)):
-    X_ = Ve[sel]; A_ = np.c_[2*X_, np.ones(len(X_))]; sol = np.linalg.lstsq(A_, (X_**2).sum(1), rcond=None)[0]
-    c = sol[:3]; r = np.sqrt(sol[3] + (c**2).sum())
-    bm2 = bmesh.new(); bm2.loops.layers.uv.new("UVMap"); bmesh.ops.create_uvsphere(bm2, u_segments=32, v_segments=16, radius=r, calc_uvs=True)
+# globos oculares: raio anatômico (12,2 mm x escala do alinhamento), centro entre os cantos do olho no scan,
+# frente (córnea) na profundidade da íris do scan; depois a pele das pálpebras é moldada por fora do globo
+bpy.data.objects.remove(eo)
+Lm = np.load(pre + "_lm.npz"); LP = {int(k): p for k, p in zip(Lm['mp_id'], Lm['pos'])}
+sim = S['sim']; R_EYE = 0.0122*float(sim[0]); CLR = 0.0008
+P = np.array([v.co[:] for v in me.vertices]); Nn = np.array([v.normal[:] for v in me.vertices])
+push = np.zeros_like(P)
+for side, (ca, cb, iris) in (('D', (33, 133, 468)), ('E', (263, 362, 473))):
+    mid = 0.5*(LP[ca] + LP[cb]); iy = LP[iris][1] if iris in LP else mid[1]
+    c = np.array([mid[0], iy + R_EYE, mid[2]])
+    bm2 = bmesh.new(); bm2.loops.layers.uv.new("UVMap"); bmesh.ops.create_uvsphere(bm2, u_segments=48, v_segments=24, radius=R_EYE, calc_uvs=True)
     em = bpy.data.meshes.new('Olho' + side); bm2.to_mesh(em); bm2.free()
     ob = bpy.data.objects.new('Olho' + side, em); ob.location = c; ob.rotation_euler = (1.5708, 0, 0); bpy.context.scene.collection.objects.link(ob)
     for p in em.polygons: p.use_smooth = True
-    print("R_FINISH olho %s centro %s raio %.1f mm" % (side, np.round(c*1000, 1), r*1000))
+    dv = P - c; dist = np.linalg.norm(dv, axis=1)
+    front = (-dv[:, 1] > 0.25*dist) & (dist < 0.03) & ~excl
+    inside = front & (dist < R_EYE + CLR)
+    push[inside] = (dv[inside]/dist[inside, None])*((R_EYE + CLR) - dist[inside])[:, None]
+    print("R_FINISH olho %s centro %s raio %.1f mm; pele empurrada: %d vertices, max %.1f mm" % (side, np.round(c*1000, 1), R_EYE*1000, inside.sum(), np.linalg.norm(push[inside], axis=1).max()*1000 if inside.any() else 0))
+# esfuma o empurrão em 2 anéis (sem degrau na pálpebra)
+pm = np.linalg.norm(push, axis=1) > 0
+for _ in range(4):
+    pn = np.array([push[nb[i]].mean(0) if nb[i] else push[i] for i in range(n)])
+    push = np.where(pm[:, None], push, 0.6*pn)
+P = P + push; me.vertices.foreach_set('co', P.astype(np.float32).ravel()); me.update()
 # shape keys de expressão: delta da base (transformado pela afim do NICP) subdividido e somado à forma final
 if os.environ.get('R_KEYS'):
     Hb = np.load(pre.rsplit('/', 1)[0] + '/human_base.npz', allow_pickle=True)   # gerado por r_human.py
@@ -138,7 +152,11 @@ if os.environ.get('R_KEYS'):
         kb = o.shape_key_add(name=k, from_mix=False); kb.data.foreach_set('co', (basis + subd(B0 + dl) - S0).astype(np.float32).ravel())
     bpy.data.objects.remove(tmp); print("R_FINISH shape keys:", len(names))
 # máscara das pálpebras (textura de pele, não do olho pintado do scan)
-lid = spread(S['soft_eye']).astype(np.float32)
+# máscara da pálpebra só na abertura do olho (não na órbita inteira), para repintar com pele
+Pv = np.array([v.co[:] for v in me.vertices]); lid = np.zeros(n, np.float32)
+for (ca, cb, up, dn) in ((33, 133, 159, 145), (263, 362, 386, 374)):
+    c0 = 0.5*(LP[ca] + LP[cb]); rr = 0.6*np.linalg.norm(LP[ca] - LP[cb])
+    lid[np.linalg.norm(Pv - c0, axis=1) < rr] = 1.0
 at = me.color_attributes.new('lid', 'FLOAT_COLOR', 'POINT'); at.data.foreach_set('color', np.repeat(lid, 4).reshape(-1, 4).ravel())
 # 4. corte da base
 bm = bmesh.new(); bm.from_mesh(me)

@@ -28,7 +28,7 @@ ZP = np.array(ZP) if ZP else np.zeros((0, 2), int)
 print("R_NICP ziper da boca: %d pares" % len(ZP))
 TV = T['V']*100; TN = T['N']; CLS = T['cls']
 ALL = len(sys.argv) > 5 and sys.argv[5] == 'all'
-selT = np.ones(len(TV), bool) if ALL else (CLS == 0)
+selT = (CLS != 1) if ALL else (CLS == 0)     # 'all' = pele + barba (o cabelo vira casca própria)
 kd = cKDTree(TV[selT]); TVs, TNs = TV[selT], TN[selT]                         # pares: pele (ou todo o alvo com 'all')
 kh = cKDTree(TV[CLS > 0]); TVh, TNh = TV[CLS > 0], TN[CLS > 0]               # cabelo/barba: só impede a pele de atravessar
 TMIN = float(sys.argv[3]) if len(sys.argv) > 3 else 0.3

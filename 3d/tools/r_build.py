@@ -15,6 +15,20 @@ for i in range(NB, len(V)):
     nb = kd.find_n(V0all[i], 6); w = np.array([1/(d + 1e-4) for _, _, d in nb]); w /= w.sum()
     Xm = sum(wk*X[j] for wk, (_, j, _) in zip(w, nb))
     V[i] = (np.r_[V0all[i]*100, 1] @ Xm)/100
+# orelhas: a MPFB as coloca à frente do lugar; alinhar pelo centro da orelha pintada no scan (classe pele na lateral)
+if os.environ.get('R_EARS', '1') == '1':
+    T = np.load(pre + "_tgt.npz"); TV = T['V']*1000; CL = T['cls']
+    Hb = np.load(hpre + "_base.npz", allow_pickle=True); ear_idx = Hb['g_idx'][list(Hb['g_names']).index('ears')]
+    Vmm = V*1000
+    for sgn, nm in ((1, 'E'), (-1, 'D')):
+        m = (CL == 0) & (sgn*TV[:, 0] > 60) & (TV[:, 1] > 100) & (TV[:, 1] < 195) & (TV[:, 2] > 108) & (TV[:, 2] < 200)
+        ei = ear_idx[sgn*Vmm[ear_idx, 0] > 0]
+        tgt_c = TV[m].mean(0); ear_c = Vmm[ei].mean(0); d = tgt_c - ear_c
+        w = np.zeros(len(V)); w[ei] = 1.0
+        dist = np.linalg.norm(Vmm - ear_c, axis=1); ring = (dist < 55) & (sgn*Vmm[:, 0] > 25) & (w == 0)
+        w[ring] = np.clip((55 - dist[ring])/30, 0, 1)**2
+        V = V + (w[:, None]*d)/1000
+        print("R_BUILD orelha %s: delta %s mm, %d vertices (anel %d)" % (nm, np.round(d, 1), int((w > 0).sum()), int(ring.sum())))
 EXPR = os.environ.get('R_EXPR', '')
 if EXPR:                                   # alvos de expressão do MPFB aplicados na forma base (deltas pela parte linear da afim)
     Hb = np.load(hpre + "_base.npz", allow_pickle=True); en = list(Hb['e_names']); ED = Hb['e_d']
