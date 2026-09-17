@@ -44,10 +44,15 @@ def op_restore(c, r, ref_blend, strength=1.0):
     mr = dst.meshes[0]; R = np.empty(len(mr.vertices)*3); mr.vertices.foreach_get('co', R); R = R.reshape(-1, 3); bpy.data.meshes.remove(mr)
     V = _V(); assert len(R) == len(V); w = _w(R, c, r)[:, None]*strength
     _set(V + w*(R - V)); _log('restore', c=c, r=r, ref=ref_blend, strength=strength); return int((w > 0).sum())
-def op_inflate(c, r, mm):
-    """Empurra ao longo da normal (mm > 0 para fora)."""
+def _nfilt(N, ndir, ndot):
+    if ndir is None: return 1.0
+    d = np.array(ndir, float); d /= np.linalg.norm(d); return np.clip(((N @ d) - ndot)/(1 - ndot), 0, 1)
+def op_inflate(c, r, mm, ndir=None, ndot=0.3):
+    """Empurra ao longo da normal (mm > 0 para fora). ndir: só vértices com normal apontando para ndir
+    (evita atingir dobras/superfícies de trás)."""
     me = _ob().data; V = _V(); N = np.empty(len(V)*3); me.vertices.foreach_get('normal', N); N = N.reshape(-1, 3)
-    _set(V + _w(V, c, r)[:, None]*N*mm/1000); _log('inflate', c=c, r=r, mm=mm)
+    w = _w(V, c, r)*_nfilt(N, ndir, ndot)
+    _set(V + w[:, None]*N*mm/1000); _log('inflate', c=c, r=r, mm=mm, ndir=ndir); return int((w > 0).sum())
 def op_diff(c, r, ref_blend):
     """Deslocamento (mm) desta malha em relação ao ref dentro da esfera: mediana, máx, média com sinal na normal."""
     with bpy.data.libraries.load(ref_blend) as (src, dst): dst.meshes = [src.meshes[0]]
@@ -70,3 +75,50 @@ def op_fill(c, r, strength=1.0, dry=False, ring=(0.65, 1.0)):
         w = _w(V, c, r)*strength; up = np.where(m & (gap > 0), gap, 0)*w
         _set(V + up[:, None]*n); _log('fill', c=c, r=r, strength=strength)
     return rep
+def op_symavg(c, r, strength=1.0, zmin=-9, zmax=9):
+    """Simetria por média: cada vértice vai para a média entre ele e o espelho da superfície oposta (x -> -x).
+    Remove elevações de um lado só sem escolher um lado 'certo'. Limites z em metros."""
+    ob = _ob(); V = _V(); w = _w(V, c, r)*((V[:, 2] > zmin) & (V[:, 2] < zmax))
+    bvh = BVHTree.FromObject(ob, bpy.context.evaluated_depsgraph_get()); V0 = V.copy()
+    for i in np.nonzero(w > 0)[0]:
+        q = bvh.find_nearest(Vector((-V0[i, 0], V0[i, 1], V0[i, 2])))[0]
+        if q is None: continue
+        V[i] = V0[i] + w[i]*strength*(0.5*(V0[i] + np.array((-q.x, q.y, q.z))) - V0[i])
+    _set(V); _log('symavg', c=c, r=r, strength=strength, zmin=zmin, zmax=zmax); return int((w > 0).sum())
+def op_smooth_mask(mask, strength=0.6, it=20, taubin=False, feather=6):
+    """Suavização com máscara por vértice (bool), borda esfumada por difusão no grafo. taubin=False encolhe
+    relevos (bom para cabelo 'preso')."""
+    V = _V(); E = _edges(); n = len(V); w = mask.astype(float)
+    for _ in range(feather): w = 0.5*w + 0.5*_lap(w[:, None], E, n)[:, 0]
+    w = w[:, None]*strength
+    for _ in range(it):
+        V = V + w*(_lap(V, E, n) - V)
+        if taubin: V = V - 1.03*w*(_lap(V, E, n) - V)
+    _set(V); _log('smooth_mask', n=int(mask.sum()), strength=strength, it=it, taubin=taubin); return int(mask.sum())
+def vert_lum():
+    """Luminância da textura ORIGINAL por vértice (export/toon06/base_vdata.npz) mapeada por proximidade."""
+    from mathutils.kdtree import KDTree
+    vd = np.load('export/toon06/base_vdata.npz'); Vb, lum = vd['V'], vd['lum']; kd = KDTree(len(Vb))
+    for i, p in enumerate(Vb): kd.insert(p, i)
+    kd.balance(); return np.array([lum[kd.find(p)[1]] for p in _V()])
+def op_subdivide(c=None, r=None, cuts=1):
+    """Subdivide (arestas inteiras dentro da esfera, ou a malha toda se c=None), com UV interpolado."""
+    import bmesh
+    me = _ob().data; bm = bmesh.new(); bm.from_mesh(me)
+    if c is None: es = bm.edges[:]
+    else:
+        C = Vector(np.array(c)/1000); es = [e for e in bm.edges if all((v.co - C).length < r/1000 for v in e.verts)]
+    bmesh.ops.subdivide_edges(bm, edges=es, cuts=cuts, use_grid_fill=True, use_only_quads=False)
+    bmesh.ops.triangulate(bm, faces=[f for f in bm.faces if len(f.verts) > 4])
+    bm.to_mesh(me); bm.free(); me.update(); _log('subdivide', c=c, r=r, cuts=cuts); return len(me.vertices)
+def op_crease(p0, p1, sigma, depth, r_end, ndir=None, ndot=0.3):
+    """Pincel Crease: sulco ao longo do segmento p0->p1 (mm). Perfil gaussiano (sigma mm) pela distância ao segmento
+    medida só em x (faca vertical no plano x = x do segmento), profundidade 'depth' mm para dentro da normal,
+    decaimento nas pontas (r_end mm além do segmento)."""
+    me = _ob().data; V = _V(); N = np.empty(len(V)*3); me.vertices.foreach_get('normal', N); N = N.reshape(-1, 3)
+    a, b = np.array(p0)/1000, np.array(p1)/1000; ab = b - a; t = np.clip(((V - a) @ ab)/(ab @ ab), 0, 1)
+    Q = a + t[:, None]*ab; dx = np.abs(V[:, 0] - Q[:, 0]); dq = np.linalg.norm((V - Q)[:, 1:], axis=1)
+    # só a superfície próxima do segmento (em y/z) e sem passar das pontas
+    tr = ((V - a) @ ab)/(ab @ ab); over = np.maximum(np.maximum(-tr, tr - 1)*np.linalg.norm(ab), 0)
+    w = np.exp(-(dx/(sigma/1000))**2) * np.exp(-(dq/0.004)**2) * np.clip(1 - over/(r_end/1000), 0, 1) * _nfilt(N, ndir, ndot)
+    _set(V - w[:, None]*N*depth/1000); _log('crease', p0=p0, p1=p1, sigma=sigma, depth=depth); return int((w > 0.1).sum())
