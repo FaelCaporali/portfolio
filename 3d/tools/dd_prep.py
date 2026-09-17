@@ -59,8 +59,9 @@ bmesh.ops.delete(bm, geom=[bm.faces[i] for i in range(nf0, nf0+nfill)], context=
 bmesh.ops.delete(bm, geom=[bm.verts[i] for i in np.nonzero(occl)[0]], context='VERTS')
 be = [e for e in bm.edges if e.is_boundary and e.verts[0].co.z > 0.045]; nf0 = len(bm.faces); old = set(bm.faces)
 bmesh.ops.holes_fill(bm, edges=be, sides=0); print("PREP buracos: %d arestas, %d faces novas" % (len(be), len(bm.faces)-nf0))
-uvl = bm.loops.layers.uv.active; nuv = 0
+uvl = bm.loops.layers.uv.active; nuv = 0; uvfix = bm.verts.layers.int.new('uvfix')
 for f in [f for f in bm.faces if f not in old]:             # faces novas herdam UV dos vértices (faces vizinhas antigas)
+    for v in f.verts: v[uvfix] = 1
     for l in f.loops:
         srcs = [l2[uvl].uv.copy() for l2 in l.vert.link_loops if l2.face in old]
         if srcs: l[uvl].uv = srcs[0]; nuv += 1
@@ -121,9 +122,10 @@ bm.to_mesh(mp.data); bm.free(); mp.data.update()
 # re-unwrap das regiões fundidas com a borda fixada (LSCM com pins): UVs sem sobreposição
 bpy.ops.object.mode_set(mode='EDIT'); bm2 = bmesh.from_edit_mesh(mp.data); uv2 = bm2.loops.layers.uv.active; bm2.verts.ensure_lookup_table()
 bpy.context.scene.tool_settings.use_uv_select_sync = True
+fx = bm2.verts.layers.int.get('uvfix'); fix = np.array([sel[v.index] or (fx is not None and v[fx] == 1) for v in bm2.verts])
 for f in bm2.faces:
-    f.select = any(sel[v.index] for v in f.verts)
-    for l in f.loops: l[uv2].pin_uv = not sel[l.vert.index]
+    f.select = any(fix[v.index] for v in f.verts)
+    for l in f.loops: l[uv2].pin_uv = not fix[l.vert.index]
 bmesh.update_edit_mesh(mp.data); bpy.ops.uv.unwrap(method='ANGLE_BASED', margin=0.001); bpy.ops.object.mode_set(mode='OBJECT')
 print("PREP re-unwrap das regioes macias: %d faces" % sum(1 for f in mp.data.polygons if f.select))
 V = np.array([v.co[:] for v in mp.data.vertices]); E = np.array([e.vertices[:] for e in mp.data.edges]); F = []

@@ -92,6 +92,16 @@ bk.use_pass_direct = False; bk.use_pass_indirect = False; bk.use_pass_color = Tr
 scan.hide_render = True; scan.hide_viewport = True
 bpy.ops.object.select_all(action='DESELECT'); sw.select_set(True); mp.select_set(True); bpy.context.view_layer.objects.active = mp
 bpy.ops.object.bake(type='DIFFUSE'); img.save(); print("BAKE cor ok")
+px = np.zeros(S*S*4, np.float32); img.pixels.foreach_get(px); al = px.reshape(S, S, 4)[:, :, 3]; uvl = mp.data.uv_layers.active.data; holes = []
+for p_ in mp.data.polygons:
+    u = np.mean([uvl[l].uv[:] for l in p_.loop_indices], 0); ix, iy = int(u[0]*S) % S, int(u[1]*S) % S
+    if al[iy, ix] < 0.5: holes.append(p_.center[:])
+holes = np.array(holes) if holes else np.zeros((0, 3))
+print("BAKE faces sem cor: %d; por altura z<0.05: %d, 0.05-0.10: %d, >0.10: %d; atras y>0.05: %d" % (len(holes), (holes[:,2] < 0.05).sum(), ((holes[:,2] >= 0.05) & (holes[:,2] < 0.10)).sum(), (holes[:,2] >= 0.10).sum(), (holes[:,1] > 0.05).sum()) if len(holes) else "BAKE sem furos")
+# segundo bake de alcance longo (nuca/pescoço onde o scan está longe); tex_inpaint usa onde o primeiro falhou
+img2 = bpy.data.images.new("BakeFar", S, S, alpha=True); img2.filepath_raw = os.path.abspath(out + "_tex_far.png"); img2.file_format = 'PNG'
+img2.pixels.foreach_set(np.zeros(S*S*4, np.float32)); tex.image = img2; bk.cage_extrusion = 0.02; bk.max_ray_distance = 0.15
+bpy.ops.object.bake(type='DIFFUSE'); img2.save(); tex.image = img; print("BAKE longo ok")
 isl = bpy.data.images.new("Islands", S, S); isl.filepath_raw = os.path.abspath(out + "_islands.png"); isl.file_format = 'PNG'
 me = bpy.data.materials.new("Emit"); me.use_nodes = True; ntm = me.node_tree
 for nd in list(ntm.nodes): ntm.nodes.remove(nd)
