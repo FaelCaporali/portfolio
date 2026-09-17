@@ -1,0 +1,156 @@
+[
+ {
+  "op": "restore",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-s02.blend",
+  "c": [
+   78,
+   40,
+   195
+  ],
+  "r": 32,
+  "ref": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "strength": 1.0
+ },
+ {
+  "op": "smooth",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-s02.blend",
+  "c": [
+   78,
+   40,
+   195
+  ],
+  "r": 30,
+  "strength": 0.5,
+  "it": 6,
+  "taubin": true
+ },
+ {
+  "op": "restore",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-s02.blend",
+  "c": [
+   98,
+   75,
+   205
+  ],
+  "r": 45,
+  "ref": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "strength": 1.0
+ },
+ {
+  "op": "smooth",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-s02.blend",
+  "c": [
+   98,
+   75,
+   205
+  ],
+  "r": 45,
+  "strength": 0.4,
+  "it": 4,
+  "taubin": true
+ },
+ {
+  "op": "restore",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-s02.blend",
+  "c": [
+   98,
+   75,
+   205
+  ],
+  "r": 45,
+  "ref": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "strength": 1.0
+ },
+ {
+  "op": "fill",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-s02.blend",
+  "c": [
+   70,
+   32,
+   188
+  ],
+  "r": 22,
+  "strength": 1.0
+ },
+ {
+  "op": "smooth",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-s02.blend",
+  "c": [
+   70,
+   32,
+   188
+  ],
+  "r": 24,
+  "strength": 0.3,
+  "it": 3,
+  "taubin": true
+ },
+ {
+  "op": "mirror",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-s02.blend",
+  "c": [
+   -37,
+   13,
+   180
+  ],
+  "r": 24,
+  "strength": 1.0
+ },
+ {
+  "op": "mirror",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-s02.blend",
+  "c": [
+   21,
+   -3,
+   127
+  ],
+  "r": 11,
+  "strength": 1.0
+ },
+ {
+  "op": "smooth",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-s02.blend",
+  "c": [
+   1,
+   -20,
+   121
+  ],
+  "r": 13,
+  "strength": 0.8,
+  "it": 12,
+  "taubin": true
+ },
+ {
+  "op": "smooth_beard",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-s03.blend",
+  "lum_thr": 0.35,
+  "zmax": 0.125,
+  "it": 25
+ },
+ {
+  "op": "smooth",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-s03.blend",
+  "c": [
+   72,
+   40,
+   208
+  ],
+  "r": 34,
+  "strength": 0.6,
+  "it": 12,
+  "taubin": true
+ },
+ {
+  "op": "smooth",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-s03.blend",
+  "c": [
+   0,
+   -8,
+   215
+  ],
+  "r": 16,
+  "strength": 0.6,
+  "it": 10,
+  "taubin": true
+ }
+]
