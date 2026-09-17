@@ -136,35 +136,6 @@
   "note": "F3 cabelo passa-banda"
  },
  {
-  "op": "sil",
-  "mask": "hair",
-  "args": [
-   [
-    "analise/pnp/ref-11.json",
-    "analise/pnp/ref-12.json",
-    "analise/pnp/ref-14.json",
-    "analise/pnp/ref-15.json"
-   ],
-   "grow",
-   3,
-   0.6,
-   12,
-   25
-  ],
-  "note": "F3 volume do cabelo (coque/laterais) at\u00e9 a silhueta das fotos"
- },
- {
-  "op": "bandpass",
-  "mask": "hair",
-  "args": [
-   60,
-   100,
-   0.5,
-   8
-  ],
-  "note": "F3 uniformiza o volume novo"
- },
- {
   "op": "cap_rebuild",
   "args": [
    0.0015,
@@ -188,7 +159,7 @@
     0
    ]
   ],
-  "note": "F4 dorso avan\u00e7a 1,2 mm (perfil ref-12)"
+  "note": "F4 dorso avança 1,2 mm (perfil ref-12)"
  },
  {
   "op": "grab",
@@ -205,7 +176,7 @@
     1.2
    ]
   ],
-  "note": "F4 ponta avan\u00e7a e sobe (n\u00e3o ca\u00edda)"
+  "note": "F4 ponta avança e sobe (não caída)"
  },
  {
   "op": "grab",
@@ -236,7 +207,7 @@
    0.2,
    3
   ],
-  "note": "F4 transi\u00e7\u00e3o"
+  "note": "F4 transição"
  },
  {
   "op": "subsurf",
@@ -254,7 +225,7 @@
    false,
    14
   ],
-  "note": "F5 barba uniforme (regi\u00e3o geom\u00e9trica, como S05)"
+  "note": "F5 barba uniforme (região geométrica, como S05)"
  },
  {
   "op": "smooth_mask",
@@ -265,7 +236,7 @@
    true,
    6
   ],
-  "note": "F5 bigode suave, l\u00e1bios preservados"
+  "note": "F5 bigode suave, lábios preservados"
  },
  {
   "op": "subsurf",
@@ -307,7 +278,7 @@
    0.5,
    15
   ],
-  "note": "F4 limpa dobra nariz-l\u00e1bio"
+  "note": "F4 limpa dobra nariz-lábio"
  },
  {
   "op": "smooth",
@@ -344,7 +315,7 @@
    ],
    0.4
   ],
-  "note": "F4 p\u00e9 D da columela"
+  "note": "F4 pé D da columela"
  },
  {
   "op": "grab_n",
@@ -367,7 +338,7 @@
    ],
    0.4
   ],
-  "note": "F4 p\u00e9 E da columela"
+  "note": "F4 pé E da columela"
  },
  {
   "op": "crease_n",
@@ -419,7 +390,7 @@
    ],
    0.4
   ],
-  "note": "F4 p\u00e9 D 2"
+  "note": "F4 pé D 2"
  },
  {
   "op": "grab_n",
@@ -442,7 +413,7 @@
    ],
    0.4
   ],
-  "note": "F4 p\u00e9 E 2"
+  "note": "F4 pé E 2"
  },
  {
   "op": "crease_n",

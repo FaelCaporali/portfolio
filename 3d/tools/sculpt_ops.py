@@ -295,3 +295,36 @@ def op_sil(mask, pnps, mode='grow', rounds=3, step=0.6, rit=12, clip_mm=25, DS=4
         ln = np.linalg.norm(disp, axis=1); disp *= (np.minimum(ln, clip_mm/1000)/np.maximum(ln, 1e-9))[:, None]
         _set(V + step*disp); out.append((r, 'max_mm', round(float(ln.max()*1000), 1)))
     _log('sil', mode=mode, pnps=pnps, rounds=rounds); return out
+def op_profile_fill(z_top, z_bot, x_half, f=0.7, band=(-6, 6), ndot=0.3, dry=False, wit=6):
+    """Preenche um sulco horizontal da frente (ex.: abaixo do lábio inferior) como uma régua esticada: em cada faixa
+    de x, a frente do perfil (menor y por altura) entre z_top e z_bot é comparada à reta que liga as frentes nas duas
+    alturas; os vértices da superfície frontal atrás dessa reta avançam uma fração f do vão. Peso em x ((1-(x/x_half)²)²),
+    taper em z nas pontas e peso esfumado no grafo. mm nas entradas. dry=True só mede o vão por faixa."""
+    me = _ob().data; V = _V(); N = np.empty(len(V)*3); me.vertices.foreach_get('normal', N); N = N.reshape(-1, 3)
+    P = V*1000; zt, zb = z_top, z_bot; bx = 2.0
+    reg = (np.abs(P[:, 0]) < x_half) & (P[:, 2] > zb - 8) & (P[:, 2] < zt + 4) & (N[:, 1] < -ndot)
+    xi = np.floor(P[:, 0]/bx).astype(int); zi = np.floor(P[:, 2]).astype(int)
+    front = {}
+    for k in np.nonzero(reg)[0]:
+        key = (xi[k], zi[k]); front[key] = min(front.get(key, 1e9), P[k, 1])
+    def fy(x, z0, z1):
+        vals = [front[(x, z)] for z in range(int(z0), int(z1)+1) if (x, z) in front]
+        return min(vals) if vals else None
+    gap = np.zeros(len(V)); rep = {}
+    for x in sorted(set(xi[reg])):
+        yt = fy(x, zt - 2, zt + 2); yb = fy(x, zb - 8, zb)
+        if yt is None or yb is None: continue
+        sel = np.nonzero(reg & (xi == x) & (P[:, 2] < zt) & (P[:, 2] > zb))[0]
+        for k in sel:
+            z = P[k, 2]; t = (zt - z)/(zt - zb); yl = yt + t*(yb - yt)
+            if P[k, 1] - front.get((x, zi[k]), P[k, 1]) > 3.0: continue     # só a camada da frente
+            g = P[k, 1] - yl
+            if g > 0: gap[k] = g
+        if len(sel): rep[int(x*bx)] = round(float(gap[sel].max()), 1)
+    if dry: return rep
+    wx = np.clip(1 - (P[:, 0]/x_half)**2, 0, 1)**2; t = np.clip((zt - P[:, 2])/(zt - zb), 0, 1); wz = np.sin(np.pi*t)**0.5
+    d = f*gap*wx*wz
+    E = _edges(); n = len(V)
+    for _ in range(wit): d = np.maximum(d, 0.5*d + 0.5*_lap(d[:, None], E, n)[:, 0])
+    _set(V + np.c_[np.zeros(n), -d/1000, np.zeros(n)]); _log('profile_fill', z_top=zt, z_bot=zb, x_half=x_half, f=f)
+    return dict(moved=int((d > 0.05).sum()), max_mm=float(d.max()), gaps=rep)

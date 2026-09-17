@@ -12,7 +12,7 @@ for bi, bf in enumerate(blends):
     bpy.ops.wm.open_mainfile(filepath=os.path.abspath(bf)); sc = bpy.context.scene; ob = bpy.data.objects['Busto']
     for o in list(sc.objects):
         if o.type in ('LIGHT', 'CAMERA'): bpy.data.objects.remove(o)
-    sc.render.engine = 'BLENDER_WORKBENCH'; sh = sc.display.shading; sh.light = 'STUDIO' if not os.environ.get('CV_TEX') else 'FLAT'; sh.color_type = 'TEXTURE' if os.environ.get('CV_TEX') else 'SINGLE'
+    sc.render.engine = 'BLENDER_WORKBENCH'; sh = sc.display.shading; sh.light = 'FLAT' if (os.environ.get('CV_TEX') or os.environ.get('CV_VCOL')) else 'STUDIO'; sh.color_type = 'VERTEX' if os.environ.get('CV_VCOL') else ('TEXTURE' if os.environ.get('CV_TEX') else 'SINGLE')
     sh.single_color = (0.78, 0.76, 0.74); sh.show_cavity = False; sc.render.resolution_x = sc.render.resolution_y = 420
     sc.view_settings.view_transform = 'Standard'; sc.render.film_transparent = False
     sc.world = sc.world or bpy.data.worlds.new('W')

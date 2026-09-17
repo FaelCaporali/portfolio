@@ -8,3 +8,7 @@ dist
 3d/export/toon05/*.npy
 3d/export/toon06/*.npy
 3d/export/toon06/base_nocap.blend
+# R01: intermediários do wrap (grandes); ficam só o blend final e a textura
+3d/export/r01/*
+!3d/export/r01/r01q_t.blend
+!3d/export/r01/r01p_patch.jpg
