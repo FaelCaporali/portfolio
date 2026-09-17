@@ -19,11 +19,29 @@ for d in ('head','eyes','nose','mouth','cheek','chin','forehead','eyebrows','ear
         TargetService.load_target(o, f, weight=0.0, name=os.path.basename(f).replace('.target.gz','')); n += 1
 # remover geometria de helpers (grupos 'helper*'/'joint*') e o corpo abaixo do pescoço
 top = max(v.co.z for v in o.data.vertices); zcut = top - 0.33
-helper_groups = {vg.index for vg in o.vertex_groups if vg.name.lower().startswith(('helper', 'joint', 'hair', 'eyebrow', 'eyelash', 'skirt', 'tights', 'ground'))}
+body_idx = o.vertex_groups['body'].index
 bpy.ops.object.mode_set(mode='EDIT'); bpy.ops.mesh.select_all(action='DESELECT'); bpy.ops.object.mode_set(mode='OBJECT')
 for v in o.data.vertices:
-    v.select = (v.co.z < zcut) or any(g.group in helper_groups and g.weight > 0.5 for g in v.groups)
+    v.select = (v.co.z < zcut) or v.index >= 13380   # basemesh MakeHuman: corpo = 0..13379, helpers depois
 bpy.ops.object.mode_set(mode='EDIT'); bpy.ops.mesh.delete(type='VERT'); bpy.ops.object.mode_set(mode='OBJECT')
+# manter só o maior componente conexo (remove tiras de sobrancelha/cílios)
+bm = bmesh.new(); bm.from_mesh(o.data); bm.verts.ensure_lookup_table()
+seen = set(); comps = []
+for v in bm.verts:
+    if v.index in seen: continue
+    stack = [v]; comp = []
+    while stack:
+        x = stack.pop()
+        if x.index in seen: continue
+        seen.add(x.index); comp.append(x)
+        for e in x.link_edges:
+            y = e.other_vert(x)
+            if y.index not in seen: stack.append(y)
+    comps.append(comp)
+comps.sort(key=len, reverse=True)
+small = [v for c in comps[1:] for v in c]
+print("MPFB componentes:", [len(c) for c in comps[:6]])
+bmesh.ops.delete(bm, geom=small, context='VERTS'); bm.to_mesh(o.data); bm.free()
 zmin = min(v.co.z for v in o.data.vertices); o.location.z = -zmin; bpy.ops.object.transform_apply(location=True)
 m=bpy.data.materials.new("Pele"); m.use_nodes=True
 b=next(n for n in m.node_tree.nodes if n.type=="BSDF_PRINCIPLED"); b.inputs["Base Color"].default_value=(0.62,0.45,0.35,1); b.inputs["Roughness"].default_value=0.7
