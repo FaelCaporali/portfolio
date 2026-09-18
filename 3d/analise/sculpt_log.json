@@ -2307,5 +2307,1292 @@
   ],
   "sigma": 0.8,
   "depth": 0.7
+ },
+ {
+  "op": "restore_mask",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "ref": "/home/fael/projects/portfolio/3d/blend/busto-s02.blend",
+  "n": 3401
+ },
+ {
+  "op": "smooth",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   0,
+   -8,
+   215
+  ],
+  "r": 16,
+  "strength": 0.6,
+  "it": 10,
+  "taubin": true
+ },
+ {
+  "op": "smooth",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   0,
+   -2,
+   234
+  ],
+  "r": 26,
+  "strength": 0.7,
+  "it": 30,
+  "taubin": true
+ },
+ {
+  "op": "smooth_mask",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "n": 109,
+  "strength": 0.6,
+  "it": 40,
+  "taubin": true
+ },
+ {
+  "op": "grab",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   38,
+   -4,
+   203
+  ],
+  "r": 18,
+  "delta": [
+   0,
+   2.5,
+   0
+  ]
+ },
+ {
+  "op": "grab",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   27,
+   -11,
+   202
+  ],
+  "r": 13,
+  "delta": [
+   0,
+   2.5,
+   0
+  ]
+ },
+ {
+  "op": "smooth",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   0,
+   -6,
+   222
+  ],
+  "r": 26,
+  "strength": 0.3,
+  "it": 4,
+  "taubin": true
+ },
+ {
+  "op": "scrape",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   -41.2,
+   10.0,
+   169.7
+  ],
+  "r": 12,
+  "target": 1.2
+ },
+ {
+  "op": "scrape",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   -19.7,
+   -1.1,
+   159.8
+  ],
+  "r": 12,
+  "target": 0.8
+ },
+ {
+  "op": "bandpass",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "n": 6344,
+  "it_detail": 80,
+  "it_low": 120
+ },
+ {
+  "op": "cap_rebuild",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "zcut": 0.03
+ },
+ {
+  "op": "bandpass",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "n": 1067,
+  "it_detail": 120,
+  "it_low": 150
+ },
+ {
+  "op": "restore_mask",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "ref": "/home/fael/projects/portfolio/3d/blend/busto-s02.blend",
+  "n": 3401
+ },
+ {
+  "op": "smooth",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   0,
+   -8,
+   215
+  ],
+  "r": 16,
+  "strength": 0.6,
+  "it": 10,
+  "taubin": true
+ },
+ {
+  "op": "smooth",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   0,
+   -2,
+   234
+  ],
+  "r": 26,
+  "strength": 0.7,
+  "it": 30,
+  "taubin": true
+ },
+ {
+  "op": "smooth_mask",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "n": 109,
+  "strength": 0.6,
+  "it": 40,
+  "taubin": true
+ },
+ {
+  "op": "grab",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   38,
+   -4,
+   203
+  ],
+  "r": 18,
+  "delta": [
+   0,
+   2.5,
+   0
+  ]
+ },
+ {
+  "op": "grab",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   27,
+   -11,
+   202
+  ],
+  "r": 13,
+  "delta": [
+   0,
+   2.5,
+   0
+  ]
+ },
+ {
+  "op": "smooth",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   0,
+   -6,
+   222
+  ],
+  "r": 26,
+  "strength": 0.3,
+  "it": 4,
+  "taubin": true
+ },
+ {
+  "op": "scrape",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   -41.2,
+   10.0,
+   169.7
+  ],
+  "r": 12,
+  "target": 1.2
+ },
+ {
+  "op": "scrape",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   -19.7,
+   -1.1,
+   159.8
+  ],
+  "r": 12,
+  "target": 0.8
+ },
+ {
+  "op": "bandpass",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "n": 6344,
+  "it_detail": 80,
+  "it_low": 120
+ },
+ {
+  "op": "restore_mask",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "ref": "/home/fael/projects/portfolio/3d/blend/busto-s02.blend",
+  "n": 3401
+ },
+ {
+  "op": "smooth",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   0,
+   -8,
+   215
+  ],
+  "r": 16,
+  "strength": 0.6,
+  "it": 10,
+  "taubin": true
+ },
+ {
+  "op": "smooth",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   0,
+   -2,
+   234
+  ],
+  "r": 26,
+  "strength": 0.7,
+  "it": 30,
+  "taubin": true
+ },
+ {
+  "op": "smooth_mask",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "n": 109,
+  "strength": 0.6,
+  "it": 40,
+  "taubin": true
+ },
+ {
+  "op": "grab",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   38,
+   -4,
+   203
+  ],
+  "r": 18,
+  "delta": [
+   0,
+   2.5,
+   0
+  ]
+ },
+ {
+  "op": "grab",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   27,
+   -11,
+   202
+  ],
+  "r": 13,
+  "delta": [
+   0,
+   2.5,
+   0
+  ]
+ },
+ {
+  "op": "smooth",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   0,
+   -6,
+   222
+  ],
+  "r": 26,
+  "strength": 0.3,
+  "it": 4,
+  "taubin": true
+ },
+ {
+  "op": "scrape",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   -41.2,
+   10.0,
+   169.7
+  ],
+  "r": 12,
+  "target": 1.2
+ },
+ {
+  "op": "scrape",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   -19.7,
+   -1.1,
+   159.8
+  ],
+  "r": 12,
+  "target": 0.8
+ },
+ {
+  "op": "bandpass",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "n": 6344,
+  "it_detail": 80,
+  "it_low": 120
+ },
+ {
+  "op": "restore_mask",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "ref": "/home/fael/projects/portfolio/3d/blend/busto-s02.blend",
+  "n": 3401
+ },
+ {
+  "op": "smooth",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   0,
+   -8,
+   215
+  ],
+  "r": 16,
+  "strength": 0.6,
+  "it": 10,
+  "taubin": true
+ },
+ {
+  "op": "smooth",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   0,
+   -2,
+   234
+  ],
+  "r": 26,
+  "strength": 0.7,
+  "it": 30,
+  "taubin": true
+ },
+ {
+  "op": "smooth_mask",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "n": 109,
+  "strength": 0.6,
+  "it": 40,
+  "taubin": true
+ },
+ {
+  "op": "grab",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   38,
+   -4,
+   203
+  ],
+  "r": 18,
+  "delta": [
+   0,
+   2.5,
+   0
+  ]
+ },
+ {
+  "op": "grab",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   27,
+   -11,
+   202
+  ],
+  "r": 13,
+  "delta": [
+   0,
+   2.5,
+   0
+  ]
+ },
+ {
+  "op": "smooth",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   0,
+   -6,
+   222
+  ],
+  "r": 26,
+  "strength": 0.3,
+  "it": 4,
+  "taubin": true
+ },
+ {
+  "op": "scrape",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   -41.2,
+   10.0,
+   169.7
+  ],
+  "r": 12,
+  "target": 1.2
+ },
+ {
+  "op": "scrape",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   -19.7,
+   -1.1,
+   159.8
+  ],
+  "r": 12,
+  "target": 0.8
+ },
+ {
+  "op": "bandpass",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "n": 6344,
+  "it_detail": 80,
+  "it_low": 120
+ },
+ {
+  "op": "cap_rebuild",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "zplane": 0.0015
+ },
+ {
+  "op": "smooth_mask",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "n": 1019,
+  "strength": 0.5,
+  "it": 150,
+  "taubin": false
+ },
+ {
+  "op": "smooth_mask",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "n": 78,
+  "strength": 0.5,
+  "it": 40,
+  "taubin": true
+ },
+ {
+  "op": "restore_mask",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "ref": "/home/fael/projects/portfolio/3d/blend/busto-s02.blend",
+  "n": 3401
+ },
+ {
+  "op": "smooth",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   0,
+   -8,
+   215
+  ],
+  "r": 16,
+  "strength": 0.6,
+  "it": 10,
+  "taubin": true
+ },
+ {
+  "op": "smooth",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   0,
+   -2,
+   234
+  ],
+  "r": 26,
+  "strength": 0.7,
+  "it": 30,
+  "taubin": true
+ },
+ {
+  "op": "smooth_mask",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "n": 109,
+  "strength": 0.6,
+  "it": 40,
+  "taubin": true
+ },
+ {
+  "op": "grab",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   38,
+   -4,
+   203
+  ],
+  "r": 18,
+  "delta": [
+   0,
+   2.5,
+   0
+  ]
+ },
+ {
+  "op": "grab",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   27,
+   -11,
+   202
+  ],
+  "r": 13,
+  "delta": [
+   0,
+   2.5,
+   0
+  ]
+ },
+ {
+  "op": "smooth",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   0,
+   -6,
+   222
+  ],
+  "r": 26,
+  "strength": 0.3,
+  "it": 4,
+  "taubin": true
+ },
+ {
+  "op": "scrape",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   -41.2,
+   10.0,
+   169.7
+  ],
+  "r": 12,
+  "target": 1.2
+ },
+ {
+  "op": "scrape",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   -19.7,
+   -1.1,
+   159.8
+  ],
+  "r": 12,
+  "target": 0.8
+ },
+ {
+  "op": "bandpass",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "n": 6344,
+  "it_detail": 80,
+  "it_low": 120
+ },
+ {
+  "op": "cap_rebuild",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "zplane": 0.0015
+ },
+ {
+  "op": "grab",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   1,
+   -22,
+   156
+  ],
+  "r": 14,
+  "delta": [
+   0,
+   -1.2,
+   0
+  ]
+ },
+ {
+  "op": "grab",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   1,
+   -30,
+   137
+  ],
+  "r": 11,
+  "delta": [
+   0,
+   -2.0,
+   1.2
+  ]
+ },
+ {
+  "op": "grab",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   1,
+   -25,
+   127
+  ],
+  "r": 7,
+  "delta": [
+   0,
+   -0.6,
+   1.8
+  ]
+ },
+ {
+  "op": "smooth",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   1,
+   -26,
+   133
+  ],
+  "r": 14,
+  "strength": 0.2,
+  "it": 3,
+  "taubin": true
+ },
+ {
+  "op": "smooth_mask",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "n": 6115,
+  "strength": 0.5,
+  "it": 150,
+  "taubin": false
+ },
+ {
+  "op": "smooth_mask",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "n": 467,
+  "strength": 0.5,
+  "it": 40,
+  "taubin": true
+ },
+ {
+  "op": "inflate",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   18,
+   -8,
+   126
+  ],
+  "r": 7,
+  "mm": 1.2,
+  "ndir": [
+   1,
+   -0.6,
+   0
+  ]
+ },
+ {
+  "op": "smooth",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   0,
+   -19,
+   123
+  ],
+  "r": 11,
+  "strength": 0.5,
+  "it": 15,
+  "taubin": true
+ },
+ {
+  "op": "smooth",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   -9,
+   -15,
+   123
+  ],
+  "r": 7,
+  "strength": 0.5,
+  "it": 10,
+  "taubin": true
+ },
+ {
+  "op": "grab_n",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   -2.6,
+   -20,
+   124
+  ],
+  "r": 3.5,
+  "delta": [
+   0,
+   -0.45,
+   -0.45
+  ],
+  "ndir": [
+   0,
+   -0.3,
+   -1
+  ]
+ },
+ {
+  "op": "grab_n",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   2.6,
+   -20,
+   124
+  ],
+  "r": 3.5,
+  "delta": [
+   0,
+   -0.45,
+   -0.45
+  ],
+  "ndir": [
+   0,
+   -0.3,
+   -1
+  ]
+ },
+ {
+  "op": "crease_n",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "p0": [
+   0,
+   -18.5,
+   122
+  ],
+  "p1": [
+   0,
+   -22,
+   125.5
+  ],
+  "sigma": 0.9,
+  "depth": 0.7
+ },
+ {
+  "op": "grab_n",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   -2.6,
+   -20,
+   124
+  ],
+  "r": 3.5,
+  "delta": [
+   0,
+   -0.35,
+   -0.35
+  ],
+  "ndir": [
+   0,
+   -0.3,
+   -1
+  ]
+ },
+ {
+  "op": "grab_n",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   2.6,
+   -20,
+   124
+  ],
+  "r": 3.5,
+  "delta": [
+   0,
+   -0.35,
+   -0.35
+  ],
+  "ndir": [
+   0,
+   -0.3,
+   -1
+  ]
+ },
+ {
+  "op": "crease_n",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "p0": [
+   0,
+   -18.5,
+   122
+  ],
+  "p1": [
+   0,
+   -22,
+   125.5
+  ],
+  "sigma": 0.8,
+  "depth": 0.7
+ },
+ {
+  "op": "restore_mask",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "ref": "/home/fael/projects/portfolio/3d/blend/busto-s02.blend",
+  "n": 3401
+ },
+ {
+  "op": "smooth",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   0,
+   -8,
+   215
+  ],
+  "r": 16,
+  "strength": 0.6,
+  "it": 10,
+  "taubin": true
+ },
+ {
+  "op": "smooth",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   0,
+   -2,
+   234
+  ],
+  "r": 26,
+  "strength": 0.7,
+  "it": 30,
+  "taubin": true
+ },
+ {
+  "op": "smooth_mask",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "n": 109,
+  "strength": 0.6,
+  "it": 40,
+  "taubin": true
+ },
+ {
+  "op": "grab",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   38,
+   -4,
+   203
+  ],
+  "r": 18,
+  "delta": [
+   0,
+   2.5,
+   0
+  ]
+ },
+ {
+  "op": "grab",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   27,
+   -11,
+   202
+  ],
+  "r": 13,
+  "delta": [
+   0,
+   2.5,
+   0
+  ]
+ },
+ {
+  "op": "smooth",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   0,
+   -6,
+   222
+  ],
+  "r": 26,
+  "strength": 0.3,
+  "it": 4,
+  "taubin": true
+ },
+ {
+  "op": "scrape",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   -41.2,
+   10.0,
+   169.7
+  ],
+  "r": 12,
+  "target": 1.2
+ },
+ {
+  "op": "scrape",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   -19.7,
+   -1.1,
+   159.8
+  ],
+  "r": 12,
+  "target": 0.8
+ },
+ {
+  "op": "bandpass",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "n": 6344,
+  "it_detail": 80,
+  "it_low": 120
+ },
+ {
+  "op": "sil",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "mode": "grow",
+  "pnps": [
+   "analise/pnp/ref-11.json",
+   "analise/pnp/ref-12.json",
+   "analise/pnp/ref-14.json",
+   "analise/pnp/ref-15.json"
+  ],
+  "rounds": 3
+ },
+ {
+  "op": "bandpass",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "n": 6199,
+  "it_detail": 60,
+  "it_low": 100
+ },
+ {
+  "op": "cap_rebuild",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "zplane": 0.0015
+ },
+ {
+  "op": "grab",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   1,
+   -22,
+   156
+  ],
+  "r": 14,
+  "delta": [
+   0,
+   -1.2,
+   0
+  ]
+ },
+ {
+  "op": "grab",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   1,
+   -30,
+   137
+  ],
+  "r": 11,
+  "delta": [
+   0,
+   -2.0,
+   1.2
+  ]
+ },
+ {
+  "op": "grab",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   1,
+   -25,
+   127
+  ],
+  "r": 7,
+  "delta": [
+   0,
+   -0.6,
+   1.8
+  ]
+ },
+ {
+  "op": "smooth",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   1,
+   -26,
+   133
+  ],
+  "r": 14,
+  "strength": 0.2,
+  "it": 3,
+  "taubin": true
+ },
+ {
+  "op": "smooth_mask",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "n": 6115,
+  "strength": 0.5,
+  "it": 150,
+  "taubin": false
+ },
+ {
+  "op": "smooth_mask",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "n": 467,
+  "strength": 0.5,
+  "it": 40,
+  "taubin": true
+ },
+ {
+  "op": "inflate",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   18,
+   -8,
+   126
+  ],
+  "r": 7,
+  "mm": 1.2,
+  "ndir": [
+   1,
+   -0.6,
+   0
+  ]
+ },
+ {
+  "op": "smooth",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   0,
+   -19,
+   123
+  ],
+  "r": 11,
+  "strength": 0.5,
+  "it": 15,
+  "taubin": true
+ },
+ {
+  "op": "smooth",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   -9,
+   -15,
+   123
+  ],
+  "r": 7,
+  "strength": 0.5,
+  "it": 10,
+  "taubin": true
+ },
+ {
+  "op": "grab_n",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   -2.6,
+   -20,
+   124
+  ],
+  "r": 3.5,
+  "delta": [
+   0,
+   -0.45,
+   -0.45
+  ],
+  "ndir": [
+   0,
+   -0.3,
+   -1
+  ]
+ },
+ {
+  "op": "grab_n",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   2.6,
+   -20,
+   124
+  ],
+  "r": 3.5,
+  "delta": [
+   0,
+   -0.45,
+   -0.45
+  ],
+  "ndir": [
+   0,
+   -0.3,
+   -1
+  ]
+ },
+ {
+  "op": "crease_n",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "p0": [
+   0,
+   -18.5,
+   122
+  ],
+  "p1": [
+   0,
+   -22,
+   125.5
+  ],
+  "sigma": 0.9,
+  "depth": 0.7
+ },
+ {
+  "op": "grab_n",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   -2.6,
+   -20,
+   124
+  ],
+  "r": 3.5,
+  "delta": [
+   0,
+   -0.35,
+   -0.35
+  ],
+  "ndir": [
+   0,
+   -0.3,
+   -1
+  ]
+ },
+ {
+  "op": "grab_n",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "c": [
+   2.6,
+   -20,
+   124
+  ],
+  "r": 3.5,
+  "delta": [
+   0,
+   -0.35,
+   -0.35
+  ],
+  "ndir": [
+   0,
+   -0.3,
+   -1
+  ]
+ },
+ {
+  "op": "crease_n",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-base.blend",
+  "p0": [
+   0,
+   -18.5,
+   122
+  ],
+  "p1": [
+   0,
+   -22,
+   125.5
+  ],
+  "sigma": 0.8,
+  "depth": 0.7
+ },
+ {
+  "op": "profile_fill",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-s06b.blend",
+  "z_top": 104,
+  "z_bot": 44,
+  "x_half": 46.0,
+  "f": 0.55
+ },
+ {
+  "op": "smooth",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-s06b.blend",
+  "c": [
+   0,
+   -14,
+   84
+  ],
+  "r": 30,
+  "strength": 0.4,
+  "it": 6,
+  "taubin": true
+ },
+ {
+  "op": "profile_fill",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-s07a.blend",
+  "z_top": 107,
+  "z_bot": 74,
+  "x_half": 34,
+  "f": 0.7
+ },
+ {
+  "op": "smooth",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-s07a.blend",
+  "c": [
+   0,
+   -18,
+   94
+  ],
+  "r": 20,
+  "strength": 0.4,
+  "it": 5,
+  "taubin": true
+ },
+ {
+  "op": "profile_fill",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-s06b.blend",
+  "z_top": 104,
+  "z_bot": 44,
+  "x_half": 46,
+  "f": 0.55
+ },
+ {
+  "op": "smooth",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-s06b.blend",
+  "c": [
+   0,
+   -14,
+   84
+  ],
+  "r": 30,
+  "strength": 0.4,
+  "it": 6,
+  "taubin": true
+ },
+ {
+  "op": "profile_fill",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-s06b.blend",
+  "z_top": 107,
+  "z_bot": 74,
+  "x_half": 34,
+  "f": 0.7
+ },
+ {
+  "op": "smooth",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-s06b.blend",
+  "c": [
+   0,
+   -18,
+   94
+  ],
+  "r": 20,
+  "strength": 0.4,
+  "it": 5,
+  "taubin": true
+ },
+ {
+  "op": "smooth",
+  "file": "/home/fael/projects/portfolio/3d/blend/busto-s06b.blend",
+  "c": [
+   0,
+   -15,
+   85
+  ],
+  "r": 34,
+  "strength": 0.5,
+  "it": 12,
+  "taubin": true
  }
 ]

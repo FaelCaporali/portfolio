@@ -1,19 +1,61 @@
+# ---- site
 node_modules
 dist
 *.local
 .DS_Store
 *.tsbuildinfo
 
-# bakes de geometria (npy ~200 MB)
-3d/export/toon05/*.npy
-3d/export/toon06/*.npy
-3d/export/toon06/base_nocap.blend
-# R01: intermediários do wrap (grandes); ficam só o blend final e a textura
-3d/export/r01/*
-!3d/export/r01/r01q_t.blend
-!3d/export/r01/r01p_patch.jpg
+# ---- 3d: LISTA DE PERMISSÃO. Tudo em 3d/ é ignorado por padrão; só entra no git o que é
+# fonte, receita, entrega aprovada ou evidência curada. Iterações intermediárias, capturas,
+# scans brutos, renders de processo e caches ficam no disco (e no backup em /data/portfolio-backup).
+3d/**
+!3d/*.md
+!3d/tools/
+!3d/tools/**
+!3d/docs/
+!3d/docs/**
+# fontes e entregas (base S07 = escultura sobre o scan; S13 = busto base aprovado; NPC01 = cartoon riggado)
+!3d/blend/
+!3d/blend/busto-s07.blend
+!3d/blend/busto-s13.blend
+!3d/blend/toon-npc-01.blend
+!3d/blend/mpfb-02.json
+!3d/export/
+!3d/export/s13/
+!3d/export/s13/busto-s13.glb
+!3d/export/s13/pele_s13.jpg
+!3d/export/npc01/
+!3d/export/npc01/**
+!3d/renders/
+!3d/renders/s13_demo.mp4
+# referências fotográficas (só as usadas pelas ferramentas de medição)
+!3d/referencias/
+!3d/referencias/upload-02/
+!3d/referencias/upload-02/**
+# análise: documentos, dados de medição, calibrações e folhas curadas
+!3d/analise/
+!3d/analise/*.md
+!3d/analise/*.json
+!3d/analise/face_landmarker.task
+!3d/analise/pnp/
+!3d/analise/pnp/**
+!3d/analise/gate/
+!3d/analise/gate/*.json
+!3d/analise/gate/olho_*_regua.jpg
+!3d/analise/aud/
+!3d/analise/aud/*.md
+!3d/analise/aud/*.txt
+!3d/analise/aud/cmp_*.jpg
+!3d/analise/aud/s1?_*.jpg
+!3d/analise/aud13/
+!3d/analise/aud13/*.txt
+!3d/analise/aud13/cmp_*.jpg
+!3d/analise/aud13/s13_*.jpg
+!3d/analise/clay/
+!3d/analise/clay/s13_*.jpg
+!3d/analise/clay/npc01_*.jpg
+# nunca
 *.blend1
-
-# caches e quadros temporários
 __pycache__/
 3d/renders/*.frames/
+3d/tools/__pycache__/
