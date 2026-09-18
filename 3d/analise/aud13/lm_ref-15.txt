@@ -1,0 +1,25 @@
+
+
+[INFO ] services.locationservice ...............: Not adding link to MakeHuman user data, since neither explicit path nor auto-discovery is set in preferences.
+[INFO ] mpfb.init ..............................: Build info 20260722
+[INFO ] mpfb.init ..............................: MPFB initialization has finished.
+MEDIDA                    foto   lm_ref-15_busto-s1   lm_ref-15_busto-s1
+boca largura             50.8      55.2 ( +8.5%)      55.2 ( +8.5%)
+labio sup espessura       6.1       4.8 (-21.5%)       4.8 (-20.1%)
+labio inf espessura      10.6       9.3 (-11.6%)       9.4 (-11.0%)
+boca altura              17.2      14.6 (-15.1%)      14.9 (-13.6%)
+nariz largura            45.9      47.9 ( +4.3%)      48.1 ( +4.7%)
+nariz altura             56.7      61.6 ( +8.6%)      61.1 ( +7.7%)
+olho D abertura          10.7      11.0 ( +2.9%)      11.1 ( +4.2%)
+olho E abertura          10.4      10.8 ( +3.3%)      11.0 ( +5.0%)
+olho D largura           31.5      32.1 ( +1.8%)      32.0 ( +1.5%)
+olho E largura           31.5      31.9 ( +1.1%)      31.9 ( +1.3%)
+sobrancelhas dist        30.4      30.5 ( +0.4%)      30.4 ( +0.1%)
+rosto largura           141.5     143.9 ( +1.7%)     143.3 ( +1.3%)
+rosto altura            179.2     195.8 ( +9.3%)     195.2 ( +9.0%)
+boca-queixo              33.1      40.8 (+23.6%)      40.6 (+22.9%)
+nariz-boca               21.0      22.5 ( +7.0%)      22.3 ( +6.5%)
+ERRO MEDIO (% da interocular) lm_ref-15_busto-s11.png: boca 1.7%, olhos 2.4%, nariz 1.9%, oval 4.3%
+ERRO MEDIO (% da interocular) lm_ref-15_busto-s13.png: boca 1.7%, olhos 2.3%, nariz 1.7%, oval 4.4%
+
+

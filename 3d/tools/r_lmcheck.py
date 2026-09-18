@@ -13,6 +13,11 @@ for bf in blends:
     for o in list(sc.objects):
         if o.type in ('LIGHT', 'CAMERA'): bpy.data.objects.remove(o)
     sc.render.engine = 'BLENDER_WORKBENCH'; sh = sc.display.shading; sh.light = 'FLAT'; sh.color_type = 'TEXTURE'
+    if os.environ.get('LM_EEVEE'):   # materiais reais (olhos, conjuntiva) com luz de mundo uniforme
+        for e_ in ('BLENDER_EEVEE_NEXT', 'BLENDER_EEVEE'):
+            try: sc.render.engine = e_; break
+            except TypeError: pass
+        sc.world = sc.world or bpy.data.worlds.new('W'); sc.world.use_nodes = False; sc.world.color = (0.85, 0.85, 0.85)
     sc.view_settings.view_transform = 'Standard'; sc.render.film_transparent = False
     sc.world = sc.world or bpy.data.worlds.new('W')
     cam = bpy.data.objects.new('CamPnP', bpy.data.cameras.new('CamPnP')); sc.collection.objects.link(cam); sc.camera = cam

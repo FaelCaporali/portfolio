@@ -9,12 +9,18 @@ def run(expr=True, name='s10', head=False):
     F.F9.restore_xz(); F.F9.moustache(); F.lower_lip(); F.mirror_eye()
     if head:
         import s11_head; H = importlib.reload(s11_head); V0 = H._V(); H.dome(smooth=120 if head == 's12' else 0)                                 # S11: crânio arredondado e laterais estreitas (só cabelo)
-        if head == 's12':
-            H.sides(); H.sides(); H.relax(V0); H.ears(); H.width_report()
-            import s12_tex; TX = importlib.reload(s12_tex); TX.top_patch(); TX.nostril()                                   # S12: remendo cinza do topo vira cabelo                                           # S12: cabelo atrás das orelhas medido contra a foto de longe (ref-22)
+        if head in ('s12', 's13'):
+            H.sides(); H.sides(); H.relax(V0)
+            if head == 's12': H.ears()                                           # S13 (P0 da auditoria): sem aba de orelha e sem narina repintada
+            H.width_report()
+            import s12_tex; TX = importlib.reload(s12_tex); TX.top_patch(out='export/%s/pele_%s.jpg' % (name, name))
+            if head == 's12': TX.nostril()                                   # S12: remendo cinza do topo vira cabelo                                           # S12: cabelo atrás das orelhas medido contra a foto de longe (ref-22)
+    os.environ['S_CONT'] = 's10'
+    if head == 's13':
+        import s13_face; importlib.reload(s13_face).asym_D(); os.environ['S_CONT'] = 's13'                     # P1: olho D com a assimetria real da ref-15
     c = ROOT + 'analise/gate/olhos_centro_s10.json'
     if os.path.exists(c): os.remove(c)
-    import s10_eye; E = importlib.reload(s10_eye); E.UPPER_WALL = (head == 's12')
+    import s10_eye; E = importlib.reload(s10_eye); E.UPPER_WALL = (head in ('s12', 's13'))
     E.build('D', F.CD[0], F.CD[1], pitch=-5, yaw=3.4); E.build('E', F.CE[0], F.CE[1], pitch=-5, yaw=-3.4)
     if expr:
         import s08_expr; X = importlib.reload(s08_expr); X.build_all()

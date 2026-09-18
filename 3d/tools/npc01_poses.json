@@ -1,0 +1,6 @@
+{
+ "A": {"upperarm01.R": [0, -40, -80], "upperarm02.R": [0, 0, -20], "lowerarm01.R": [-70, 0, 0], "lowerarm02.R": [-20, 0, 0], "wrist.R": [0, 0, -20],
+       "head": [0, 0, 10], "neck01": [0, 0, 5], "spine03": [0, 0, -3], "upperarm01.L": [0, 0, 25], "lowerarm01.L": [-20, 0, 0]},
+ "B": {"upperleg01.L": [-30, 0, 0], "lowerleg01.L": [20, 0, 0], "upperleg01.R": [20, 0, 0], "lowerleg01.R": [35, 0, 0], "spine02": [0, 15, 0], "spine03": [5, 10, 0],
+       "upperarm01.R": [-60, 0, 20], "lowerarm01.R": [-40, 0, 0], "upperarm01.L": [30, 0, 25], "lowerarm01.L": [-30, 0, 0], "head": [0, -15, 0], "neck01": [0, -8, 0]}
+}

@@ -7,7 +7,7 @@ from mathutils.bvhtree import BVHTree
 import s09_eye as B
 B = importlib.reload(B)
 ROOT = B.ROOT
-B.CONT = json.load(open(ROOT + 'analise/gate/olhos_contorno_s10.json')); B.CENF = ROOT + 'analise/gate/olhos_centro_s10.json'
+B.CONT = json.load(open(ROOT + 'analise/gate/olhos_contorno_%s.json' % os.environ.get('S_CONT', 's10')))   # S13: contorno D com assimetria da foto; B.CENF = ROOT + 'analise/gate/olhos_centro_s10.json'
 B.CEN.clear(); B.CEN.update(json.load(open(B.CENF)) if os.path.exists(B.CENF) else {}); B.POL.clear()
 _tex0 = B.eye_texture
 B.eye_texture = lambda **k: _tex0(path=ROOT + 'export/s10/olho_tex.png', **k)
