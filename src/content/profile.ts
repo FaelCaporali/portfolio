@@ -41,6 +41,12 @@ export const directContacts: DirectContact[] = [
   { kind: 'phone', label: 'WhatsApp', value: '+55 31 99196-2016', href: 'https://wa.me/5531991962016' },
 ]
 
+/** Código deste portfólio. PLACEHOLDER: o repositório público ainda não existe; trocar pela URL definitiva. */
+export const sourceLink: ProfileLink = {
+  label: 'View source on GitHub',
+  href: 'https://github.com/FaelCaporali/portfolio',
+}
+
 /** Abrem em outra aba. */
 export const profileLinks: ProfileLink[] = [
   { label: 'LinkedIn', href: 'https://www.linkedin.com/in/faelcaporali/' },

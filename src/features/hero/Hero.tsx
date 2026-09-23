@@ -3,6 +3,7 @@ import { stages } from '../../content/journey'
 import { profile } from '../../content/profile'
 import { cyclicAt } from '../../lib/array'
 import { HeroCopy } from './HeroCopy'
+import { SourceLink } from './SourceLink'
 import { useDragRotation } from './hooks/useDragRotation'
 import { useFreeArea } from './hooks/useFreeArea'
 import { usePointerGaze } from './hooks/usePointerGaze'
@@ -57,6 +58,13 @@ export function Hero() {
           {profile.name}
         </a>
       </header>
+
+      {/* Largo: o canto superior direito está livre (o botão de contato fica embaixo). Alinhado ao nome; discreto:
+          só o ícone apagado, sem contorno nem fundo, com área de toque de 44 px. */}
+      <SourceLink
+        className="absolute top-2.5 right-8 hidden h-11 w-11 items-center justify-center rounded-full text-white/50 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white lg:flex"
+        iconClassName="h-5 w-5"
+      />
 
       <HeroCopy ref={text} stage={stage} leaving={phase === 'out'} />
     </section>
