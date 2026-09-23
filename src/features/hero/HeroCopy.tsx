@@ -5,7 +5,6 @@ import { pill } from '../../ui/pill'
 import { CopyContacts } from '../contact/CopyContacts'
 import { useFitFontSize } from './hooks/useFitFontSize'
 import { ResumeMenu } from './ResumeMenu'
-import { SourceLink } from './SourceLink'
 import { SlotWord } from './SlotWord'
 
 interface HeroCopyProps {
@@ -68,9 +67,8 @@ export function HeroCopy({ ref, stage, leaving }: HeroCopyProps) {
         >
           {journeyLink.label} <span aria-hidden>→</span>
         </a>
-        {/* Abaixo de 360 px os quatro não cabem numa linha: grade 2×2 em vez de um órfão. O atalho do código fica aqui
-            até o largo; lá ele vai para o canto superior direito (Hero). */}
-        <ul className="grid w-full grid-cols-2 gap-1.5 min-[360px]:flex min-[360px]:w-auto min-[360px]:flex-wrap sm:gap-2">
+        {/* Três pílulas: cabem numa linha desde 320 px. */}
+        <ul className="flex flex-wrap gap-1.5 sm:gap-2">
           <li>
             <ResumeMenu className={pill} />
           </li>
@@ -84,12 +82,6 @@ export function HeroCopy({ ref, stage, leaving }: HeroCopyProps) {
               </a>
             </li>
           ))}
-          <li className="lg:hidden">
-            <SourceLink
-              className="flex h-9 w-9 items-center justify-center rounded-full text-white/50 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-              iconClassName="h-4.5 w-4.5"
-            />
-          </li>
         </ul>
       </nav>
       {/* Contato direto sempre à vista; clique copia (o formulário e os links ficam no botão flutuante). */}

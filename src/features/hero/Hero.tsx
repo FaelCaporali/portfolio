@@ -80,10 +80,10 @@ export function Hero() {
         </div>
       </header>
 
-      {/* Largo: o canto superior direito está livre (o botão de contato fica embaixo). Alinhado ao nome; discreto:
-          só o ícone apagado, sem contorno nem fundo, com área de toque de 44 px. */}
+      {/* Canto superior direito em todos os tamanhos (o contato fica embaixo). Alinhado ao nome; discreto: só o ícone
+          apagado, sem contorno nem fundo, com área de toque de 44 px. */}
       <SourceLink
-        className="absolute top-2.5 right-8 hidden h-11 w-11 items-center justify-center rounded-full text-white/50 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white lg:flex"
+        className="absolute top-2.5 right-3 flex h-11 w-11 items-center justify-center rounded-full text-white/50 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:right-8"
         iconClassName="h-5 w-5"
       />
 
