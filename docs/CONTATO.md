@@ -14,22 +14,22 @@ navegador ── POST /api/contact ──▶ Worker ──▶ D1 (grava) ──�
                             cron */15 min: reenvia pendentes, apaga > 90 dias
 ```
 
-| Arquivo                            | Papel                                                                                    |
-| ---------------------------------- | ---------------------------------------------------------------------------------------- |
-| `shared/contact/contract.ts`       | contrato com o site: rota, ação do Turnstile, limites, campos, resposta, códigos de erro |
-| `shared/contact/validation.ts`     | limpeza e validação dos campos (funções puras, usadas pelo Worker e pelo widget)         |
-| `worker/index.ts`                  | roteamento (`/api/contact`, 404 JSON no resto de `/api/`, assets) e cron                 |
-| `worker/contact.ts`                | o endpoint: ordem das checagens, respostas, logs sem dado pessoal                        |
-| `worker/http.ts`                   | resposta JSON endurecida, leitura do corpo com teto                                      |
-| `worker/turnstile.ts`              | conferência do token no servidor                                                         |
-| `worker/message.ts`                | a mensagem e a política: tentativas, retenção, teto diário                               |
-| `worker/repository.ts`             | D1 (consultas parametrizadas)                                                            |
-| `worker/mail.ts`                   | composição do e-mail (só texto) e envio pela binding                                     |
-| `worker/cron.ts`                   | reenvio de pendentes e limpeza após 90 dias                                              |
-| `worker/migrations/`               | esquema do D1 (`messages`)                                                               |
-| `src/components/ContactWidget.tsx` | formulário + atalhos (e-mail e WhatsApp)                                                 |
-| `src/components/CopyContacts.tsx`  | linha do herói: clique copia e-mail/telefone                                             |
-| `public/_headers`                  | cabeçalhos de segurança do site (CSP etc.)                                               |
+| Arquivo                                  | Papel                                                                                    |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `shared/contact/contract.ts`             | contrato com o site: rota, ação do Turnstile, limites, campos, resposta, códigos de erro |
+| `shared/contact/validation.ts`           | limpeza e validação dos campos (funções puras, usadas pelo Worker e pelo widget)         |
+| `worker/index.ts`                        | roteamento (`/api/contact`, 404 JSON no resto de `/api/`, assets) e cron                 |
+| `worker/contact.ts`                      | o endpoint: ordem das checagens, respostas, logs sem dado pessoal                        |
+| `worker/http.ts`                         | resposta JSON endurecida, leitura do corpo com teto                                      |
+| `worker/turnstile.ts`                    | conferência do token no servidor                                                         |
+| `worker/message.ts`                      | a mensagem e a política: tentativas, retenção, teto diário                               |
+| `worker/repository.ts`                   | D1 (consultas parametrizadas)                                                            |
+| `worker/mail.ts`                         | composição do e-mail (só texto) e envio pela binding                                     |
+| `worker/cron.ts`                         | reenvio de pendentes e limpeza após 90 dias                                              |
+| `worker/migrations/`                     | esquema do D1 (`messages`)                                                               |
+| `src/features/contact/ContactWidget.tsx` | formulário + atalhos (e-mail e WhatsApp)                                                 |
+| `src/features/contact/CopyContacts.tsx`  | linha do herói: clique copia e-mail/telefone                                             |
+| `public/_headers`                        | cabeçalhos de segurança do site (CSP etc.)                                               |
 
 O e-mail vai para `fael@caporali.dev` (destino verificado; o roteamento entrega no Gmail). Assim a mensagem chega
 "para" o endereço profissional e a resposta sai por ele ("Enviar como" + "responder do mesmo endereço", docs/EMAIL.md).

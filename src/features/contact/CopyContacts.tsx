@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { directContacts, type DirectContact } from '../content/profile'
+import { directContacts, type DirectContact } from '../../content/profile'
 
 /** Área de transferência (exige HTTPS ou localhost, o que o site sempre é). */
 async function copyText(text: string): Promise<boolean> {

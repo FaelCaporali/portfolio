@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useId, useRef, useState, type SubmitEvent } from 'react'
-import { directContacts } from '../content/profile'
+import { directContacts } from '../../content/profile'
 import {
   CONTACT_PATH,
   LIMITS,
@@ -8,10 +8,10 @@ import {
   type ContactRequest,
   type ContactResponse,
   type Field,
-} from '../../shared/contact/contract'
-import { parseContact } from '../../shared/contact/validation'
+} from '../../../shared/contact/contract'
+import { parseContact } from '../../../shared/contact/validation'
 import { SITEKEY, loadTurnstile } from './turnstile'
-import { useDismiss } from './useDismiss'
+import { useDismiss } from '../../ui/useDismiss'
 
 type Status = { kind: 'idle' } | { kind: 'sending' } | { kind: 'sent' } | { kind: 'error'; text: string }
 

@@ -2,11 +2,11 @@ import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
-import bustUrl from '../../3d/export/s13/busto-s13.glb?url'
-import type { Expression, PropId } from '../content/journey'
+import bustUrl from '../../../../3d/export/s13/busto-s13.glb?url'
+import type { Expression, PropId } from '../../../content/journey'
 import { dissolveUniforms, withDissolve } from './dissolve'
 import { Vortex } from './Vortex'
-import { Props } from './Props'
+import { Props } from './props/Props'
 
 /** Pivô de rotação da cabeça: base do pescoço, no espaço do glb (Y para cima, rosto para +Z). */
 const PIVOT = new THREE.Vector3(0, 0.05, -0.13)

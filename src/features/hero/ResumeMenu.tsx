@@ -1,6 +1,6 @@
 import { useCallback, useId, useRef, useState } from 'react'
-import { resumes } from '../content/profile'
-import { useDismiss } from '../components/useDismiss'
+import { resumes } from '../../content/profile'
+import { useDismiss } from '../../ui/useDismiss'
 
 /**
  * Botão do currículo: abre a escolha de idioma e o clique já baixa o PDF.

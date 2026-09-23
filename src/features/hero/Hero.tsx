@@ -3,11 +3,11 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import { ResumeMenu } from './ResumeMenu'
-import { Bust, DRAG_MAX_PITCH, DRAG_MAX_YAW, type DragState } from './Bust'
-import { DISSOLVE_MAX, dissolveUniforms } from './dissolve'
-import { stages, type Stage } from '../content/journey'
-import { journeyLink, profile, profileLinks } from '../content/profile'
-import { CopyContacts } from '../components/CopyContacts'
+import { Bust, DRAG_MAX_PITCH, DRAG_MAX_YAW, type DragState } from './scene/Bust'
+import { DISSOLVE_MAX, dissolveUniforms } from './scene/dissolve'
+import { stages, type Stage } from '../../content/journey'
+import { journeyLink, profile, profileLinks } from '../../content/profile'
+import { CopyContacts } from '../contact/CopyContacts'
 
 /** Tempos do carrossel (s). A primeira vida fica mais tempo: é o que quem chega lê primeiro. */
 const HOLD_FIRST = 4.5

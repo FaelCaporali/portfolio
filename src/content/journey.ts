@@ -21,7 +21,7 @@ export interface Stage {
   /** Pergunta da entrevista que ainda falta responder. */
   pending?: string
   accent: string
-  /** Adereço da vida (blockout em src/hero/Props.tsx). */
+  /** Adereço da vida (blockout em src/features/hero/scene/props/). */
   prop: PropId
   expr: Expression
 }

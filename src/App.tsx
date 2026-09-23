@@ -1,5 +1,5 @@
-import { Hero } from './hero/Hero'
-import { ContactWidget } from './components/ContactWidget'
+import { Hero } from './features/hero/Hero'
+import { ContactWidget } from './features/contact/ContactWidget'
 
 export default function App() {
   return (
