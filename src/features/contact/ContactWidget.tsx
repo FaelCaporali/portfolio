@@ -4,9 +4,9 @@ import { DirectContacts } from './DirectContacts'
 
 /**
  * Contato flutuante, em todas as páginas: formulário que envia direto (Worker → fael@caporali.dev) e, abaixo, e-mail e
- * WhatsApp à vista. Sempre no canto inferior direito, abrindo para cima. Celular: botão redondo de 56 px só com o
- * balão de conversa, na zona do polegar, acima da margem de segurança do iPhone (o nome "Contact me" continua para
- * leitor de tela). Largo: pílula com ícone e texto.
+ * WhatsApp à vista. Sempre no canto inferior direito, abrindo para cima. Celular: botão redondo só com o balão de
+ * conversa, na zona do polegar, acima da margem de segurança do iPhone (o nome "Contact me" continua para leitor de
+ * tela); 56 px, ou 48 px até 360 px de largura, onde encostava na linha de contato. Largo: pílula com ícone e texto.
  */
 export function ContactWidget() {
   const { open, root, panelId, triggerProps } = usePopover()
@@ -19,12 +19,12 @@ export function ContactWidget() {
     >
       <button
         {...triggerProps}
-        className="flex h-14 w-14 cursor-pointer items-center justify-center gap-2 rounded-full border border-white/25 bg-[#16161b]/90 text-sm font-medium text-white shadow-lg backdrop-blur-md transition-colors hover:border-white/60 hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white lg:h-auto lg:w-auto lg:bg-white/10 lg:px-5 lg:py-3"
+        className="flex h-12 w-12 cursor-pointer items-center justify-center gap-2 rounded-full border border-white/25 bg-[#16161b]/90 text-sm font-medium text-white shadow-lg backdrop-blur-md transition-colors hover:border-white/60 hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white min-[361px]:h-14 min-[361px]:w-14 lg:h-auto lg:w-auto lg:bg-white/10 lg:px-5 lg:py-3"
       >
         <svg
           aria-hidden
           viewBox="0 0 24 24"
-          className="h-6 w-6 lg:h-5 lg:w-5"
+          className="h-5 w-5 min-[361px]:h-6 min-[361px]:w-6 lg:h-5 lg:w-5"
           fill="none"
           stroke="currentColor"
           strokeWidth="1.8"
