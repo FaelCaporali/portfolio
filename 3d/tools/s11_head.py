@@ -7,7 +7,8 @@ Medido no S10 (unidades do scan; o scan é ~1,2x o tamanho real, então só vale
 Método: em cada fatia coronal (y constante) a superfície do cabelo é levada, radialmente a partir de (x0, ZC), para uma elipse de
 semieixos a(y) (meia-largura alvo) e c(y) (altura do topo, a atual). Só vértices de cabelo (cor da textura), com a máscara esfumada.
 Deslocamento radial no plano xz: o vértice leva o UV junto, a textura não escorrega."""
-import bpy, numpy as np
+import bpy, os, numpy as np
+GATE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'analise', 'gate')
 ZC = 0.205; X0 = 0.001                                   # nível da maior largura (logo acima das orelhas) e linha média
 def _V():
     me = bpy.data.objects['Busto'].data; V = np.empty(len(me.vertices)*3, np.float32); me.vertices.foreach_get('co', V); return V.reshape(-1, 3).astype(np.float64)
@@ -77,7 +78,7 @@ def dome(narrow=0.885, y_a=0.045, y_b=0.095, lift=0.007, nth=24, dy=0.006, smoot
 
 
 # ------------------------------------------------------------------ S12: laterais atrás das orelhas, medidas contra a foto de longe
-def sides(y_a=0.100, y_b=0.135, ear_gap=0.003, smooth=200, json_path='/home/fael/projects/portfolio/3d/analise/gate/ref22_largura.json'):
+def sides(y_a=0.100, y_b=0.135, ear_gap=0.003, smooth=200, json_path=os.path.join(GATE, 'ref22_largura.json')):
     """A conferência do S11 usou fotos de perto (0,36 m): em perspectiva a metade de trás da cabeça some atrás do rosto, então a largura do
     cabelo atrás das orelhas ficou sem medida. A ref-22 foi tirada de longe (quase ortográfica): largura total da silhueta por altura, em
     unidades de distância interpupilar (tools: medição gravada em analise/gate/ref22_largura.json). Aqui o cabelo atrás das orelhas
@@ -106,7 +107,7 @@ def sides(y_a=0.100, y_b=0.135, ear_gap=0.003, smooth=200, json_path='/home/fael
     me.vertices.foreach_set('co', N.astype(np.float32).ravel()); me.update()
     d = np.abs(N[:, 0] - V[:, 0])*1000; print("SIDES: fator min %.3f (lado E) %.3f (lado D); %d vertices, medio %.1f mm, max %.1f mm" % (K[:, 0].min(), K[:, 1].min(), (d > 0.05).sum(), d[d > 0.05].mean(), d.max()))
 
-def width_report(json_path='/home/fael/projects/portfolio/3d/analise/gate/ref22_largura.json'):
+def width_report(json_path=os.path.join(GATE, 'ref22_largura.json')):
     import json
     P = json.load(open(json_path)); IPD = 79.15; EZ = 180.05; V = _V()*1000; print("LARGURA malha x foto (ref-22), total em mm; topo malha %.2f IPD, foto %.2f" % ((V[:, 2].max() - EZ)/IPD, P['top']))
     for k in sorted(map(float, P['prof']), reverse=True):

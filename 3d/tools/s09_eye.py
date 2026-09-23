@@ -1,15 +1,15 @@
 """Cirurgia local dos olhos no scan (S09 = S08 + canto anatômico: a abertura é o contorno COMPLETO; onde o globo acaba,
-uma folha de conjuntiva/carúncula liga o globo ao canto, em vez do corte reto na silhueta). Rodar DENTRO do Blender (interativo): exec(open(...).read()); depois chamar as etapas.
+uma folha de conjuntiva/carúncula liga o globo ao canto, em vez do corte reto na silhueta). Rodar DENTRO do Blender (interativo): import s09_eye as E; depois chamar as etapas.
 Cada etapa é pequena, idempotente por lado e imprime suas medidas. Nada fora da região do olho é tocado.
   subdiv(s)  -> subdivide só as faces da região do olho (sem suavizar: a superfície não muda)
   cut(s)     -> apaga as faces dentro do contorno traçado à mão e encosta a borda na curva
   rim(s)     -> borda de pálpebra: extrusão da margem até a superfície do globo
   ball(s)    -> globo ocular (objeto próprio, gira para olhar)
 Unidades do arquivo: metros. Contornos e centros em analise/gate/."""
-import bpy, bmesh, json, math, numpy as np
+import bpy, bmesh, json, math, os, numpy as np
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
-ROOT = '/home/fael/projects/portfolio/3d/'
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/'
 CONTF = ROOT + 'analise/gate/olhos_contorno_s09.json'
 CONT = json.load(open(CONTF if __import__('os').path.exists(CONTF) else ROOT + 'analise/gate/olhos_contorno_mao.json')); CENF = ROOT + 'analise/gate/olhos_centro_s09.json'
 import os

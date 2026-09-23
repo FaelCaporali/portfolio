@@ -1,7 +1,7 @@
 """Receita completa do S10, no Blender interativo:  import s10_build; s10_build.run()
 S07 -> textura no lugar, bigode, lábio inferior discreto (arcada retraída), olho D = E espelhado, cirurgia dos olhos, expressões. Salva no NEUTRO."""
 import bpy, os, sys, importlib
-ROOT = '/home/fael/projects/portfolio/3d/'
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/'
 def run(expr=True, name='s10', head=False):
     os.environ['S_EYE'] = 's10_eye'
     bpy.ops.wm.open_mainfile(filepath=ROOT + 'blend/busto-s07.blend'); bpy.ops.wm.save_as_mainfile(filepath=ROOT + 'blend/busto-%s.blend' % name)

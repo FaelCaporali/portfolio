@@ -1,4 +1,4 @@
-"""/data/venv-face/bin/python tools/r_exprsheet.py <out_prefix> <folha.jpg>
+"""$FACE_PYTHON tools/r_exprsheet.py <out_prefix> <folha.jpg>
 Monta a folha do portão de expressões: por chave, frente e 3/4, com o veredito medido no rótulo."""
 import sys, json, cv2, numpy as np
 pre, outf = sys.argv[1:3]; g = json.load(open(pre + '_gate.json'))

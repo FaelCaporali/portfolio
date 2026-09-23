@@ -44,7 +44,7 @@ for i, (nm, keys, gz) in enumerate(POSES):
     for cn, c in cams:
         sc.camera = c; f = os.path.abspath(f"{out}.{i}{cn}.png"); sc.render.filepath = f; bpy.ops.render.render(write_still=True); files.append((nm, f))
 json.dump(files, open(out + '.json', 'w'))
-print(subprocess.run(['/data/venv-face/bin/python', '-c', '''
+print(subprocess.run([os.environ.get('FACE_PYTHON', 'python3'), '-c', '''
 import json,sys,cv2,numpy as np
 F=json.load(open(sys.argv[1]+".json")); cells=[]
 for i in range(0,len(F),2):

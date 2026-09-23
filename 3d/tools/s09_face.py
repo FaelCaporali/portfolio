@@ -3,8 +3,8 @@
 Regra aprendida: suavização ARRASTA A TEXTURA (vértice desliza na superfície levando o UV). Tudo aqui ou devolve o vértice
 ao lugar do texel no scan cru, ou desloca por campo explícito e medido. Nenhum smooth.
 Frame: x+ = lado esquerdo dele, -y = frente, z = altura; metros no arquivo, mm nas tabelas."""
-import bpy, json, numpy as np
-ROOT = '/home/fael/projects/portfolio/3d/'
+import bpy, json, os, numpy as np
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/'
 def _ob(): return bpy.data.objects['Busto']
 def _V():
     me = _ob().data; V = np.empty(len(me.vertices)*3, np.float32); me.vertices.foreach_get('co', V); return V.reshape(-1, 3).astype(np.float64)

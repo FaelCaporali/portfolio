@@ -2,7 +2,7 @@
 import sys, json, math, glob, os, numpy as np, cv2, mediapipe as mp
 from mediapipe.tasks import python as mpp
 from mediapipe.tasks.python import vision
-A='/home/fael/projects/portfolio/3d/analise'
+V=os.path.dirname(os.path.dirname(os.path.abspath(__file__))); A=f'{V}/analise'
 opts=vision.FaceLandmarkerOptions(base_options=mpp.BaseOptions(model_asset_path=f'{A}/face_landmarker.task'),
     output_face_blendshapes=False, output_facial_transformation_matrixes=True, num_faces=1, running_mode=vision.RunningMode.IMAGE)
 lm=vision.FaceLandmarker.create_from_options(opts)
@@ -29,7 +29,7 @@ def metrics(P):
     m['alt_larg']=u(Q[152][1]-Q[10][1])/u(Q[454][0]-Q[234][0])
     m['nariz_len']=u(Q[2][1]-Q[6][1]); m['olho_nariz']=u(Q[2][1]-Q[168][1]); m['nariz_boca']=u(Q[0][1]-Q[2][1])
     return m
-ref=detect('/home/fael/projects/portfolio/3d/referencias/upload-02/ref-15.jpg'); mref=metrics(ref[0])
+ref=detect(f'{V}/referencias/upload-02/ref-15.jpg'); mref=metrics(ref[0])
 targets=sys.argv[1:]
 rows=[]
 for t in targets:

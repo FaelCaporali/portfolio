@@ -1,4 +1,4 @@
-"""/data/venv-face/bin/python tools/aud_sheets.py
+"""$FACE_PYTHON tools/aud_sheets.py
 Folhas foto|S10|S11|S12 pela câmera PnP de cada foto (mesmos pixels), inteira e recortes por região
 (olhos, nariz, boca, orelha) definidos pelos landmarks MediaPipe da FOTO. Saída ' + AUD + '/cmp_<foto>_<regiao>.jpg"""
 import json, os, cv2, numpy as np, mediapipe as mp

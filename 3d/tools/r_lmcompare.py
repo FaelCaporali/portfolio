@@ -1,4 +1,4 @@
-"""/data/venv-face/bin/python tools/r_lmcompare.py <prefix_lm.json>
+"""$FACE_PYTHON tools/r_lmcompare.py <prefix_lm.json>
 Detecta os pontos faciais na foto e em cada render (mesmo detector, mesma câmera), alinha por Procrustes de
 similaridade nos pontos estáveis (olhos, raiz e base do nariz) e compara medidas normalizadas pela interocular.
 Imprime, por medida, o valor da foto e o de cada malha, e o erro em porcentagem."""

@@ -3,8 +3,8 @@ Medido em analise/gate/olhos_foto_ref-15.json (MediaPipe, frações da largura d
   D: margem sup 0,174, inf 0,162, canto lateral 3,4 graus mais alto que o medial;  E: sup 0,155, inf 0,171, cantos nivelados.
 asym_D(): lê olhos_contorno_s10.json (D = E espelhado); escala dos ramos DESLIGADA (up=low=1: abrir mais a margem superior foi na direção errada, a foto cobre o topo da íris);
 à corda canto-a-canto, gira a corda 3,7 graus a mais que o E (lateral para cima; o E do scan já tem 2,9 graus, a foto diz que o D tem 3,7 a mais) e grava olhos_contorno_s13.json."""
-import json, numpy as np
-ROOT = '/home/fael/projects/portfolio/3d/'
+import json, os, numpy as np
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/'
 def asym_D(up=1.0, low=1.0, tilt_deg=-3.7, src='olhos_contorno_s10.json', out='olhos_contorno_s13.json'):
     C = json.load(open(ROOT + 'analise/gate/' + src)); D = np.array(C['D'], float)
     i_lat, i_med = int(np.argmin(D[:, 0])), int(np.argmax(D[:, 0]))          # olho D: lateral = x mais negativo

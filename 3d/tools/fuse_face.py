@@ -5,7 +5,7 @@ import json, math, os, glob, numpy as np, cv2
 import mediapipe as mp
 from mediapipe.tasks import python as mpp
 from mediapipe.tasks.python import vision
-V='/home/fael/projects/portfolio/3d'; A=f'{V}/analise'; OUT=f'{V}/face'
+V=os.path.dirname(os.path.dirname(os.path.abspath(__file__))); A=f'{V}/analise'; OUT=f'{V}/face'
 NEUTRAL=['ref-15.jpg','ref-14.jpg','ref-11.jpg','ref-12.jpg','ref-05.jpg','ref-04.jpg','ref-02.jpg','ref-01.jpg','ref-24.jpg']
 FULLRES={'ref-15.jpg','ref-14.jpg','ref-11.jpg','ref-12.jpg','ref-24.jpg'}
 TEXSET={'ref-15.jpg','ref-14.jpg','ref-11.jpg','ref-12.jpg'}

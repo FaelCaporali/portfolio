@@ -32,4 +32,4 @@ for bf in blends:
     bpy.ops.render.render(write_still=True); outs.append(f)
 json.dump(dict(foto=foto, renders=outs), open(out + '_lm.json', 'w'))
 import subprocess
-print(subprocess.run(['/data/venv-face/bin/python', os.path.join(os.path.dirname(os.path.abspath(__file__)), 'r_lmcompare.py'), out + '_lm.json'], capture_output=True, text=True).stdout)
+print(subprocess.run([os.environ.get('FACE_PYTHON', 'python3'), os.path.join(os.path.dirname(os.path.abspath(__file__)), 'r_lmcompare.py'), out + '_lm.json'], capture_output=True, text=True).stdout)

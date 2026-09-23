@@ -1,14 +1,14 @@
-"""Cirurgia local dos olhos no scan (S08). Rodar DENTRO do Blender (interativo): exec(open(...).read()); depois chamar as etapas.
+"""Cirurgia local dos olhos no scan (S08). Rodar DENTRO do Blender (interativo): import s08_eye as E; depois chamar as etapas.
 Cada etapa é pequena, idempotente por lado e imprime suas medidas. Nada fora da região do olho é tocado.
   subdiv(s)  -> subdivide só as faces da região do olho (sem suavizar: a superfície não muda)
   cut(s)     -> apaga as faces dentro do contorno traçado à mão e encosta a borda na curva
   rim(s)     -> borda de pálpebra: extrusão da margem até a superfície do globo
   ball(s)    -> globo ocular (objeto próprio, gira para olhar)
 Unidades do arquivo: metros. Contornos e centros em analise/gate/."""
-import bpy, bmesh, json, math, numpy as np
+import bpy, bmesh, json, math, os, numpy as np
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
-ROOT = '/home/fael/projects/portfolio/3d/'
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/'
 CONT = json.load(open(ROOT + 'analise/gate/olhos_contorno_mao.json')); CEN = json.load(open(ROOT + 'analise/gate/olhos_centro.json'))
 R_EYE = 0.0136
 
