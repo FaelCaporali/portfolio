@@ -1,5 +1,5 @@
 import type { PropId } from '../../../../content/journey'
-import { Compass, Magnifier, Rocket, Sailboat, Wheel } from './floating'
+import { Compass, InfinityLoop, Magnifier, Rocket, Sailboat, Wheel } from './floating'
 import { Brim, Dome, Headphones, Sunglasses, Tears } from './head'
 import { Coins, Neural } from './orbits'
 
@@ -34,6 +34,8 @@ export function Props({ id }: { id: PropId }) {
       )
     case 'compass':
       return <Compass />
+    case 'infinity':
+      return <InfinityLoop />
     case 'uber':
       return (
         <>

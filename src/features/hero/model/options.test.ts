@@ -1,18 +1,18 @@
 import { describe, expect, it } from 'vitest'
 import { readHeroOptions } from './options'
 
-const ids = ['ai', 'qa', 'vela']
+const ids = ['vela', 'qa', 'ai']
 
 describe('opções da URL', () => {
-  it('sem parâmetros: começa na primeira vida, carrossel normal', () => {
-    expect(readHeroOptions('', ids, false)).toEqual({ start: 0, frozenDissolve: null, reducedMotion: false })
+  it('sem parâmetros: começa na vida de abertura, carrossel normal', () => {
+    expect(readHeroOptions('', ids, 'ai', false)).toEqual({ start: 2, frozenDissolve: null, reducedMotion: false })
   })
-  it('?slot escolhe a vida; desconhecida volta para a primeira', () => {
-    expect(readHeroOptions('?slot=vela', ids, false).start).toBe(2)
-    expect(readHeroOptions('?slot=nada', ids, false).start).toBe(0)
+  it('?slot escolhe a vida; desconhecida volta para a abertura', () => {
+    expect(readHeroOptions('?slot=vela', ids, 'ai', false).start).toBe(0)
+    expect(readHeroOptions('?slot=nada', ids, 'ai', false).start).toBe(2)
   })
   it('?d congela a desintegração; valor inválido é ignorado', () => {
-    expect(readHeroOptions('?d=0.7', ids, true)).toMatchObject({ frozenDissolve: 0.7, reducedMotion: true })
-    expect(readHeroOptions('?d=abc', ids, false).frozenDissolve).toBeNull()
+    expect(readHeroOptions('?d=0.7', ids, 'ai', true)).toMatchObject({ frozenDissolve: 0.7, reducedMotion: true })
+    expect(readHeroOptions('?d=abc', ids, 'ai', false).frozenDissolve).toBeNull()
   })
 })

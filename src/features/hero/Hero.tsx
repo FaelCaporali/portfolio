@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from 'react'
-import { stages } from '../../content/journey'
+import { OPENING, stages } from '../../content/journey'
 import { profile } from '../../content/profile'
 import { cyclicAt } from '../../lib/array'
 import { HeroCopy } from './HeroCopy'
@@ -9,6 +9,7 @@ import { useDragRotation } from './hooks/useDragRotation'
 import { useFreeArea } from './hooks/useFreeArea'
 import { usePointerGaze } from './hooks/usePointerGaze'
 import type { Phase } from './model/carousel'
+import { advance, createLineup } from './model/lineup'
 import { readHeroOptions } from './model/options'
 import { HeroCanvas } from './scene/HeroCanvas'
 
@@ -16,6 +17,7 @@ const readOptions = () =>
   readHeroOptions(
     window.location.search,
     stages.map((s) => s.id),
+    OPENING,
     window.matchMedia('(prefers-reduced-motion: reduce)').matches,
   )
 
@@ -26,6 +28,10 @@ const readOptions = () =>
 export function Hero() {
   const [options] = useState(readOptions)
   const [index, setIndex] = useState(options.start)
+  // A vida de abertura segura mais tempo só na chegada, não quando volta a aparecer.
+  const [opening, setOpening] = useState(true)
+  const [initialLineup] = useState(() => createLineup(stages.length, options.start))
+  const lineup = useRef(initialLineup)
   const [phase, setPhase] = useState<Phase>('hold')
   const { drag, handlers } = useDragRotation()
   const pointer = usePointerGaze()
@@ -39,7 +45,9 @@ export function Hero() {
     const target = requested.current
     requested.current = null
     setPending(null)
-    setIndex((i) => target ?? (i + 1) % stages.length)
+    lineup.current = advance(lineup.current, stages.length, target)
+    setIndex(lineup.current.current)
+    setOpening(false)
   }, [])
   const stage = cyclicAt(stages, index)
   const select = (id: string) => {
@@ -53,7 +61,7 @@ export function Hero() {
     <section className="relative h-svh overflow-hidden" aria-label="Apresentação">
       <HeroCanvas
         stage={stage}
-        first={index === 0}
+        first={opening}
         options={options}
         free={free}
         pointer={pointer}

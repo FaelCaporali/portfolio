@@ -1,8 +1,5 @@
-import { chronology, stages } from '../../content/journey'
+import { stages } from '../../content/journey'
 import { cx } from '../../lib/cx'
-
-const byId = new Map(stages.map((s) => [s.id, s]))
-const ordered = chronology.flatMap((id) => byId.get(id) ?? [])
 
 interface LifeTimelineProps {
   /** Vida em destaque: a atual, ou a escolhida enquanto a troca acontece. */
@@ -20,7 +17,7 @@ export function LifeTimeline({ currentId, onSelect }: LifeTimelineProps) {
     <nav aria-label="Timeline" className="pointer-events-auto relative">
       <span aria-hidden className="absolute inset-x-3 top-1/2 h-px -translate-y-1/2 bg-white/15" />
       <ol className="relative flex items-center gap-1 sm:gap-2.5">
-        {ordered.map((s) => {
+        {stages.map((s) => {
           const on = s.id === currentId
           return (
             <li key={s.id}>

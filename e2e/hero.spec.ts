@@ -39,9 +39,9 @@ test('?slot começa na vida pedida e o carrossel troca sozinho', async ({ page }
 test('indicador cronológico: clique leva à vida escolhida', async ({ page }) => {
   await page.goto('/?slot=consultant')
   const timeline = page.getByRole('navigation', { name: 'Timeline' })
-  await timeline.getByRole('button', { name: 'QA Tester' }).click()
-  await expect(timeline.getByRole('button', { name: 'QA Tester' })).toHaveAttribute('aria-current', 'step')
-  await expect(page.locator('.slot-word .sr-only')).toHaveText('QA Tester', { timeout: 30_000 })
+  await timeline.getByRole('button', { name: 'QA Analyst' }).click()
+  await expect(timeline.getByRole('button', { name: 'QA Analyst' })).toHaveAttribute('aria-current', 'step')
+  await expect(page.locator('.slot-word .sr-only')).toHaveText('QA Analyst', { timeout: 30_000 })
 })
 
 test('sem rolagem horizontal e currículo com os dois PDFs', async ({ page }) => {

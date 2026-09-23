@@ -1,13 +1,12 @@
 /**
- * Capítulos do herói: "Today I am a [slot]".
- * Ordem "zíper": trilha tech e trilha anterior, cada uma em ordem própria,
- * alternadas; abre e fecha no presente. Fatos só com fonte (CV 09/09, Lattes 22/09);
- * o que não tem fonte fica `pending`.
+ * Vidas do herói: "Today I am a [slot]" / "Yesterday I was a [slot]".
+ * Decisão do Fael (23/09): 10 vidas em ordem cronológica (é a ordem do indicador); o carrossel abre em OPENING e segue
+ * embaralhado (model/lineup.ts). Fatos e comprovação moram na página da trajetória, não aqui.
  */
 export type ExprKey = 'mouthSmile' | 'browInnerUp' | 'browOuterUp' | 'browDown'
 
 export type PropId =
-  'neural' | 'magnifier' | 'coins' | 'headphones' | 'rocket' | 'headset' | 'sailor' | 'compass' | 'uber'
+  'neural' | 'magnifier' | 'coins' | 'headphones' | 'rocket' | 'headset' | 'sailor' | 'compass' | 'uber' | 'infinity'
 
 export type Expression = Partial<Record<ExprKey, number>>
 
@@ -29,44 +28,11 @@ export interface Stage {
   expr: Expression
 }
 
-/**
- * Ordem cronológica das vidas, para o indicador do herói (o carrossel roda na ordem "zíper" de `stages`).
- * PROPOSTA a confirmar pelo Fael: vela e Uber ainda sem data (entrevista A3, A4). Com data: empreendedor desde 2009,
- * financeiro 2013–2017, QA desde 2023, tech lead 2025, fullstack e consultor 2025–2026, IA 2026.
- */
-export const chronology = [
-  'empreendedor',
-  'financeiro',
-  'vela',
-  'uber',
-  'qa',
-  'techlead',
-  'fullstack',
-  'consultant',
-  'ai',
-] as const
+/** Vida em que o carrossel abre: a de IA, que chama atenção (decisão do Fael, 23/09). */
+export const OPENING = 'ai'
 
+/** Em ordem cronológica. */
 export const stages: Stage[] = [
-  {
-    id: 'ai',
-    prop: 'neural',
-    slot: 'AI Software Developer',
-    track: 'tech',
-    accent: '#00e5ff',
-    fact: 'Plataforma multi-tenant de agentes de IA para atendimento via WhatsApp em produção: RAG, avaliação automatizada de agentes e cobrança por consumo de tokens.',
-    where: 'Marketing para Cartórios – AI · 2026',
-    expr: { mouthSmile: 0.3 },
-  },
-  {
-    id: 'qa',
-    prop: 'magnifier',
-    slot: 'QA Tester',
-    track: 'tech',
-    accent: '#e0324b',
-    fact: 'Estruturou a área de qualidade da Brickup. Feature flags e monitoramento levaram os defeitos abertos de cerca de 300 para menos de 100.',
-    where: 'Brickup · desde 2023 · CTFL ISTQB',
-    expr: { browDown: 0.5 },
-  },
   {
     id: 'financeiro',
     past: true,
@@ -77,16 +43,6 @@ export const stages: Stage[] = [
     fact: 'Coordenador financeiro: planejamento com a diretoria e relatórios gerenciais automatizados em VBA.',
     where: 'Immersus Ensino de Idiomas · 2013–2017',
     expr: { browDown: 0.2 },
-  },
-  {
-    id: 'fullstack',
-    prop: 'headphones',
-    slot: 'FullStack Dev',
-    track: 'tech',
-    accent: '#3ddc84',
-    fact: 'Consolidou cinco MVPs de uma plataforma de trade-in em um monorepo React/TypeScript com PostgreSQL, multi-tenancy por RLS e Terraform.',
-    where: 'BID Tecnologia · 2025–2026',
-    expr: { mouthSmile: 0.4 },
   },
   {
     id: 'empreendedor',
@@ -100,16 +56,6 @@ export const stages: Stage[] = [
     expr: { mouthSmile: 0.8, browOuterUp: 0.3 },
   },
   {
-    id: 'techlead',
-    prop: 'headset',
-    slot: 'Tech Lead',
-    track: 'tech',
-    accent: '#b388ff',
-    fact: 'Desenhou e implantou a arquitetura AWS da Beamble e a migração do legado para microsserviços, com logística integrada a Uber, UPS e DHL.',
-    where: 'La Fabrique Flottante · 2025',
-    expr: { mouthSmile: 0.5 },
-  },
-  {
     id: 'vela',
     past: true,
     prop: 'sailor',
@@ -120,7 +66,64 @@ export const stages: Stage[] = [
     expr: { mouthSmile: 1 },
   },
   {
-    // Decisão do Fael (23/09): FDE sai; CTO vira "tech consultant". Fato, adereço e texto entram na revisão um a um.
+    id: 'uber',
+    past: true,
+    prop: 'uber',
+    slot: 'Uber Driver',
+    track: 'antes',
+    accent: '#8a8a8a',
+    pending: 'A4 — período e tom',
+    expr: { browInnerUp: 0.8 },
+  },
+  {
+    id: 'fullstack',
+    prop: 'headphones',
+    slot: 'FullStack Dev',
+    track: 'tech',
+    accent: '#3ddc84',
+    fact: 'Consolidou cinco MVPs de uma plataforma de trade-in em um monorepo React/TypeScript com PostgreSQL, multi-tenancy por RLS e Terraform.',
+    where: 'BID Tecnologia · 2025–2026',
+    expr: { mouthSmile: 0.4 },
+  },
+  {
+    id: 'qa',
+    prop: 'magnifier',
+    slot: 'QA Analyst',
+    track: 'tech',
+    accent: '#e0324b',
+    fact: 'Estruturou a área de qualidade da Brickup. Feature flags e monitoramento levaram os defeitos abertos de cerca de 300 para menos de 100.',
+    where: 'Brickup · desde 2023 · CTFL ISTQB',
+    expr: { browDown: 0.5 },
+  },
+  {
+    id: 'devops',
+    prop: 'infinity',
+    slot: 'DevOps Engineer',
+    track: 'tech',
+    accent: '#ff6ec7',
+    expr: { browDown: 0.2, mouthSmile: 0.2 },
+  },
+  {
+    id: 'techlead',
+    prop: 'headset',
+    slot: 'Tech Lead',
+    track: 'tech',
+    accent: '#b388ff',
+    fact: 'Desenhou e implantou a arquitetura AWS da Beamble e a migração do legado para microsserviços, com logística integrada a Uber, UPS e DHL.',
+    where: 'La Fabrique Flottante · 2025',
+    expr: { mouthSmile: 0.5 },
+  },
+  {
+    id: 'ai',
+    prop: 'neural',
+    slot: 'AI Software Developer',
+    track: 'tech',
+    accent: '#00e5ff',
+    fact: 'Plataforma multi-tenant de agentes de IA para atendimento via WhatsApp em produção: RAG, avaliação automatizada de agentes e cobrança por consumo de tokens.',
+    where: 'Marketing para Cartórios – AI · 2026',
+    expr: { mouthSmile: 0.3 },
+  },
+  {
     id: 'consultant',
     prop: 'compass',
     slot: 'Tech Consultant',
@@ -130,15 +133,5 @@ export const stages: Stage[] = [
     where: 'BID Tecnologia · Marketing para Cartórios – AI · 2025–2026',
     pending: 'revisão do slot',
     expr: { browDown: 0.3, mouthSmile: 0.2 },
-  },
-  {
-    id: 'uber',
-    past: true,
-    prop: 'uber',
-    slot: 'Uber Driver',
-    track: 'antes',
-    accent: '#8a8a8a',
-    pending: 'A4 — período e tom',
-    expr: { browInnerUp: 0.8 },
   },
 ]
