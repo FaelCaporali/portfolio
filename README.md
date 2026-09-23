@@ -6,13 +6,27 @@ pelo mesmo Worker da Cloudflare que entrega o site.
 
 ## Estrutura
 
-| Pasta     | Conteúdo                                                                                                                              |
-| --------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/`    | site: Vite 7, React 19, TypeScript, React Three Fiber + drei, GSAP, Tailwind 4                                                        |
-| `worker/` | API de contato em Cloudflare Workers: validação, Turnstile, limite por IP, D1 e reenvio por cron ([docs/CONTATO.md](docs/CONTATO.md)) |
-| `public/` | assets estáticos e cabeçalhos de segurança (`_headers`)                                                                               |
-| `3d/`     | pipeline do busto e do personagem cartoon: Blender 4.5 headless, MPFB, MediaPipe ([3d/README.md](3d/README.md))                       |
-| `docs/`   | pipeline 3D, contato, e-mail e pesquisas de referência                                                                                |
+| Pasta     | Conteúdo                                                                                                                   |
+| --------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `src/`    | site: Vite 7, React 19, TypeScript, React Three Fiber + drei, Tailwind 4                                                   |
+| `shared/` | contrato do contato (rota, limites, campos, códigos de erro, validação), usado pelo site e pelo Worker                     |
+| `worker/` | API de contato em Cloudflare Workers: Turnstile, limite por IP, D1 e reenvio por cron ([docs/CONTATO.md](docs/CONTATO.md)) |
+| `e2e/`    | testes de ponta a ponta (Playwright) contra o servidor de dev                                                              |
+| `public/` | assets estáticos e cabeçalhos de segurança (`_headers`)                                                                    |
+| `3d/`     | pipeline do busto e do personagem cartoon: Blender 4.5 headless, MPFB, MediaPipe ([3d/README.md](3d/README.md))            |
+| `docs/`   | pipeline 3D, contato, e-mail e pesquisas de referência                                                                     |
+
+O site é organizado por feature, e cada feature separa camadas:
+
+| Caminho                    | Papel                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------- |
+| `src/features/hero/model/` | lógica pura do herói (carrossel, arrasto, olhar, rosto, enquadramento), sem React/three |
+| `src/features/hero/hooks/` | ligação do DOM com o modelo (ponteiro, arrasto, medição do layout)                      |
+| `src/features/hero/scene/` | cena do React Three Fiber: busto, furacão, luz, câmera e adereços                       |
+| `src/features/hero/*.tsx`  | composição da página e texto                                                            |
+| `src/features/contact/`    | widget: shell, formulário, hooks do Turnstile e do envio, cliente da API, textos        |
+| `src/ui/`, `src/lib/`      | peças de interface genéricas (popover, pílula) e utilidades sem React                   |
+| `src/content/`             | conteúdo: perfil e vidas do carrossel                                                   |
 
 ## Desenvolvimento
 
@@ -21,6 +35,10 @@ pnpm install
 cp .dev.vars.example .dev.vars                                  # chaves de teste do Turnstile
 pnpm exec wrangler d1 migrations apply fael-caporali --local    # primeira vez
 pnpm dev                                                         # http://localhost:5199
-pnpm test                                                        # testes do Worker no runtime da Cloudflare
+pnpm check                                                       # tipos, ESLint, Prettier e testes (Worker + front)
+pnpm e2e                                                         # Playwright contra o pnpm dev (sobe sozinho)
 pnpm build                                                       # exige VITE_TURNSTILE_SITEKEY em .env.production
 ```
+
+Qualidade: TypeScript estrito (`tsconfig.base.json`), ESLint com typescript-eslint, React, jsx-a11y e SonarJS
+(`eslint.config.js`), Prettier a 120 colunas; até 300 linhas por arquivo.

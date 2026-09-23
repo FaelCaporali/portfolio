@@ -64,7 +64,9 @@ Apagadas após 90 dias pelo cron. O aviso de privacidade entra na tarefa de moni
 - `pnpm dev` (porta 5199): o Worker roda dentro do Vite; D1, limite e e-mail simulados. O e-mail vira arquivo em
   `.wrangler/tmp/email/` (não sai de verdade). Chaves de teste do Turnstile em `.env.development` e `.dev.vars`
   (copiar de `.dev.vars.example`). Primeira vez: `pnpm exec wrangler d1 migrations apply fael-caporali --local`.
-- `pnpm test`: 59 testes do Worker no runtime da Cloudflare (vitest + `@cloudflare/vitest-plugin`).
+- `pnpm test`: testes do Worker no runtime da Cloudflare (vitest + `@cloudflare/vitest-plugin`, `worker/test/`) e do
+  widget e do contrato em jsdom (`src/features/contact/*.test.tsx`, `shared/contact/*.test.ts`).
+- `pnpm e2e`: envio de ponta a ponta pelo widget contra o `pnpm dev` (`e2e/contact.spec.ts`).
 - `pnpm cf-typegen` depois de mudar `wrangler.jsonc`.
 - O build de produção exige `VITE_TURNSTILE_SITEKEY` (`.env.production`); sem ela, falha de propósito.
 
