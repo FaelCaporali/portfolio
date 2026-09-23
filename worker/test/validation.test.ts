@@ -24,7 +24,7 @@ describe('validação dos campos', () => {
   ])('%s → 422 apontando o campo', async (_, patch, field) => {
     const r = await call(post({ ...valid, ...patch }))
     expect(r.status).toBe(422)
-    expect(((await r.json()) as { fields: string[] }).fields).toContain(field)
+    expect((await r.json<{ fields: string[] }>()).fields).toContain(field)
     expect(t.send).not.toHaveBeenCalled()
   })
   it('a validação vem antes do Turnstile (token não é gasto à toa)', async () => {

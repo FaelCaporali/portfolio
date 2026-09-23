@@ -1,8 +1,8 @@
 /** Adereços presos à cabeça: casco e aba de boné, fones, óculos e lágrimas. */
 import { useFrame } from '@react-three/fiber'
-import { useRef } from 'react'
+import { useMemo, useRef } from 'react'
 import * as THREE from 'three'
-import { GLOSS, LENS, TEAR, useDisposable, useMat } from './materials'
+import { GLOSS, LENS, TEAR, useDisposal, useMat } from './materials'
 
 /** Casco sobre o crânio (boné, chapéu): elipsoide cortado, centro e raios medidos. */
 export function Dome({ color, y = 0.232 }: { color: string; y?: number }) {
@@ -27,7 +27,7 @@ export function Brim({ color, y = 0.236, depth = 0.09 }: { color: string; y?: nu
 export function Headphones({ color = '#1b1d22', mic = false }: { color?: string; mic?: boolean }) {
   const m = useMat(color, GLOSS)
   const accent = useMat('#3ddc84', GLOSS)
-  const boom = useDisposable(
+  const boom = useMemo(
     () =>
       new THREE.TubeGeometry(
         new THREE.CatmullRomCurve3([
@@ -41,6 +41,7 @@ export function Headphones({ color = '#1b1d22', mic = false }: { color?: string;
       ),
     [],
   )
+  useDisposal(boom)
   return (
     <group>
       <mesh position={[0, 0.2, -0.13]} scale={[0.8, 1, 1]} material={m}>

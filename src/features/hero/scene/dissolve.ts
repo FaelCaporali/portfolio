@@ -31,6 +31,11 @@ float disField(vec3 p) {
 const EDGE = 'vec3(1.0, 0.86, 0.62)'
 const BG_SRGB = 'vec3(0.0431, 0.0431, 0.0549)' // #0b0b0e
 
+/** Pescoço: o corte da malha some num degradê até a cor do fundo. */
+const NECK_FADE = `gl_FragColor.rgb = mix(${BG_SRGB}, gl_FragColor.rgb, smoothstep(0.012, 0.075, vLocalY));\n`
+/** Borda quente onde a pele está se desfazendo. */
+const EDGE_GLOW = `gl_FragColor.rgb = mix(gl_FragColor.rgb, ${EDGE}, (1.0 - smoothstep(uD, uD + 0.035, disN)) * step(0.001, uD));\n`
+
 /** Aplica a desintegração a um material (e, na pele, o degradê que esconde o corte do pescoço). */
 export function withDissolve<T extends THREE.Material>(m: T, opts: { neckFade?: boolean } = {}): T {
   m.onBeforeCompile = (sh) => {
@@ -56,8 +61,7 @@ export function withDissolve<T extends THREE.Material>(m: T, opts: { neckFade?: 
       )
       .replace(
         '#include <dithering_fragment>',
-        `${opts.neckFade ? `gl_FragColor.rgb = mix(${BG_SRGB}, gl_FragColor.rgb, smoothstep(0.012, 0.075, vLocalY));\n` : ''}` +
-          `gl_FragColor.rgb = mix(gl_FragColor.rgb, ${EDGE}, (1.0 - smoothstep(uD, uD + 0.035, disN)) * step(0.001, uD));\n#include <dithering_fragment>`,
+        (opts.neckFade ? NECK_FADE : '') + EDGE_GLOW + '#include <dithering_fragment>',
       )
   }
   m.customProgramCacheKey = () => (opts.neckFade ? 'dissolve-neck' : 'dissolve')

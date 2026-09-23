@@ -3,19 +3,16 @@ import * as THREE from 'three'
 import { withDissolve } from '../dissolve'
 
 /**
- * Objeto do three.js criado uma vez por montagem e liberado da GPU ao desmontar. Os adereços trocam a cada vida:
- * sem o dispose, cada troca deixava materiais e geometrias órfãos.
+ * Libera da GPU, ao desmontar ou ao trocar, um objeto do three.js criado pelo componente (useMemo). Os adereços
+ * trocam a cada vida: sem o dispose, cada troca deixava materiais e geometrias órfãos.
  */
-export function useDisposable<T extends { dispose: () => void }>(create: () => T, deps: readonly unknown[]): T {
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- deps repassadas de quem chama, como no useMemo
-  const value = useMemo(create, deps)
+export function useDisposal(value: { dispose: () => void }) {
   useEffect(
     () => () => {
       value.dispose()
     },
     [value],
   )
-  return value
 }
 
 /** Acabamentos (constantes de módulo: o material só é recriado quando cor ou acabamento mudam). */
@@ -32,8 +29,10 @@ export const TEAR = { transparent: true, opacity: 0.85, roughness: 0.05 }
 
 /** Material padrão dos adereços, com a desintegração. */
 export function useMat(color: string, finish: THREE.MeshStandardMaterialParameters = MATTE) {
-  return useDisposable(
+  const material = useMemo(
     () => withDissolve(new THREE.MeshStandardMaterial({ color, roughness: 0.55, ...finish })),
     [color, finish],
   )
+  useDisposal(material)
+  return material
 }

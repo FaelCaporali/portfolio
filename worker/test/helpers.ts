@@ -8,7 +8,7 @@ import type { Message } from '../message'
 export const ORIGIN = 'https://fael.caporali.dev'
 export const CONTACT_URL = `${ORIGIN}${CONTACT_PATH}`
 
-/** IP novo por requisição (o limite por IP é testado à parte). IPv6 de documentação, distinto entre arquivos de teste. */
+/** IP novo por requisição (o limite por IP é testado à parte). IPv6 de documentação, distinto por arquivo. */
 const run = crypto.randomUUID().slice(0, 4)
 let ipSeq = 0
 const nextIp = () => `2001:db8:${run}::${(++ipSeq).toString(16)}`
@@ -35,7 +35,7 @@ export function post(body: unknown, init: { headers?: Record<string, string>; ra
   })
 }
 
-const sendOk = async (_mail: EmailMessageBuilder) => ({ messageId: 'msg-1' })
+const sendOk = (_mail: EmailMessageBuilder) => Promise.resolve({ messageId: 'msg-1' })
 
 /** Dublês renovados a cada teste: a binding de e-mail, a resposta do siteverify e o env que os usa. */
 export const t = {
@@ -51,11 +51,11 @@ export function useWorkerDoubles() {
     t.send = vi.fn(sendOk)
     t.env = { ...env, EMAIL: { send: t.send } as unknown as SendEmail }
     t.siteverify = { success: true, action: 'contact', hostname: 'fael.caporali.dev' }
-    vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
+    vi.spyOn(globalThis, 'fetch').mockImplementation((input) => {
       const url = input instanceof Request ? input.url : String(input)
       if (url.startsWith('https://challenges.cloudflare.com/turnstile/v0/siteverify'))
-        return Response.json(t.siteverify)
-      throw new Error(`fetch inesperado: ${url}`)
+        return Promise.resolve(Response.json(t.siteverify))
+      return Promise.reject(new Error(`fetch inesperado: ${url}`))
     })
   })
   afterEach(() => vi.restoreAllMocks())

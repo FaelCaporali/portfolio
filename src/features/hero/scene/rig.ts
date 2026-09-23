@@ -8,6 +8,8 @@ import { withDissolve } from './dissolve'
 
 type Channels = Map<string, { mesh: THREE.Mesh; index: number }[]>
 
+const isMesh = (o: THREE.Object3D): o is THREE.Mesh => (o as Partial<THREE.Mesh>).isMesh === true
+
 export interface Rig {
   /** Malha da pele: fonte das partículas do furacão. */
   skin: THREE.Mesh
@@ -18,9 +20,9 @@ export interface Rig {
 function collectChannels(root: THREE.Object3D): Channels {
   const channels: Channels = new Map()
   root.traverse((o) => {
-    const mesh = o as THREE.Mesh
-    if (!mesh.isMesh || !mesh.morphTargetDictionary) return
-    for (const [name, index] of Object.entries(mesh.morphTargetDictionary)) {
+    if (!isMesh(o) || !o.morphTargetDictionary) return
+    const mesh = o
+    for (const [name, index] of Object.entries(o.morphTargetDictionary)) {
       const list = channels.get(name) ?? []
       list.push({ mesh, index })
       channels.set(name, list)
@@ -43,12 +45,13 @@ function setKey(channels: Channels, name: string, value: number) {
 function prepareMaterials(root: THREE.Object3D): THREE.Mesh {
   let skin: THREE.Mesh | undefined
   root.traverse((o) => {
-    const mesh = o as THREE.Mesh
-    if (!mesh.isMesh) return
+    if (!isMesh(o)) return
+    const mesh = o
     const mat = mesh.material as THREE.MeshStandardMaterial
     if (mat.name === 'SombraOlho') {
-      const alpha = mesh.geometry.getAttribute('color_1')
-      if (alpha) mesh.geometry.setAttribute('color', alpha)
+      // O three.js tipa getAttribute como sempre presente; hasAttribute é a checagem real.
+      if (mesh.geometry.hasAttribute('color_1'))
+        mesh.geometry.setAttribute('color', mesh.geometry.getAttribute('color_1'))
       mesh.material = withDissolve(
         new THREE.MeshBasicMaterial({
           color: mat.color,

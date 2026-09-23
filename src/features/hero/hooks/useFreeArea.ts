@@ -9,6 +9,8 @@ export function useFreeArea(header: RefObject<HTMLElement | null>, text: RefObje
     const el = text.current
     if (!hd || !el) return
     const measure = () => {
+      // Medir o DOM e guardar o resultado é o uso próprio do layout effect (antes da pintura, sem piscar).
+      // eslint-disable-next-line @eslint-react/set-state-in-effect
       setFree((f) => {
         const top = hd.offsetTop + hd.offsetHeight
         const bottom = el.offsetTop

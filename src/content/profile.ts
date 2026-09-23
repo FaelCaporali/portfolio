@@ -1,5 +1,6 @@
 /**
- * Identidade e links públicos. Fonte: CV 09/09 (perfis) e Lattes (ID 3842816194833398); títulos redigidos pelo Fael (23/09).
+ * Identidade e links públicos. Fonte: CV 09/09 (perfis) e Lattes (ID 3842816194833398);
+ * títulos redigidos pelo Fael (23/09).
  * Nome público "Fael Caporali" (decisão do Fael, 23/09). Idioma padrão (D-C) ainda aberto: por ora, inglês.
  */
 export const profile = {
@@ -23,12 +24,16 @@ export const resumes: ProfileLink[] = [
 ]
 
 /**
- * Contato direto, sempre à vista (linha do herói e widget). Exposto por decisão do Fael (23/09): "quero ser encontrado".
+ * Contato direto, sempre à vista (linha do herói e widget).
+ * Exposto por decisão do Fael (23/09): "quero ser encontrado".
  * O telefone abre o WhatsApp. O formulário do widget envia pelo Worker (worker/, docs/CONTATO.md).
  */
 export interface DirectContact extends ProfileLink {
   kind: 'email' | 'phone'
-  /** Como aparece e como é copiado. Telefone no formato internacional legível: discador, WhatsApp e agenda reconhecem ao colar. */
+  /**
+   * Como aparece e como é copiado. Telefone no formato internacional legível: discador, WhatsApp e agenda
+   * reconhecem ao colar.
+   */
   value: string
 }
 export const directContacts: DirectContact[] = [
@@ -40,5 +45,7 @@ export const directContacts: DirectContact[] = [
 export const profileLinks: ProfileLink[] = [
   { label: 'LinkedIn', href: 'https://www.linkedin.com/in/faelcaporali/' },
   { label: 'GitHub', href: 'https://github.com/FaelCaporali' },
+  // O Lattes só serve em http: o endereço https redireciona para http.
+  // eslint-disable-next-line sonarjs/no-clear-text-protocols
   { label: 'Lattes', href: 'http://lattes.cnpq.br/3842816194833398' },
 ]

@@ -13,8 +13,8 @@ const LABEL = 'mb-1 block text-xs text-white/60'
  * Turnstile vive dentro dele. `active` = painel aberto (carrega a verificação e põe o foco no primeiro campo).
  */
 export function ContactForm({ active }: { active: boolean }) {
-  const turnstile = useTurnstile(active)
-  const { status, invalid, submit, clearInvalid, restart } = useContactForm(turnstile)
+  const { container: captcha, token, failed, renew } = useTurnstile(active)
+  const { status, invalid, submit, clearInvalid, restart } = useContactForm({ token, failed, renew })
   const form = useRef<HTMLFormElement>(null)
   const id = useId()
 
@@ -109,7 +109,7 @@ export function ContactForm({ active }: { active: boolean }) {
             <input name="website" type="text" tabIndex={-1} autoComplete="off" defaultValue="" />
           </label>
         </div>
-        <div ref={turnstile.container} />
+        <div ref={captcha} />
         <button
           type="submit"
           disabled={status.kind === 'sending'}

@@ -1,9 +1,9 @@
 /** Adereços que flutuam ao lado da cabeça: lupa, foguete, veleiro, bússola e volante. */
 import { useFrame } from '@react-three/fiber'
-import { useRef } from 'react'
+import { useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import { Float } from './Float'
-import { DOUBLE_SIDED, FLAME, GLASS, GLOSS, GOLD, NEEDLE, useDisposable, useMat } from './materials'
+import { DOUBLE_SIDED, FLAME, GLASS, GLOSS, GOLD, NEEDLE, useDisposal, useMat } from './materials'
 
 export function Magnifier() {
   const rim = useMat('#e0324b', GLOSS)
@@ -59,12 +59,13 @@ export function Rocket() {
 export function Sailboat() {
   const hull = useMat('#f2f2f2', GLOSS)
   const sail = useMat('#2ea8ff', DOUBLE_SIDED)
-  const sailGeo = useDisposable(() => {
+  const sailGeo = useMemo(() => {
     const g = new THREE.BufferGeometry()
     g.setAttribute('position', new THREE.Float32BufferAttribute([0, 0.005, 0, 0, 0.075, 0, 0.045, 0.005, 0], 3))
     g.computeVertexNormals()
     return g
   }, [])
+  useDisposal(sailGeo)
   return (
     <Float position={[-0.2, 0.1, -0.05]} speed={1.1} amp={0.008}>
       <group rotation={[0.1, 0.6, 0]}>

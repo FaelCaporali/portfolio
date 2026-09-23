@@ -52,7 +52,8 @@ function texelReader(tex: THREE.Texture) {
   const cv = document.createElement('canvas')
   cv.width = img.width
   cv.height = img.height
-  const ctx = cv.getContext('2d', { willReadFrequently: true })!
+  const ctx = cv.getContext('2d', { willReadFrequently: true })
+  if (!ctx) throw new Error('canvas 2D indisponível para ler a textura da pele')
   ctx.drawImage(img, 0, 0)
   const data = ctx.getImageData(0, 0, cv.width, cv.height).data
   return (u: number, v: number, out: number[], o: number) => {
@@ -69,9 +70,11 @@ export function Vortex({ skin }: { skin: THREE.Mesh }) {
   const { gl } = useThree()
   const { geometry, material, uSize, uSwirl } = useMemo(() => {
     const sampler = new MeshSurfaceSampler(new THREE.Mesh(skin.geometry)).build()
-    const read = texelReader((skin.material as THREE.MeshStandardMaterial).map!)
+    const map = (skin.material as THREE.MeshStandardMaterial).map
+    if (!map) throw new Error('pele sem mapa de cor: o furacão não tem de onde tirar as cores')
+    const read = texelReader(map)
     const pos = new Float32Array(COUNT * 3)
-    const col: number[] = new Array(COUNT * 3)
+    const col = new Array<number>(COUNT * 3)
     const seed = new Float32Array(COUNT)
     const p = new THREE.Vector3(),
       nrm = new THREE.Vector3(),
@@ -102,7 +105,8 @@ export function Vortex({ skin }: { skin: THREE.Mesh }) {
 
   useFrame((_, dt) => {
     uSize.value = 5 * gl.getPixelRatio()
-    // O giro só acumula enquanto há furacão; volta a zero com a cabeça inteira (o caminho de volta é o de ida ao contrário).
+    // O giro só acumula enquanto há furacão; volta a zero com a cabeça inteira
+    // (o caminho de volta é o de ida ao contrário).
     uSwirl.value = dissolveUniforms.uD.value > 0 ? uSwirl.value + dt * 2.2 : 0
   })
 

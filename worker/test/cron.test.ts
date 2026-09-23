@@ -11,7 +11,7 @@ useWorkerDoubles()
 describe('cron', () => {
   async function runCron(e: Env, at = Date.now()) {
     const ctx = createExecutionContext()
-    await worker.scheduled(createScheduledController({ scheduledTime: at, cron: '*/15 * * * *' }), e, ctx)
+    worker.scheduled(createScheduledController({ scheduledTime: at, cron: '*/15 * * * *' }), e, ctx)
     await waitOnExecutionContext(ctx)
   }
   const seed = (id: string, createdAt: number, status = 'pending', attempts = 1) =>

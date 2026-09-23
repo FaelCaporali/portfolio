@@ -3,7 +3,7 @@ import { useFrame } from '@react-three/fiber'
 import { useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import { withDissolve } from '../dissolve'
-import { GLOW, GOLD, useDisposable, useMat } from './materials'
+import { GLOW, GOLD, useDisposal, useMat } from './materials'
 
 const NEURAL_NODES = 9
 
@@ -17,16 +17,18 @@ function neuralNode(i: number) {
 export function Neural() {
   const g = useRef<THREE.Group>(null)
   const node = useMat('#bff4ff', GLOW)
-  const line = useDisposable(
+  const line = useMemo(
     () => withDissolve(new THREE.LineBasicMaterial({ color: '#29d8ff', transparent: true, opacity: 0.6 })),
     [],
   )
+  useDisposal(line)
   const pts = useMemo(() => Array.from({ length: NEURAL_NODES }, (_, i) => neuralNode(i)), [])
   // Cada nó liga ao vizinho e ao terceiro seguinte no anel.
-  const links = useDisposable(
+  const links = useMemo(
     () => new THREE.BufferGeometry().setFromPoints(pts.flatMap((p, i) => [p, neuralNode(i + 1), p, neuralNode(i + 3)])),
     [pts],
   )
+  useDisposal(links)
   useFrame((_, dt) => {
     if (g.current) g.current.rotation.y += dt * 0.35
   })
@@ -34,6 +36,7 @@ export function Neural() {
     <group position={[0, 0.25, -0.125]} rotation={[0.25, 0, 0.08]}>
       <group ref={g}>
         {pts.map((p, i) => (
+          // eslint-disable-next-line @eslint-react/no-array-index-key -- nós fixos do anel, nunca reordenam
           <mesh key={i} position={p} material={node}>
             <sphereGeometry args={[0.007, 16, 12]} />
           </mesh>

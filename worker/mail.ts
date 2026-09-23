@@ -14,7 +14,7 @@ export function compose(m: Message): EmailMessageBuilder {
     `Nome: ${m.name}`,
     m.reply_email ? `E-mail: ${m.reply_email} (responda este e-mail)` : `Telefone: ${m.contact}`,
     ...(phone ? [`WhatsApp: https://wa.me/${phone}`] : []),
-    `Recebida em: ${BRT.format(m.created_at)} (Brasília)${m.country ? ` · país: ${m.country}` : ''}`,
+    `Recebida em: ${BRT.format(m.created_at)} (Brasília)` + (m.country ? ` · país: ${m.country}` : ''),
     '',
     m.body,
     '',

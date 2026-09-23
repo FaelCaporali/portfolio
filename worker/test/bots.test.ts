@@ -65,7 +65,7 @@ describe('robôs', () => {
   it('manda o IP do visitante e o segredo para o siteverify', async () => {
     await call(post(valid, { ip: '198.51.100.7' }))
     const init = vi.mocked(fetch).mock.calls[0]?.[1]
-    const body = new URLSearchParams(String(init?.body))
+    const body = new URLSearchParams(init?.body as URLSearchParams)
     expect(body.get('remoteip')).toBe('198.51.100.7')
     expect(body.get('secret')).toBe('test-secret')
   })

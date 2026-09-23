@@ -7,14 +7,16 @@ import { cx } from '../../lib/cx'
  */
 export function SlotWord({ text, color, leaving }: { text: string; color: string; leaving: boolean }) {
   const words = text.split(' ')
-  const starts = words.map((_, w) => [...words.slice(0, w).join('')].length)
+  const starts = words.map((_, w) => Array.from(words.slice(0, w).join('')).length)
   return (
     <span key={text} className={cx('slot-word', leaving && 'is-leaving')} style={{ color }} aria-live="polite">
       {words.map((word, w) => (
+        // eslint-disable-next-line @eslint-react/no-array-index-key -- palavras fixas: a posição é a identidade
         <Fragment key={`${w}-${word}`}>
           {w > 0 && ' '}
           <span className="whitespace-nowrap">
-            {[...word].map((ch, k) => (
+            {Array.from(word).map((ch, k) => (
+              // eslint-disable-next-line @eslint-react/no-array-index-key -- letras fixas da palavra, nunca reordenam
               <span key={`${k}-${ch}`} className="ch" style={{ '--i': (starts[w] ?? 0) + k } as CSSProperties}>
                 {ch}
               </span>

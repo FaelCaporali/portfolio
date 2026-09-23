@@ -22,6 +22,6 @@ export default defineConfig({
     setupFiles: ['./worker/test/setup.ts'],
     // O simulador da binding de e-mail também registra como erro solto a recusa que o teste espera (destino ou
     // remetente fora da lista). Só essas duas mensagens são ignoradas; qualquer outro erro solto reprova a execução.
-    onUnhandledError: (error) => !/^email (to|from) \S+ not allowed$/.test(error.message ?? ''),
+    onUnhandledError: (error) => !/^email (to|from) \S+ not allowed$/.test(error.message),
   },
 })

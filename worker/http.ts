@@ -18,7 +18,7 @@ export async function readCapped(request: Request, max: number): Promise<string 
   const declared = Number(request.headers.get('Content-Length') ?? 0)
   if (declared > max) return null
   if (!request.body) return ''
-  const reader = request.body.getReader()
+  const reader = request.body.getReader() as ReadableStreamDefaultReader<Uint8Array>
   const chunks: Uint8Array[] = []
   let size = 0
   for (;;) {

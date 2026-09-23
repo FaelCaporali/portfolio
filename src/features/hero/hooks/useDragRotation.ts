@@ -6,12 +6,12 @@ export function useDragRotation() {
   const drag = useRef(createDrag())
   const last = useRef({ x: 0, y: 0, t: 0 })
 
-  const onPointerDown = (e: PointerEvent<Element>) => {
+  const onPointerDown = (e: PointerEvent) => {
     e.currentTarget.setPointerCapture(e.pointerId)
     grab(drag.current)
     last.current = { x: e.clientX, y: e.clientY, t: performance.now() }
   }
-  const onPointerMove = (e: PointerEvent<Element>) => {
+  const onPointerMove = (e: PointerEvent) => {
     if (!drag.current.active) return
     const now = performance.now()
     const dt = Math.max((now - last.current.t) / 1000, 1 / 240)
@@ -20,7 +20,7 @@ export function useDragRotation() {
     dragBy(drag.current, dx, dy, dt)
     last.current = { x: e.clientX, y: e.clientY, t: now }
   }
-  const onPointerUp = (e: PointerEvent<Element>) => {
+  const onPointerUp = (e: PointerEvent) => {
     release(drag.current, performance.now() - last.current.t)
     e.currentTarget.releasePointerCapture(e.pointerId)
   }

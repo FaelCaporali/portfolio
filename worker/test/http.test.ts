@@ -29,6 +29,7 @@ describe('origem (CSRF)', () => {
     ['sem Origin', { Origin: '' }],
     ['outro site', { Origin: 'https://evil.example' }],
     ['subdomínio parecido', { Origin: 'https://fael.caporali.dev.evil.example' }],
+    // eslint-disable-next-line sonarjs/no-clear-text-protocols -- o teste é justamente recusar http
     ['http em vez de https', { Origin: 'http://fael.caporali.dev' }],
     ['Sec-Fetch-Site cross-site', { 'Sec-Fetch-Site': 'cross-site' }],
   ])('%s → 403', async (_, headers) => {

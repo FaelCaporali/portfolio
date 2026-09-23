@@ -1,6 +1,6 @@
 /**
- * Turnstile (anti-robô da Cloudflare) em modo explícito: o script só carrega quando o formulário abre pela primeira vez.
- * O token é conferido no Worker (worker/turnstile.ts); aqui só se obtém e renova.
+ * Turnstile (anti-robô da Cloudflare) em modo explícito: o script só carrega quando o formulário abre pela
+ * primeira vez. O token é conferido no Worker (worker/turnstile.ts); aqui só se obtém e renova.
  */
 
 interface RenderOptions {
@@ -11,7 +11,7 @@ interface RenderOptions {
   appearance: 'always' | 'execute' | 'interaction-only'
   callback: (token: string) => void
   'expired-callback': () => void
-  'error-callback': () => boolean | void
+  'error-callback': () => void
 }
 
 interface Turnstile {
@@ -33,11 +33,17 @@ let loading: Promise<Turnstile> | undefined
 
 export function loadTurnstile(): Promise<Turnstile> {
   loading ??= new Promise<Turnstile>((resolve, reject) => {
-    if (window.turnstile) return resolve(window.turnstile)
+    if (window.turnstile) {
+      resolve(window.turnstile)
+      return
+    }
     const script = document.createElement('script')
     script.src = SRC
     script.async = true
-    script.onload = () => (window.turnstile ? resolve(window.turnstile) : reject(new Error('turnstile')))
+    script.onload = () => {
+      if (window.turnstile) resolve(window.turnstile)
+      else reject(new Error('turnstile'))
+    }
     script.onerror = () => {
       loading = undefined
       script.remove()
