@@ -7,6 +7,7 @@ import { Bust, DRAG_MAX_PITCH, DRAG_MAX_YAW, type DragState } from './Bust'
 import { DISSOLVE_MAX, dissolveUniforms } from './dissolve'
 import { stages } from '../content/journey'
 import { journeyLink, profile, profileLinks } from '../content/profile'
+import { CopyContacts } from '../components/CopyContacts'
 
 /** Tempos do carrossel (s). A primeira vida fica mais tempo: é o que quem chega lê primeiro. */
 const HOLD_FIRST = 4.5
@@ -250,6 +251,8 @@ export function Hero() {
             ))}
           </ul>
         </nav>
+        {/* Contato direto sempre à vista; clique copia (o formulário e os links ficam no botão flutuante). */}
+        <CopyContacts className="pointer-events-auto mt-4 lg:mt-6" />
       </div>
     </section>
   )

@@ -22,6 +22,20 @@ export const resumes: ProfileLink[] = [
   { label: 'English', href: '/cv/fael-caporali-cv-en.pdf' },
 ]
 
+/**
+ * Contato direto, sempre à vista (linha do herói e widget). Exposto por decisão do Fael (23/09): "quero ser encontrado".
+ * O telefone abre o WhatsApp. O formulário do widget envia pelo Worker (worker/, docs/CONTATO.md).
+ */
+export interface DirectContact extends ProfileLink {
+  kind: 'email' | 'phone'
+  /** Como aparece e como é copiado. Telefone no formato internacional legível: discador, WhatsApp e agenda reconhecem ao colar. */
+  value: string
+}
+export const directContacts: DirectContact[] = [
+  { kind: 'email', label: 'E-mail', value: 'fael@caporali.dev', href: 'mailto:fael@caporali.dev' },
+  { kind: 'phone', label: 'WhatsApp', value: '+55 31 99196-2016', href: 'https://wa.me/5531991962016' },
+]
+
 /** Abrem em outra aba. */
 export const profileLinks: ProfileLink[] = [
   { label: 'LinkedIn', href: 'https://www.linkedin.com/in/faelcaporali/' },
