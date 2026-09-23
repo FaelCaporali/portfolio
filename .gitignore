@@ -63,3 +63,7 @@ __pycache__/
 # ---- worker
 .dev.vars
 .wrangler
+
+# ---- contexto privado do projeto (planos, entrevista, pesquisa, estado do 3D) e configuração local de ferramentas
+.wai/
+.mcp.json
