@@ -31,7 +31,7 @@ Conclusão: rosto **mais pesado à direita** (osso zigomático e mandíbula), na
 - Barba: densa, 1/3 da altura do rosto, afunila; grisalha no queixo.
 - Cabelo: escuro, puxado para trás em coque/rabo; volume atrás da cabeça. Orelha média, lóbulo aderido, levemente afastada.
 - Perfil: testa inclina moderadamente, nariz projetado, queixo escondido pela barba (a barba define a silhueta do maxilar), pescoço longo.
-- Pele: cicatrizes de acne nas bochechas; tom oliva quente.
+- Pele: tom oliva quente.
 
 ## Expressões nas referências (blendshapes)
 - ref-16: sobrancelhas ao máximo, olhos arregalados → **surpresa** (rugas de testa obrigatórias).

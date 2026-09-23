@@ -16,7 +16,7 @@ export interface ProfileLink {
 /** Página da trajetória cronológica (ainda não existe; tarefa própria). */
 export const journeyLink: ProfileLink = { label: 'See the full journey', href: '/trajetoria' }
 
-/** Currículo: baixa direto no idioma escolhido (cópias de ~/Downloads/curriculo, versão 2026-09). */
+/** Currículo: baixa direto no idioma escolhido (versão 2026-09). */
 export const resumes: ProfileLink[] = [
   { label: 'Português', href: '/cv/fael-caporali-cv-pt.pdf' },
   { label: 'English', href: '/cv/fael-caporali-cv-en.pdf' },

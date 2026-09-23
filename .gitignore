@@ -7,7 +7,7 @@ dist
 
 # ---- 3d: LISTA DE PERMISSÃO. Tudo em 3d/ é ignorado por padrão; só entra no git o que é
 # fonte, receita, entrega aprovada ou evidência curada. Iterações intermediárias, capturas,
-# scans brutos, renders de processo e caches ficam no disco (e no backup em /data/portfolio-backup).
+# scans brutos, renders de processo e caches ficam só no disco.
 3d/**
 !3d/*.md
 !3d/tools/

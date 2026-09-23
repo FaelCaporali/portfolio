@@ -1,6 +1,6 @@
 /**
  * Capítulos do herói: "Today I am a [slot]".
- * Ordem "zíper" (docs/PLANO-PAGINA-E-VERSOES.md §1): trilha tech e trilha anterior, cada uma em ordem própria,
+ * Ordem "zíper": trilha tech e trilha anterior, cada uma em ordem própria,
  * alternadas; abre e fecha no presente. Fatos só com fonte (CV 09/09, Lattes 22/09); o que não tem fonte fica `pending`.
  */
 export type ExprKey =

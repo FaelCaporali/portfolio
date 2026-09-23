@@ -1,7 +1,7 @@
 # E-mail profissional — caporali.dev
 
 Configurado em 23/09/2026. Custo zero: Cloudflare (DNS, Email Routing) e Resend (plano free: 3.000/mês, 100/dia, SMTP).
-Nenhum segredo neste arquivo. A chave SMTP do Gmail fica em `~/.config/caporali/resend-gmail-smtp.key` (fora do repositório, 600).
+Nenhum segredo neste arquivo. A chave SMTP do Gmail fica num arquivo local fora do repositório (permissão 600).
 
 ## Separação de reputação
 

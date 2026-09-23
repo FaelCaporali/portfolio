@@ -14,7 +14,7 @@ descartado: é pago após 15 dias de teste.
 |---|---|---|---|
 | ~~RealityScan Mobile~~ | — | — | **Incompatível com o Poco X5** (verificado na Play Store em 2026-09-14). |
 | KIRI Engine 4.0 (plano Basic) | nuvem, app Android 7+ | grátis, exportação ilimitada | Até 150 fotos por scan no Basic. Exporta OBJ/FBX/GLTF/STL direto do app. |
-| Meshroom 2025.1.0 (AliceVision 3.3) | local, CUDA 12 na RTX 3050 | grátis | Instalado em `/data/meshroom/Meshroom-2025.1.0` (2026-09-15), cache em `/data`. `meshroom_batch -i <fotos> -o <saída>`. |
+| Meshroom 2025.1.0 (AliceVision 3.3) | local, CUDA 12 na RTX 3050 | grátis | Instalado localmente (2026-09-15). `meshroom_batch -i <fotos> -o <saída>`. |
 
 Ordem: KIRI Engine é a rota principal (60–80 fotos bastam para um busto). Meshroom entra como terceira via quando houver disco.
 Fontes verificadas em 2026-09-14: release do Meshroom no GitHub, realityscan.com, kiriengine.app/pricing.
