@@ -26,6 +26,7 @@ export type Parsed = { ok: true; value: ContactInput } | { ok: false; fields: Fi
  * apresenta invertido), separadores de linha Unicode e BOM.
  */
 const INVISIBLE =
+  // eslint-disable-next-line no-control-regex -- remover caracteres de controle é o propósito desta expressão
   /[\u0000-\u0008\u000B-\u001F\u007F-\u009F\u061C\u200E\u200F\u202A-\u202E\u2028\u2029\u2066-\u2069\uFEFF]/g
 
 /** Texto de uma linha: sem quebras (fecha a porta para injeção de cabeçalho), espaços colapsados. */
@@ -40,18 +41,24 @@ export function cleanLine(s: string): string {
 
 /** Texto de várias linhas: mantém parágrafos, no máximo uma linha em branco seguida. */
 export function cleanText(s: string): string {
-  return s
-    .normalize('NFC')
-    .replace(/\r\n?/g, '\n')
-    .replace(/\t/g, '  ')
-    .replace(INVISIBLE, '')
-    .replace(/[ \u00A0]+$/gm, '')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim()
+  return (
+    s
+      .normalize('NFC')
+      .replace(/\r\n?/g, '\n')
+      .replace(/\t/g, '  ')
+      .replace(INVISIBLE, '')
+      // Espaço no fim de cada linha. Por linha e com trimEnd, linear: a regex /[ ]+$/gm era quadrática com uma
+      // sequência longa de espaços no meio da linha (16 KB de espaços: ~250 ms de CPU; o limite do Worker é 10 ms).
+      .split('\n')
+      .map((line) => line.trimEnd())
+      .join('\n')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim()
+  )
 }
 
 /** Comprimento em caracteres (pontos de código), não em unidades UTF-16. */
-const length = (s: string) => [...s].length
+const length = (s: string) => Array.from(s).length
 
 const EMAIL = /^[A-Za-z0-9._%+-]{1,64}@(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)+[A-Za-z]{2,63}$/
 
