@@ -3,9 +3,9 @@ import * as THREE from 'three'
 /**
  * Desintegração ("desaparatar"). Um único campo escalar n(p) no espaço do glb decide quando cada ponto some:
  * a malha descarta o fragmento quando n < uD, e a partícula nascida naquele ponto parte no mesmo instante.
- * Por isso o furacão sai exatamente de onde a pele se desfaz. uD vai de 0 (inteiro) a DISSOLVE_MAX (só furacão).
+ * Por isso o furacão sai exatamente de onde a pele se desfaz. uD vai de 0 (inteiro) a DISSOLVE_MAX (só furacão),
+ * conduzido pelo relógio do carrossel (model/carousel.ts).
  */
-export const DISSOLVE_MAX = 1.35
 
 export const dissolveUniforms = {
   uD: { value: 0 },

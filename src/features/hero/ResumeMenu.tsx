@@ -1,33 +1,22 @@
-import { useCallback, useId, useRef, useState } from 'react'
 import { resumes } from '../../content/profile'
-import { useDismiss } from '../../ui/useDismiss'
+import { cx } from '../../lib/cx'
+import { usePopover } from '../../ui/usePopover'
 
 /**
  * Botão do currículo: abre a escolha de idioma e o clique já baixa o PDF.
  * Abre para cima porque no celular os botões ficam no rodapé da tela. Fecha com Esc, clique fora ou após escolher.
  */
 export function ResumeMenu({ className }: { className: string }) {
-  const [open, setOpen] = useState(false)
-  const root = useRef<HTMLDivElement>(null)
-  const menuId = useId()
-
-  const close = useCallback(() => setOpen(false), [])
-  useDismiss(open, close, root)
+  const { open, close, root, panelId, triggerProps } = usePopover()
 
   return (
     <div ref={root} className="relative">
-      <button
-        type="button"
-        aria-expanded={open}
-        aria-controls={menuId}
-        onClick={() => setOpen((o) => !o)}
-        className={`w-full ${className}`}
-      >
+      <button {...triggerProps} className={cx('w-full', className)}>
         Résumé
         <svg
           aria-hidden
           viewBox="0 0 10 6"
-          className={`h-1.5 w-2.5 text-white/45 transition-transform ${open ? '' : 'rotate-180'}`}
+          className={cx('h-1.5 w-2.5 text-white/45 transition-transform', !open && 'rotate-180')}
         >
           <path
             d="M1 5l4-4 4 4"
@@ -40,7 +29,7 @@ export function ResumeMenu({ className }: { className: string }) {
         </svg>
       </button>
       <ul
-        id={menuId}
+        id={panelId}
         hidden={!open}
         className="absolute bottom-full left-0 z-10 mb-2 min-w-full overflow-hidden rounded-2xl border border-white/15 bg-[#16161b]/95 py-1 shadow-xl backdrop-blur"
       >

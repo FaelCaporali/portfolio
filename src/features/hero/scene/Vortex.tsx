@@ -2,7 +2,8 @@ import { useMemo } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { MeshSurfaceSampler } from 'three/examples/jsm/math/MeshSurfaceSampler.js'
-import { NOISE_GLSL, DISSOLVE_MAX, dissolveUniforms } from './dissolve'
+import { DISSOLVE_MAX } from '../model/carousel'
+import { NOISE_GLSL, dissolveUniforms } from './dissolve'
 
 const COUNT = 42000
 /** Eixo do furacão: vertical, pelo centro do crânio (espaço do glb). */
