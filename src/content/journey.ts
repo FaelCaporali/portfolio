@@ -1,43 +1,88 @@
 /**
- * A jornada do hero. Cada etapa = um slot da frase "Today I am a [slot]".
- * Ordem definida pelo Fael em 2026-09-14. Props reais (.glb) substituem `placeholder`
- * quando `model` existir em public/models/props/.
+ * Capítulos do herói: "Today I am a [slot]".
+ * Ordem "zíper" (docs/PLANO-PAGINA-E-VERSOES.md §1): trilha tech e trilha anterior, cada uma em ordem própria,
+ * alternadas; abre e fecha no presente. Fatos só com fonte (CV 09/09, Lattes 22/09); o que não tem fonte fica `pending`.
  */
-export type Lang = 'pt' | 'en'
+export type ExprKey =
+  | 'mouthSmile'
+  | 'browInnerUp'
+  | 'browOuterUp'
+  | 'browDown'
 
-export type PlaceholderProp =
-  | 'coins'
-  | 'rocket'
-  | 'sail'
-  | 'wheel-tears'
-  | 'bug-lens'
-  | 'brackets'
-  | 'team'
-  | 'compass'
-  | 'neural'
+export type PropId = 'neural' | 'magnifier' | 'coins' | 'headphones' | 'rocket' | 'headset' | 'sailor' | 'compass' | 'uber'
+
+export type Expression = Partial<Record<ExprKey, number>>
 
 export interface Stage {
   id: string
-  slot: Record<Lang, string>
-  /** Cor de destaque da etapa: tinge partículas, base e props. */
+  slot: string
+  track: 'tech' | 'antes'
+  /** Uma linha de fato, com fonte. */
+  fact?: string
+  /** Onde e quando, como no CV/Lattes. */
+  where?: string
+  /** Pergunta da entrevista que ainda falta responder. */
+  pending?: string
   accent: string
-  /** Arquivo em public/models/props/<model>. Ausente enquanto o Fael não modelar. */
-  model?: string
-  placeholder: PlaceholderProp
-  /** Tom emocional da cabeça: usado para animações da própria cabeça. */
-  mood: 'neutral' | 'proud' | 'crying' | 'focused'
-  /** Duração em ms antes do avanço automático. */
-  hold: number
+  /** Adereço da vida (blockout em src/hero/Props.tsx). */
+  prop: PropId
+  expr: Expression
 }
 
 export const stages: Stage[] = [
-  { id: 'financeiro', slot: { pt: 'administrador financeiro', en: 'financial manager' }, accent: '#c9a227', placeholder: 'coins', mood: 'neutral', hold: 3200 },
-  { id: 'empreendedor', slot: { pt: 'empreendedor', en: 'entrepreneur' }, accent: '#ff7a1a', placeholder: 'rocket', mood: 'proud', hold: 3200 },
-  { id: 'vela', slot: { pt: 'professor de barco a vela', en: 'sailing instructor' }, accent: '#2ea8ff', placeholder: 'sail', mood: 'proud', hold: 3200 },
-  { id: 'uber', slot: { pt: 'motorista de Uber', en: 'Uber driver' }, accent: '#8a8a8a', placeholder: 'wheel-tears', mood: 'crying', hold: 4200 },
-  { id: 'qa', slot: { pt: 'QA tester', en: 'QA tester' }, accent: '#e0324b', placeholder: 'bug-lens', mood: 'focused', hold: 3200 },
-  { id: 'fullstack', slot: { pt: 'fullstack dev', en: 'fullstack dev' }, accent: '#3ddc84', placeholder: 'brackets', mood: 'focused', hold: 3200 },
-  { id: 'techlead', slot: { pt: 'tech lead', en: 'tech lead' }, accent: '#b388ff', placeholder: 'team', mood: 'proud', hold: 3200 },
-  { id: 'cto', slot: { pt: 'FDE CTO', en: 'FDE CTO' }, accent: '#ffd166', placeholder: 'compass', mood: 'focused', hold: 3200 },
-  { id: 'ai', slot: { pt: 'AI software developer', en: 'AI software developer' }, accent: '#00e5ff', placeholder: 'neural', mood: 'proud', hold: 4000 },
+  {
+    id: 'ai', prop: 'neural', slot: 'AI software developer', track: 'tech', accent: '#00e5ff',
+    fact: 'Plataforma multi-tenant de agentes de IA para atendimento via WhatsApp em produção: RAG, avaliação automatizada de agentes e cobrança por consumo de tokens.',
+    where: 'Marketing para Cartórios – AI · 2026',
+    expr: { mouthSmile: 0.3 },
+  },
+  {
+    id: 'qa', prop: 'magnifier', slot: 'QA tester', track: 'tech', accent: '#e0324b',
+    fact: 'Estruturou a área de qualidade da Brickup. Feature flags e monitoramento levaram os defeitos abertos de cerca de 300 para menos de 100.',
+    where: 'Brickup · desde 2023 · CTFL ISTQB',
+    expr: { browDown: 0.5 },
+  },
+  {
+    id: 'financeiro', prop: 'coins', slot: 'financial manager', track: 'antes', accent: '#c9a227',
+    fact: 'Coordenador financeiro: planejamento com a diretoria e relatórios gerenciais automatizados em VBA.',
+    where: 'Immersus Ensino de Idiomas · 2013–2017',
+    expr: { browDown: 0.2 },
+  },
+  {
+    id: 'fullstack', prop: 'headphones', slot: 'fullstack dev', track: 'tech', accent: '#3ddc84',
+    fact: 'Consolidou cinco MVPs de uma plataforma de trade-in em um monorepo React/TypeScript com PostgreSQL, multi-tenancy por RLS e Terraform.',
+    where: 'BID Tecnologia · 2025–2026',
+    expr: { mouthSmile: 0.4 },
+  },
+  {
+    id: 'empreendedor', prop: 'rocket', slot: 'entrepreneur', track: 'antes', accent: '#ff7a1a',
+    fact: 'Negócios próprios: SUP LagoaSanta, confeitaria, hostel e escola de vela.',
+    where: '2009–2022',
+    pending: 'A2 — ordem, anos e qual negócio vira a imagem',
+    expr: { mouthSmile: 0.8, browOuterUp: 0.3 },
+  },
+  {
+    id: 'techlead', prop: 'headset', slot: 'tech lead', track: 'tech', accent: '#b388ff',
+    fact: 'Desenhou e implantou a arquitetura AWS da Beamble e a migração do legado para microsserviços, com logística integrada a Uber, UPS e DHL.',
+    where: 'La Fabrique Flottante · 2025',
+    expr: { mouthSmile: 0.5 },
+  },
+  {
+    id: 'vela', prop: 'sailor', slot: 'sailing instructor', track: 'antes', accent: '#2ea8ff',
+    pending: 'A3 — onde, que barco, escola própria ou não',
+    expr: { mouthSmile: 1 },
+  },
+  {
+    // Decisão do Fael (23/09): FDE sai; CTO vira "tech consultant". Fato, adereço e texto entram na revisão um a um.
+    id: 'consultant', prop: 'compass', slot: 'tech consultant', track: 'tech', accent: '#ffd166',
+    fact: 'Assumiu o legado de uma plataforma de trade-in e definiu stack, precificação e roadmap com fundadores de clientes.',
+    where: 'BID Tecnologia · Marketing para Cartórios – AI · 2025–2026',
+    pending: 'revisão do slot',
+    expr: { browDown: 0.3, mouthSmile: 0.2 },
+  },
+  {
+    id: 'uber', prop: 'uber', slot: 'Uber driver', track: 'antes', accent: '#8a8a8a',
+    pending: 'A4 — período e tom',
+    expr: { browInnerUp: 0.8 },
+  },
 ]
