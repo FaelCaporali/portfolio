@@ -14,6 +14,11 @@ export interface Framing {
 }
 
 const WIDE_FOV = 24
+/**
+ * Proporção de referência do largo (1440×900). Abaixo dela (iPad deitado, janela estreita e alta) a abertura cresce
+ * para o busto e os adereços ocuparem a mesma fração da largura, sem invadir o texto nem sair pela borda.
+ */
+const WIDE_ASPECT = 1.6
 /** Celular deitado: nome e indicador ocupam ~1/4 da altura; o busto fica menor e desce para baixo deles. */
 const SHORT_FOV = 30
 const SHORT_DROP = 0.1
@@ -29,7 +34,9 @@ export function computeFraming(width: number, height: number, [top, bottom]: rea
   if (isWide(width, height)) {
     if (height <= SHORT_LANDSCAPE)
       return { fov: SHORT_FOV, offsetX: -width * BUST_SHIFT, offsetY: -height * SHORT_DROP }
-    return { fov: WIDE_FOV, offsetX: -width * BUST_SHIFT, offsetY: height * 0.06 }
+    const narrow = Math.max(1, WIDE_ASPECT / (width / height))
+    const fov = radToDeg(2 * Math.atan(Math.tan(degToRad(WIDE_FOV / 2)) * narrow))
+    return { fov, offsetX: -width * BUST_SHIFT, offsetY: height * 0.06 }
   }
 
   const free = Math.max(bottom - top, height * 0.3)
