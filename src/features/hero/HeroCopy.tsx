@@ -21,24 +21,36 @@ export function HeroCopy({ ref, stage, leaving }: HeroCopyProps) {
       className="pointer-events-none absolute inset-x-0 bottom-0 px-5 pb-6 text-white sm:px-10 lg:inset-y-0 lg:right-auto lg:flex lg:w-1/2 lg:flex-col lg:justify-center lg:pb-0 lg:pl-[7vw]"
     >
       <h1>
-        <span className="block text-xs tracking-[0.3em] text-white/60 uppercase lg:text-sm">
+        <span className="block text-sm tracking-[0.3em] text-white/60 uppercase lg:text-base">
           {stage.past ? 'Yesterday I was' : 'Today I am'} a{/^[aeiou]/i.test(stage.slot) ? 'n' : ''}
         </span>{' '}
-        {/* Duas linhas reservadas onde a vida mais longa quebra (celular e coluna do largo):
-            a troca não empurra o resto. */}
-        <span className="mt-2 block min-h-[2em] text-[2.6rem] leading-none font-semibold tracking-tight sm:min-h-[1em] lg:min-h-[2em] lg:text-[clamp(3rem,4.6vw,5rem)]">
+        {/* Altura reservada para a troca não empurrar o resto: duas linhas no celular (a vida mais longa quebra), uma
+            a partir de sm. No largo a fonte segue a coluna (3,6vw): "AI software developer" mede 10,1em e cabe numa
+            linha de 1024 a 1920 px, sem vão embaixo das vidas curtas. */}
+        <span className="mt-2 block min-h-[2em] text-[2.6rem] leading-none font-semibold tracking-tight sm:min-h-[1em] lg:text-[clamp(2.25rem,3.6vw,5rem)]">
           <SlotWord text={stage.slot} color={stage.accent} leaving={leaving} />
         </span>
       </h1>
+      {/* Celular: um título por linha. A partir de sm: numa linha só, separados por um ponto apagado. */}
       <ul
         aria-label="Títulos"
-        className="mt-3 space-y-0.5 text-sm leading-snug text-white/70 lg:mt-6 lg:space-y-1 lg:text-lg"
+        className="mt-4 flex flex-col gap-0.5 text-sm leading-snug font-medium text-white/75 sm:mt-5 sm:flex-row sm:flex-wrap sm:items-baseline sm:gap-y-1 sm:text-[15px] lg:mt-6 lg:text-lg"
       >
-        {profile.titles.map((t) => (
-          <li key={t}>{t}</li>
+        {profile.titles.map((t, i) => (
+          <li key={t} className="flex items-baseline">
+            {i > 0 && (
+              <span aria-hidden className="mx-2 hidden text-white/25 sm:inline lg:mx-3">
+                •
+              </span>
+            )}
+            {t}
+          </li>
         ))}
       </ul>
-      <nav aria-label="Links" className="pointer-events-auto mt-5 flex flex-col items-start gap-3 lg:mt-10">
+      <nav
+        aria-label="Links"
+        className="pointer-events-auto mt-6 flex flex-col items-start gap-3 sm:mt-7 lg:mt-8 lg:gap-4"
+      >
         <a
           href={journeyLink.href}
           className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-neutral-950 transition-colors hover:bg-white/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
@@ -63,7 +75,7 @@ export function HeroCopy({ ref, stage, leaving }: HeroCopyProps) {
         </ul>
       </nav>
       {/* Contato direto sempre à vista; clique copia (o formulário e os links ficam no botão flutuante). */}
-      <CopyContacts className="pointer-events-auto mt-4 lg:mt-6" />
+      <CopyContacts className="pointer-events-auto mt-5 lg:mt-6" />
     </div>
   )
 }
