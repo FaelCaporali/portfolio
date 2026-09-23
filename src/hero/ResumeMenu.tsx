@@ -16,10 +16,27 @@ export function ResumeMenu({ className }: { className: string }) {
 
   return (
     <div ref={root} className="relative">
-      <button type="button" aria-expanded={open} aria-controls={menuId} onClick={() => setOpen((o) => !o)} className={`w-full ${className}`}>
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-controls={menuId}
+        onClick={() => setOpen((o) => !o)}
+        className={`w-full ${className}`}
+      >
         Résumé
-        <svg aria-hidden viewBox="0 0 10 6" className={`h-1.5 w-2.5 text-white/45 transition-transform ${open ? '' : 'rotate-180'}`}>
-          <path d="M1 5l4-4 4 4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        <svg
+          aria-hidden
+          viewBox="0 0 10 6"
+          className={`h-1.5 w-2.5 text-white/45 transition-transform ${open ? '' : 'rotate-180'}`}
+        >
+          <path
+            d="M1 5l4-4 4 4"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
         </svg>
       </button>
       <ul
@@ -36,7 +53,9 @@ export function ResumeMenu({ className }: { className: string }) {
               className="flex items-center justify-between gap-3 px-4 py-2 text-sm whitespace-nowrap text-white/80 hover:bg-white/10 hover:text-white focus-visible:bg-white/10 focus-visible:outline-none"
             >
               {r.label}
-              <span aria-hidden className="text-xs text-white/40">PDF ↓</span>
+              <span aria-hidden className="text-xs text-white/40">
+                PDF ↓
+              </span>
             </a>
           </li>
         ))}

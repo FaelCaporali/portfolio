@@ -36,11 +36,17 @@ export type Parsed = { ok: true; value: ContactInput } | { ok: false; fields: Fi
  * Caracteres de controle e de formatação invisível: C0 (menos \t e \n), C1, marcas bidirecionais (texto que se
  * apresenta invertido), separadores de linha Unicode e BOM.
  */
-const INVISIBLE = /[\u0000-\u0008\u000B-\u001F\u007F-\u009F\u061C\u200E\u200F\u202A-\u202E\u2028\u2029\u2066-\u2069\uFEFF]/g
+const INVISIBLE =
+  /[\u0000-\u0008\u000B-\u001F\u007F-\u009F\u061C\u200E\u200F\u202A-\u202E\u2028\u2029\u2066-\u2069\uFEFF]/g
 
 /** Texto de uma linha: sem quebras (fecha a porta para injeção de cabeçalho), espaços colapsados. */
 export function cleanLine(s: string): string {
-  return s.normalize('NFC').replace(/\r\n?|\n|\t/g, ' ').replace(INVISIBLE, '').replace(/\s+/g, ' ').trim()
+  return s
+    .normalize('NFC')
+    .replace(/\r\n?|\n|\t/g, ' ')
+    .replace(INVISIBLE, '')
+    .replace(/\s+/g, ' ')
+    .trim()
 }
 
 /** Texto de várias linhas: mantém parágrafos, no máximo uma linha em branco seguida. */
@@ -79,7 +85,8 @@ export function asPhone(s: string): string | null {
 const str = (v: unknown) => (typeof v === 'string' ? v : '')
 
 export function parseContact(data: unknown): Parsed {
-  if (typeof data !== 'object' || data === null || Array.isArray(data)) return { ok: false, fields: ['name', 'contact', 'message'] }
+  if (typeof data !== 'object' || data === null || Array.isArray(data))
+    return { ok: false, fields: ['name', 'contact', 'message'] }
   const d = data as Record<string, unknown>
   const fields: Field[] = []
 

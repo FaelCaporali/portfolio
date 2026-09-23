@@ -5,10 +5,10 @@ Nenhum segredo neste arquivo. A chave SMTP do Gmail fica num arquivo local fora 
 
 ## Separação de reputação
 
-| Uso | Endereço | Caminho | Por quê |
-|---|---|---|---|
-| Caixa pessoal (receber) | `fael@caporali.dev` | Cloudflare Email Routing → o Gmail pessoal | tudo centralizado no Gmail |
-| Caixa pessoal (responder) | `fael@caporali.dev` | Gmail "Enviar como" → SMTP do Resend | o remetente precisa ser o domínio principal; volume humano |
+| Uso                           | Endereço                   | Caminho                                                | Por quê                                                                          |
+| ----------------------------- | -------------------------- | ------------------------------------------------------ | -------------------------------------------------------------------------------- |
+| Caixa pessoal (receber)       | `fael@caporali.dev`        | Cloudflare Email Routing → o Gmail pessoal             | tudo centralizado no Gmail                                                       |
+| Caixa pessoal (responder)     | `fael@caporali.dev`        | Gmail "Enviar como" → SMTP do Resend                   | o remetente precisa ser o domínio principal; volume humano                       |
 | Disparos do site (formulário) | `worker@mail.caporali.dev` | Worker → Cloudflare Email Service → destino verificado | subdomínio isola a reputação de envio automático; grátis para destino verificado |
 
 Return-Path do Resend em `send.caporali.dev` (bounces fora do domínio principal). DMARC `p=reject` mantido no domínio principal
@@ -16,16 +16,16 @@ Return-Path do Resend em `send.caporali.dev` (bounces fora do domínio principal
 
 ## DNS (zona caporali.dev, Cloudflare)
 
-| Registro | Origem |
-|---|---|
-| `MX caporali.dev` route1/2/3.mx.cloudflare.net | Email Routing (substituiu o MX nulo `.`) |
-| `TXT caporali.dev` `v=spf1 include:_spf.mx.cloudflare.net ~all` | Email Routing (substituiu `v=spf1 -all`) |
-| `TXT cf2024-1._domainkey` | DKIM do Email Routing |
-| `MX/TXT mail.caporali.dev` | Email Routing no subdomínio (disparos do site) |
-| `TXT resend._domainkey` | DKIM do Resend |
-| `MX send.caporali.dev` feedback-smtp.sa-east-1.amazonses.com, `TXT send` `v=spf1 include:amazonses.com ~all` | Return-Path do Resend |
-| `CNAME rsend` send.forge.rmta.net (sem proxy) | Resend |
-| `TXT _dmarc` `v=DMARC1; p=reject; rua=mailto:(e-mail pessoal)` | já existia |
+| Registro                                                                                                     | Origem                                         |
+| ------------------------------------------------------------------------------------------------------------ | ---------------------------------------------- |
+| `MX caporali.dev` route1/2/3.mx.cloudflare.net                                                               | Email Routing (substituiu o MX nulo `.`)       |
+| `TXT caporali.dev` `v=spf1 include:_spf.mx.cloudflare.net ~all`                                              | Email Routing (substituiu `v=spf1 -all`)       |
+| `TXT cf2024-1._domainkey`                                                                                    | DKIM do Email Routing                          |
+| `MX/TXT mail.caporali.dev`                                                                                   | Email Routing no subdomínio (disparos do site) |
+| `TXT resend._domainkey`                                                                                      | DKIM do Resend                                 |
+| `MX send.caporali.dev` feedback-smtp.sa-east-1.amazonses.com, `TXT send` `v=spf1 include:amazonses.com ~all` | Return-Path do Resend                          |
+| `CNAME rsend` send.forge.rmta.net (sem proxy)                                                                | Resend                                         |
+| `TXT _dmarc` `v=DMARC1; p=reject; rua=mailto:(e-mail pessoal)`                                               | já existia                                     |
 
 Regra de roteamento: `fael@caporali.dev` → o Gmail pessoal (catch-all continua desligado: outros endereços são recusados).
 Rollback do estado anterior (domínio sem e-mail): desativar Email Routing e recriar `MX caporali.dev .` (prioridade 0) e `TXT v=spf1 -all`.

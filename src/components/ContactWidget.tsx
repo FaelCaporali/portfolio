@@ -102,7 +102,10 @@ export function ContactWidget() {
       return
     }
     if (!token) {
-      setStatus({ kind: 'error', text: captchaError ? FALLBACK : 'Still checking you are human. One moment and try again.' })
+      setStatus({
+        kind: 'error',
+        text: captchaError ? FALLBACK : 'Still checking you are human. One moment and try again.',
+      })
       return
     }
     setStatus({ kind: 'sending' })
@@ -110,7 +113,13 @@ export function ContactWidget() {
       const r = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: data.name, contact: data.contact, message: data.message, website: data.website, token }),
+        body: JSON.stringify({
+          name: data.name,
+          contact: data.contact,
+          message: data.message,
+          website: data.website,
+          token,
+        }),
       })
       const body = (await r.json().catch(() => ({}))) as { ok?: boolean; error?: string; fields?: Field[] }
       if (r.ok && body.ok) {
@@ -155,7 +164,16 @@ export function ContactWidget() {
         onClick={() => setOpen((o) => !o)}
         className="ml-auto flex cursor-pointer items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3.5 py-1.5 text-[13px] font-medium text-white shadow-lg backdrop-blur-md transition-colors hover:border-white/60 hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white lg:px-5 lg:py-3 lg:text-sm"
       >
-        <svg aria-hidden viewBox="0 0 24 24" className="h-4 w-4 lg:h-5 lg:w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <svg
+          aria-hidden
+          viewBox="0 0 24 24"
+          className="h-4 w-4 lg:h-5 lg:w-5"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
           <path d="M21 12a8.5 8.5 0 0 1-12.6 7.4L3 21l1.6-5.2A8.5 8.5 0 1 1 21 12z" />
         </svg>
         Contact me
@@ -176,7 +194,11 @@ export function ContactWidget() {
         {status.kind === 'sent' && (
           <div role="status" className="mt-4 space-y-3 text-sm text-white/80">
             <p>Thanks! Message received. I'll get back to you soon.</p>
-            <button type="button" onClick={() => setStatus({ kind: 'idle' })} className="cursor-pointer text-white underline underline-offset-4 hover:text-white/80">
+            <button
+              type="button"
+              onClick={() => setStatus({ kind: 'idle' })}
+              className="cursor-pointer text-white underline underline-offset-4 hover:text-white/80"
+            >
               Send another message
             </button>
           </div>
@@ -186,21 +208,42 @@ export function ContactWidget() {
             <label htmlFor={`${id}-name`} className="mb-1 block text-xs text-white/60">
               Name
             </label>
-            <input {...fieldProps('name')} type="text" autoComplete="name" maxLength={LIMITS.name} required className={INPUT} />
+            <input
+              {...fieldProps('name')}
+              type="text"
+              autoComplete="name"
+              maxLength={LIMITS.name}
+              required
+              className={INPUT}
+            />
             {hint('name')}
           </div>
           <div>
             <label htmlFor={`${id}-contact`} className="mb-1 block text-xs text-white/60">
               E-mail or WhatsApp, so I can reply
             </label>
-            <input {...fieldProps('contact')} type="text" inputMode="email" autoComplete="email" maxLength={LIMITS.contact} required className={INPUT} />
+            <input
+              {...fieldProps('contact')}
+              type="text"
+              inputMode="email"
+              autoComplete="email"
+              maxLength={LIMITS.contact}
+              required
+              className={INPUT}
+            />
             {hint('contact')}
           </div>
           <div>
             <label htmlFor={`${id}-message`} className="mb-1 block text-xs text-white/60">
               Message
             </label>
-            <textarea {...fieldProps('message')} rows={4} maxLength={LIMITS.message} required className={`${INPUT} resize-y`} />
+            <textarea
+              {...fieldProps('message')}
+              rows={4}
+              maxLength={LIMITS.message}
+              required
+              className={`${INPUT} resize-y`}
+            />
             {hint('message')}
           </div>
           {/* Isca para robôs: invisível, fora do Tab e do leitor de tela. Pessoas não preenchem. */}

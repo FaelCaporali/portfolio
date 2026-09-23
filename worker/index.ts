@@ -11,7 +11,9 @@ export default {
 
   async scheduled(controller, env, ctx) {
     ctx.waitUntil(
-      retryAndPurge(env, controller.scheduledTime).then((r) => console.log(JSON.stringify({ event: 'contact_cron', ...r }))),
+      retryAndPurge(env, controller.scheduledTime).then((r) =>
+        console.log(JSON.stringify({ event: 'contact_cron', ...r })),
+      ),
     )
   },
 } satisfies ExportedHandler<Env>

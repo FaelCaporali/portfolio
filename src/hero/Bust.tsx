@@ -70,7 +70,15 @@ function prepareMaterials(root: THREE.Object3D): THREE.Mesh {
     if (mat.name === 'SombraOlho') {
       const alpha = mesh.geometry.getAttribute('color_1')
       if (alpha) mesh.geometry.setAttribute('color', alpha)
-      mesh.material = withDissolve(new THREE.MeshBasicMaterial({ color: mat.color, vertexColors: true, transparent: true, depthWrite: false, side: THREE.DoubleSide }))
+      mesh.material = withDissolve(
+        new THREE.MeshBasicMaterial({
+          color: mat.color,
+          vertexColors: true,
+          transparent: true,
+          depthWrite: false,
+          side: THREE.DoubleSide,
+        }),
+      )
       mesh.renderOrder = 1
     } else if (mat.name === 'Conjuntiva') {
       mesh.material = withDissolve(new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.DoubleSide }))
@@ -85,7 +93,12 @@ function prepareMaterials(root: THREE.Object3D): THREE.Mesh {
   return skin!
 }
 
-export function Bust({ expr, prop, pointer, drag }: {
+export function Bust({
+  expr,
+  prop,
+  pointer,
+  drag,
+}: {
   expr: Expression
   prop: PropId
   /** Posição do cursor normalizada em [-1, 1], atualizada fora do React. */
@@ -107,7 +120,17 @@ export function Bust({ expr, prop, pointer, drag }: {
     return { skin, channels, eyes }
   }, [scene])
 
-  const state = useRef({ smile: 0, innerUp: 0, outerUp: 0, down: 0, blink: 0, nextBlink: 2, blinkT: -1, yaw: 0, pitch: 0 })
+  const state = useRef({
+    smile: 0,
+    innerUp: 0,
+    outerUp: 0,
+    down: 0,
+    blink: 0,
+    nextBlink: 2,
+    blinkT: -1,
+    yaw: 0,
+    pitch: 0,
+  })
   const q = useMemo(() => ({ gaze: new THREE.Quaternion(), euler: new THREE.Euler() }), [])
 
   useFrame((_, dt) => {
@@ -120,11 +143,17 @@ export function Bust({ expr, prop, pointer, drag }: {
 
     // Piscar autônomo: 150 ms fechando e abrindo, a cada 2 a 5 s.
     s.nextBlink -= dt
-    if (s.nextBlink <= 0 && s.blinkT < 0) { s.blinkT = 0; s.nextBlink = 2 + Math.random() * 3 }
+    if (s.nextBlink <= 0 && s.blinkT < 0) {
+      s.blinkT = 0
+      s.nextBlink = 2 + Math.random() * 3
+    }
     if (s.blinkT >= 0) {
       s.blinkT += dt
       s.blink = Math.sin(Math.min(s.blinkT / 0.15, 1) * Math.PI)
-      if (s.blinkT >= 0.15) { s.blinkT = -1; s.blink = 0 }
+      if (s.blinkT >= 0.15) {
+        s.blinkT = -1
+        s.blink = 0
+      }
     }
 
     const c = rig.channels

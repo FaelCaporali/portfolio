@@ -11,12 +11,23 @@ let ipSeq = 0
 /** IP novo por requisição (o limite por IP é testado à parte). */
 const nextIp = () => `203.0.113.${++ipSeq % 250}`
 
-const valid = { name: 'Maria Silva', contact: 'maria@example.com', message: 'Olá, Fael! Vamos conversar sobre uma vaga.', token: 'tok', website: '' }
+const valid = {
+  name: 'Maria Silva',
+  contact: 'maria@example.com',
+  message: 'Olá, Fael! Vamos conversar sobre uma vaga.',
+  token: 'tok',
+  website: '',
+}
 
 function post(body: unknown, init: { headers?: Record<string, string>; raw?: string; ip?: string } = {}) {
   return new Request(URL_, {
     method: 'POST',
-    headers: { Origin: ORIGIN, 'Content-Type': 'application/json', 'CF-Connecting-IP': init.ip ?? nextIp(), ...init.headers },
+    headers: {
+      Origin: ORIGIN,
+      'Content-Type': 'application/json',
+      'CF-Connecting-IP': init.ip ?? nextIp(),
+      ...init.headers,
+    },
     body: init.raw ?? JSON.stringify(body),
     cf: { country: 'BR' },
   })
@@ -42,7 +53,10 @@ afterEach(() => vi.restoreAllMocks())
 /** E-mail entregue à binding na primeira chamada de send. */
 const sentMail = () => send.mock.calls[0]?.[0] as EmailMessageBuilder
 const call = (req: Request, e: Env = testEnv) => worker.fetch(req as Request<unknown, IncomingRequestCfProperties>, e)
-const rows = () => env.DB.prepare('SELECT * FROM messages ORDER BY created_at').all<Message & { status: string; last_error: string | null }>().then((r) => r.results)
+const rows = () =>
+  env.DB.prepare('SELECT * FROM messages ORDER BY created_at')
+    .all<Message & { status: string; last_error: string | null }>()
+    .then((r) => r.results)
 
 describe('rota e método', () => {
   it('só aceita POST', async () => {
@@ -79,27 +93,48 @@ describe('origem (CSRF)', () => {
 })
 
 describe('formato do corpo', () => {
-  it.each(['text/plain', 'application/x-www-form-urlencoded', 'multipart/form-data; boundary=x', ''])('Content-Type "%s" → 415', async (type) => {
-    expect((await call(post(valid, { headers: { 'Content-Type': type } }))).status).toBe(415)
-  })
+  it.each(['text/plain', 'application/x-www-form-urlencoded', 'multipart/form-data; boundary=x', ''])(
+    'Content-Type "%s" → 415',
+    async (type) => {
+      expect((await call(post(valid, { headers: { 'Content-Type': type } }))).status).toBe(415)
+    },
+  )
   it('corpo acima de 16 KB → 413 (Content-Length declarado)', async () => {
     const r = await call(post({ ...valid, message: 'a'.repeat(17_000) }))
     expect(r.status).toBe(413)
   })
   it('corpo acima de 16 KB → 413 (sem Content-Length, em streaming)', async () => {
     const big = new TextEncoder().encode(JSON.stringify({ ...valid, message: 'a'.repeat(17_000) }))
-    const stream = new ReadableStream({ start(c) { for (let i = 0; i < big.length; i += 1024) c.enqueue(big.slice(i, i + 1024)); c.close() } })
-    const req = new Request(URL_, { method: 'POST', headers: { Origin: ORIGIN, 'Content-Type': 'application/json' }, body: stream })
+    const stream = new ReadableStream({
+      start(c) {
+        for (let i = 0; i < big.length; i += 1024) c.enqueue(big.slice(i, i + 1024))
+        c.close()
+      },
+    })
+    const req = new Request(URL_, {
+      method: 'POST',
+      headers: { Origin: ORIGIN, 'Content-Type': 'application/json' },
+      body: stream,
+    })
     expect((await call(req)).status).toBe(413)
   })
   it('JSON inválido → 400', async () => {
     expect((await call(post(null, { raw: '{"name": ' }))).status).toBe(400)
   })
   it('UTF-8 inválido → 400', async () => {
-    const req = new Request(URL_, { method: 'POST', headers: { Origin: ORIGIN, 'Content-Type': 'application/json' }, body: new Uint8Array([0x7b, 0xff, 0xfe, 0x7d]) })
+    const req = new Request(URL_, {
+      method: 'POST',
+      headers: { Origin: ORIGIN, 'Content-Type': 'application/json' },
+      body: new Uint8Array([0x7b, 0xff, 0xfe, 0x7d]),
+    })
     expect((await call(req)).status).toBe(400)
   })
-  it.each([['array', []], ['string', 'x'], ['número', 1], ['null', null]])('JSON que não é objeto (%s) → 422', async (_, body) => {
+  it.each([
+    ['array', []],
+    ['string', 'x'],
+    ['número', 1],
+    ['null', null],
+  ])('JSON que não é objeto (%s) → 422', async (_, body) => {
     expect((await call(post(body))).status).toBe(422)
   })
 })
@@ -111,7 +146,11 @@ describe('validação dos campos', () => {
     ['nome não string', { name: { $gt: '' } }, 'name'],
     ['contato vazio', { contact: '' }, 'contact'],
     ['contato que não é e-mail nem telefone', { contact: 'linkedin.com/in/maria' }, 'contact'],
-    ['e-mail com quebra de linha (injeção de cabeçalho)', { contact: 'maria@example.com\r\nBcc: alvo@example.com' }, 'contact'],
+    [
+      'e-mail com quebra de linha (injeção de cabeçalho)',
+      { contact: 'maria@example.com\r\nBcc: alvo@example.com' },
+      'contact',
+    ],
     ['e-mail com dois arrobas', { contact: 'a@b@example.com' }, 'contact'],
     ['e-mail com pontos seguidos', { contact: 'a..b@example.com' }, 'contact'],
     ['telefone curto', { contact: '1234567' }, 'contact'],
@@ -140,11 +179,41 @@ describe('robôs', () => {
   it.each([
     ['sem token', () => ({ token: '' }), () => {}],
     ['token gigante', () => ({ token: 'x'.repeat(2049) }), () => {}],
-    ['siteverify recusa', () => ({}), () => { siteverify = { success: false, 'error-codes': ['invalid-input-response'] } }],
-    ['ação errada', () => ({}), () => { siteverify = { success: true, action: 'login', hostname: 'fael.caporali.dev' } }],
-    ['sem ação', () => ({}), () => { siteverify = { success: true, hostname: 'fael.caporali.dev' } }],
-    ['hostname errado', () => ({}), () => { siteverify = { success: true, action: 'contact', hostname: 'evil.example' } }],
-    ['chave de teste em produção', () => ({}), () => { siteverify = { success: true, hostname: 'example.com', metadata: { result_with_testing_key: true } } }],
+    [
+      'siteverify recusa',
+      () => ({}),
+      () => {
+        siteverify = { success: false, 'error-codes': ['invalid-input-response'] }
+      },
+    ],
+    [
+      'ação errada',
+      () => ({}),
+      () => {
+        siteverify = { success: true, action: 'login', hostname: 'fael.caporali.dev' }
+      },
+    ],
+    [
+      'sem ação',
+      () => ({}),
+      () => {
+        siteverify = { success: true, hostname: 'fael.caporali.dev' }
+      },
+    ],
+    [
+      'hostname errado',
+      () => ({}),
+      () => {
+        siteverify = { success: true, action: 'contact', hostname: 'evil.example' }
+      },
+    ],
+    [
+      'chave de teste em produção',
+      () => ({}),
+      () => {
+        siteverify = { success: true, hostname: 'example.com', metadata: { result_with_testing_key: true } }
+      },
+    ],
   ])('Turnstile: %s → 403', async (_, patch, arrange) => {
     arrange()
     const r = await call(post({ ...valid, ...patch() }))
@@ -169,7 +238,9 @@ describe('robôs', () => {
     expect(status).toEqual([200, 200, 200, 429])
   })
   it(`teto de ${DAILY_CAP} mensagens em 24 h → 429`, async () => {
-    const stmt = env.DB.prepare("INSERT INTO messages (id, created_at, name, contact, body, status) VALUES (?, ?, 'x', 'x', 'x', 'sent')")
+    const stmt = env.DB.prepare(
+      "INSERT INTO messages (id, created_at, name, contact, body, status) VALUES (?, ?, 'x', 'x', 'x', 'sent')",
+    )
     await env.DB.batch(Array.from({ length: DAILY_CAP }, (_, i) => stmt.bind(`old-${i}`, Date.now() - 1000)))
     const r = await call(post(valid))
     expect(r.status).toBe(429)
@@ -192,7 +263,13 @@ describe('envio', () => {
     expect(mail.text).toContain(valid.message)
     expect(mail.text).toContain('país: BR')
     const [row] = await rows()
-    expect(row).toMatchObject({ status: 'sent', attempts: 1, reply_email: 'maria@example.com', country: 'BR', message_id: 'msg-1' })
+    expect(row).toMatchObject({
+      status: 'sent',
+      attempts: 1,
+      reply_email: 'maria@example.com',
+      country: 'BR',
+      message_id: 'msg-1',
+    })
   })
   it('telefone: sem Reply-To, com link do WhatsApp (assume +55)', async () => {
     await call(post({ ...valid, contact: '(31) 99999-0000' }))
@@ -228,7 +305,11 @@ describe('envio', () => {
     expect(mail.text).toContain(message)
   })
   it('falha no envio: responde 200 (fica na fila), grava pendente com o código do erro', async () => {
-    send.mockRejectedValue(Object.assign(new Error('E_RATE_LIMIT_EXCEEDED: slow down, maria@example.com'), { code: 'E_RATE_LIMIT_EXCEEDED' }))
+    send.mockRejectedValue(
+      Object.assign(new Error('E_RATE_LIMIT_EXCEEDED: slow down, maria@example.com'), {
+        code: 'E_RATE_LIMIT_EXCEEDED',
+      }),
+    )
     const r = await call(post(valid))
     expect(r.status).toBe(200)
     const [row] = await rows()
@@ -236,12 +317,20 @@ describe('envio', () => {
   })
   it('falha no envio e no banco: 503, visitante vê o erro', async () => {
     send.mockRejectedValue(new Error('boom'))
-    const brokenDb = { prepare: () => { throw new Error('D1 down') } } as unknown as D1Database
+    const brokenDb = {
+      prepare: () => {
+        throw new Error('D1 down')
+      },
+    } as unknown as D1Database
     const r = await call(post(valid), { ...testEnv, DB: brokenDb })
     expect(r.status).toBe(503)
   })
   it('banco fora do ar não impede o envio', async () => {
-    const brokenDb = { prepare: () => { throw new Error('D1 down') } } as unknown as D1Database
+    const brokenDb = {
+      prepare: () => {
+        throw new Error('D1 down')
+      },
+    } as unknown as D1Database
     const r = await call(post(valid), { ...testEnv, DB: brokenDb })
     expect(r.status).toBe(200)
     expect(send).toHaveBeenCalledOnce()
@@ -258,12 +347,30 @@ describe('envio', () => {
     expect(all).not.toContain('vaga')
   })
   it('a mensagem composta passa pela binding real de e-mail (simulada localmente)', async () => {
-    const m: Message = { id: 'x', created_at: Date.now(), name: 'Maria', contact: 'maria@example.com', reply_email: 'maria@example.com', body: 'Olá, tudo bem? Teste.', country: 'BR', attempts: 0 }
+    const m: Message = {
+      id: 'x',
+      created_at: Date.now(),
+      name: 'Maria',
+      contact: 'maria@example.com',
+      reply_email: 'maria@example.com',
+      body: 'Olá, tudo bem? Teste.',
+      country: 'BR',
+      attempts: 0,
+    }
     await expect(env.EMAIL.send(compose(m))).resolves.toHaveProperty('messageId')
   })
   // O simulador local registra a recusa como erro solto e um aviso de "hung" do próprio simulador; o resultado vale.
   it('a binding real recusa outro destino (destino fixo na configuração)', async () => {
-    const m: Message = { id: 'x', created_at: Date.now(), name: 'Maria', contact: 'maria@example.com', reply_email: null, body: 'Olá, tudo bem? Teste.', country: null, attempts: 0 }
+    const m: Message = {
+      id: 'x',
+      created_at: Date.now(),
+      name: 'Maria',
+      contact: 'maria@example.com',
+      reply_email: null,
+      body: 'Olá, tudo bem? Teste.',
+      country: null,
+      attempts: 0,
+    }
     await expect(env.EMAIL.send({ ...compose(m), to: 'alvo@example.com' })).rejects.toThrow()
     await expect(env.EMAIL.send({ ...compose(m), from: 'fael@caporali.dev' })).rejects.toThrow()
   })
@@ -276,7 +383,9 @@ describe('cron', () => {
     await waitOnExecutionContext(ctx)
   }
   const seed = (id: string, createdAt: number, status = 'pending', attempts = 1) =>
-    env.DB.prepare("INSERT INTO messages (id, created_at, name, contact, reply_email, body, status, attempts) VALUES (?, ?, 'Maria', 'maria@example.com', 'maria@example.com', 'Olá, mensagem de teste.', ?, ?)")
+    env.DB.prepare(
+      "INSERT INTO messages (id, created_at, name, contact, reply_email, body, status, attempts) VALUES (?, ?, 'Maria', 'maria@example.com', 'maria@example.com', 'Olá, mensagem de teste.', ?, ?)",
+    )
       .bind(id, createdAt, status, attempts)
       .run()
 
@@ -295,7 +404,11 @@ describe('cron', () => {
     send.mockRejectedValue(new Error('E_INTERNAL_SERVER_ERROR'))
     await seed('tired', Date.now() - 10 * 60_000, 'pending', MAX_ATTEMPTS - 1)
     await runCron(testEnv)
-    expect((await rows())[0]).toMatchObject({ status: 'failed', attempts: MAX_ATTEMPTS, last_error: 'E_INTERNAL_SERVER_ERROR' })
+    expect((await rows())[0]).toMatchObject({
+      status: 'failed',
+      attempts: MAX_ATTEMPTS,
+      last_error: 'E_INTERNAL_SERVER_ERROR',
+    })
   })
   it('apaga mensagens com mais de 90 dias', async () => {
     const now = Date.now()

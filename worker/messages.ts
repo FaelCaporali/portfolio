@@ -71,7 +71,9 @@ export async function deliver(env: Env, m: Message): Promise<Delivery> {
 
 export async function insert(db: D1Database, m: Message): Promise<void> {
   await db
-    .prepare('INSERT INTO messages (id, created_at, name, contact, reply_email, body, country, attempts) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+    .prepare(
+      'INSERT INTO messages (id, created_at, name, contact, reply_email, body, country, attempts) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+    )
     .bind(m.id, m.created_at, m.name, m.contact, m.reply_email, m.body, m.country, m.attempts)
     .run()
 }
@@ -80,7 +82,9 @@ export async function insert(db: D1Database, m: Message): Promise<void> {
 export async function record(db: D1Database, id: string, attempts: number, d: Delivery, now: number): Promise<void> {
   if (d.ok) {
     await db
-      .prepare("UPDATE messages SET status = 'sent', attempts = ?, sent_at = ?, message_id = ?, last_error = NULL WHERE id = ?")
+      .prepare(
+        "UPDATE messages SET status = 'sent', attempts = ?, sent_at = ?, message_id = ?, last_error = NULL WHERE id = ?",
+      )
       .bind(attempts, now, d.messageId, id)
       .run()
   } else {
@@ -92,7 +96,10 @@ export async function record(db: D1Database, id: string, attempts: number, d: De
 }
 
 export async function countSince(db: D1Database, since: number): Promise<number> {
-  const row = await db.prepare('SELECT COUNT(*) AS n FROM messages WHERE created_at >= ?').bind(since).first<{ n: number }>()
+  const row = await db
+    .prepare('SELECT COUNT(*) AS n FROM messages WHERE created_at >= ?')
+    .bind(since)
+    .first<{ n: number }>()
   return row?.n ?? 0
 }
 
@@ -108,8 +115,11 @@ export async function retryAndPurge(env: Env, now: number): Promise<{ retried: n
     const d = await deliver(env, m)
     await record(env.DB, m.id, m.attempts + 1, d, now)
     if (d.ok) sent++
-    else console.warn(JSON.stringify({ event: 'contact_retry_failed', id: m.id, code: d.code, attempts: m.attempts + 1 }))
+    else
+      console.warn(JSON.stringify({ event: 'contact_retry_failed', id: m.id, code: d.code, attempts: m.attempts + 1 }))
   }
-  const purge = await env.DB.prepare('DELETE FROM messages WHERE created_at < ?').bind(now - RETENTION_MS).run()
+  const purge = await env.DB.prepare('DELETE FROM messages WHERE created_at < ?')
+    .bind(now - RETENTION_MS)
+    .run()
   return { retried: results.length, sent, purged: purge.meta.changes }
 }

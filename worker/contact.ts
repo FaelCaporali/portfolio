@@ -2,10 +2,23 @@ import { DAILY_CAP, countSince, deliver, insert, record, type Message } from './
 import { list, verifyTurnstile } from './turnstile'
 import { LIMITS, parseContact, type Field } from './validate'
 
-type ErrorCode = 'method' | 'forbidden' | 'unsupported' | 'rate_limited' | 'too_large' | 'invalid' | 'verification_failed' | 'busy' | 'unavailable'
+type ErrorCode =
+  | 'method'
+  | 'forbidden'
+  | 'unsupported'
+  | 'rate_limited'
+  | 'too_large'
+  | 'invalid'
+  | 'verification_failed'
+  | 'busy'
+  | 'unavailable'
 
 /** Resposta da API: só JSON, nunca em cache, sem conteúdo ativo. Erros genéricos, sem detalhe interno. */
-export function json(status: number, body: { ok: true } | { ok: false; error: ErrorCode | 'not_found'; fields?: Field[] }, extra?: HeadersInit): Response {
+export function json(
+  status: number,
+  body: { ok: true } | { ok: false; error: ErrorCode | 'not_found'; fields?: Field[] },
+  extra?: HeadersInit,
+): Response {
   const headers = new Headers(extra)
   headers.set('Content-Type', 'application/json; charset=utf-8')
   headers.set('Cache-Control', 'no-store')
@@ -17,7 +30,8 @@ export function json(status: number, body: { ok: true } | { ok: false; error: Er
 const fail = (status: number, error: ErrorCode, extra?: HeadersInit) => json(status, { ok: false, error }, extra)
 
 /** Log sem dado pessoal: evento, desfecho e, no máximo, o id da mensagem e o código do erro. */
-const log = (outcome: string, extra: Record<string, string | number> = {}) => console.log(JSON.stringify({ event: 'contact', outcome, ...extra }))
+const log = (outcome: string, extra: Record<string, string | number> = {}) =>
+  console.log(JSON.stringify({ event: 'contact', outcome, ...extra }))
 
 /** Lê o corpo até o limite, sem confiar no Content-Length (pode faltar ou mentir). */
 async function readCapped(request: Request, max: number): Promise<string | null> {

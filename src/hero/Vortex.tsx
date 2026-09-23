@@ -72,7 +72,10 @@ export function Vortex({ skin }: { skin: THREE.Mesh }) {
     const pos = new Float32Array(COUNT * 3)
     const col: number[] = new Array(COUNT * 3)
     const seed = new Float32Array(COUNT)
-    const p = new THREE.Vector3(), nrm = new THREE.Vector3(), c = new THREE.Color(), uv = new THREE.Vector2()
+    const p = new THREE.Vector3(),
+      nrm = new THREE.Vector3(),
+      c = new THREE.Color(),
+      uv = new THREE.Vector2()
     for (let i = 0; i < COUNT; i++) {
       sampler.sample(p, nrm, c, uv)
       pos.set([p.x, p.y, p.z], i * 3)

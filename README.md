@@ -6,13 +6,13 @@ pelo mesmo Worker da Cloudflare que entrega o site.
 
 ## Estrutura
 
-| Pasta | Conteúdo |
-|---|---|
-| `src/` | site: Vite 7, React 19, TypeScript, React Three Fiber + drei, GSAP, Tailwind 4 |
+| Pasta     | Conteúdo                                                                                                                              |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/`    | site: Vite 7, React 19, TypeScript, React Three Fiber + drei, GSAP, Tailwind 4                                                        |
 | `worker/` | API de contato em Cloudflare Workers: validação, Turnstile, limite por IP, D1 e reenvio por cron ([docs/CONTATO.md](docs/CONTATO.md)) |
-| `public/` | assets estáticos e cabeçalhos de segurança (`_headers`) |
-| `3d/` | pipeline do busto e do personagem cartoon: Blender 4.5 headless, MPFB, MediaPipe ([3d/README.md](3d/README.md)) |
-| `docs/` | pipeline 3D, contato, e-mail e pesquisas de referência |
+| `public/` | assets estáticos e cabeçalhos de segurança (`_headers`)                                                                               |
+| `3d/`     | pipeline do busto e do personagem cartoon: Blender 4.5 headless, MPFB, MediaPipe ([3d/README.md](3d/README.md))                       |
+| `docs/`   | pipeline 3D, contato, e-mail e pesquisas de referência                                                                                |
 
 ## Desenvolvimento
 

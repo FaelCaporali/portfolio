@@ -1,0 +1,9 @@
+# gerados ou de terceiros
+pnpm-lock.yaml
+worker/worker-configuration.d.ts
+dist
+.wrangler
+# pipeline 3D (Python e documentos de processo) e arquivos servidos como estão
+3d
+public
+.claude

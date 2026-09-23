@@ -37,11 +37,23 @@ export function withDissolve<T extends THREE.Material>(m: T, opts: { neckFade?: 
     sh.uniforms.uD = dissolveUniforms.uD
     sh.uniforms.uToGlb = dissolveUniforms.uToGlb
     sh.vertexShader = sh.vertexShader
-      .replace('#include <common>', '#include <common>\nuniform mat4 uToGlb;\nvarying vec3 vDisPos;\nvarying float vLocalY;')
-      .replace('#include <project_vertex>', '#include <project_vertex>\nvDisPos = (uToGlb * modelMatrix * vec4(transformed, 1.0)).xyz;\nvLocalY = transformed.y;')
+      .replace(
+        '#include <common>',
+        '#include <common>\nuniform mat4 uToGlb;\nvarying vec3 vDisPos;\nvarying float vLocalY;',
+      )
+      .replace(
+        '#include <project_vertex>',
+        '#include <project_vertex>\nvDisPos = (uToGlb * modelMatrix * vec4(transformed, 1.0)).xyz;\nvLocalY = transformed.y;',
+      )
     sh.fragmentShader = sh.fragmentShader
-      .replace('#include <common>', `#include <common>\nuniform float uD;\nvarying vec3 vDisPos;\nvarying float vLocalY;\n${NOISE_GLSL}`)
-      .replace('#include <clipping_planes_fragment>', '#include <clipping_planes_fragment>\nfloat disN = disField(vDisPos);\nif (disN < uD) discard;')
+      .replace(
+        '#include <common>',
+        `#include <common>\nuniform float uD;\nvarying vec3 vDisPos;\nvarying float vLocalY;\n${NOISE_GLSL}`,
+      )
+      .replace(
+        '#include <clipping_planes_fragment>',
+        '#include <clipping_planes_fragment>\nfloat disN = disField(vDisPos);\nif (disN < uD) discard;',
+      )
       .replace(
         '#include <dithering_fragment>',
         `${opts.neckFade ? `gl_FragColor.rgb = mix(${BG_SRGB}, gl_FragColor.rgb, smoothstep(0.012, 0.075, vLocalY));\n` : ''}` +

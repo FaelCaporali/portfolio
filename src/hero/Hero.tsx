@@ -17,7 +17,10 @@ const IN = 1.5
 
 const params = new URLSearchParams(window.location.search)
 /** Conferência: ?slot=<id> começa numa vida; ?d=0..1.35 congela a desintegração naquele ponto. */
-const START = Math.max(0, stages.findIndex((s) => s.id === params.get('slot')))
+const START = Math.max(
+  0,
+  stages.findIndex((s) => s.id === params.get('slot')),
+)
 const FROZEN_D = params.has('d') ? Number(params.get('d')) : null
 const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
@@ -31,7 +34,8 @@ function stageAt(i: number): Stage {
 }
 
 /** Botões secundários (currículo e perfis). */
-const PILL = 'flex items-center justify-center gap-1.5 rounded-full border border-white/20 px-3 py-1.5 text-[13px] min-[360px]:inline-flex sm:px-4 sm:py-2 sm:text-sm text-white/80 transition-colors hover:border-white/60 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white cursor-pointer'
+const PILL =
+  'flex items-center justify-center gap-1.5 rounded-full border border-white/20 px-3 py-1.5 text-[13px] min-[360px]:inline-flex sm:px-4 sm:py-2 sm:text-sm text-white/80 transition-colors hover:border-white/60 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white cursor-pointer'
 
 /** Largura a partir da qual o texto vai para a esquerda e o busto para a direita (lg do Tailwind). */
 const WIDE = 1024
@@ -39,11 +43,24 @@ const WIDE = 1024
 const BUST_SHIFT = 0.2
 
 /** Relógio do carrossel: segura, desintegra (troca a vida no auge do furacão) e reconstrói. */
-function Director({ index, drag, onPhase, onNext }: { index: number; drag: React.RefObject<DragState>; onPhase: (p: Phase) => void; onNext: () => void }) {
+function Director({
+  index,
+  drag,
+  onPhase,
+  onNext,
+}: {
+  index: number
+  drag: React.RefObject<DragState>
+  onPhase: (p: Phase) => void
+  onNext: () => void
+}) {
   const t = useRef({ phase: 'hold' as Phase, time: 0 })
   useFrame((_, dt) => {
     const c = t.current
-    if (FROZEN_D !== null) { dissolveUniforms.uD.value = FROZEN_D; return }
+    if (FROZEN_D !== null) {
+      dissolveUniforms.uD.value = FROZEN_D
+      return
+    }
     // Quem está girando o busto não o perde na mão: a vida atual segura até soltar (e um instante depois).
     if (c.phase === 'hold' && (drag.current.active || drag.current.idle < 0.8)) return
     c.time += Math.min(dt, 0.1)
@@ -52,15 +69,28 @@ function Director({ index, drag, onPhase, onNext }: { index: number; drag: React
       dissolveUniforms.uD.value = 0
       if (c.time >= (index === 0 ? HOLD_FIRST : HOLD)) {
         c.time = 0
-        if (REDUCED) { onNext(); return }
-        c.phase = 'out'; onPhase('out')
+        if (REDUCED) {
+          onNext()
+          return
+        }
+        c.phase = 'out'
+        onPhase('out')
       }
     } else if (c.phase === 'out') {
       dissolveUniforms.uD.value = DISSOLVE_MAX * ease(Math.min(c.time / OUT, 1))
-      if (c.time >= OUT) { c.time = 0; c.phase = 'in'; onNext(); onPhase('in') }
+      if (c.time >= OUT) {
+        c.time = 0
+        c.phase = 'in'
+        onNext()
+        onPhase('in')
+      }
     } else {
       dissolveUniforms.uD.value = DISSOLVE_MAX * (1 - ease(Math.min(c.time / IN, 1)))
-      if (c.time >= IN) { c.time = 0; c.phase = 'hold'; onPhase('hold') }
+      if (c.time >= IN) {
+        c.time = 0
+        c.phase = 'hold'
+        onPhase('hold')
+      }
     }
   })
   return null
@@ -101,7 +131,11 @@ function Environment() {
     const env = pmrem.fromScene(new RoomEnvironment(), 0.04).texture
     scene.environment = env
     scene.environmentIntensity = 0.35
-    return () => { env.dispose(); pmrem.dispose(); scene.environment = null }
+    return () => {
+      env.dispose()
+      pmrem.dispose()
+      scene.environment = null
+    }
   }, [gl, scene])
   return null
 }
@@ -116,7 +150,9 @@ function SlotWord({ text, color, leaving }: { text: string; color: string; leavi
           {w > 0 && ' '}
           <span className="whitespace-nowrap">
             {[...word].map((ch) => (
-              <span key={i} className="ch" style={{ '--i': i++ } as React.CSSProperties}>{ch}</span>
+              <span key={i} className="ch" style={{ '--i': i++ } as React.CSSProperties}>
+                {ch}
+              </span>
             ))}
           </span>
         </Fragment>
@@ -156,7 +192,10 @@ export function Hero() {
     last.current = { x: e.clientX, y: e.clientY, t: now }
   }
   const onUp = (e: React.PointerEvent) => {
-    if (performance.now() - last.current.t > 80) { drag.current.vYaw = 0; drag.current.vPitch = 0 } // parou antes de soltar: sem embalo
+    if (performance.now() - last.current.t > 80) {
+      drag.current.vYaw = 0
+      drag.current.vPitch = 0
+    } // parou antes de soltar: sem embalo
     drag.current.active = false
     drag.current.idle = 0
     e.currentTarget.releasePointerCapture(e.pointerId)
@@ -177,16 +216,20 @@ export function Hero() {
   useLayoutEffect(() => {
     const el = text.current!
     const hd = header.current!
-    const measure = () => setFree((f) => {
-      const next: [number, number] = [hd.offsetTop + hd.offsetHeight, el.offsetTop]
-      return f[0] === next[0] && f[1] === next[1] ? f : next
-    })
+    const measure = () =>
+      setFree((f) => {
+        const next: [number, number] = [hd.offsetTop + hd.offsetHeight, el.offsetTop]
+        return f[0] === next[0] && f[1] === next[1] ? f : next
+      })
     const ro = new ResizeObserver(measure)
     ro.observe(el)
     ro.observe(hd)
     window.addEventListener('resize', measure)
     measure()
-    return () => { ro.disconnect(); window.removeEventListener('resize', measure) }
+    return () => {
+      ro.disconnect()
+      window.removeEventListener('resize', measure)
+    }
   }, [])
 
   return (
@@ -209,7 +252,12 @@ export function Hero() {
         <directionalLight position={[0.3, 0.4, -1]} intensity={0.5} color="#ffffff" />
         <Suspense fallback={null}>
           <Bust expr={stage.expr} prop={stage.prop} pointer={pointer} drag={drag} />
-          <Director index={index} drag={drag} onPhase={setPhase} onNext={() => setIndex((i) => (i + 1) % stages.length)} />
+          <Director
+            index={index}
+            drag={drag}
+            onPhase={setPhase}
+            onNext={() => setIndex((i) => (i + 1) % stages.length)}
+          />
         </Suspense>
       </Canvas>
 
@@ -222,17 +270,23 @@ export function Hero() {
         </a>
       </header>
 
-      <div ref={text} className="pointer-events-none absolute inset-x-0 bottom-0 px-5 pb-6 text-white sm:px-10 lg:inset-y-0 lg:right-auto lg:flex lg:w-1/2 lg:flex-col lg:justify-center lg:pb-0 lg:pl-[7vw]">
+      <div
+        ref={text}
+        className="pointer-events-none absolute inset-x-0 bottom-0 px-5 pb-6 text-white sm:px-10 lg:inset-y-0 lg:right-auto lg:flex lg:w-1/2 lg:flex-col lg:justify-center lg:pb-0 lg:pl-[7vw]"
+      >
         <h1>
           <span className="block text-xs tracking-[0.3em] text-white/60 uppercase lg:text-sm">
             Today I am a{/^[aeiou]/i.test(stage.slot) ? 'n' : ''}
           </span>
           {/* Duas linhas reservadas onde a vida mais longa quebra (celular e coluna do largo): a troca não empurra o resto. */}
-          <span className="mt-2 block min-h-[2em] text-[2.6rem] sm:min-h-[1em] lg:min-h-[2em] leading-none font-semibold tracking-tight lg:text-[clamp(3rem,4.6vw,5rem)]">
+          <span className="mt-2 block min-h-[2em] text-[2.6rem] leading-none font-semibold tracking-tight sm:min-h-[1em] lg:min-h-[2em] lg:text-[clamp(3rem,4.6vw,5rem)]">
             <SlotWord text={stage.slot} color={stage.accent} leaving={phase === 'out'} />
           </span>
         </h1>
-        <ul aria-label="Títulos" className="mt-3 space-y-0.5 text-sm leading-snug text-white/70 lg:mt-6 lg:space-y-1 lg:text-lg">
+        <ul
+          aria-label="Títulos"
+          className="mt-3 space-y-0.5 text-sm leading-snug text-white/70 lg:mt-6 lg:space-y-1 lg:text-lg"
+        >
           {profile.titles.map((t) => (
             <li key={t}>{t}</li>
           ))}
@@ -252,7 +306,10 @@ export function Hero() {
             {profileLinks.map((l) => (
               <li key={l.label}>
                 <a href={l.href} target="_blank" rel="noopener noreferrer" className={PILL}>
-                  {l.label} <span aria-hidden className="hidden text-white/45 xl:inline">↗</span>
+                  {l.label}{' '}
+                  <span aria-hidden className="hidden text-white/45 xl:inline">
+                    ↗
+                  </span>
                 </a>
               </li>
             ))}

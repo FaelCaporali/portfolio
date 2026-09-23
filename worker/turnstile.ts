@@ -10,7 +10,13 @@ interface Siteverify {
   metadata?: { result_with_testing_key?: boolean }
 }
 
-export const list = (csv: string) => new Set(csv.split(',').map((s) => s.trim()).filter(Boolean))
+export const list = (csv: string) =>
+  new Set(
+    csv
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean),
+  )
 
 /**
  * Confere o token no servidor (o widget sozinho não protege nada). Token de uso único, válido por 5 minutos.

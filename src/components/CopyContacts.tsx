@@ -14,7 +14,16 @@ async function copyText(text: string): Promise<boolean> {
 /** Ícone do tipo de contato; vira um visto por um instante depois de copiar. */
 function KindIcon({ kind }: { kind: DirectContact['kind'] | 'copied' }) {
   return (
-    <svg aria-hidden viewBox="0 0 24 24" className="h-3.5 w-3.5 shrink-0 lg:h-4 lg:w-4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      aria-hidden
+      viewBox="0 0 24 24"
+      className="h-3.5 w-3.5 shrink-0 lg:h-4 lg:w-4"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       {kind === 'copied' ? (
         <path d="m5 12.5 4.5 4.5L19 7.5" />
       ) : kind === 'email' ? (
@@ -55,7 +64,7 @@ export function CopyContacts({ className = '' }: { className?: string }) {
               type="button"
               onClick={() => copy(c)}
               title={`Copy ${c.kind === 'email' ? 'e-mail' : 'phone number'}`}
-              className="group -mx-1.5 inline-flex cursor-copy items-center gap-1.5 rounded-md px-1.5 py-1 text-xs text-white/65 min-[360px]:text-[13px] transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-white lg:text-sm"
+              className="group -mx-1.5 inline-flex cursor-copy items-center gap-1.5 rounded-md px-1.5 py-1 text-xs text-white/65 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-white min-[360px]:text-[13px] lg:text-sm"
             >
               <KindIcon kind={shown && copied.ok ? 'copied' : c.kind} />
               <span className="tabular-nums">{c.value}</span>
@@ -64,7 +73,11 @@ export function CopyContacts({ className = '' }: { className?: string }) {
               role="status"
               className={`pointer-events-none absolute bottom-full left-0 mb-1 rounded-md bg-white px-2 py-0.5 text-xs font-medium whitespace-nowrap text-neutral-950 shadow transition-all duration-150 ${shown ? 'translate-y-0 opacity-100' : 'translate-y-1 opacity-0'}`}
             >
-              {shown ? (copied.ok ? `${c.kind === 'email' ? 'E-mail' : 'Phone'} copied` : 'Copy failed. Select the text instead.') : ''}
+              {shown
+                ? copied.ok
+                  ? `${c.kind === 'email' ? 'E-mail' : 'Phone'} copied`
+                  : 'Copy failed. Select the text instead.'
+                : ''}
             </span>
           </li>
         )
