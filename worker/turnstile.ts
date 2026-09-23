@@ -1,7 +1,6 @@
-import { LIMITS } from './validate'
+import { LIMITS, TURNSTILE_ACTION } from '../shared/contact/contract'
 
 const SITEVERIFY = 'https://challenges.cloudflare.com/turnstile/v0/siteverify'
-export const TURNSTILE_ACTION = 'contact'
 
 interface Siteverify {
   success: boolean

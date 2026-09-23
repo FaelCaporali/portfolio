@@ -1,13 +1,19 @@
 import { useCallback, useEffect, useId, useRef, useState, type SubmitEvent } from 'react'
 import { directContacts } from '../content/profile'
-import { ACTION, SITEKEY, loadTurnstile } from './turnstile'
+import {
+  CONTACT_PATH,
+  LIMITS,
+  TURNSTILE_ACTION,
+  type ContactErrorCode,
+  type ContactRequest,
+  type ContactResponse,
+  type Field,
+} from '../../shared/contact/contract'
+import { parseContact } from '../../shared/contact/validation'
+import { SITEKEY, loadTurnstile } from './turnstile'
 import { useDismiss } from './useDismiss'
 
-type Field = 'name' | 'contact' | 'message'
 type Status = { kind: 'idle' } | { kind: 'sending' } | { kind: 'sent' } | { kind: 'error'; text: string }
-
-/** Os mesmos limites do Worker (worker/validate.ts). O servidor é quem decide; aqui é só para avisar antes. */
-const LIMITS = { name: 100, contact: 200, messageMin: 10, message: 4000 }
 
 const FIELD_HINT: Record<Field, string> = {
   name: 'Tell me your name.',
@@ -16,19 +22,20 @@ const FIELD_HINT: Record<Field, string> = {
 }
 
 const FALLBACK = "Couldn't send right now. Please reach me directly below."
-const ERRORS: Record<string, string> = {
+/** Um texto por recusa do Worker: quem escreveu sabe o que aconteceu e o que fazer. */
+const ERRORS: Record<ContactErrorCode, string> = {
+  method: 'The form could not be sent from here. Please reach me directly below.',
+  forbidden: 'This page is not allowed to send the form. Please reach me directly below.',
+  unsupported: 'Your browser sent the form in a format I cannot read. Please reach me directly below.',
   rate_limited: 'Too many attempts. Please try again in a minute.',
+  too_large: 'The message is too long. Please shorten it and try again.',
+  invalid: 'Something in the form could not be read. Please check it and try again.',
   verification_failed: 'Human verification failed. Please try again.',
+  busy: 'Too many messages today. Please reach me directly below.',
+  unavailable: FALLBACK,
 }
 
-function check(data: Record<string, string>): Field[] {
-  const bad: Field[] = []
-  if (!data.name?.trim()) bad.push('name')
-  const contact = data.contact?.trim() ?? ''
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact) && contact.replace(/\D/g, '').length < 8) bad.push('contact')
-  if ((data.message?.trim().length ?? 0) < LIMITS.messageMin) bad.push('message')
-  return bad
-}
+const isErrorCode = (code: unknown): code is ContactErrorCode => typeof code === 'string' && Object.hasOwn(ERRORS, code)
 
 const INPUT =
   'w-full rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/35 transition-colors focus:border-white/60 focus:outline-none aria-[invalid=true]:border-rose-400/80'
@@ -66,7 +73,7 @@ export function ContactWidget() {
         if (cancelled || widget.current || !captcha.current) return
         widget.current = t.render(captcha.current, {
           sitekey: SITEKEY,
-          action: ACTION,
+          action: TURNSTILE_ACTION,
           theme: 'dark',
           size: 'flexible',
           appearance: 'interaction-only',
@@ -95,7 +102,9 @@ export function ContactWidget() {
     e.preventDefault()
     if (status.kind === 'sending') return
     const data = Object.fromEntries(new FormData(e.currentTarget)) as Record<string, string>
-    const bad = check(data)
+    // A mesma validação do Worker: o que passa aqui não volta recusado por formato.
+    const parsed = parseContact(data)
+    const bad = parsed.ok ? [] : parsed.fields
     setInvalid(bad)
     if (bad.length) {
       form.current?.querySelector<HTMLElement>(`[name="${bad[0]}"]`)?.focus()
@@ -110,26 +119,28 @@ export function ContactWidget() {
     }
     setStatus({ kind: 'sending' })
     try {
-      const r = await fetch('/api/contact', {
+      const request: ContactRequest = {
+        name: data.name ?? '',
+        contact: data.contact ?? '',
+        message: data.message ?? '',
+        website: data.website ?? '',
+        token,
+      }
+      const r = await fetch(CONTACT_PATH, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: data.name,
-          contact: data.contact,
-          message: data.message,
-          website: data.website,
-          token,
-        }),
+        body: JSON.stringify(request),
       })
-      const body = (await r.json().catch(() => ({}))) as { ok?: boolean; error?: string; fields?: Field[] }
+      const body = (await r.json().catch(() => ({}))) as Partial<ContactResponse>
       if (r.ok && body.ok) {
         form.current?.reset()
         setStatus({ kind: 'sent' })
-      } else if (body.fields?.length) {
+      } else if (body.ok === false && body.fields?.length) {
         setInvalid(body.fields)
         setStatus({ kind: 'idle' })
       } else {
-        setStatus({ kind: 'error', text: ERRORS[body.error ?? ''] ?? FALLBACK })
+        const code = body.ok === false ? body.error : undefined
+        setStatus({ kind: 'error', text: isErrorCode(code) ? ERRORS[code] : FALLBACK })
       }
     } catch {
       setStatus({ kind: 'error', text: FALLBACK })

@@ -28,8 +28,6 @@ declare global {
 
 const SRC = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'
 export const SITEKEY = import.meta.env.VITE_TURNSTILE_SITEKEY
-/** Tem de bater com TURNSTILE_ACTION do Worker. */
-export const ACTION = 'contact'
 
 let loading: Promise<Turnstile> | undefined
 

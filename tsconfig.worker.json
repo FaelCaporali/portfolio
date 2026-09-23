@@ -5,5 +5,5 @@
     "composite": true,
     "types": ["@cloudflare/vitest-plugin/types"]
   },
-  "include": ["worker"]
+  "include": ["worker", "shared"]
 }

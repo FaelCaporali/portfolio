@@ -1,22 +1,12 @@
 import { DAILY_CAP, countSince, deliver, insert, record, type Message } from './messages'
 import { list, verifyTurnstile } from './turnstile'
-import { LIMITS, parseContact, type Field } from './validate'
-
-type ErrorCode =
-  | 'method'
-  | 'forbidden'
-  | 'unsupported'
-  | 'rate_limited'
-  | 'too_large'
-  | 'invalid'
-  | 'verification_failed'
-  | 'busy'
-  | 'unavailable'
+import { LIMITS, type ContactErrorCode, type ContactResponse } from '../shared/contact/contract'
+import { parseContact } from '../shared/contact/validation'
 
 /** Resposta da API: só JSON, nunca em cache, sem conteúdo ativo. Erros genéricos, sem detalhe interno. */
 export function json(
   status: number,
-  body: { ok: true } | { ok: false; error: ErrorCode | 'not_found'; fields?: Field[] },
+  body: ContactResponse | { ok: false; error: 'not_found' },
   extra?: HeadersInit,
 ): Response {
   const headers = new Headers(extra)
@@ -27,7 +17,7 @@ export function json(
   return new Response(JSON.stringify(body), { status, headers })
 }
 
-const fail = (status: number, error: ErrorCode, extra?: HeadersInit) => json(status, { ok: false, error }, extra)
+const fail = (status: number, error: ContactErrorCode, extra?: HeadersInit) => json(status, { ok: false, error }, extra)
 
 /** Log sem dado pessoal: evento, desfecho e, no máximo, o id da mensagem e o código do erro. */
 const log = (outcome: string, extra: Record<string, string | number> = {}) =>

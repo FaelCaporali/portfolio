@@ -1,19 +1,8 @@
 /**
- * Validação do formulário de contato. Funções puras: tudo o que vem do visitante passa por aqui antes de tocar
- * banco, Turnstile ou e-mail.
+ * Validação do formulário de contato. Funções puras, sem ambiente: o Worker decide com elas e o site as usa para
+ * avisar antes de enviar. Tudo o que vem do visitante passa por aqui antes de tocar banco, Turnstile ou e-mail.
  */
-
-export const LIMITS = {
-  /** Corpo da requisição inteiro, em bytes. */
-  body: 16 * 1024,
-  name: 100,
-  contact: 200,
-  messageMin: 10,
-  message: 4000,
-  token: 2048,
-} as const
-
-export type Field = 'name' | 'contact' | 'message'
+import { LIMITS, type Field } from './contract'
 
 export interface ContactInput {
   name: string

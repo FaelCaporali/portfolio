@@ -2,7 +2,7 @@
  * Mensagens no D1 e entrega por e-mail. A mensagem é gravada antes do envio; o cron reenvia o que ficou pendente.
  * Consultas sempre parametrizadas.
  */
-import { asPhone } from './validate'
+import { asPhone } from '../shared/contact/validation'
 
 export const SENDER = { email: 'worker@mail.caporali.dev', name: 'Portfólio · contato' }
 export const DESTINATION = 'fael@caporali.dev'
