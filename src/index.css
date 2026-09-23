@@ -1,5 +1,18 @@
 @import 'tailwindcss';
 
+/* Layout largo (texto à esquerda, busto à direita): desktop ou celular deitado. Mesma condição de isWide e
+   WIDE_QUERY em src/features/hero/model/layout.ts. */
+@custom-variant wide {
+  @media (min-width: 1024px) {
+    @slot;
+  }
+  @media (orientation: landscape) and (max-height: 520px) {
+    @slot;
+  }
+}
+/* Tela baixa (celular deitado): espaçamentos verticais mais curtos. */
+@custom-variant short (@media (max-height: 520px));
+
 html {
   color-scheme: dark;
 }

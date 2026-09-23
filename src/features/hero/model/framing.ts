@@ -4,7 +4,7 @@
  * Medidas do busto a fov 38: altura ~0,40 da tela, centro 0,013 da tela abaixo do centro.
  */
 import { degToRad, radToDeg } from '../../../lib/math'
-import { BUST_SHIFT, isWide } from './layout'
+import { BUST_SHIFT, SHORT_LANDSCAPE, isWide } from './layout'
 
 export interface Framing {
   fov: number
@@ -14,6 +14,9 @@ export interface Framing {
 }
 
 const WIDE_FOV = 24
+/** Celular deitado: nome e indicador ocupam ~1/4 da altura; o busto fica menor e desce para baixo deles. */
+const SHORT_FOV = 30
+const SHORT_DROP = 0.1
 /** Tangente da meia abertura de referência (fov 38). */
 const REF = Math.tan(degToRad(19))
 const BUST_HEIGHT = 0.4
@@ -23,7 +26,11 @@ const FILL = 0.8
 /** free = [topo, base] do espaço livre em pixels (base do header, topo do texto). */
 export function computeFraming(width: number, height: number, [top, bottom]: readonly [number, number]): Framing {
   // Janela de vista deslocada: x negativo leva o busto para a direita, y positivo o leva para cima.
-  if (isWide(width)) return { fov: WIDE_FOV, offsetX: -width * BUST_SHIFT, offsetY: height * 0.06 }
+  if (isWide(width, height)) {
+    if (height <= SHORT_LANDSCAPE)
+      return { fov: SHORT_FOV, offsetX: -width * BUST_SHIFT, offsetY: -height * SHORT_DROP }
+    return { fov: WIDE_FOV, offsetX: -width * BUST_SHIFT, offsetY: height * 0.06 }
+  }
 
   const free = Math.max(bottom - top, height * 0.3)
   const half = Math.atan((REF * BUST_HEIGHT * height) / (FILL * free))

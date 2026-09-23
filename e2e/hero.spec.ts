@@ -52,3 +52,30 @@ test('sem rolagem horizontal e currículo com os dois PDFs', async ({ page }) =>
   await expect(page.getByRole('link', { name: /Português/ })).toHaveAttribute('href', '/cv/fael-caporali-cv-pt.pdf')
   await expect(page.getByRole('link', { name: /English/ })).toHaveAttribute('href', '/cv/fael-caporali-cv-en.pdf')
 })
+
+// Celular deitado: layout largo (texto à esquerda, busto à direita), texto abaixo do cabeçalho e inteiro na tela.
+for (const [width, height] of [
+  [800, 360],
+  [712, 320],
+] as const) {
+  test(`paisagem ${width}×${height}: texto abaixo do cabeçalho, sem cortar`, async ({ page }) => {
+    await page.setViewportSize({ width, height })
+    await page.goto('/?slot=ai&d=0')
+    const header = await page.locator('header').boundingBox()
+    const title = await page.getByRole('heading', { level: 1 }).boundingBox()
+    const contact = await page.getByRole('list', { name: 'Contact' }).boundingBox()
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)
+    if (!header || !title || !contact) throw new Error('herói incompleto')
+    const box = {
+      headerBottom: header.y + header.height,
+      textTop: title.y,
+      textBottom: contact.y + contact.height,
+      textRight: title.x + title.width,
+      overflow,
+    }
+    expect(box.textTop).toBeGreaterThanOrEqual(box.headerBottom)
+    expect(box.textBottom).toBeLessThanOrEqual(height)
+    expect(box.textRight).toBeLessThan(width * 0.6)
+    expect(box.overflow).toBeLessThanOrEqual(0)
+  })
+}

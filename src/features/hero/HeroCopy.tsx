@@ -4,6 +4,7 @@ import { journeyLink, profile, profileLinks } from '../../content/profile'
 import { pill } from '../../ui/pill'
 import { CopyContacts } from '../contact/CopyContacts'
 import { useFitFontSize } from './hooks/useFitFontSize'
+import { WIDE_QUERY } from './model/layout'
 import { ResumeMenu } from './ResumeMenu'
 import { SlotWord } from './SlotWord'
 
@@ -20,11 +21,11 @@ const SLOTS = stages.map((s) => s.slot)
 export function HeroCopy({ ref, stage, leaving }: HeroCopyProps) {
   const slotRef = useRef<HTMLSpanElement>(null)
   // Largo (lg): a vida mais longa sempre numa linha, com a fonte do visitante. Abaixo, reserva de duas linhas.
-  const slotSize = useFitFontSize(slotRef, SLOTS, '(min-width: 1024px)')
+  const slotSize = useFitFontSize(slotRef, SLOTS, WIDE_QUERY)
   return (
     <div
       ref={ref}
-      className="pointer-events-none absolute inset-x-0 bottom-0 px-5 pb-6 text-white sm:px-10 lg:inset-y-0 lg:right-auto lg:flex lg:w-[56%] lg:flex-col lg:justify-center lg:pr-6 lg:pb-0 lg:pl-[7vw]"
+      className="pointer-events-none absolute inset-x-0 bottom-0 px-5 pb-6 text-white sm:px-10 wide:inset-y-0 wide:right-auto wide:flex wide:w-[56%] wide:flex-col wide:justify-center wide:pr-6 wide:pb-0 wide:pl-[7vw] wide:short:pt-20 wide:short:pb-3"
     >
       <h1>
         <span className="block text-lg text-white/65 lg:text-2xl">
@@ -44,7 +45,7 @@ export function HeroCopy({ ref, stage, leaving }: HeroCopyProps) {
       {/* Celular: um título por linha. A partir de sm: numa linha só, separados por um ponto apagado. */}
       <ul
         aria-label="Títulos"
-        className="mt-4 flex flex-col gap-0.5 text-sm leading-snug font-medium text-white/75 sm:mt-5 sm:flex-row sm:flex-wrap sm:items-baseline sm:gap-y-1 sm:text-[15px] lg:mt-6 lg:text-lg"
+        className="mt-4 flex flex-col gap-0.5 text-sm leading-snug font-medium text-white/75 sm:mt-5 sm:flex-row sm:flex-wrap sm:items-baseline sm:gap-y-1 sm:text-[15px] lg:mt-6 lg:text-lg short:mt-2"
       >
         {profile.titles.map((t, i) => (
           <li key={t} className="flex items-baseline">
@@ -59,11 +60,11 @@ export function HeroCopy({ ref, stage, leaving }: HeroCopyProps) {
       </ul>
       <nav
         aria-label="Links"
-        className="pointer-events-auto mt-6 flex flex-col items-start gap-3 sm:mt-7 lg:mt-8 lg:gap-4"
+        className="pointer-events-auto mt-6 flex flex-col items-start gap-3 sm:mt-7 lg:mt-8 lg:gap-4 short:mt-3 short:gap-2"
       >
         <a
           href={journeyLink.href}
-          className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-neutral-950 transition-colors hover:bg-white/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+          className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-neutral-950 transition-colors hover:bg-white/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white short:py-2"
         >
           {journeyLink.label} <span aria-hidden>→</span>
         </a>
@@ -85,7 +86,7 @@ export function HeroCopy({ ref, stage, leaving }: HeroCopyProps) {
         </ul>
       </nav>
       {/* Contato direto sempre à vista; clique copia (o formulário e os links ficam no botão flutuante). */}
-      <CopyContacts className="pointer-events-auto mt-5 lg:mt-6" />
+      <CopyContacts className="pointer-events-auto mt-5 lg:mt-6 short:mt-2" />
     </div>
   )
 }

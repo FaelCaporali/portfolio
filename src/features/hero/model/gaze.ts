@@ -25,7 +25,7 @@ const EYE_MAX_PITCH = 0.28
 /** Coordenadas da tela → ponteiro relativo ao busto (no layout largo o busto está à direita do centro). */
 export function toPointer(clientX: number, clientY: number, width: number, height: number): Pointer {
   return {
-    x: clampAbs((clientX / width - bustCenterX(width)) * 2, 1),
+    x: clampAbs((clientX / width - bustCenterX(width, height)) * 2, 1),
     y: -((clientY / height) * 2 - 1),
   }
 }

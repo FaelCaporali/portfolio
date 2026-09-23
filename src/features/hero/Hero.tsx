@@ -67,7 +67,7 @@ export function Hero() {
       {/* Cabeçalho na largura toda: o nome à esquerda e, abaixo dele, o indicador centralizado na página. A base do
           cabeçalho é o topo do espaço livre do busto no celular (useFreeArea). */}
       <header ref={header} className="pointer-events-none absolute inset-x-0 top-0 pt-5 pb-1">
-        <div className="px-5 sm:px-10 lg:pl-[7vw]">
+        <div className="px-5 sm:px-10 wide:pl-[7vw]">
           <a
             href="/"
             className="pointer-events-auto text-sm font-medium tracking-wide text-white/90 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white lg:text-base"

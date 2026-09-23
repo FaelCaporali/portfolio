@@ -9,6 +9,8 @@ describe('olhar', () => {
     expect(wide.y).toBeCloseTo(0)
     expect(toPointer(180, 0, 360, 740)).toEqual({ x: 0, y: 1 })
     expect(toPointer(1440, 900, 1440, 900).x).toBeCloseTo(0.6)
+    // Celular deitado: layout largo, centro também à direita.
+    expect(toPointer(560, 180, 800, 360).x).toBeCloseTo(0)
   })
   it('sem arrasto a cabeça acompanha o ponteiro; com arrasto, só os olhos', () => {
     const free = createGaze()
