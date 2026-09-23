@@ -1,4 +1,5 @@
 import { LIMITS, TURNSTILE_ACTION } from '../shared/contact/contract'
+import { csvSet } from './http'
 
 const SITEVERIFY = 'https://challenges.cloudflare.com/turnstile/v0/siteverify'
 
@@ -8,14 +9,6 @@ interface Siteverify {
   action?: string
   metadata?: { result_with_testing_key?: boolean }
 }
-
-export const list = (csv: string) =>
-  new Set(
-    csv
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean),
-  )
 
 /**
  * Confere o token no servidor (o widget sozinho não protege nada). Token de uso único, válido por 5 minutos.
@@ -35,5 +28,5 @@ export async function verifyTurnstile(env: Env, token: string, ip: string | null
   }
   if (!result.success) return false
   if (result.metadata?.result_with_testing_key) return env.ALLOW_TEST_TURNSTILE === '1'
-  return result.action === TURNSTILE_ACTION && list(env.TURNSTILE_HOSTNAMES).has(result.hostname ?? '')
+  return result.action === TURNSTILE_ACTION && csvSet(env.TURNSTILE_HOSTNAMES).has(result.hostname ?? '')
 }

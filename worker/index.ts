@@ -1,10 +1,13 @@
-import { handleContact, json } from './contact'
-import { retryAndPurge } from './messages'
+/** Roteamento do Worker único do site: a API do contato, 404 JSON no resto de /api/ e os assets do Vite. */
+import { CONTACT_PATH } from '../shared/contact/contract'
+import { handleContact } from './contact'
+import { retryAndPurge } from './cron'
+import { json } from './http'
 
 export default {
   async fetch(request, env) {
     const { pathname } = new URL(request.url)
-    if (pathname === '/api/contact') return handleContact(request, env)
+    if (pathname === CONTACT_PATH) return handleContact(request, env)
     if (pathname.startsWith('/api/')) return json(404, { ok: false, error: 'not_found' })
     return env.ASSETS.fetch(request)
   },
