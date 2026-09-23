@@ -42,11 +42,6 @@ dist
 !3d/analise/gate/
 !3d/analise/gate/*.json
 !3d/analise/gate/olho_*_regua.jpg
-!3d/analise/aud/
-!3d/analise/aud/*.md
-!3d/analise/aud/*.txt
-!3d/analise/aud/cmp_*.jpg
-!3d/analise/aud/s1?_*.jpg
 !3d/analise/aud13/
 !3d/analise/aud13/*.txt
 !3d/analise/aud13/cmp_*.jpg

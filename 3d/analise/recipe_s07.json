@@ -1,7 +1,0 @@
-[
- {"op": "profile_fill", "args": [104, 44, 46], "kwargs": {"f": 0.55}, "note": "S07 sulco abaixo do lábio inferior preenchido (leitura de boca aberta no perfil); ref-12 confere"},
- {"op": "smooth", "args": [[0, -14, 84], 30, 0.4, 6], "note": "S07 acabamento do preenchimento"},
- {"op": "profile_fill", "args": [107, 74, 34], "kwargs": {"f": 0.7}, "note": "S07 volume do lábio inferior (bigode não sobra sobre vazio)"},
- {"op": "smooth", "args": [[0, -18, 94], 20, 0.4, 5], "note": "S07 acabamento do lábio"},
- {"op": "smooth", "args": [[0, -15, 85], 34, 0.5, 12], "kwargs": {"taubin": true}, "note": "S07 remove estrias das faixas de 2 mm"}
-]
