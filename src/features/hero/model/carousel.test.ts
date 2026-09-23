@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { DISSOLVE_MAX, TIMING, createClock, tick, type CarouselClock, type Tick, type TickInput } from './carousel'
 
-const normal: TickInput = { first: false, reducedMotion: false, held: false }
+const normal: TickInput = { first: false, reducedMotion: false, held: false, jump: false }
 
 /** Avança o relógio em passos de 50 ms e devolve os quadros em que algo mudou. */
 function run(c: CarouselClock, seconds: number, input: TickInput = normal) {
@@ -30,6 +30,10 @@ describe('carrossel', () => {
     const c = createClock()
     expect(run(c, 10, { ...normal, held: true })).toEqual([])
     expect(c.time).toBe(0)
+  })
+  it('vida escolhida no indicador: sai do repouso no próximo quadro, mesmo com o busto seguro', () => {
+    const c = createClock()
+    expect(tick(c, 0.016, { ...normal, held: true, jump: true })).toEqual({ dissolve: 0, next: false, phase: 'out' })
   })
   it('movimento reduzido troca direto, sem furacão', () => {
     const c = createClock()

@@ -10,19 +10,26 @@ interface DirectorProps {
   /** Conferência: desintegração parada neste valor. */
   frozenDissolve: number | null
   drag: RefObject<DragState>
+  /** Vida escolhida no indicador, esperando a troca (null = seguir o carrossel). */
+  requested: RefObject<number | null>
   onPhase: (p: Phase) => void
   onNext: () => void
 }
 
 /** Liga o relógio do carrossel ao quadro do Canvas: aplica a desintegração e avisa as trocas de vida e de fase. */
-export function Director({ first, reducedMotion, frozenDissolve, drag, onPhase, onNext }: DirectorProps) {
+export function Director({ first, reducedMotion, frozenDissolve, drag, requested, onPhase, onNext }: DirectorProps) {
   const clock = useRef(createClock())
   useFrame((_, dt) => {
     if (frozenDissolve !== null) {
       dissolveUniforms.uD.value = frozenDissolve
       return
     }
-    const t = tick(clock.current, dt, { first, reducedMotion, held: isHeld(drag.current) })
+    const t = tick(clock.current, dt, {
+      first,
+      reducedMotion,
+      held: isHeld(drag.current),
+      jump: requested.current !== null,
+    })
     dissolveUniforms.uD.value = t.dissolve
     if (t.next) onNext()
     if (t.phase) onPhase(t.phase)

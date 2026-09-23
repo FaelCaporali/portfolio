@@ -28,6 +28,8 @@ export interface TickInput {
   reducedMotion: boolean
   /** Alguém está girando o busto: a vida não troca. */
   held: boolean
+  /** Uma vida foi escolhida no indicador: sai do repouso agora, mesmo com o busto seguro. */
+  jump: boolean
 }
 
 export interface Tick {
@@ -41,11 +43,13 @@ export interface Tick {
 
 /** Avança o relógio (mutável, vive num ref) e diz o que o quadro aplica. */
 export function tick(c: CarouselClock, dt: number, input: TickInput): Tick {
-  if (c.phase === 'hold' && input.held) return { dissolve: 0, next: false, phase: null }
+  if (c.phase === 'hold' && input.held && !input.jump) return { dissolve: 0, next: false, phase: null }
   c.time += Math.min(dt, MAX_DT)
 
   if (c.phase === 'hold') {
-    if (c.time < (input.first ? TIMING.holdFirst : TIMING.hold)) return { dissolve: 0, next: false, phase: null }
+    if (!input.jump && c.time < (input.first ? TIMING.holdFirst : TIMING.hold)) {
+      return { dissolve: 0, next: false, phase: null }
+    }
     c.time = 0
     if (input.reducedMotion) return { dissolve: 0, next: true, phase: null }
     c.phase = 'out'

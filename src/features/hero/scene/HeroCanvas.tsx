@@ -20,6 +20,7 @@ interface HeroCanvasProps {
   free: readonly [number, number]
   pointer: RefObject<Pointer>
   drag: RefObject<DragState>
+  requested: RefObject<number | null>
   dragHandlers: Record<'onPointerDown' | 'onPointerMove' | 'onPointerUp' | 'onPointerCancel', PointerEventHandler>
   onPhase: (p: Phase) => void
   onNext: () => void
@@ -33,6 +34,7 @@ export function HeroCanvas({
   free,
   pointer,
   drag,
+  requested,
   dragHandlers,
   onPhase,
   onNext,
@@ -70,6 +72,7 @@ export function HeroCanvas({
           reducedMotion={options.reducedMotion}
           frozenDissolve={options.frozenDissolve}
           drag={drag}
+          requested={requested}
           onPhase={onPhase}
           onNext={onNext}
         />

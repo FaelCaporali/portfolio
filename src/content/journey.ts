@@ -29,6 +29,23 @@ export interface Stage {
   expr: Expression
 }
 
+/**
+ * Ordem cronológica das vidas, para o indicador do herói (o carrossel roda na ordem "zíper" de `stages`).
+ * PROPOSTA a confirmar pelo Fael: vela e Uber ainda sem data (entrevista A3, A4). Com data: empreendedor desde 2009,
+ * financeiro 2013–2017, QA desde 2023, tech lead 2025, fullstack e consultor 2025–2026, IA 2026.
+ */
+export const chronology = [
+  'empreendedor',
+  'financeiro',
+  'vela',
+  'uber',
+  'qa',
+  'techlead',
+  'fullstack',
+  'consultant',
+  'ai',
+] as const
+
 export const stages: Stage[] = [
   {
     id: 'ai',

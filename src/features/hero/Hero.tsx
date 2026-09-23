@@ -3,6 +3,7 @@ import { stages } from '../../content/journey'
 import { profile } from '../../content/profile'
 import { cyclicAt } from '../../lib/array'
 import { HeroCopy } from './HeroCopy'
+import { LifeTimeline } from './LifeTimeline'
 import { SourceLink } from './SourceLink'
 import { useDragRotation } from './hooks/useDragRotation'
 import { useFreeArea } from './hooks/useFreeArea'
@@ -31,10 +32,22 @@ export function Hero() {
   const header = useRef<HTMLElement>(null)
   const text = useRef<HTMLDivElement>(null)
   const free = useFreeArea(header, text)
+  // Vida escolhida no indicador: o ref é lido pelo relógio a cada quadro; o estado destaca o ponto na hora.
+  const requested = useRef<number | null>(null)
+  const [pending, setPending] = useState<number | null>(null)
   const next = useCallback(() => {
-    setIndex((i) => (i + 1) % stages.length)
+    const target = requested.current
+    requested.current = null
+    setPending(null)
+    setIndex((i) => target ?? (i + 1) % stages.length)
   }, [])
   const stage = cyclicAt(stages, index)
+  const select = (id: string) => {
+    const i = stages.findIndex((s) => s.id === id)
+    const target = i === index ? null : i
+    requested.current = target
+    setPending(target)
+  }
 
   return (
     <section className="relative h-svh overflow-hidden" aria-label="Apresentação">
@@ -45,18 +58,26 @@ export function Hero() {
         free={free}
         pointer={pointer}
         drag={drag}
+        requested={requested}
         dragHandlers={handlers}
         onPhase={setPhase}
         onNext={next}
       />
 
-      <header ref={header} className="absolute top-0 left-0 px-5 py-5 sm:px-10 lg:pl-[7vw]">
-        <a
-          href="/"
-          className="text-sm font-medium tracking-wide text-white/90 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white lg:text-base"
-        >
-          {profile.name}
-        </a>
+      {/* Cabeçalho na largura toda: o nome à esquerda e, abaixo dele, o indicador centralizado na página. A base do
+          cabeçalho é o topo do espaço livre do busto no celular (useFreeArea). */}
+      <header ref={header} className="pointer-events-none absolute inset-x-0 top-0 pt-5 pb-1">
+        <div className="px-5 sm:px-10 lg:pl-[7vw]">
+          <a
+            href="/"
+            className="pointer-events-auto text-sm font-medium tracking-wide text-white/90 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white lg:text-base"
+          >
+            {profile.name}
+          </a>
+        </div>
+        <div className="mt-2 flex justify-center">
+          <LifeTimeline currentId={cyclicAt(stages, pending ?? index).id} onSelect={select} />
+        </div>
       </header>
 
       {/* Largo: o canto superior direito está livre (o botão de contato fica embaixo). Alinhado ao nome; discreto:
