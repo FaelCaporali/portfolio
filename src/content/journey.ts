@@ -37,7 +37,7 @@ export const stages: Stage[] = [
     id: 'financeiro',
     past: true,
     prop: 'coins',
-    slot: 'Financial Manager',
+    slot: 'Financial Assistant',
     track: 'antes',
     accent: '#c9a227',
     fact: 'Coordenador financeiro: planejamento com a diretoria e relatórios gerenciais automatizados em VBA.',
