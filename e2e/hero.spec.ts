@@ -1,0 +1,42 @@
+import { expect, test, type Page } from '@playwright/test'
+
+/** Erros do console durante o teste (WebGL, shader, React). */
+function collectErrors(page: Page) {
+  const errors: string[] = []
+  page.on('console', (m) => {
+    if (m.type() === 'error') errors.push(m.text())
+  })
+  page.on('pageerror', (e) => errors.push(e.message))
+  return errors
+}
+
+test('herói: vida, títulos, links e o busto sem erro no console', async ({ page }) => {
+  const errors = collectErrors(page)
+  const bust = page.waitForResponse((r) => r.url().includes('busto-s13.glb') && r.ok())
+  await page.goto('/')
+  // Nome acessível: a frase inteira, com espaço, e não letra a letra.
+  await expect(page.getByRole('heading', { level: 1 })).toHaveAccessibleName(/^Today I am an? \S/)
+  await expect(page.getByRole('link', { name: 'See the full journey' })).toHaveAttribute('href', '/trajetoria')
+  await expect(page.getByRole('link', { name: 'LinkedIn' })).toHaveAttribute('target', '_blank')
+  await expect(page.locator('canvas')).toBeVisible()
+  await bust
+  expect(errors).toEqual([])
+})
+
+test('?slot começa na vida pedida e o carrossel troca sozinho', async ({ page }) => {
+  await page.goto('/?slot=vela')
+  // O texto que o leitor de tela recebe (as letras animadas são aria-hidden).
+  const slot = page.locator('.slot-word .sr-only')
+  await expect(slot).toHaveText('sailing instructor')
+  // Sem GPU o headless roda a ~7 FPS e o relógio limita o passo por quadro: a troca leva mais que os ~5 s reais.
+  await expect(slot).not.toHaveText('sailing instructor', { timeout: 45_000 })
+})
+
+test('sem rolagem horizontal e currículo com os dois PDFs', async ({ page }) => {
+  await page.goto('/')
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)
+  expect(overflow).toBeLessThanOrEqual(0)
+  await page.getByRole('button', { name: /Résumé/ }).click()
+  await expect(page.getByRole('link', { name: /Português/ })).toHaveAttribute('href', '/cv/fael-caporali-cv-pt.pdf')
+  await expect(page.getByRole('link', { name: /English/ })).toHaveAttribute('href', '/cv/fael-caporali-cv-en.pdf')
+})

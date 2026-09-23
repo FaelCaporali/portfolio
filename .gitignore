@@ -4,6 +4,8 @@ dist
 *.local
 .DS_Store
 *.tsbuildinfo
+test-results
+playwright-report
 
 # ---- 3d: LISTA DE PERMISSÃO. Tudo em 3d/ é ignorado por padrão; só entra no git o que é
 # fonte, receita, entrega aprovada ou evidência curada. Iterações intermediárias, capturas,

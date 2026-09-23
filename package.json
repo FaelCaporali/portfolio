@@ -15,7 +15,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint --max-warnings=0 .",
-    "check": "tsc -b && eslint --max-warnings=0 . && prettier --check . && vitest run"
+    "check": "tsc -b && eslint --max-warnings=0 . && prettier --check . && vitest run",
+    "e2e": "playwright test"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.0",
@@ -30,10 +31,12 @@
     "@cloudflare/vitest-plugin": "1.2.4",
     "@eslint-react/eslint-plugin": "^5.20.6",
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/vite": "^4.1.0",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.7",
+    "@types/node": "^22.20.4",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
     "@types/three": "^0.180.0",

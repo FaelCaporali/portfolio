@@ -7,3 +7,5 @@ dist
 3d
 public
 .claude
+test-results
+playwright-report
