@@ -45,7 +45,4 @@ export const directContacts: DirectContact[] = [
 export const profileLinks: ProfileLink[] = [
   { label: 'LinkedIn', href: 'https://www.linkedin.com/in/faelcaporali/' },
   { label: 'GitHub', href: 'https://github.com/FaelCaporali' },
-  // O Lattes só serve em http: o endereço https redireciona para http.
-  // eslint-disable-next-line sonarjs/no-clear-text-protocols
-  { label: 'Lattes', href: 'http://lattes.cnpq.br/3842816194833398' },
 ]
