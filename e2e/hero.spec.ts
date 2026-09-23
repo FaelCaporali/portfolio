@@ -31,9 +31,9 @@ test('?slot começa na vida pedida e o carrossel troca sozinho', async ({ page }
   await page.goto('/?slot=vela')
   // O texto que o leitor de tela recebe (as letras animadas são aria-hidden).
   const slot = page.locator('.slot-word .sr-only')
-  await expect(slot).toHaveText('sailing instructor')
+  await expect(slot).toHaveText('Sailing Instructor')
   // Sem GPU o headless roda a ~7 FPS e o relógio limita o passo por quadro: a troca leva mais que os ~5 s reais.
-  await expect(slot).not.toHaveText('sailing instructor', { timeout: 45_000 })
+  await expect(slot).not.toHaveText('Sailing Instructor', { timeout: 45_000 })
 })
 
 test('sem rolagem horizontal e currículo com os dois PDFs', async ({ page }) => {

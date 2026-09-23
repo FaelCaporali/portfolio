@@ -1,8 +1,9 @@
-import type { Ref } from 'react'
-import type { Stage } from '../../content/journey'
+import { useRef, type Ref } from 'react'
+import { stages, type Stage } from '../../content/journey'
 import { journeyLink, profile, profileLinks } from '../../content/profile'
 import { pill } from '../../ui/pill'
 import { CopyContacts } from '../contact/CopyContacts'
+import { useFitFontSize } from './hooks/useFitFontSize'
 import { ResumeMenu } from './ResumeMenu'
 import { SourceLink } from './SourceLink'
 import { SlotWord } from './SlotWord'
@@ -14,21 +15,30 @@ interface HeroCopyProps {
   leaving: boolean
 }
 
+const SLOTS = stages.map((s) => s.slot)
+
 /** Coluna de texto do herói: a vida atual, os títulos, os links e o contato direto. */
 export function HeroCopy({ ref, stage, leaving }: HeroCopyProps) {
+  const slotRef = useRef<HTMLSpanElement>(null)
+  // Largo (lg): a vida mais longa sempre numa linha, com a fonte do visitante. Abaixo, reserva de duas linhas.
+  const slotSize = useFitFontSize(slotRef, SLOTS, '(min-width: 1024px)')
   return (
     <div
       ref={ref}
-      className="pointer-events-none absolute inset-x-0 bottom-0 px-5 pb-6 text-white sm:px-10 lg:inset-y-0 lg:right-auto lg:flex lg:w-1/2 lg:flex-col lg:justify-center lg:pb-0 lg:pl-[7vw]"
+      className="pointer-events-none absolute inset-x-0 bottom-0 px-5 pb-6 text-white sm:px-10 lg:inset-y-0 lg:right-auto lg:flex lg:w-[56%] lg:flex-col lg:justify-center lg:pr-6 lg:pb-0 lg:pl-[7vw]"
     >
       <h1>
-        <span className="block text-sm tracking-[0.3em] text-white/60 uppercase lg:text-base">
+        <span className="block text-lg text-white/65 lg:text-2xl">
           {stage.past ? 'Yesterday I was' : 'Today I am'} a{/^[aeiou]/i.test(stage.slot) ? 'n' : ''}
         </span>{' '}
-        {/* Altura reservada para a troca não empurrar o resto: duas linhas no celular (a vida mais longa quebra), uma
-            a partir de sm. No largo a fonte segue a coluna (3,6vw): "AI software developer" mede 10,1em e cabe numa
-            linha de 1024 a 1920 px, sem vão embaixo das vidas curtas. */}
-        <span className="mt-2 block min-h-[2em] text-[2.6rem] leading-none font-semibold tracking-tight sm:min-h-[1em] lg:text-[clamp(2.25rem,3.6vw,5rem)]">
+        {/* Altura reservada para a troca não empurrar o resto: duas linhas no celular (a vida mais longa quebra),
+            uma a partir de sm. No largo, useFitFontSize escolhe a maior fonte (até 4,4vw) em que todas cabem numa
+            linha, sem vão embaixo das vidas curtas. */}
+        <span
+          ref={slotRef}
+          style={slotSize ? { fontSize: slotSize } : undefined}
+          className="mt-2 block min-h-[2em] text-[2.75rem] leading-none font-semibold tracking-tight min-[360px]:text-[3rem] sm:min-h-[1em] lg:text-[clamp(2.75rem,4.4vw,5.5rem)]"
+        >
           <SlotWord text={stage.slot} color={stage.accent} leaving={leaving} />
         </span>
       </h1>
