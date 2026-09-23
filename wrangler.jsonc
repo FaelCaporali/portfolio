@@ -1,0 +1,44 @@
+{
+  // Um Worker só: serve o site (build do Vite) e a API do formulário de contato no mesmo endereço.
+  // Mesmo endereço = sem CORS, Turnstile confere um hostname fixo e a CSP cobre tudo. Detalhes em docs/CONTATO.md.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "fael-caporali",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-09-21",
+  "routes": [{ "pattern": "fael.caporali.dev", "custom_domain": true }],
+  "workers_dev": false,
+  "preview_urls": false,
+  "assets": {
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    // Só a API acorda o Worker; o resto sai direto dos assets (não consome requisições do plano).
+    "run_worker_first": ["/api/*"]
+  },
+  // Envio grátis só para destino verificado. Destino e remetente fixos na binding: mesmo com o código explorado,
+  // o Worker não consegue mandar e-mail para mais ninguém nem em nome de outro endereço.
+  "send_email": [
+    {
+      "name": "EMAIL",
+      "destination_address": "fael@caporali.dev",
+      "allowed_sender_addresses": ["worker@mail.caporali.dev"]
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "fael-caporali",
+      "database_id": "47468d59-26bb-49b0-95da-f22b963f79e2",
+      "migrations_dir": "worker/migrations"
+    }
+  ],
+  // Por IP, por data center: 3 envios por minuto.
+  "ratelimits": [{ "name": "CONTACT_LIMITER", "namespace_id": "1001", "simple": { "limit": 3, "period": 60 } }],
+  // Reenvio do que ficou pendente e limpeza das mensagens com mais de 90 dias.
+  "triggers": { "crons": ["*/15 * * * *"] },
+  "vars": {
+    "ALLOWED_ORIGINS": "https://fael.caporali.dev",
+    "TURNSTILE_HOSTNAMES": "fael.caporali.dev",
+    "ALLOW_TEST_TURNSTILE": "0"
+  },
+  "observability": { "enabled": true }
+}

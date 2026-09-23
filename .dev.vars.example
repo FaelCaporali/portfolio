@@ -1,0 +1,5 @@
+# Só desenvolvimento local (vite dev / vitest). Chaves de TESTE públicas do Turnstile (sempre passam).
+TURNSTILE_SECRET=1x0000000000000000000000000000000AA
+ALLOWED_ORIGINS=http://localhost:5199
+TURNSTILE_HOSTNAMES=example.com
+ALLOW_TEST_TURNSTILE=1

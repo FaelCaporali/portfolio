@@ -59,3 +59,7 @@ dist
 __pycache__/
 3d/renders/*.frames/
 3d/tools/__pycache__/
+
+# ---- worker
+.dev.vars
+.wrangler
