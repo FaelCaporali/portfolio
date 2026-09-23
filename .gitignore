@@ -44,6 +44,8 @@ playwright-report
 !3d/analise/gate/
 !3d/analise/gate/*.json
 !3d/analise/gate/olho_*_regua.jpg
+# deriva de UV medida no S07: o s09_face.restore_xz lê para reconstruir o S13
+!3d/analise/gate/uvdrift_s07.npz
 !3d/analise/aud13/
 !3d/analise/aud13/*.txt
 !3d/analise/aud13/cmp_*.jpg
