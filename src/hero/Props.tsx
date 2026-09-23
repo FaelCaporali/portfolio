@@ -96,15 +96,22 @@ function Sunglasses() {
   )
 }
 
+const NEURAL_NODES = 9
+
+/** Nó i do anel neural (o índice dá a volta). */
+function neuralNode(i: number) {
+  const k = i % NEURAL_NODES
+  const a = (k / NEURAL_NODES) * Math.PI * 2
+  return new THREE.Vector3(Math.cos(a) * 0.19, Math.sin(k * 2.1) * 0.025, Math.sin(a) * 0.19)
+}
+
 function Neural() {
   const g = useRef<THREE.Group>(null)
   const node = useMat('#bff4ff', GLOW)
   const line = useMemo(() => withDissolve(new THREE.LineBasicMaterial({ color: '#29d8ff', transparent: true, opacity: 0.6 })), [])
-  const pts = useMemo(() => Array.from({ length: 9 }, (_, i) => {
-    const a = (i / 9) * Math.PI * 2
-    return new THREE.Vector3(Math.cos(a) * 0.19, Math.sin(i * 2.1) * 0.025, Math.sin(a) * 0.19)
-  }), [])
-  const links = useMemo(() => new THREE.BufferGeometry().setFromPoints(pts.flatMap((p, i) => [p, pts[(i + 1) % pts.length], p, pts[(i + 3) % pts.length]])), [pts])
+  const pts = useMemo(() => Array.from({ length: NEURAL_NODES }, (_, i) => neuralNode(i)), [])
+  // Cada nó liga ao vizinho e ao terceiro seguinte no anel.
+  const links = useMemo(() => new THREE.BufferGeometry().setFromPoints(pts.flatMap((p, i) => [p, neuralNode(i + 1), p, neuralNode(i + 3)])), [pts])
   useFrame((_, dt) => { if (g.current) g.current.rotation.y += dt * 0.35 })
   return (
     <group position={[0, 0.25, -0.125]} rotation={[0.25, 0, 0.08]}>

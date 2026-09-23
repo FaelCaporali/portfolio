@@ -58,15 +58,15 @@ function texelReader(tex: THREE.Texture) {
     const x = Math.min(cv.width - 1, Math.max(0, Math.floor(u * cv.width)))
     const y = Math.min(cv.height - 1, Math.max(0, Math.floor(v * cv.height))) // glTF: flipY desligado
     const i = (y * cv.width + x) * 4
-    out[o] = data[i] / 255
-    out[o + 1] = data[i + 1] / 255
-    out[o + 2] = data[i + 2] / 255
+    out[o] = (data[i] ?? 0) / 255
+    out[o + 1] = (data[i + 1] ?? 0) / 255
+    out[o + 2] = (data[i + 2] ?? 0) / 255
   }
 }
 
 export function Vortex({ skin }: { skin: THREE.Mesh }) {
   const { gl } = useThree()
-  const { geometry, material } = useMemo(() => {
+  const { geometry, material, uSize, uSwirl } = useMemo(() => {
     const sampler = new MeshSurfaceSampler(new THREE.Mesh(skin.geometry)).build()
     const read = texelReader((skin.material as THREE.MeshStandardMaterial).map!)
     const pos = new Float32Array(COUNT * 3)
@@ -83,22 +83,23 @@ export function Vortex({ skin }: { skin: THREE.Mesh }) {
     g.setAttribute('position', new THREE.BufferAttribute(pos, 3))
     g.setAttribute('aColor', new THREE.BufferAttribute(new Float32Array(col), 3))
     g.setAttribute('aSeed', new THREE.BufferAttribute(seed, 1))
+    const size = { value: 5 }
+    const swirl = { value: 0 }
     const m = new THREE.ShaderMaterial({
       vertexShader: vertex,
       fragmentShader: fragment,
-      uniforms: { uD: dissolveUniforms.uD, uSwirl: { value: 0 }, uSize: { value: 5 } },
+      uniforms: { uD: dissolveUniforms.uD, uSwirl: swirl, uSize: size },
       transparent: true,
       depthWrite: false,
       blending: THREE.AdditiveBlending,
     })
-    return { geometry: g, material: m }
+    return { geometry: g, material: m, uSize: size, uSwirl: swirl }
   }, [skin])
 
   useFrame((_, dt) => {
-    material.uniforms.uSize.value = 5 * gl.getPixelRatio()
+    uSize.value = 5 * gl.getPixelRatio()
     // O giro só acumula enquanto há furacão; volta a zero com a cabeça inteira (o caminho de volta é o de ida ao contrário).
-    const u = material.uniforms.uSwirl
-    u.value = dissolveUniforms.uD.value > 0 ? u.value + dt * 2.2 : 0
+    uSwirl.value = dissolveUniforms.uD.value > 0 ? uSwirl.value + dt * 2.2 : 0
   })
 
   return <points geometry={geometry} material={material} frustumCulled={false} />

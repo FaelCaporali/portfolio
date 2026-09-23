@@ -39,6 +39,8 @@ beforeEach(async () => {
 })
 afterEach(() => vi.restoreAllMocks())
 
+/** E-mail entregue à binding na primeira chamada de send. */
+const sentMail = () => send.mock.calls[0]?.[0] as EmailMessageBuilder
 const call = (req: Request, e: Env = testEnv) => worker.fetch(req as Request<unknown, IncomingRequestCfProperties>, e)
 const rows = () => env.DB.prepare('SELECT * FROM messages ORDER BY created_at').all<Message & { status: string; last_error: string | null }>().then((r) => r.results)
 
@@ -155,7 +157,7 @@ describe('robôs', () => {
   })
   it('manda o IP do visitante e o segredo para o siteverify', async () => {
     await call(post(valid, { ip: '198.51.100.7' }))
-    const [, init] = vi.mocked(fetch).mock.calls[0]
+    const init = vi.mocked(fetch).mock.calls[0]?.[1]
     const body = new URLSearchParams(String(init?.body))
     expect(body.get('remoteip')).toBe('198.51.100.7')
     expect(body.get('secret')).toBe('test-secret')
@@ -181,7 +183,7 @@ describe('envio', () => {
     expect(r.status).toBe(200)
     expect(await r.json()).toEqual({ ok: true })
     expect(send).toHaveBeenCalledOnce()
-    const mail = send.mock.calls[0][0] as EmailMessageBuilder
+    const mail = sentMail()
     expect(mail.from).toEqual({ email: 'worker@mail.caporali.dev', name: 'Portfólio · contato' })
     expect(mail.to).toBe('fael@caporali.dev')
     expect(mail.replyTo).toEqual({ email: 'maria@example.com', name: 'Maria Silva' })
@@ -194,17 +196,17 @@ describe('envio', () => {
   })
   it('telefone: sem Reply-To, com link do WhatsApp (assume +55)', async () => {
     await call(post({ ...valid, contact: '(31) 99999-0000' }))
-    const mail = send.mock.calls[0][0] as EmailMessageBuilder
+    const mail = sentMail()
     expect(mail.replyTo).toBeUndefined()
     expect(mail.text).toContain('https://wa.me/5531999990000')
   })
   it('telefone internacional mantém o código do país', async () => {
     await call(post({ ...valid, contact: '+1 415 555 0100' }))
-    expect((send.mock.calls[0][0] as EmailMessageBuilder).text).toContain('https://wa.me/14155550100')
+    expect(sentMail().text).toContain('https://wa.me/14155550100')
   })
   it('injeção de cabeçalho pelo nome: quebras viram espaço, assunto em uma linha', async () => {
     await call(post({ ...valid, name: 'Maria\r\nBcc: alvo@example.com' }))
-    const mail = send.mock.calls[0][0] as EmailMessageBuilder
+    const mail = sentMail()
     expect(mail.subject).toBe('Contato pelo portfólio: Maria Bcc: alvo@example.com')
     expect(mail.subject).not.toMatch(/[\r\n]/)
     expect(mail.to).toBe('fael@caporali.dev')
@@ -214,14 +216,14 @@ describe('envio', () => {
     const rlo = String.fromCharCode(0x202e)
     const nul = String.fromCharCode(0)
     await call(post({ ...valid, name: `Maria${rlo}gpj.exe`, message: `Linha 1${nul}\r\n\r\n\r\n\r\nLinha 2 👩‍💻` }))
-    const mail = send.mock.calls[0][0] as EmailMessageBuilder
+    const mail = sentMail()
     expect(mail.subject).toBe('Contato pelo portfólio: Mariagpj.exe')
     expect(mail.text).toContain('Linha 1\n\nLinha 2 👩‍💻')
   })
   it('HTML do visitante chega como texto, nunca como HTML', async () => {
     const message = '<img src=x onerror=alert(1)> <a href="https://phish.example">clique</a>'
     await call(post({ ...valid, message }))
-    const mail = send.mock.calls[0][0] as EmailMessageBuilder
+    const mail = sentMail()
     expect(mail.html).toBeUndefined()
     expect(mail.text).toContain(message)
   })

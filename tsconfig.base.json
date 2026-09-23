@@ -1,0 +1,20 @@
+{
+  // Opções comuns aos três projetos (app, worker, ferramentas). Cada um acrescenta ambiente (lib/types) e arquivos.
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    // Índice de array/objeto pode não existir: o tipo passa a incluir undefined.
+    "noUncheckedIndexedAccess": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    // Import de tipo explícito (import type) e só sintaxe que o esbuild apaga sem transformar (sem enum/namespace).
+    "verbatimModuleSyntax": true,
+    "erasableSyntaxOnly": true,
+    "skipLibCheck": true,
+    "noEmit": true
+  }
+}

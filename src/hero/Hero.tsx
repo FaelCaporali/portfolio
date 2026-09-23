@@ -5,7 +5,7 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
 import { ResumeMenu } from './ResumeMenu'
 import { Bust, DRAG_MAX_PITCH, DRAG_MAX_YAW, type DragState } from './Bust'
 import { DISSOLVE_MAX, dissolveUniforms } from './dissolve'
-import { stages } from '../content/journey'
+import { stages, type Stage } from '../content/journey'
 import { journeyLink, profile, profileLinks } from '../content/profile'
 import { CopyContacts } from '../components/CopyContacts'
 
@@ -22,6 +22,13 @@ const FROZEN_D = params.has('d') ? Number(params.get('d')) : null
 const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 type Phase = 'hold' | 'out' | 'in'
+
+/** Vida na posição i do carrossel (o índice sempre dá a volta dentro da lista). */
+function stageAt(i: number): Stage {
+  const stage = stages[i % stages.length]
+  if (!stage) throw new Error('journey.ts sem vidas')
+  return stage
+}
 
 /** Botões secundários (currículo e perfis). */
 const PILL = 'flex items-center justify-center gap-1.5 rounded-full border border-white/20 px-3 py-1.5 text-[13px] min-[360px]:inline-flex sm:px-4 sm:py-2 sm:text-sm text-white/80 transition-colors hover:border-white/60 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white cursor-pointer'
@@ -127,7 +134,7 @@ export function Hero() {
   const header = useRef<HTMLElement>(null)
   const text = useRef<HTMLDivElement>(null)
   const [free, setFree] = useState<[number, number]>([0, 0])
-  const stage = stages[index]
+  const stage = stageAt(index)
 
   // Arrasto: meia largura da tela gira ~100°; a velocidade do último movimento vira embalo ao soltar.
   const onDown = (e: React.PointerEvent) => {
