@@ -16,10 +16,14 @@ export function ContactForm({ active }: { active: boolean }) {
   const { container: captcha, token, failed, renew } = useTurnstile(active)
   const { status, invalid, submit, clearInvalid, restart } = useContactForm({ token, failed, renew })
   const form = useRef<HTMLFormElement>(null)
+  const again = useRef<HTMLButtonElement>(null)
   const id = useId()
 
   useEffect(() => {
-    if (active && status.kind !== 'sent') form.current?.querySelector<HTMLInputElement>('input[name="name"]')?.focus()
+    if (!active) return
+    // Enviado: o formulário (e o botão que tinha o foco) some; o foco vai para "enviar outra".
+    if (status.kind === 'sent') again.current?.focus()
+    else form.current?.querySelector<HTMLInputElement>('input[name="name"]')?.focus()
   }, [active, status.kind])
 
   const hintId = (name: Field) => `${id}-${name}-hint`
@@ -46,6 +50,7 @@ export function ContactForm({ active }: { active: boolean }) {
           <p>Thanks! Message received. I&apos;ll get back to you soon.</p>
           <button
             type="button"
+            ref={again}
             onClick={restart}
             className="cursor-pointer text-white underline underline-offset-4 hover:text-white/80"
           >

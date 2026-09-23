@@ -23,7 +23,7 @@ export function HeroCopy({ ref, stage, leaving }: HeroCopyProps) {
       <h1>
         <span className="block text-xs tracking-[0.3em] text-white/60 uppercase lg:text-sm">
           Today I am a{/^[aeiou]/i.test(stage.slot) ? 'n' : ''}
-        </span>
+        </span>{' '}
         {/* Duas linhas reservadas onde a vida mais longa quebra (celular e coluna do largo):
             a troca não empurra o resto. */}
         <span className="mt-2 block min-h-[2em] text-[2.6rem] leading-none font-semibold tracking-tight sm:min-h-[1em] lg:min-h-[2em] lg:text-[clamp(3rem,4.6vw,5rem)]">

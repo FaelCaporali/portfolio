@@ -73,6 +73,8 @@ describe('widget de contato', () => {
     const user = await openAndFill()
     await user.click(screen.getByRole('button', { name: 'Send' }))
     expect(await screen.findByText(/Message received/)).toBeVisible()
+    // O formulário some com o botão que tinha o foco: o foco vai para "enviar outra".
+    expect(screen.getByRole('button', { name: 'Send another message' })).toHaveFocus()
     const [path, init] = fetchMock.mock.calls[0] ?? []
     expect(path).toBe('/api/contact')
     expect(JSON.parse(init?.body as string)).toEqual({

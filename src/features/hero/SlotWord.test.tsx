@@ -9,6 +9,11 @@ describe('SlotWord', () => {
     expect(letters.map((l) => l.textContent).join('')).toBe('QAtester')
     expect(letters.map((l) => l.style.getPropertyValue('--i'))).toEqual(['0', '1', '2', '3', '4', '5', '6', '7'])
   })
+  it('o leitor de tela recebe a frase inteira; as letras são só visuais', () => {
+    const { container } = render(<SlotWord text="QA tester" color="#fff" leaving={false} />)
+    expect(container.querySelector('.sr-only')).toHaveTextContent('QA tester')
+    expect(container.querySelector('.ch')?.closest('[aria-hidden]')).not.toBeNull()
+  })
   it('quebra só entre palavras e marca a saída', () => {
     const { container } = render(<SlotWord text="AI software developer" color="#fff" leaving />)
     expect(container.querySelectorAll('.whitespace-nowrap')).toHaveLength(3)
