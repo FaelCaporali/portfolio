@@ -18,7 +18,8 @@ export const LIMITS = {
   token: 2048,
 } as const
 
-export type Field = 'name' | 'contact' | 'message'
+export const FIELDS = ['name', 'contact', 'message'] as const
+export type Field = (typeof FIELDS)[number]
 
 /** Corpo do POST. `website` é a isca para robôs: invisível para pessoas, que o deixam vazio. */
 export interface ContactRequest {
@@ -31,15 +32,20 @@ export interface ContactRequest {
 }
 
 /** Por que o envio foi recusado. Genéricos de propósito: nenhum detalhe interno sai do Worker. */
-export type ContactErrorCode =
-  | 'method'
-  | 'forbidden'
-  | 'unsupported'
-  | 'rate_limited'
-  | 'too_large'
-  | 'invalid'
-  | 'verification_failed'
-  | 'busy'
-  | 'unavailable'
+export const CONTACT_ERROR_CODES = [
+  'method',
+  'forbidden',
+  'unsupported',
+  'rate_limited',
+  'too_large',
+  'invalid',
+  'verification_failed',
+  'busy',
+  'unavailable',
+] as const
+export type ContactErrorCode = (typeof CONTACT_ERROR_CODES)[number]
+
+export const isField = (v: unknown): v is Field => FIELDS.some((f) => f === v)
+export const isContactErrorCode = (v: unknown): v is ContactErrorCode => CONTACT_ERROR_CODES.some((c) => c === v)
 
 export type ContactResponse = { ok: true } | { ok: false; error: ContactErrorCode; fields?: Field[] }

@@ -1,15 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { directContacts, type DirectContact } from '../../content/profile'
-
-/** Área de transferência (exige HTTPS ou localhost, o que o site sempre é). */
-async function copyText(text: string): Promise<boolean> {
-  try {
-    await navigator.clipboard.writeText(text)
-    return true
-  } catch {
-    return false
-  }
-}
+import { copyText } from '../../lib/clipboard'
 
 /** Ícone do tipo de contato; vira um visto por um instante depois de copiar. */
 function KindIcon({ kind }: { kind: DirectContact['kind'] | 'copied' }) {
