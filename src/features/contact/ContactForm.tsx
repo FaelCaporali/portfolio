@@ -10,7 +10,11 @@ const LABEL = 'mb-1 block text-xs text-white/60'
 
 /**
  * Formulário de contato. Continua montado com o painel fechado e depois do envio: o texto digitado não se perde e o
- * Turnstile vive dentro dele. `active` = painel aberto (carrega a verificação e põe o foco no primeiro campo).
+ * Turnstile vive dentro dele. `active` = painel aberto.
+ *
+ * Foco: só se move quando quem o tinha deixa de existir ou quando a pessoa pede. Ao abrir, entra no painel (padrão de
+ * diálogo); campo inválido recebe o foco; enviado, o formulário some e o foco vai para "enviar outra"; "enviar outra"
+ * volta ao primeiro campo. Erro de envio não mexe no foco: o texto é anunciado pelo status.
  */
 export function ContactForm({ active }: { active: boolean }) {
   const { container: captcha, token, failed, renew } = useTurnstile(active)
@@ -19,12 +23,23 @@ export function ContactForm({ active }: { active: boolean }) {
   const again = useRef<HTMLButtonElement>(null)
   const id = useId()
 
+  const wasActive = useRef(false)
+  const sent = status.kind === 'sent'
+  const nameInput = () => form.current?.querySelector<HTMLInputElement>('input[name="name"]')
+
   useEffect(() => {
-    if (!active) return
-    // Enviado: o formulário (e o botão que tinha o foco) some; o foco vai para "enviar outra".
-    if (status.kind === 'sent') again.current?.focus()
-    else form.current?.querySelector<HTMLInputElement>('input[name="name"]')?.focus()
-  }, [active, status.kind])
+    const opened = active && !wasActive.current
+    wasActive.current = active
+    if (opened) (sent ? again.current : nameInput())?.focus()
+  }, [active, sent])
+
+  // Enviado → "enviar outra"; de volta ao formulário (só acontece por "enviar outra") → primeiro campo.
+  const wasSent = useRef(false)
+  useEffect(() => {
+    if (sent) again.current?.focus()
+    else if (wasSent.current) nameInput()?.focus()
+    wasSent.current = sent
+  }, [sent])
 
   const hintId = (name: Field) => `${id}-${name}-hint`
   const fieldProps = (name: Field) => ({

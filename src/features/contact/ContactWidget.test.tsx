@@ -100,13 +100,33 @@ describe('widget de contato', () => {
     expect(await screen.findByText(text)).toBeVisible()
   })
 
-  it('campo recusado pelo Worker volta como dica no campo', async () => {
+  it('campo recusado pelo Worker volta como dica e recebe o foco', async () => {
     fetchMock.mockResolvedValue(Response.json({ ok: false, error: 'invalid', fields: ['contact'] }, { status: 422 }))
     const user = await openAndFill()
     await user.click(screen.getByRole('button', { name: 'Send' }))
+    const contact = screen.getByLabelText('E-mail or WhatsApp, so I can reply')
     await waitFor(() => {
-      expect(screen.getByLabelText('E-mail or WhatsApp, so I can reply')).toHaveAttribute('aria-invalid', 'true')
+      expect(contact).toHaveAttribute('aria-invalid', 'true')
     })
+    expect(contact).toHaveFocus()
+  })
+
+  it('erro de envio não tira o foco de onde a pessoa deixou', async () => {
+    fetchMock.mockResolvedValue(Response.json({ ok: false, error: 'busy' }, { status: 429 }))
+    const user = await openAndFill()
+    const send = screen.getByRole('button', { name: 'Send' })
+    await user.click(send)
+    expect(await screen.findByText(errorText('busy'))).toBeVisible()
+    expect(send).toHaveFocus()
+  })
+
+  it('"enviar outra" volta ao primeiro campo com o formulário limpo', async () => {
+    fetchMock.mockResolvedValue(Response.json({ ok: true }))
+    const user = await openAndFill()
+    await user.click(screen.getByRole('button', { name: 'Send' }))
+    await user.click(await screen.findByRole('button', { name: 'Send another message' }))
+    expect(screen.getByLabelText('Name')).toHaveFocus()
+    expect(screen.getByLabelText('Name')).toHaveValue('')
   })
 
   it('sem token ainda: pede um instante e não envia', async () => {

@@ -22,6 +22,10 @@ function readForm(form: HTMLFormElement): Omit<ContactRequest, 'token'> {
   return { name: text('name'), contact: text('contact'), message: text('message'), website: text('website') }
 }
 
+const focusField = (form: HTMLFormElement, field: Field | undefined) => {
+  if (field) form.querySelector<HTMLElement>(`[name="${field}"]`)?.focus()
+}
+
 /**
  * Estado e envio do formulário: valida com as mesmas regras do Worker, exige o token da verificação humana, envia e
  * traduz o resultado (enviado, campos a corrigir ou erro com texto próprio).
@@ -40,8 +44,8 @@ export function useContactForm(verification: Verification) {
     const parsed = parseContact(fields)
     const bad = parsed.ok ? [] : parsed.fields
     setInvalid(bad)
-    if (bad[0]) {
-      form.querySelector<HTMLElement>(`[name="${bad[0]}"]`)?.focus()
+    if (bad.length) {
+      focusField(form, bad[0])
       return
     }
     const { token } = verification
@@ -59,6 +63,7 @@ export function useContactForm(verification: Verification) {
     } else if (result.kind === 'invalid') {
       setInvalid(result.fields)
       setStatus({ kind: 'idle' })
+      focusField(form, result.fields[0])
     } else {
       setStatus({ kind: 'error', text: errorText(result.code) })
     }
