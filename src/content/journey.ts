@@ -15,6 +15,8 @@ export interface Stage {
   id: string
   slot: string
   track: 'tech' | 'antes'
+  /** Vida que ficou no passado: o herói diz "Yesterday I was" em vez de "Today I am" (decisão do Fael, 23/09). */
+  past?: true
   /** Uma linha de fato, com fonte. */
   fact?: string
   /** Onde e quando, como no CV/Lattes. */
@@ -50,6 +52,7 @@ export const stages: Stage[] = [
   },
   {
     id: 'financeiro',
+    past: true,
     prop: 'coins',
     slot: 'financial manager',
     track: 'antes',
@@ -91,6 +94,7 @@ export const stages: Stage[] = [
   },
   {
     id: 'vela',
+    past: true,
     prop: 'sailor',
     slot: 'sailing instructor',
     track: 'antes',
@@ -112,6 +116,7 @@ export const stages: Stage[] = [
   },
   {
     id: 'uber',
+    past: true,
     prop: 'uber',
     slot: 'Uber driver',
     track: 'antes',
