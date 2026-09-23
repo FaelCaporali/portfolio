@@ -22,10 +22,12 @@ interface BustProps {
   pointer: RefObject<Pointer>
   /** Giro por arrasto, escrito pelos eventos de ponteiro do herói. */
   drag: RefObject<DragState>
+  /** Fração das partículas do furacão (qualidade adaptativa). */
+  particles: number
 }
 
 /** O busto do S13 com expressão da vida, piscar, olhar que segue o ponteiro, arrasto, adereço e furacão. */
-export function Bust({ expr, prop, pointer, drag }: BustProps) {
+export function Bust({ expr, prop, pointer, drag, particles }: BustProps) {
   const { scene } = useGLTF(bustUrl)
   const head = useRef<THREE.Group>(null)
   const frame = useRef<THREE.Group>(null)
@@ -58,7 +60,7 @@ export function Bust({ expr, prop, pointer, drag }: BustProps) {
         <group ref={frame} position={PIVOT.clone().negate()}>
           <primitive object={scene} />
           <Props id={prop} />
-          <Vortex skin={rig.skin} />
+          <Vortex skin={rig.skin} fraction={particles} />
         </group>
       </group>
     </group>

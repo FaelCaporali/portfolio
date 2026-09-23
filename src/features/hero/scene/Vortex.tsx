@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { MeshSurfaceSampler } from 'three/examples/jsm/math/MeshSurfaceSampler.js'
@@ -66,7 +66,9 @@ function texelReader(tex: THREE.Texture) {
   }
 }
 
-export function Vortex({ skin }: { skin: THREE.Mesh }) {
+/** fraction: parte das partículas desenhada (qualidade adaptativa). A amostragem é aleatória, então o começo do
+ * buffer já é uma amostra uniforme da pele: basta encurtar o drawRange, sem refazer a geometria. */
+export function Vortex({ skin, fraction }: { skin: THREE.Mesh; fraction: number }) {
   const { gl } = useThree()
   const { geometry, material, uSize, uSwirl } = useMemo(() => {
     const sampler = new MeshSurfaceSampler(new THREE.Mesh(skin.geometry)).build()
@@ -102,6 +104,10 @@ export function Vortex({ skin }: { skin: THREE.Mesh }) {
     })
     return { geometry: g, material: m, uSize: size, uSwirl: swirl }
   }, [skin])
+
+  useEffect(() => {
+    geometry.setDrawRange(0, Math.round(COUNT * fraction))
+  }, [geometry, fraction])
 
   useFrame((_, dt) => {
     uSize.value = 5 * gl.getPixelRatio()
