@@ -13,7 +13,8 @@ export default defineConfig(({ command, mode }) => {
     // bindings simuladas localmente (D1, limite, e-mail); variáveis de dev em .dev.vars.
     plugins: [react(), tailwindcss(), cloudflare()],
     // Demo remota pelo ngrok: o subdomínio muda a cada túnel, então libera o domínio inteiro (só no servidor de dev).
-    server: { allowedHosts: ['.ngrok-free.app'] },
+    // Porta fixa: ALLOWED_ORIGINS do .dev.vars aponta para ela (o Worker recusa outra origem).
+    server: { port: 5199, strictPort: true, allowedHosts: ['.ngrok-free.app'] },
     build: {
       rollupOptions: {
         output: {
