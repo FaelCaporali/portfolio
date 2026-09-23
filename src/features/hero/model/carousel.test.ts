@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DISSOLVE_MAX, createClock, tick, type CarouselClock, type Tick, type TickInput } from './carousel'
+import { DISSOLVE_MAX, TIMING, createClock, tick, type CarouselClock, type Tick, type TickInput } from './carousel'
 
 const normal: TickInput = { first: false, reducedMotion: false, held: false }
 
@@ -16,15 +16,14 @@ function run(c: CarouselClock, seconds: number, input: TickInput = normal) {
 describe('carrossel', () => {
   it('segura, desintegra, troca a vida no auge e reconstrói', () => {
     const c = createClock()
-    expect(run(c, 3.35)).toEqual([])
+    expect(run(c, TIMING.hold - 0.05)).toEqual([])
     expect(run(c, 0.1)).toEqual([{ dissolve: 0, next: false, phase: 'out' }])
-    const out = run(c, 1.5)
-    expect(out).toEqual([{ dissolve: DISSOLVE_MAX, next: true, phase: 'in' }])
-    expect(run(c, 1.5)).toEqual([{ dissolve: 0, next: false, phase: 'hold' }])
+    expect(run(c, TIMING.out)).toEqual([{ dissolve: DISSOLVE_MAX, next: true, phase: 'in' }])
+    expect(run(c, TIMING.in)).toEqual([{ dissolve: 0, next: false, phase: 'hold' }])
   })
   it('a primeira vida fica mais tempo', () => {
     const c = createClock()
-    expect(run(c, 4.4, { ...normal, first: true })).toEqual([])
+    expect(run(c, TIMING.holdFirst - 0.1, { ...normal, first: true })).toEqual([])
     expect(run(c, 0.15, { ...normal, first: true })).toHaveLength(1)
   })
   it('não troca enquanto alguém segura o busto', () => {
@@ -34,7 +33,7 @@ describe('carrossel', () => {
   })
   it('movimento reduzido troca direto, sem furacão', () => {
     const c = createClock()
-    const events = run(c, 3.5, { ...normal, reducedMotion: true })
+    const events = run(c, TIMING.hold + 0.05, { ...normal, reducedMotion: true })
     expect(events).toEqual([{ dissolve: 0, next: true, phase: null }])
     expect(c.phase).toBe('hold')
   })

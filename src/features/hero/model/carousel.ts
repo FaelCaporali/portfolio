@@ -1,11 +1,11 @@
 /** Relógio do carrossel: segura a vida, desintegra (troca a vida no auge do furacão) e reconstrói. Sem React. */
 import { smooth } from '../../../lib/math'
 
-/** Tempos (s). A primeira vida fica mais tempo: é o que quem chega lê primeiro. */
-const HOLD_FIRST = 4.5
-const HOLD = 3.4
-const OUT = 1.5
-const IN = 1.5
+/**
+ * Tempos (s). Parado 2,5 s (a primeira vida, que quem chega lê primeiro, 3 s) e transição de 1 s para cada lado
+ * (decisão do Fael, 23/09: antes eram 3,4–4,5 s parado e 1,5 s cada lado).
+ */
+export const TIMING = { holdFirst: 3, hold: 2.5, out: 1, in: 1 } as const
 /** Quadro longo (aba em segundo plano) não pula a animação. */
 const MAX_DT = 0.1
 
@@ -45,7 +45,7 @@ export function tick(c: CarouselClock, dt: number, input: TickInput): Tick {
   c.time += Math.min(dt, MAX_DT)
 
   if (c.phase === 'hold') {
-    if (c.time < (input.first ? HOLD_FIRST : HOLD)) return { dissolve: 0, next: false, phase: null }
+    if (c.time < (input.first ? TIMING.holdFirst : TIMING.hold)) return { dissolve: 0, next: false, phase: null }
     c.time = 0
     if (input.reducedMotion) return { dissolve: 0, next: true, phase: null }
     c.phase = 'out'
@@ -53,15 +53,15 @@ export function tick(c: CarouselClock, dt: number, input: TickInput): Tick {
   }
 
   if (c.phase === 'out') {
-    const dissolve = DISSOLVE_MAX * smooth(Math.min(c.time / OUT, 1))
-    if (c.time < OUT) return { dissolve, next: false, phase: null }
+    const dissolve = DISSOLVE_MAX * smooth(Math.min(c.time / TIMING.out, 1))
+    if (c.time < TIMING.out) return { dissolve, next: false, phase: null }
     c.time = 0
     c.phase = 'in'
     return { dissolve, next: true, phase: 'in' }
   }
 
-  const dissolve = DISSOLVE_MAX * (1 - smooth(Math.min(c.time / IN, 1)))
-  if (c.time < IN) return { dissolve, next: false, phase: null }
+  const dissolve = DISSOLVE_MAX * (1 - smooth(Math.min(c.time / TIMING.in, 1)))
+  if (c.time < TIMING.in) return { dissolve, next: false, phase: null }
   c.time = 0
   c.phase = 'hold'
   return { dissolve, next: false, phase: 'hold' }
