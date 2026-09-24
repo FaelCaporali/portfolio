@@ -28,6 +28,9 @@ playwright-report
 !3d/export/s13/pele_s13.jpg
 !3d/export/npc01/
 !3d/export/npc01/**
+# adereços do herói (receita em 3d/tools/prop_*.py; o site importa o glb)
+!3d/export/props/
+!3d/export/props/*.glb
 !3d/renders/
 !3d/renders/s13_demo.mp4
 # referências fotográficas (só as usadas pelas ferramentas de medição)
@@ -66,3 +69,6 @@ __pycache__/
 # ---- contexto privado do projeto (planos, entrevista, pesquisa, estado do 3D) e configuração local de ferramentas
 .wai/
 .mcp.json
+
+# agentes e workflows do estúdio (citam .wai, privado)
+.claude/

@@ -1,6 +1,6 @@
 import { PerformanceMonitor } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
-import { Suspense, useState, type PointerEventHandler, type RefObject } from 'react'
+import { Suspense, lazy, useState, type PointerEventHandler, type RefObject } from 'react'
 import * as THREE from 'three'
 import type { Stage } from '../../../content/journey'
 import type { Phase } from '../model/carousel'
@@ -12,6 +12,11 @@ import { Bust } from './Bust'
 import { Director } from './Director'
 import { Framing } from './Framing'
 import { Lighting } from './Lighting'
+
+/** Gancho de depuração do estúdio 3D (window.__heroDebug): só no servidor de desenvolvimento; o build o descarta. */
+const DebugHook = import.meta.env.DEV
+  ? lazy(() => import('./dev/DebugHook').then((m) => ({ default: m.DebugHook })))
+  : null
 
 interface HeroCanvasProps {
   stage: Stage
@@ -76,6 +81,7 @@ export function HeroCanvas({
           onPhase={onPhase}
           onNext={onNext}
         />
+        {DebugHook && <DebugHook />}
       </Suspense>
     </Canvas>
   )
