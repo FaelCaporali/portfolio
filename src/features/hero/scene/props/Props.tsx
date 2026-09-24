@@ -1,7 +1,8 @@
 import type { PropId } from '../../../../content/journey'
 import { Compass, InfinityLoop, Magnifier, Rocket, Sailboat, Wheel } from './floating'
+import { Ledger } from './ledger/Ledger'
 import { Brim, Dome, Headphones, Sunglasses, Tears } from './head'
-import { Coins, Neural } from './orbits'
+import { Neural } from './orbits'
 
 /**
  * Adereços por vida — BLOCKOUT em primitivas, para aprovar forma, tamanho e posição antes da modelagem no Blender.
@@ -15,8 +16,8 @@ export function Props({ id }: { id: PropId }) {
       return <Neural />
     case 'magnifier':
       return <Magnifier />
-    case 'coins':
-      return <Coins />
+    case 'ledger':
+      return <Ledger />
     case 'headphones':
       return <Headphones />
     case 'rocket':

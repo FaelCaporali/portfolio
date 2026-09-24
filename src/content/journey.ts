@@ -6,7 +6,7 @@
 export type ExprKey = 'mouthSmile' | 'browInnerUp' | 'browOuterUp' | 'browDown'
 
 export type PropId =
-  'neural' | 'magnifier' | 'coins' | 'headphones' | 'rocket' | 'headset' | 'sailor' | 'compass' | 'uber' | 'infinity'
+  'neural' | 'magnifier' | 'ledger' | 'headphones' | 'rocket' | 'headset' | 'sailor' | 'compass' | 'uber' | 'infinity'
 
 export type Expression = Partial<Record<ExprKey, number>>
 
@@ -36,13 +36,13 @@ export const stages: Stage[] = [
   {
     id: 'financeiro',
     past: true,
-    prop: 'coins',
+    prop: 'ledger',
     slot: 'Financial Assistant',
     track: 'antes',
     accent: '#c9a227',
     fact: 'Coordenador financeiro: planejamento com a diretoria e relatórios gerenciais automatizados em VBA.',
     where: 'Immersus Ensino de Idiomas · 2013–2017',
-    expr: { browDown: 0.2 },
+    expr: { browDown: 0.4, mouthSmile: 0.15 },
   },
   {
     id: 'empreendedor',
