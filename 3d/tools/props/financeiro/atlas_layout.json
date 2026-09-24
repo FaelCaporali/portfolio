@@ -1,0 +1,421 @@
+{
+ "convencao": "rect = [u0, v0, u1, v1] em UV do glTF (0–1; origem embaixo à esquerda: u = x/W, v = 1 − y/H); (u0, v0) = canto inferior esquerdo. A face da frente do painel mapeia o atlas 1:1 (forma.py).",
+ "atlas": {
+  "largura_px": 820,
+  "altura_px": 1050,
+  "cheio": "atlas_painel_rgba.png",
+  "vazio": "atlas_painel_vazio_rgba.png",
+  "nota": "mesma UV e mesmo layout; o vazio só perde preenchimento, números, texto da fórmula, cursor e moldura ativa — cruzar por retângulo (célula, caractere) do vazio para o cheio"
+ },
+ "celulas_ordem_leitura": [
+  {
+   "indice": 0,
+   "ref": "A1",
+   "linha": 0,
+   "coluna": 0,
+   "rect": [
+    0.09024,
+    0.57333,
+    0.38171,
+    0.75429
+   ],
+   "preenchimento_rect": [
+    0.10878,
+    0.58781,
+    0.36317,
+    0.73981
+   ],
+   "valor": 12,
+   "ativa_final": false
+  },
+  {
+   "indice": 1,
+   "ref": "B1",
+   "linha": 0,
+   "coluna": 1,
+   "rect": [
+    0.38171,
+    0.57333,
+    0.67317,
+    0.75429
+   ],
+   "preenchimento_rect": [
+    0.40024,
+    0.58781,
+    0.65463,
+    0.73981
+   ],
+   "valor": 15,
+   "ativa_final": false
+  },
+  {
+   "indice": 2,
+   "ref": "C1",
+   "linha": 0,
+   "coluna": 2,
+   "rect": [
+    0.67317,
+    0.57333,
+    0.96463,
+    0.75429
+   ],
+   "preenchimento_rect": [
+    0.69171,
+    0.58781,
+    0.9461,
+    0.73981
+   ],
+   "valor": 19,
+   "ativa_final": false
+  },
+  {
+   "indice": 3,
+   "ref": "A2",
+   "linha": 1,
+   "coluna": 0,
+   "rect": [
+    0.09024,
+    0.39238,
+    0.38171,
+    0.57333
+   ],
+   "preenchimento_rect": [
+    0.10878,
+    0.40686,
+    0.36317,
+    0.55886
+   ],
+   "valor": 24,
+   "ativa_final": false
+  },
+  {
+   "indice": 4,
+   "ref": "B2",
+   "linha": 1,
+   "coluna": 1,
+   "rect": [
+    0.38171,
+    0.39238,
+    0.67317,
+    0.57333
+   ],
+   "preenchimento_rect": [
+    0.40024,
+    0.40686,
+    0.65463,
+    0.55886
+   ],
+   "valor": 28,
+   "ativa_final": false
+  },
+  {
+   "indice": 5,
+   "ref": "C2",
+   "linha": 1,
+   "coluna": 2,
+   "rect": [
+    0.67317,
+    0.39238,
+    0.96463,
+    0.57333
+   ],
+   "preenchimento_rect": [
+    0.69171,
+    0.40686,
+    0.9461,
+    0.55886
+   ],
+   "valor": 33,
+   "ativa_final": false
+  },
+  {
+   "indice": 6,
+   "ref": "A3",
+   "linha": 2,
+   "coluna": 0,
+   "rect": [
+    0.09024,
+    0.21143,
+    0.38171,
+    0.39238
+   ],
+   "preenchimento_rect": [
+    0.10878,
+    0.2259,
+    0.36317,
+    0.3779
+   ],
+   "valor": 39,
+   "ativa_final": false
+  },
+  {
+   "indice": 7,
+   "ref": "B3",
+   "linha": 2,
+   "coluna": 1,
+   "rect": [
+    0.38171,
+    0.21143,
+    0.67317,
+    0.39238
+   ],
+   "preenchimento_rect": [
+    0.40024,
+    0.2259,
+    0.65463,
+    0.3779
+   ],
+   "valor": 46,
+   "ativa_final": false
+  },
+  {
+   "indice": 8,
+   "ref": "C3",
+   "linha": 2,
+   "coluna": 2,
+   "rect": [
+    0.67317,
+    0.21143,
+    0.96463,
+    0.39238
+   ],
+   "preenchimento_rect": [
+    0.69171,
+    0.2259,
+    0.9461,
+    0.3779
+   ],
+   "valor": 54,
+   "ativa_final": false
+  },
+  {
+   "indice": 9,
+   "ref": "A4",
+   "linha": 3,
+   "coluna": 0,
+   "rect": [
+    0.09024,
+    0.03048,
+    0.38171,
+    0.21143
+   ],
+   "preenchimento_rect": [
+    0.10878,
+    0.04495,
+    0.36317,
+    0.19695
+   ],
+   "valor": 63,
+   "ativa_final": false
+  },
+  {
+   "indice": 10,
+   "ref": "B4",
+   "linha": 3,
+   "coluna": 1,
+   "rect": [
+    0.38171,
+    0.03048,
+    0.67317,
+    0.21143
+   ],
+   "preenchimento_rect": [
+    0.40024,
+    0.04495,
+    0.65463,
+    0.19695
+   ],
+   "valor": 74,
+   "ativa_final": false
+  },
+  {
+   "indice": 11,
+   "ref": "C4",
+   "linha": 3,
+   "coluna": 2,
+   "rect": [
+    0.67317,
+    0.03048,
+    0.96463,
+    0.21143
+   ],
+   "preenchimento_rect": [
+    0.69171,
+    0.04495,
+    0.9461,
+    0.19695
+   ],
+   "valor": null,
+   "ativa_final": true
+  }
+ ],
+ "barra_formula": {
+  "rect": [
+   0.0,
+   0.75429,
+   1.0,
+   0.88952
+  ],
+  "texto": "Sub AtingirMeta()",
+  "texto_rect": [
+   0.12073,
+   0.78667,
+   0.9439,
+   0.85143
+  ],
+  "caracteres": [
+   {
+    "i": 0,
+    "c": "S",
+    "u0": 0.12073,
+    "u1": 0.16919
+   },
+   {
+    "i": 1,
+    "c": "u",
+    "u0": 0.16919,
+    "u1": 0.21764
+   },
+   {
+    "i": 2,
+    "c": "b",
+    "u0": 0.21764,
+    "u1": 0.2661
+   },
+   {
+    "i": 3,
+    "c": " ",
+    "u0": 0.2661,
+    "u1": 0.31456
+   },
+   {
+    "i": 4,
+    "c": "A",
+    "u0": 0.31456,
+    "u1": 0.36301
+   },
+   {
+    "i": 5,
+    "c": "t",
+    "u0": 0.36301,
+    "u1": 0.41147
+   },
+   {
+    "i": 6,
+    "c": "i",
+    "u0": 0.41147,
+    "u1": 0.45993
+   },
+   {
+    "i": 7,
+    "c": "n",
+    "u0": 0.45993,
+    "u1": 0.50838
+   },
+   {
+    "i": 8,
+    "c": "g",
+    "u0": 0.50838,
+    "u1": 0.55684
+   },
+   {
+    "i": 9,
+    "c": "i",
+    "u0": 0.55684,
+    "u1": 0.6053
+   },
+   {
+    "i": 10,
+    "c": "r",
+    "u0": 0.6053,
+    "u1": 0.65375
+   },
+   {
+    "i": 11,
+    "c": "M",
+    "u0": 0.65375,
+    "u1": 0.70221
+   },
+   {
+    "i": 12,
+    "c": "e",
+    "u0": 0.70221,
+    "u1": 0.75067
+   },
+   {
+    "i": 13,
+    "c": "t",
+    "u0": 0.75067,
+    "u1": 0.79912
+   },
+   {
+    "i": 14,
+    "c": "a",
+    "u0": 0.79912,
+    "u1": 0.84758
+   },
+   {
+    "i": 15,
+    "c": "(",
+    "u0": 0.84758,
+    "u1": 0.89604
+   },
+   {
+    "i": 16,
+    "c": ")",
+    "u0": 0.89604,
+    "u1": 0.94449
+   }
+  ],
+  "cursor_rect": [
+   0.95122,
+   0.77863,
+   0.95732,
+   0.86518
+  ],
+  "maiuscula_px_1440": 9.6
+ },
+ "celula_ativa_final": {
+  "indice": 11,
+  "ref": "C4",
+  "linha": 3,
+  "coluna": 2,
+  "rect": [
+   0.67317,
+   0.03048,
+   0.96463,
+   0.21143
+  ],
+  "preenchimento_rect": [
+   0.69171,
+   0.04495,
+   0.9461,
+   0.19695
+  ],
+  "valor": null,
+  "ativa_final": true,
+  "moldura_px_atlas": 5,
+  "alca_rect": [
+   0.94378,
+   0.03048,
+   0.96463,
+   0.04676
+  ]
+ },
+ "cabecalho_colunas_rect": [
+  0.0,
+  0.88952,
+  1.0,
+  1.0
+ ],
+ "cabecalho_linhas_rect": [
+  0.0,
+  0.03048,
+  0.09024,
+  0.75429
+ ],
+ "borda_vidro_uv": [
+  0.5,
+  0.012
+ ]
+}
