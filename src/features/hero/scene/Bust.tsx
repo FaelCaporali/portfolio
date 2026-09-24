@@ -68,13 +68,13 @@ export function Bust({ expr, prop, pointer, drag, particles }: BustProps) {
             <primitive object={scene} />
           </group>
           <group name="prop">
+            <Props id={prop} />
+            {/* O laboratório SOMA à vida (peça complementar julgada junto com o que já está aprovado). */}
             {LabProp && lab ? (
               <Suspense fallback={null}>
                 <LabProp url={lab} />
               </Suspense>
-            ) : (
-              <Props id={prop} />
-            )}
+            ) : null}
           </group>
           <Vortex skin={rig.skin} fraction={particles} />
         </group>
