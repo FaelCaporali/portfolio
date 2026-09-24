@@ -1,9 +1,11 @@
 """Rascunho (PIL) do conteúdo impresso da fita e do boleto do lado direito, SÓ para julgar leitura e escala nas provas
 da modelagem. O conteúdo definitivo é canvas desenhado no site (TD), com o mesmo layout de UV.
 
-Uso: python3 3d/tools/props/financeiro/rascunho_direita.py <pasta>   →   <pasta>/fita.jpg e <pasta>/boleto.jpg
-Fita: u na largura, v = 0 na fenda (base da imagem). Proporção da malha: 0,030 × ~0,166 m. Margem esquerda sem tinta.
-Boleto: face inteira, 0,105 × 0,070 m. O quinto direito (u > 0,84) fica atrás da fita: nada essencial ali.
+Uso: python3 3d/tools/props/financeiro/rascunho_direita.py <pasta> [L]  →  <pasta>/fita.jpg e <pasta>/boleto.jpg
+Fita: u na largura, v = 0 na fenda (base da imagem), v = 1 na ponta da espiral; L = comprimento da malha em metros
+(impresso pela receita como 'FITA comprimento L'). A fita inteira leva as 4 contas das colunas A–D do painel da v6, a mais
+nova (coluna D, 1.947 T em vermelho) junto da fenda. Boleto: face inteira, 0,105 × 0,070 m; os ~4 % de cima ficam presos
+sob o pé da calculadora.
 """
 import os
 import random
@@ -24,21 +26,48 @@ def fonte(caminho, tam):
         return ImageFont.load_default(size=tam)
 
 
-def fita(saida):
-    w, h = 180, 1024                      # ~6000 px/m nas duas direções
+MONOS = ('/usr/share/fonts/truetype/ubuntu/UbuntuMono-B.ttf', '/usr/share/fonts/truetype/liberation2/LiberationMono-Bold.ttf',
+         MONO_B)
+CONTAS = ((('412', '318', '276', '278'), '1.284'), (('438', '296', '251', '187'), '1.172'),
+          (('455', '362', '318', '428'), '1.563'), (('521', '447', '389', '590'), '1.947'))   # colunas A–D do painel
+
+
+def linhas_fita():
+    """Linhas da fenda (v = 0) para a ponta: a conta mais nova saiu por último; em cada conta o total fica embaixo."""
+    tinta, vermelho, out = (58, 36, 92), (178, 34, 38), []
+    for parcelas, total in reversed(CONTAS):
+        out += [(total + ' T', vermelho), ('- - - -', tinta)] + [(p + ' +', tinta) for p in reversed(parcelas)]
+        out.append(('', tinta))
+    return out[:-1]
+
+
+def mono_pesada(w, passo):
+    """A mono pesada de maior dígito que cabe: '1.947 T' em 86 % da largura e dígito ≤ 72 % do passo."""
+    melhor = (0, None)
+    for arq in (a for a in MONOS if os.path.exists(a)):
+        for tam in range(90, 8, -1):
+            f = ImageFont.truetype(arq, tam)
+            b = f.getbbox('0')
+            if f.getlength('1.947 T') <= 0.86 * w and b[3] - b[1] <= 0.72 * passo:
+                melhor = max(melhor, (b[3] - b[1], f), key=lambda m: m[0])
+                break
+    return melhor
+
+
+def fita(saida, comp):
+    h = 1024
+    w, pxm = max(64, round(h * 0.030 / comp)), h / comp
     im = Image.new('RGB', (w, h), (244, 241, 234))
     dr = ImageDraw.Draw(im)
-    f = fonte(MONO_B, 34)
-    tinta, vermelho = (58, 36, 92), (178, 34, 38)
-    passo = 40
-    linhas = [('521 +', tinta), ('447 +', tinta), ('389 +', tinta), ('590 +', tinta), ('- - - - -', tinta),
-              ('1.947 T', vermelho)]
-    base = h - 44                         # a última linha acabou de sair da fenda
-    for k, (txt, c) in enumerate(reversed(linhas)):
-        y = base - k * passo
-        tw = dr.textlength(txt, font=f)
-        dr.text((w - 12 - tw, y - 30), txt, font=f, fill=c)
-    im.save(saida, quality=88)
+    linhas = linhas_fita()
+    base = 0.0035 * pxm                  # a última linha acabou de sair da fenda
+    passo = (h - base - 0.002 * pxm) / (len(linhas) - 0.2)
+    dig, f = mono_pesada(w, passo)
+    for k, (txt, c) in enumerate(linhas):
+        dr.text((w - 0.05 * w, h - base - k * passo), txt, font=f, fill=c, anchor='rs')
+    im.save(saida, quality=90)
+    print('RASCUNHO fita %dx%d, %d linhas, passo %.1f mm, dígito %.1f mm (%s)' % (
+        w, h, len(linhas), passo / pxm * 1000, dig / pxm * 1000, os.path.basename(f.path)))
 
 
 def boleto(saida):
@@ -87,6 +116,6 @@ def boleto(saida):
 if __name__ == '__main__':
     pasta = sys.argv[1]
     os.makedirs(pasta, exist_ok=True)
-    fita(os.path.join(pasta, 'fita.jpg'))
+    fita(os.path.join(pasta, 'fita.jpg'), float(sys.argv[2]) if len(sys.argv) > 2 else 0.25)
     boleto(os.path.join(pasta, 'boleto.jpg'))
     print('RASCUNHO', pasta)

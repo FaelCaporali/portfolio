@@ -40,6 +40,7 @@ RAIZ_GL, GIRO = (-0.125, 0.06, -0.26), 0.6          # espaço do glb (Y para cim
 # Varredura de composição (só medida): raiz=x,y,z giro= bol_x= bol_yaw= sobrepõem os valores acima.
 RAIZ_GL = tuple(float(c) for c in ARGS['raiz'].split(',')) if 'raiz' in ARGS else RAIZ_GL
 GIRO = float(ARGS.get('giro', GIRO))
+ESCALA = float(ARGS.get('escala', 1.0))              # escala uniforme da raiz (equilíbrio com o painel da v6)
 papel.BOL_X, papel.BOL_YAW = float(ARGS.get('bol_x', papel.BOL_X)), float(ARGS.get('bol_yaw', papel.BOL_YAW))
 
 COR = {'num': '#2c2e33', 'op': '#4b4f56', 'mais': '#9a5b3c', 'visor': '#1d2320',
@@ -261,6 +262,7 @@ def build():
     raiz = v6.link(bpy.data.objects.new('financeiro_direita', None))
     raiz.location = comum.gl_para_bl(RAIZ_GL)
     raiz.rotation_euler = (0, 0, GIRO)
+    raiz.scale = (ESCALA,) * 3
     mats = materiais(ARGS.get('rascunho', '0'))
     objs = [carcaca(), teclas(), cabecote(), bobina(), fita(), boleto()]
     for o in objs:
