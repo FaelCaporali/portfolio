@@ -36,7 +36,7 @@ PERFIL = [(-0.030, 0.0), (0.030, 0.0), (0.030, 0.031), (0.026, 0.035), (0.004, 0
           (-0.027, 0.0125), (-0.030, 0.0100)]       # corte lateral (y, z): teclado inclinado ~22°, cabeçote atrás
 DECK = (Vector((0, 0.002, 0.024)), Vector((0, -0.027, 0.0125)))
 ROLL_R, ROLL_CORE, ROLL_W, ROLL_C = 0.016, 0.0068, 0.035, (0.050, 0.053)
-RAIZ_GL, GIRO = (-0.125, 0.06, -0.26), 0.6          # espaço do glb (Y para cima); giro em Y (rad)
+RAIZ_GL, GIRO = (-0.165, 0.06, -0.26), 0.6          # espaço do glb (Y para cima); giro em Y (rad). x −0,165: pedido do Fael (calculadora longe do rosto)
 # Varredura de composição (só medida): raiz=x,y,z giro= bol_x= bol_yaw= sobrepõem os valores acima.
 RAIZ_GL = tuple(float(c) for c in ARGS['raiz'].split(',')) if 'raiz' in ARGS else RAIZ_GL
 GIRO = float(ARGS.get('giro', GIRO))
