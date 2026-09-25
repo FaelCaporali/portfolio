@@ -91,6 +91,9 @@ def tris(objs):
 
 
 def main():
+    if ARGS.get('anim', '0') != '0':               # volta 4: composição A com o clip `montagem` (movimento)
+        import prop_empreendedor_movimento as movimento
+        return movimento.rodar(construir, tris, PASTA_GLB, ARGS.get('provas', '1') != '0')
     if ARGS.get('cena'):                           # volta 3: cena composta (A ou B), ver prop_empreendedor_cena.py
         import prop_empreendedor_cena as cena
         return cena.rodar(ARGS['cena'], construir, tris, PASTA_GLB, ARGS.get('provas', '1') != '0')

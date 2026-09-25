@@ -84,6 +84,54 @@ def bolo(mats):
     return [obj_cob, B.objeto('bolo_massa', bm, massa, ang=30, normais=False)]
 
 
+def fatia():
+    """Volta 4 (movimento): a fatia que falta no `bolo`, com as mesmas camadas, NO LUGAR dela (dentro do vão).
+    Devolve (bm_cobertura, bm_massa) para juntar às malhas do bolo; o movimento a assenta no prato. Mesmos números
+    do `bolo` (z0, R, H, vão de 55° centrado em −Y, perfil, bandas); uma roseta no topo, sobre a borda."""
+    z0, R, H, ab = 0.0314, 0.028, 0.052, math.radians(55)
+    a0 = -math.pi / 2 - ab / 2
+    zs = [z0 + H * i / 7 for i in range(8)]
+    perfil = [(0, z0), (R - 0.0012, z0), (R + 0.0013, z0 + 0.0013), (R, z0 + 0.0028)] + \
+             [(R, z) for z in zs[1:-1]] + [(R - 0.0006, z0 + H - 0.0004), (R - 0.0025, z0 + H), (0, z0 + H)]
+    escorre = [0.004 + 0.014 * B.hash01(k, 8.3) ** 2 for k in range(4)]
+
+    def raio(r, z, a):
+        e = escorre[min(3, int((a - a0) / ab * 4))]
+        return r + (0.0006 if z > z0 + H - e and z0 + 0.003 < z < z0 + H - 0.001 else 0.0)
+
+    bm = bmesh.new()
+    fs = B.torno(bm, perfil, 6, a0, ab, raio)
+
+    def cor(f):
+        c = f.calc_center_median()
+        e = escorre[min(3, max(0, int((math.atan2(c.y, c.x) - a0) / ab * 4)))]
+        return CB['ganache'] if c.z > z0 + H - max(0.0008, e) and c.z > z0 + 0.003 else CB['creme']
+    B.pintar(bm, fs, cor)
+    perfil_r = [(0, 0), (0.0034, 0), (0.0037, 0.0013), (0.0027, 0.0030), (0.0014, 0.0044), (0, 0.0053)]
+    c = Vector((0, -(R - 0.0048), z0 + H - 0.0006))
+    B.pintar(bm, B.torno(bm, perfil_r, 10, raio=lambda r, z, t: r * (1 + 0.24 * math.cos(8 * t + 2.0 + 900 * z)),
+                         mapa=lambda p: p + c), CB['roseta'])
+    bm_m = bmesh.new()
+    bandas = [(0.0135, 'massa'), (0.0045, 'recheio'), (0.0130, 'massa'), (0.0045, 'recheio'), (0.0125, 'massa'),
+              (0.0040, 'ganache')]
+    rs = [0, 0.010, 0.020, R - 0.0018, R]
+    for a in (a0, a0 + ab):
+        d, z = Vector((math.cos(a), math.sin(a), 0)), z0
+        for alt, nome in bandas:
+            for r0, r1 in zip(rs, rs[1:]):
+                q = [d * r0 + Vector((0, 0, z)), d * r1 + Vector((0, 0, z)), d * r1 + Vector((0, 0, z + alt)),
+                     d * r0 + Vector((0, 0, z + alt))]
+                f = bm_m.faces.new([bm_m.verts.new(p) for p in q])
+                casca = r0 >= R - 0.0019 and nome != 'ganache'
+                base = CB['creme'] if casca else CB[nome]
+                sombra = 0.9 + 0.1 * B.hash01(r0 * 700, z * 700)
+                B.pintar(bm_m, [f], base if nome != 'massa' or casca else _escurece(base, sombra))
+            z += alt
+    bmesh.ops.remove_doubles(bm_m, verts=bm_m.verts, dist=1e-7)
+    return bm, bm_m
+
+
+
 def _escurece(hexcor, k):
     h = hexcor.lstrip('#')
     return '#' + ''.join('%02x' % int(int(h[i:i + 2], 16) * k) for i in (0, 2, 4))

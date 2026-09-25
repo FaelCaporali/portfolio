@@ -3,7 +3,8 @@
 //   estatico : ?slot=<vida>&d=0 em 1440×900, 1024×768 e 360×740 (dsf 2), depois da animação terminar.
 //   zoom     : ?slot=<vida>&d=0 em 1440×900 com densidade 2; recorte da cabeça + adereço e detalhe do adereço
 //              (retângulos medidos pelo gancho de depuração; sem ele, os recortes fixos antigos).
-//   sequencia: ?slot=<vida> (carrossel normal) em 1440×900 com relógio falso: 17 quadros a cada 0,25 s de cena.
+//   sequencia: ?slot=<vida> (carrossel normal) em 1440×900 com relógio falso: 17 quadros a cada 0,25 s de cena, com
+//              t=0 na MONTAGEM real (pula pelo indicador para a vida seguinte e volta; folha: props/folha_seq.py).
 //   poses    : ?slot=<vida>&d=0 em 1440×900 dsf 2: ponteiro nos 4 cantos e no centro e arrasto para os dois lados e
 //              para cima (interpenetração com cabelo, barba e orelhas), recorte da cabeça + adereço em cada pose.
 // Extras: --q=chave=valor (parâmetro de URL, repetível), --reduzido (prefers-reduced-motion), --espera=16000 (ms até o
@@ -27,6 +28,29 @@ async function recorte(page, margem, soPeca = false) {
   if (!m) return null
   const vp = page.viewportSize()
   return uniao(soPeca ? [m.peca.boxTotal] : [m.cabeca.box, m.peca.boxTotal], margem, vp.width, vp.height)
+}
+
+/** Palavra da vida em cena (a que não está saindo), com espaços normalizados. */
+const palavra = (page) =>
+  page.evaluate(() => document.querySelector('.slot-word:not(.is-leaving)')?.textContent?.replace(/\s+/g, ' ').trim())
+/** A palavra traz o texto duas vezes (medida + visível): basta conter o nome da vida. */
+const mesma = (palavraAtual, vida) => (palavraAtual ?? '').includes(vida)
+
+/** Escolhe a vida no indicador e avança o relógio falso em passos de 0,05 s até ela montar. */
+async function montar(page, vida) {
+  await page.evaluate(
+    (v) => [...document.querySelectorAll('nav[aria-label="Timeline"] button')].find((b) => b.ariaLabel === v)?.click(),
+    vida,
+  )
+  for (let i = 0; i < 120; i++) {
+    await page.clock.runFor(50)
+    if (mesma(await palavra(page), vida)) return
+  }
+  const agora = await page.evaluate(() => ({
+    palavras: [...document.querySelectorAll('.slot-word')].map((e) => `${e.className}: ${e.textContent}`),
+    atual: document.querySelector('nav[aria-label="Timeline"] button[aria-current]')?.ariaLabel,
+  }))
+  throw new Error(`a vida ${vida} não montou em 6 s de cena: ${JSON.stringify(agora)}`)
 }
 
 if (mode === 'estatico') {
@@ -101,8 +125,10 @@ if (mode === 'estatico') {
   await ctx.close()
 } else {
   // Relógio falso do Playwright (rAF e performance.now): cada passo avança exatamente 0,25 s de cena, então a
-  // sequência mostra o roteiro em tempo de cena, não no ritmo lento do SwiftShader. t=0: o adereço está montado.
-  const { ctx, page } = await abrir(browser, {
+  // sequência mostra o roteiro em tempo de cena, não no ritmo lento do SwiftShader. t=0 é a MONTAGEM real da vida: na
+  // primeira carga ela monta antes de o relógio parar, então a ferramenta pula pelo indicador para a vida seguinte e
+  // volta à pedida; a palavra da vida troca no mesmo quadro em que o adereço monta (auge do furacão), com erro ≤ 0,05 s.
+  const { ctx, page, vidaInicial: alvo } = await abrir(browser, {
     viewport: { width: 1440, height: 900 },
     query: q(`slot=${slot}`),
     reduzido,
@@ -110,8 +136,15 @@ if (mode === 'estatico') {
   })
   await page.clock.pauseAt(Date.now() + 1000)
   const clip = (await recorte(page, 40)) ?? { x: 900, y: 120, width: 540, height: 480 }
+  const vidas = await page.evaluate(() =>
+    [...document.querySelectorAll('nav[aria-label="Timeline"] button')].map((b) => b.getAttribute('aria-label') ?? ''),
+  )
+  await montar(page, vidas[(vidas.indexOf(alvo) + 1) % vidas.length])
+  await montar(page, alvo)
   for (let i = 0; i <= 16; i++) {
-    await page.screenshot({ path: `${out}/${tag}-seq-${(i * 0.25).toFixed(2)}s${sufixo}.png`, clip })
+    // Sem GPU, o primeiro quadro depois de muitos passos do relógio falso demora: prazo longo no screenshot.
+    const path = `${out}/${tag}-seq-${(i * 0.25).toFixed(2)}s${sufixo}.png`
+    await page.screenshot({ path, clip, timeout: 180_000 })
     await page.clock.runFor(250)
   }
   await ctx.close()

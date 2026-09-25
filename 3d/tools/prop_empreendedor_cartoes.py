@@ -117,10 +117,11 @@ def leque(mats):
         bpy.data.meshes.remove(me)
     bmesh.ops.rotate(bm, verts=bm.verts, cent=(0, 0, 0), matrix=Matrix.Rotation(INCLINA, 3, 'X'))
     xs, ys, zs = ([v.co[i] for v in bm.verts] for i in range(3))
-    bmesh.ops.translate(bm, verts=bm.verts,
-                        vec=(-(min(xs) + max(xs)) / 2, -(min(ys) + max(ys)) / 2, -min(zs)))
+    pivo = (-(min(xs) + max(xs)) / 2, -(min(ys) + max(ys)) / 2, -min(zs))   # o pivô comum (origem) vai para cá
+    bmesh.ops.translate(bm, verts=bm.verts, vec=pivo)
     _uv_cartao(bm)
     obj = B.objeto('cartoes', bm, _material(mats), ang=60)
+    obj['pivo'] = pivo                    # lido pelo movimento (leque abre em torno dele); não vai para o glb
     obj.data.uv_layers['UVMap'].active_render = True
     obj.data.uv_layers.active = obj.data.uv_layers['UVMap']
     return [obj]

@@ -47,10 +47,14 @@ export async function abrir(browser, { viewport, dsf = 1, query, reduzido = fals
   if (relogio) await page.clock.install()
   const busto = page.waitForResponse((r) => r.url().includes('busto-s13.glb'), { timeout: 90_000 })
   await page.goto(`${BASE}/?${query}`)
+  // A vida pedida, lida no indicador logo na chegada (sem GPU, o carrossel pode já ter andado quando o busto fica pronto).
+  const vidaInicial = await page
+    .locator('nav[aria-label="Timeline"] button[aria-current]')
+    .getAttribute('aria-label', { timeout: 90_000 })
   await page.locator('canvas').waitFor({ timeout: 90_000 })
   await busto
   await page.waitForFunction(() => window.__heroDebug?.ready() === true, null, { timeout: 90_000 })
-  return { ctx, page }
+  return { ctx, page, vidaInicial }
 }
 
 /**
