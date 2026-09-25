@@ -20,8 +20,10 @@ import comum  # noqa: E402
 import prop_financeiro_v6 as v6  # noqa: E402
 import prop_empreendedor_base as B  # noqa: E402
 import prop_empreendedor_chaves as chaves  # noqa: E402
+import prop_empreendedor_cartoes as cartoes  # noqa: E402
 import prop_empreendedor_chaveiros as chaveiros  # noqa: E402
 import prop_empreendedor_doces as doces  # noqa: E402
+import prop_empreendedor_doces2 as doces2  # noqa: E402
 import prop_empreendedor_hostel as hostel  # noqa: E402
 import prop_empreendedor_kanban as kanban  # noqa: E402
 import prop_empreendedor_prova as prova  # noqa: E402
@@ -41,6 +43,8 @@ CANDIDATOS = {
     'sup': ('E1', sup.construir, (-0.165, 0.02, -0.26), 0.45, 0.62),
     'bolo': ('E2', doces.bolo, VITRINE, GIRO, 0.45),
     'brigadeiros': ('E2', doces.brigadeiros, VITRINE, GIRO, 0.45),
+    'cupcake': ('E2', doces2.cupcake, VITRINE, GIRO, 0.5),     # volta 2: candidatos ao lado do bolo (Fael)
+    'muffin': ('E2', doces2.muffin, VITRINE, GIRO, 0.5),
     'beliche': ('E3', hostel.beliche, VITRINE, 1.2, 0.45),
     'chave_quarto': ('E3', hostel.chave_quarto, VITRINE, GIRO, 0.45),
     'foguete': ('E4', tech.foguete, VITRINE, GIRO, 0.5),
@@ -49,11 +53,13 @@ CANDIDATOS = {
     'kanban': ('E5', kanban.kanban, VITRINE, GIRO, 0.5),
     'chaves': ('E5', chaves.chaves, VITRINE, GIRO, 0.5),
     'chaves_negocios': ('E5/E9', chaveiros.chaves_negocios, VITRINE, GIRO, 0.5),
+    'cartoes': ('E8', cartoes.leque, VITRINE, 1.0, 0.45),   # volta 2: leque de cartões (giro medido na prova)
 }
 # Parte 2 em diante: tamanho ajustado só pelas faixas do 1440 e do 1024 (orquestrador, 25/09: a interseção com o 360
 # encolhia as peças largas a 0,10–0,19 da cabeça). O 360 fica medido no json, para o layout próprio dele.
-SO_DESKTOP = {'kanban': ('1440x900', '1024x768'), 'chaves': ('1440x900', '1024x768'),
-              'chaves_negocios': ('1440x900', '1024x768')}
+SO_DESKTOP = {'cartoes': ('1440x900', '1024x768'), 'kanban': ('1440x900', '1024x768'), 'chaves': ('1440x900', '1024x768'),
+              'chaves_negocios': ('1440x900', '1024x768'),
+              'cupcake': ('1440x900', '1024x768'), 'muffin': ('1440x900', '1024x768')}
 
 
 def construir(cid):
