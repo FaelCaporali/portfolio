@@ -273,7 +273,8 @@ def build():
 
 if __name__ == '__main__':
     raiz, objs = build()
-    comum.exportar_glb([raiz] + objs, GLB)
+    # Posição float: Calculadora.tsx usa a geometria de cada malha fora do nó dela (otimizar.mjs --posicao-float).
+    comum.exportar_glb([raiz] + objs, GLB, posicao_float=True)
     print('EXPORT', GLB, os.path.getsize(GLB), 'bytes', {o.name: len(o.data.polygons) for o in objs})
     if ARGS.get('provas', '0') != '0':
         import prop_financeiro_direita_prova as prova

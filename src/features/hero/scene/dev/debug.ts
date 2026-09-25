@@ -120,7 +120,9 @@ function partBoxes(prop: THREE.Object3D, camera: THREE.Camera, w: number, h: num
     let x1 = -Infinity
     let y1 = -Infinity
     for (let i = 0; i < pos.count; i++) {
-      v.fromBufferAttribute(pos, i).applyMatrix4(mesh.matrixWorld).project(camera)
+      // getVertexPosition aplica ossos e morfos (no glb quantizado, a desquantização da malha com skin está nas
+      // matrizes inversas dos ossos: a posição crua × matrixWorld sairia em outra escala).
+      mesh.getVertexPosition(i, v).applyMatrix4(mesh.matrixWorld).project(camera)
       const x = ((v.x + 1) / 2) * w
       const y = ((1 - v.y) / 2) * h
       x0 = Math.min(x0, x)

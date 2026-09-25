@@ -1,7 +1,8 @@
 """Movimento do "Entrepreneur", volta 4 (E13): a composição A com o clip glTF `montagem` bakeado no glb.
 
 Chamado pela receita: blender -b --python 3d/tools/prop_empreendedor.py -- anim=1 [provas=0]
-Brief: `.wai/3d/props/empreendedor/FICHA-MOVIMENTO.md`. Saída: `3d/export/props/lab/emp_animado.glb` (Draco).
+Brief: `.wai/3d/props/empreendedor/FICHA-MOVIMENTO.md`. Saída: `3d/export/props/lab/emp_animado.glb` (meshopt: glb cru do
+Blender + `3d/tools/props/otimizar.mjs`, sem Draco; o cru fica em /data/tmp para as provas no Blender).
 
 CONTRATO com o TD (site):
 - Um único clip `montagem`, 2,1 s; t do clip = t do relógio da vida (s desde a montagem). O site faz
@@ -262,18 +263,19 @@ def _nla(ob):
     ad.action = None
 
 
-def exportar(raiz_t, saida, draco=True):
+def exportar(raiz_t, saida, otimizar=True):
     objs = [raiz_t] + list(raiz_t.children_recursive)
     for o in bpy.context.scene.objects:
         o.select_set(o in set(objs))
     bpy.ops.export_scene.gltf(
         filepath=saida, export_format='GLB', use_selection=True, export_yup=True, export_apply=True, export_extras=True,
-        export_cameras=False, export_lights=False, export_draco_mesh_compression_enable=draco,
-        export_draco_mesh_compression_level=6, export_draco_position_quantization=14,
-        export_draco_normal_quantization=10, export_draco_texcoord_quantization=12,
+        export_cameras=False, export_lights=False, export_draco_mesh_compression_enable=False,
         export_animations=True, export_animation_mode='NLA_TRACKS', export_force_sampling=True,
         export_optimize_animation_size=True, export_optimize_animation_keep_anim_armature=False,
         export_skins=True, export_def_bones=False, export_frame_range=False)
+    if otimizar:                                   # passo final: meshopt (o Draco viria do gstatic, barrado pela CSP)
+        import comum
+        comum.otimizar_glb(saida)
     return saida
 
 
@@ -284,7 +286,7 @@ def rodar(construir, tris, pasta_glb, com_provas=True):
     raiz_t, pecas = cena.montar('a', construir)
     ossos = animar(pecas)
     arq = exportar(raiz_t, os.path.join(pasta_glb, 'emp_animado.glb'))
-    cru = exportar(raiz_t, '/data/tmp/emp_animado_sem_draco.glb', draco=False)
+    cru = exportar(raiz_t, '/data/tmp/emp_animado_sem_draco.glb', otimizar=False)
     malhas = [o for p in pecas.values() for o in p['objs']]
     orc = {'glb': os.path.relpath(arq, v6.ROOT), 'kB': round(os.path.getsize(arq) / 1024, 1),
            'kB_sem_draco': round(os.path.getsize(cru) / 1024, 1), 'tris': tris(malhas),

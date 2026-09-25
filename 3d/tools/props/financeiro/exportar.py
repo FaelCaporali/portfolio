@@ -31,11 +31,12 @@ def caminho(etapa):
     return os.path.join(comum.RAIZ, f'3d/export/props/lab/financeiro_{VERSAO}_{etapa}.glb')
 
 
-def exportar(etapa='blockout', draco=True):
+def exportar(etapa='blockout', otimizar=True):
     col = bpy.data.collections.get(COLECAO)
     if col is None or not col.all_objects:
         raise RuntimeError(f'coleção {COLECAO} ausente ou vazia')
-    saida = comum.exportar_glb(list(col.all_objects), caminho(etapa), draco=draco)
+    # Posição float: ledger/assets.ts usa a geometria de cada malha fora do nó dela (otimizar.mjs --posicao-float).
+    saida = comum.exportar_glb(list(col.all_objects), caminho(etapa), otimizar=otimizar, posicao_float=True)
     subprocess.run(['node', os.path.join(comum.RAIZ, '3d/tools/props/glb.mjs'), saida], check=True)
     return saida
 

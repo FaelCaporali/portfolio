@@ -2,7 +2,8 @@
  * Vida "Financial Assistant", lado direito do busto (à esquerda do rosto na tela): a calculadora de fita imprime a soma
  * da coluna D do painel (a meta da bandeira, total em vermelho) e o boleto de cobrança da Immersus, no mesmo valor,
  * assenta quando a linha toca a bandeira. Forma e material: 3d/tools/prop_financeiro_direita.py (raiz
- * `financeiro_direita` já posicionada no espaço do frame). Texto da fita e do boleto: canvas (fita.ts, boleto.ts).
+ * `financeiro_direita` já posicionada no espaço do frame; meshopt com posição float, porque as malhas são
+ * usadas fora dos nós delas: `otimizar.mjs --posicao-float`). Texto da fita e do boleto: canvas (fita.ts, boleto.ts).
  */
 import { useGLTF } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
@@ -34,7 +35,7 @@ const prefersReducedMotion = () =>
   typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 function useCalculadoraAssets() {
-  const { nodes } = useGLTF(calculadoraUrl) as unknown as { nodes: Nodes }
+  const { nodes } = useGLTF(calculadoraUrl, false) as unknown as { nodes: Nodes }
   const glb = useMemo(() => {
     const root = nodes.financeiro_direita
     if (!root) throw new Error('financeiro_direita.glb sem a raiz financeiro_direita')
@@ -96,4 +97,4 @@ export function Calculadora() {
   )
 }
 
-useGLTF.preload(calculadoraUrl)
+useGLTF.preload(calculadoraUrl, false)

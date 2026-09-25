@@ -2,8 +2,8 @@
 
 Chamado pela receita: blender -b --python 3d/tools/prop_empreendedor.py -- cena=a|b [provas=0]
 Monta as 7 peças do E11 com os construtores do registro CANDIDATOS (sem remodelar), cada uma com transformação própria,
-sob a raiz `emp_todos` (um nó por peça, nomeado pelo id), e exporta `3d/export/props/lab/emp_todos_<a|b>.glb` (Draco,
-como o `financeiro_direita.glb` de produção). Medidas e provas em `3d/captura/props/empreendedor/v3/composicao/`.
+sob a raiz `emp_todos` (um nó por peça, nomeado pelo id), e exporta `3d/export/props/lab/emp_todos_<a|b>.glb` (meshopt,
+otimizar.mjs, como os glbs de produção). Medidas e provas em `3d/captura/props/empreendedor/v3/composicao/`.
 
 Layout em px CSS do 1440×900 (a câmera do site é a mesma nas 3 telas, só muda o recorte: o 1024 e o 360 são o 1440
 escalado em torno da origem do busto, logo quem cabe no 1440 respeitando o texto do 1024 cabe nos dois):
@@ -254,9 +254,9 @@ def rodar(prop, construir, tris, pasta_glb, com_provas=True):
     raiz_t, pecas = montar(prop, construir)
     objs = [o for p in pecas.values() for o in [p['raiz']] + p['objs']]
     arq = os.path.join(pasta_glb, 'emp_todos_%s.glb' % prop)
-    comum.exportar_glb([raiz_t] + objs, arq, draco=True)
+    comum.exportar_glb([raiz_t] + objs, arq)
     cru = os.path.join('/data/tmp', 'emp_todos_%s_sem_draco.glb' % prop)
-    comum.exportar_glb([raiz_t] + objs, cru, draco=False)
+    comum.exportar_glb([raiz_t] + objs, cru, otimizar=False)
     malhas = [o for p in pecas.values() for o in p['objs']]
     orc = {'glb': os.path.relpath(arq, v6.ROOT), 'kB': round(os.path.getsize(arq) / 1024, 1),
            'kB_sem_draco': round(os.path.getsize(cru) / 1024, 1), 'tris': tris(malhas),

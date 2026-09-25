@@ -12,6 +12,7 @@ expressa nesse espaço (inversa(frame) · câmera), com a mesma projeção verti
 import json
 import math
 import os
+import subprocess
 
 import bpy
 from mathutils import Matrix
@@ -41,7 +42,14 @@ def cena_nova():
 
 
 def importar_glb(caminho, colecao):
-    """Importa um glb para uma coleção própria e devolve os objetos importados."""
+    """Importa um glb para uma coleção própria e devolve os objetos importados. glb com meshopt (o importador do
+    Blender 4.5 não lê EXT_meshopt_compression) passa antes por `otimizar.mjs --cru` numa cópia em /data/tmp."""
+    with open(caminho, 'rb') as f:
+        if b'EXT_meshopt_compression' in f.read(1 << 16):
+            cru = os.path.join('/data/tmp', 'cru_' + os.path.basename(caminho))
+            subprocess.run(['node', os.path.join(RAIZ, '3d/tools/props/otimizar.mjs'), '--cru', caminho, cru],
+                           check=True, cwd=RAIZ)
+            caminho = cru
     antes = set(bpy.data.objects)
     bpy.ops.import_scene.gltf(filepath=caminho)
     novos = [o for o in bpy.data.objects if o not in antes]
@@ -208,10 +216,21 @@ def vistas_argila(objetos, pasta, rotulo, alvo=None, dist=None, lado=520):
     return folha
 
 
-def exportar_glb(objetos, saida, draco=True):
+def otimizar_glb(saida, posicao_float=False):
+    """Passo final de toda exportação para o site: `node 3d/tools/props/otimizar.mjs` (meshopt + quantização, sem
+    Draco: o decodificador Draco viria do gstatic, que a CSP de produção bloqueia). `posicao_float` para peças cujo
+    site usa `nodes.X.geometry` fora do nó (ex.: calculadora do financeiro). Falha se o inventário mudar."""
+    cmd = ['node', os.path.join(RAIZ, '3d/tools/props/otimizar.mjs'), os.path.abspath(saida)]
+    subprocess.run(cmd + (['--posicao-float'] if posicao_float else []), check=True, cwd=RAIZ)
+    return saida
+
+
+def exportar_glb(objetos, saida, otimizar=True, posicao_float=False):
     """Exporta só `objetos` (a coleção da peça) para glb: +Y para cima, modificadores aplicados, sem câmera nem luz,
-    nomes de objeto preservados, Draco nível 6, texturas como estão (JPEG/WebP definidos pelo lookdev). Depois de
-    exportar, conferir o JSON: `node 3d/tools/props/glb.mjs <saida>` (extensão esperada ausente = defeito)."""
+    nomes de objeto preservados, SEM Draco, texturas como estão (JPEG/WebP definidos pelo lookdev) e, com `otimizar`,
+    o passo final `otimizar_glb` (meshopt). `otimizar=False` deixa o glb cru (legível pelo importador do Blender, para
+    provas). Depois de exportar, conferir o JSON: `node 3d/tools/props/glb.mjs <saida>` (extensão esperada ausente =
+    defeito)."""
     for o in bpy.context.scene.objects:
         o.select_set(o in set(objetos))
     os.makedirs(os.path.dirname(os.path.abspath(saida)), exist_ok=True)
@@ -224,10 +243,6 @@ def exportar_glb(objetos, saida, draco=True):
         export_cameras=False,
         export_lights=False,
         export_extras=True,  # extras do material (ex.: envMapIntensity do lookdev, lido por scene/envIntensity.ts)
-        export_draco_mesh_compression_enable=draco,
-        export_draco_mesh_compression_level=6,
-        export_draco_position_quantization=14,
-        export_draco_normal_quantization=10,
-        export_draco_texcoord_quantization=12,
+        export_draco_mesh_compression_enable=False,
     )
-    return saida
+    return otimizar_glb(saida, posicao_float) if otimizar else saida

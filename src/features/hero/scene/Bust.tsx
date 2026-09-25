@@ -28,7 +28,8 @@ interface BustProps {
 
 /** O busto do S13 com expressão da vida, piscar, olhar que segue o ponteiro, arrasto, adereço e furacão. */
 export function Bust({ expr, prop, pointer, drag, particles }: BustProps) {
-  const { scene } = useGLTF(bustUrl)
+  // Draco desligado em todo useGLTF: o decodificador viria do gstatic, barrado pela CSP (o do meshopt vem no bundle).
+  const { scene } = useGLTF(bustUrl, false)
   const head = useRef<THREE.Group>(null)
   const frame = useRef<THREE.Group>(null)
   const rig = useMemo(() => buildRig(scene), [scene])
@@ -72,4 +73,4 @@ export function Bust({ expr, prop, pointer, drag, particles }: BustProps) {
   )
 }
 
-useGLTF.preload(bustUrl)
+useGLTF.preload(bustUrl, false)

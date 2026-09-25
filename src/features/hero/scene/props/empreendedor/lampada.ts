@@ -30,7 +30,9 @@ const HALO_SCALE = 2.4
 /**
  * Halo suave da lâmpada acesa (sem bloom no site, o emissivo sozinho quase não separa acesa de apagada: +6 % de
  * luminância no bulbo, medido no 1440). Plano de frente para a câmera, gradiente radial, mistura aditiva; o material
- * passa pelo `dissolve` de quem chama. Centrado no bulbo (caixa da malha `lampada_luz`, no espaço do nó `lampada`).
+ * passa pelo `dissolve` de quem chama. Centrado no bulbo (caixa da malha `lampada_luz`, no espaço do nó `lampada`:
+ * a caixa da geometria passa pela matriz local da malha, que no glb quantizado (KHR_mesh_quantization) carrega a
+ * escala e a translação da desquantização; a caixa crua sairia em unidades inteiras normalizadas).
  */
 export function createHalo(luz: THREE.Mesh, dissolve: (m: THREE.Material) => THREE.Material) {
   const canvas = document.createElement('canvas')
@@ -56,7 +58,8 @@ export function createHalo(luz: THREE.Mesh, dissolve: (m: THREE.Material) => THR
   })
   const shaded = dissolve(material) as THREE.MeshBasicMaterial
   if (!luz.geometry.boundingBox) luz.geometry.computeBoundingBox()
-  const box = luz.geometry.boundingBox ?? new THREE.Box3()
+  luz.updateMatrix()
+  const box = new THREE.Box3().copy(luz.geometry.boundingBox ?? new THREE.Box3()).applyMatrix4(luz.matrix)
   const size = box.max.y - box.min.y
   const geometry = new THREE.PlaneGeometry(size * HALO_SCALE, size * HALO_SCALE)
   const mesh = new THREE.Mesh(geometry, shaded)

@@ -1,8 +1,8 @@
 /**
  * Vida "Entrepreneur": a cena dos negócios em volta da cabeça (SUP, bolo, beliche do hostel, notebook, kanban, leque de
  * cartões de visita e foguete). Forma e material: composição A do estúdio 3D (raiz `emp_todos` já posicionada no
- * espaço do frame, Draco). Na tela estreita (mesmo critério do enquadramento, `isWide`) cartões, beliche e bolo cairiam
- * sobre o texto da vida: ficam escondidos, e SUP, kanban, foguete e notebook cabem nas laterais.
+ * espaço do frame, meshopt). Na tela estreita (mesmo critério do enquadramento, `isWide`) cartões, beliche e bolo
+ * cairiam sobre o texto da vida: ficam escondidos, e SUP, kanban, foguete e notebook cabem nas laterais.
  *
  * Movimento: o clip `montagem` bakeado no glb (2,1 s; t do clip = t desde a montagem, o último quadro é a composição
  * final) é POSICIONADO pelo relógio da vida, como o roteiro do financeiro (`ledger/timeline.ts`): o mixer nunca avança
@@ -33,7 +33,7 @@ const isMesh = (o: THREE.Object3D): o is THREE.Mesh => (o as Partial<THREE.Mesh>
 
 /** Clona a cena (geometrias e texturas seguem do cache do useGLTF) e troca cada material por um com a desintegração. */
 function useEmpreendedorScene() {
-  const { scene, animations } = useGLTF(empreendedorUrl)
+  const { scene, animations } = useGLTF(empreendedorUrl, false)
   const cena = useMemo(() => {
     const root = scene.getObjectByName('emp_todos')
     if (!root) throw new Error('empreendedor.glb sem a raiz emp_todos')
@@ -111,4 +111,4 @@ export function Empreendedor() {
   return <primitive object={root} />
 }
 
-useGLTF.preload(empreendedorUrl)
+useGLTF.preload(empreendedorUrl, false)

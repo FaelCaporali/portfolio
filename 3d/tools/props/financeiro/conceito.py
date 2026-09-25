@@ -229,7 +229,7 @@ def exportar_vazio():
     comum.cena_nova()
     bpy.ops.mesh.primitive_cube_add(size=0.001, location=comum.gl_para_bl((0.0, 0.2, -0.15)))
     comum.exportar_glb([bpy.context.active_object], os.path.join(comum.RAIZ, '3d/export/props/lab/vazio.glb'),
-                       draco=False)
+                       otimizar=False)
 
 
 def main():

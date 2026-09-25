@@ -84,7 +84,7 @@ function useSceneEnv(pairs: readonly (readonly [THREE.MeshStandardMaterial, numb
 const basic = (color: string) => withDissolve(new THREE.MeshBasicMaterial({ color }))
 
 export function useLedgerAssets(points: readonly THREE.Vector3[]) {
-  const { nodes } = useGLTF(ledgerUrl) as unknown as { nodes: Nodes }
+  const { nodes } = useGLTF(ledgerUrl, false) as unknown as { nodes: Nodes }
   const glb = useMemo(
     () => ({
       frame: part(nodes, 'Frame'),
@@ -167,4 +167,4 @@ export function useLedgerAssets(points: readonly THREE.Vector3[]) {
   return { glb, mats, sheet, cursor, trend, dot }
 }
 
-useGLTF.preload(ledgerUrl)
+useGLTF.preload(ledgerUrl, false)

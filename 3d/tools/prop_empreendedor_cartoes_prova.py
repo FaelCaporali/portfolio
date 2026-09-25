@@ -35,7 +35,7 @@ def construir():
     raiz, objs = E.construir('cartoes')
     escala, x = prova.ajustar(raiz, objs, alvo, E.SO_DESKTOP.get('cartoes'))
     arq = os.path.join(E.PASTA_GLB, 'emp_cartoes.glb')
-    comum.exportar_glb([raiz] + objs, arq, draco=False)
+    comum.exportar_glb([raiz] + objs, arq, otimizar=False)
     print('AJUSTE cartoes escala', escala, 'raiz_gl', (x, *raiz_gl[1:]), 'giro', giro)
     return {'e': e, 'raiz': raiz, 'escala': escala, 'x': x, 'objs': objs, 'telas': E.SO_DESKTOP['cartoes'],
             'glb': os.path.relpath(arq, v6.ROOT), 'kB': round(os.path.getsize(arq) / 1024, 1), 'tris': E.tris(objs),

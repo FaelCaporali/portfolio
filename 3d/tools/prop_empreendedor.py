@@ -110,7 +110,7 @@ def main():
         print('AJUSTE', cid, 'escala', escala, 'raiz_gl', (x, *CANDIDATOS[cid][2][1:]),
               'giro', CANDIDATOS[cid][3])
         arq = os.path.join(PASTA_GLB, 'emp_%s.glb' % cid)
-        comum.exportar_glb([raiz] + objs, arq, draco=False)
+        comum.exportar_glb([raiz] + objs, arq, otimizar=False)
         feitos[cid] = {'e': CANDIDATOS[cid][0], 'raiz': raiz, 'escala': escala, 'x': x, 'objs': objs,
                        'telas': SO_DESKTOP.get(cid),
                        'glb': os.path.relpath(arq, ROOT), 'kB': round(os.path.getsize(arq) / 1024, 1), 'tris': tris(objs)}
