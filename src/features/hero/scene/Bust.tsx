@@ -7,7 +7,7 @@ import type { Expression, PropId } from '../../../content/journey'
 import { stepDrag, type DragState } from '../model/drag'
 import { createFace, stepFace } from '../model/face'
 import { createGaze, stepGaze, type Pointer } from '../model/gaze'
-import { readLabUrl } from './dev/lab'
+import { readLab } from './dev/lab'
 import { dissolveUniforms } from './dissolve'
 import { Props } from './props/Props'
 import { applyEyes, applyFace, buildRig } from './rig'
@@ -16,7 +16,7 @@ import { Vortex } from './Vortex'
 /** Pivô de rotação da cabeça: base do pescoço, no espaço do glb (Y para cima, rosto para +Z). */
 const PIVOT = new THREE.Vector3(0, 0.05, -0.13)
 
-/** Laboratório do estúdio 3D (`?lab=<glb>`): só existe no servidor de desenvolvimento; o build o descarta. */
+/** Laboratório do estúdio 3D (`?lab=<glb>[&solo=1]`): só existe no servidor de desenvolvimento; o build o descarta. */
 const LabProp = import.meta.env.DEV ? lazy(() => import('./dev/LabProp').then((m) => ({ default: m.LabProp }))) : null
 
 interface BustProps {
@@ -39,7 +39,7 @@ export function Bust({ expr, prop, pointer, drag, particles }: BustProps) {
   const face = useRef(createFace())
   const gaze = useRef(createGaze())
   const eye = useMemo(() => ({ quat: new THREE.Quaternion(), euler: new THREE.Euler() }), [])
-  const [lab] = useState(() => (LabProp ? readLabUrl(window.location.search) : null))
+  const [lab] = useState(() => (LabProp ? readLab(window.location.search) : null))
 
   useFrame((_, dt) => {
     stepFace(face.current, expr, dt)
@@ -68,11 +68,11 @@ export function Bust({ expr, prop, pointer, drag, particles }: BustProps) {
             <primitive object={scene} />
           </group>
           <group name="prop">
-            <Props id={prop} />
-            {/* O laboratório SOMA à vida (peça complementar julgada junto com o que já está aprovado). */}
+            {/* O laboratório SOMA à vida (peça complementar julgada junto com o aprovado); com solo=1, SUBSTITUI. */}
+            {LabProp && lab?.solo ? null : <Props id={prop} />}
             {LabProp && lab ? (
               <Suspense fallback={null}>
-                <LabProp url={lab} />
+                <LabProp url={lab.url} />
               </Suspense>
             ) : null}
           </group>

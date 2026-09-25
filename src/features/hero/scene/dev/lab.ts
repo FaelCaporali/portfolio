@@ -11,3 +11,17 @@ export function readLabUrl(search: string): string | null {
   if (/^[a-z]+:|^\/\/|\.\./i.test(raw)) return null
   return raw.startsWith('/') ? raw : `/${raw}`
 }
+
+export interface LabRequest {
+  url: string
+  /** `&solo=1`: esconde o adereço da vida e mostra só o glb (peça que vai SUBSTITUIR o adereço). Sem ele, soma. */
+  solo: boolean
+}
+
+/** Pedido completo do laboratório; null sem `?lab=` válido (`solo` sozinho não faz nada). */
+export function readLab(search: string): LabRequest | null {
+  const url = readLabUrl(search)
+  if (!url) return null
+  const solo = new URLSearchParams(search).get('solo')?.trim().toLowerCase()
+  return { url, solo: solo === '1' || solo === 'true' }
+}

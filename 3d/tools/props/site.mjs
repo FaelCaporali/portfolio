@@ -25,6 +25,8 @@ export function extras(argv) {
   const resto = []
   for (const a of argv) {
     if (a.startsWith('--q=')) q.push(a.slice(4))
+    // --solo = --q=solo=1: com ?lab=, esconde o adereço da vida e mostra só o glb (candidato que o SUBSTITUI).
+    else if (a === '--solo') q.push('solo=1')
     else if (a === '--reduzido') reduzido = true
     else if (a.startsWith('--espera=')) espera = Number(a.slice(9))
     else resto.push(a)
