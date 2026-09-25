@@ -19,6 +19,7 @@ import bpy
 from mathutils.bvhtree import BVHTree
 
 import comum
+import prop_empreendedor_cena_metricas as met
 import prop_financeiro_v6 as v6
 from prop_financeiro_direita_prova import caixa_px
 
@@ -27,13 +28,16 @@ FALA = {'sup_deckpad', 'notebook_vinil', 'kanban_papel', 'cartoes_leque'}   # o 
 PROPOSTAS = {
     # A, "J da jornada": o passado desce pela esquerda (SUP em pé) e corre por baixo do queixo (beliche, bolo);
     # o presente sobe pela direita (notebook e o foguete saindo dele); kanban atrás, no alto à direita; leque na frente.
-    'a': {'sup': (722, 606, 0.04, 0.45, 0.80, False),
-          'cartoes': (782, 880, -0.16, 0.12, 0.49, False),
-          'beliche': (1000, 880, -0.06, 1.2, 0.28, False),
+    # Volta 3b (métricas do orquestrador): vãos ≥ 34 px no 1440 (= 24 no 1024), respiro do texto do 1024 ≥ 24, área
+    # ≤ 1,0 do busto (kanban 0,46→0,40, beliche 0,28→0,25). Base ('sobre', id, px): a peça ENCOSTA na silhueta de cima
+    # de outra (px abaixo da borda, atrás dela); profundidade None = logo atrás da borda de cima dessa peça.
+    'a': {'sup': (740, 580, 0.04, 0.45, 0.80, False),
+          'cartoes': (800, 880, -0.16, 0.12, 0.49, False),
+          'beliche': (1012, 880, -0.06, 1.2, 0.25, False),
           'bolo': (1138, 880, -0.08, 0.6, 0.18, False),
-          'notebook': (1306, 792, -0.02, -1.1, 0.30, True),
-          'foguete': (1322, 612, 0.0, -0.6, 0.38, True),
-          'kanban': (1236, 352, 0.18, -0.3, 0.46, False)},
+          'notebook': (1314, 792, -0.02, -1.1, 0.30, True),
+          'foguete': (1330, ('sobre', 'notebook', 6), None, -0.6, 0.38, True),
+          'kanban': (1236, 352, 0.18, -0.3, 0.40, False)},
     # B, "o presente ao lado do texto": notebook e foguete na coluna entre o texto e a cabeça, o kanban atrás dela no
     # alto à esquerda; o passado reunido à direita (SUP alto, beliche ao pé, bolo à altura do queixo); leque na frente.
     'b': {'kanban': (792, 340, 0.18, 0.3, 0.45, False),
@@ -70,7 +74,8 @@ def colocar(raiz, objs, cam, spec):
         ppm = 2000 * 1.05 / (1.05 + raiz.location.y)
         s *= alvo * CABECA['1440x900'] / (y1 - y0)
         raiz.location.x += (cx - (x0 + x1) / 2) / ppm
-        raiz.location.z += (y1 - base) / ppm
+        b = base(x0 + 0.3 * (x1 - x0), x1 - 0.3 * (x1 - x0)) if callable(base) else base
+        raiz.location.z += (y1 - b) / ppm
     bpy.context.view_layer.update()
     return round(s, 4)
 
@@ -85,8 +90,13 @@ def montar(prop, construir):
             if o.name == cid:              # a malha do leque se chama `cartoes`: o nó da peça leva o id
                 o.name = cid + '_leque'
         raiz.name, raiz.parent = cid, raiz_t
+        if isinstance(spec[1], tuple):     # contato: a base encosta na borda de cima de outra peça, atrás dela
+            _, dono, entra = spec[1]
+            o_d = pecas[dono]['objs']
+            prof = met.fundo_topo(cam, o_d) + 0.025 if spec[2] is None else spec[2]
+            spec = (spec[0], lambda a, b, o=o_d, e=entra: met.topo(cam, o, a, b) + e, prof) + spec[3:]
         esc = colocar(raiz, objs, cam, spec)
-        pecas[cid] = {'raiz': raiz, 'objs': objs, 'escala': esc, 'espelho': spec[5], 'giro': spec[3],
+        pecas[cid] = {'raiz': raiz, 'objs': objs, 'escala': esc, 'espelho': spec[5], 'giro': spec[3], 'prof': spec[2],
                       'raiz_gl': [round(raiz.location.x, 4), round(raiz.location.z, 4), round(-raiz.location.y, 4)]}
     bpy.data.objects.remove(cam)
     return raiz_t, pecas
@@ -189,8 +199,8 @@ def _overlay(arq, med, tela):
     subprocess.run(['convert', *cmd, arq], check=True)
 
 
-def provas(prop, pecas, busto, med):
-    pasta = os.path.join(v6.ROOT, PASTA)
+def provas(prop, pecas, busto, med, tag=None):
+    pasta, prop = os.path.join(v6.ROOT, PASTA), tag or prop
     todos = [o for p in pecas.values() for o in p['objs']]
     for tela in ('1440x900', '1024x768'):
         cam = _cam(tela)
@@ -259,7 +269,7 @@ def rodar(prop, construir, tris, pasta_glb, com_provas=True):
     med['orcamento'] = orc
     h = med['pecas']['cartoes']['1440x900']['h_px']
     med['leque_xheight_min_px_1440'] = round(3.8 * h / 142.7, 1)    # "Hostel": x-height 3,8 mm (arte), leque 142,7 mm
-    chaves = ('raiz_gl', 'giro', 'escala', 'espelho')
+    chaves = ('raiz_gl', 'giro', 'escala', 'espelho', 'prof')
     med['transformacoes'] = {cid: {k: p[k] for k in chaves} for cid, p in pecas.items()}
     esq = sum(m['1440x900']['w_px'] * m['1440x900']['h_px'] for m in med['pecas'].values()
               if (m['1440x900']['caixa'][0] + m['1440x900']['caixa'][2]) / 2 < 1008)
@@ -269,6 +279,9 @@ def rodar(prop, construir, tris, pasta_glb, com_provas=True):
     os.makedirs(pasta, exist_ok=True)
     arq_m = os.path.join(pasta, 'medidas.json')
     todas = json.load(open(arq_m, encoding='utf-8')) if os.path.exists(arq_m) else {}
+    antes = todas.get(prop, {})
+    med['composicao'] = met.composicao(med, ZONAS, CABECA)
+    med['composicao_antes'] = antes.get('composicao_antes') or (met.composicao(antes, ZONAS, CABECA) if antes else {})
     todas[prop] = med
     with open(arq_m, 'w', encoding='utf-8') as fh:
         json.dump(todas, fh, ensure_ascii=False, indent=1)
@@ -277,6 +290,11 @@ def rodar(prop, construir, tris, pasta_glb, com_provas=True):
         print('VIOL', prop, tela, med['violacoes'][tela])
     print('ENCOBERTO', prop, json.dumps(med['encoberto']))
     print('LEQUE xh', med['leque_xheight_min_px_1440'], 'peso_esq', med['peso_esquerda'])
+    print('COMPOSICAO', prop, '\n'.join(met.linhas(med['composicao'])))
     if com_provas:
-        provas(prop, pecas, bu, med)
-        folha()
+        tag = prop + '2' if prop == 'a' else prop     # volta 3b: a A corrigida não sobrescreve as provas da volta 3
+        provas(prop, pecas, bu, med, tag)
+        if tag == 'a2':
+            met.folha_a2(os.path.join(v6.ROOT, PASTA), med)
+        else:
+            folha()
