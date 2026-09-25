@@ -27,6 +27,7 @@ import prop_empreendedor_doces as doces  # noqa: E402
 import prop_empreendedor_doces2 as doces2  # noqa: E402
 import prop_empreendedor_hostel as hostel  # noqa: E402
 import prop_empreendedor_kanban as kanban  # noqa: E402
+import prop_empreendedor_lampada as lampada  # noqa: E402
 import prop_empreendedor_prova as prova  # noqa: E402
 import prop_empreendedor_sup as sup  # noqa: E402
 import prop_empreendedor_tech as tech  # noqa: E402
@@ -55,6 +56,7 @@ CANDIDATOS = {
     'chaves': ('E5', chaves.chaves, VITRINE, GIRO, 0.5),
     'chaves_negocios': ('E5/E9', chaveiros.chaves_negocios, VITRINE, GIRO, 0.5),
     'cartoes': ('E8', cartoes.leque, VITRINE, 1.0, 0.45),   # volta 2: leque de cartões (giro medido na prova)
+    'lampada': ('E14', lampada.lampada, VITRINE, 0.0, 0.14),  # a ideia sobre a cabeça (cena A, oitava peça)
 }
 # Parte 2 em diante: tamanho ajustado só pelas faixas do 1440 e do 1024 (orquestrador, 25/09: a interseção com o 360
 # encolhia as peças largas a 0,10–0,19 da cabeça). O 360 fica medido no json, para o layout próprio dele.
@@ -91,6 +93,8 @@ def tris(objs):
 
 
 def main():
+    if ARGS.get('lampada', '0') != '0':            # E14: medidas, provas e folha da lâmpada (glb animado já feito)
+        return lampada.rodar(construir, tris, os.path.join(PASTA_GLB, 'emp_animado.glb'))
     if ARGS.get('anim', '0') != '0':               # volta 4: composição A com o clip `montagem` (movimento)
         import prop_empreendedor_movimento as movimento
         return movimento.rodar(construir, tris, PASTA_GLB, ARGS.get('provas', '1') != '0')

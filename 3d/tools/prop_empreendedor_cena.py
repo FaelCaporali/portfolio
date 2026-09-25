@@ -37,7 +37,8 @@ PROPOSTAS = {
           'bolo': (1138, 880, -0.08, 0.6, 0.18, False),
           'notebook': (1314, 792, -0.02, -1.1, 0.30, True),
           'foguete': (1330, ('sobre', 'notebook', 6), None, -0.6, 0.38, True),
-          'kanban': (1236, 352, 0.18, -0.3, 0.40, False)},
+          'kanban': (1236, 352, 0.18, -0.3, 0.40, False),
+          'lampada': (1013, 112, 0.07, 0.0, 0.14, False)},   # E14: sobre o crânio (topo 129 px), 17 px acima
     # B, "o presente ao lado do texto": notebook e foguete na coluna entre o texto e a cabeça, o kanban atrás dela no
     # alto à esquerda; o passado reunido à direita (SUP alto, beliche ao pé, bolo à altura do queixo); leque na frente.
     'b': {'kanban': (792, 340, 0.18, 0.3, 0.45, False),
@@ -53,8 +54,7 @@ ZONAS = {'1440x900': {'texto': (60, 280, 500, 600), 'indicador': (560, 55, 880, 
                       'contato': (1260, 820, 1410, 870)},
          '1024x768': {'texto': (60, 230, 455, 540), 'contato': (850, 690, 1010, 740)},
          '360x740': {'texto': (0, 340, 360, 740), 'cabecalho': (0, 0, 360, 55)}}
-FOLGA_UI, BORDA = 8, 16
-PASTA = '3d/captura/props/empreendedor/v3/composicao'
+FOLGA_UI, BORDA, PASTA = 8, 16, '3d/captura/props/empreendedor/v3/composicao'
 
 
 def _cam(tela):
