@@ -41,15 +41,22 @@ def cena_nova():
     return cena
 
 
+def sem_meshopt(caminho):
+    """Caminho legível byte a byte de um glb: com EXT_meshopt_compression, uma cópia `otimizar.mjs --cru` em
+    /data/tmp (a quantização fica: acessor pode ser inteiro normalizado); sem ela, o próprio arquivo."""
+    with open(caminho, 'rb') as f:
+        if b'EXT_meshopt_compression' not in f.read(1 << 16):
+            return caminho
+    cru = os.path.join('/data/tmp', 'cru_' + os.path.basename(caminho))
+    subprocess.run(['node', os.path.join(RAIZ, '3d/tools/props/otimizar.mjs'), '--cru', caminho, cru],
+                   check=True, cwd=RAIZ)
+    return cru
+
+
 def importar_glb(caminho, colecao):
     """Importa um glb para uma coleção própria e devolve os objetos importados. glb com meshopt (o importador do
-    Blender 4.5 não lê EXT_meshopt_compression) passa antes por `otimizar.mjs --cru` numa cópia em /data/tmp."""
-    with open(caminho, 'rb') as f:
-        if b'EXT_meshopt_compression' in f.read(1 << 16):
-            cru = os.path.join('/data/tmp', 'cru_' + os.path.basename(caminho))
-            subprocess.run(['node', os.path.join(RAIZ, '3d/tools/props/otimizar.mjs'), '--cru', caminho, cru],
-                           check=True, cwd=RAIZ)
-            caminho = cru
+    Blender 4.5 não lê EXT_meshopt_compression) passa antes por `sem_meshopt`."""
+    caminho = sem_meshopt(caminho)
     antes = set(bpy.data.objects)
     bpy.ops.import_scene.gltf(filepath=caminho)
     novos = [o for o in bpy.data.objects if o not in antes]

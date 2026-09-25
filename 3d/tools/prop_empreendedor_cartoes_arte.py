@@ -1,11 +1,18 @@
 """Leque de cartões de visita (E8) do "Entrepreneur": geometria do leque (compartilhada com o Blender) e a arte-RASCUNHO
 da face de cada cartão, desenhada com PIL. Roda com o python3 do sistema (o Blender não tem PIL):
 
-    python3 3d/tools/prop_empreendedor_cartoes_arte.py <saida.jpg>
+    python3 3d/tools/prop_empreendedor_cartoes_arte.py <saida.webp|saida.jpg> [qualidade]
+
+FORMATO (25/09, ficha `.wai/3d/props/empreendedor/FICHA-CARTOES-WEBP.md`): o atlas é desenhado em memória, gravado SEM
+perda em `<saida>.png` (referência para medir PSNR e para as folhas) e codificado UMA vez, a partir dessa imagem sem
+perda, no formato da extensão da saída: `.webp` = WebP com perda, qualidade 70, method 6 (Pillow do sistema; 34 kB
+contra 72 kB do JPEG q65, PSNR 37,1 contra 36,3). A receita (`prop_empreendedor_cartoes.py`) carrega o `.webp` no Blender e o
+exportador glTF (formato de imagem AUTO) embute os bytes do arquivo como estão, com `EXT_texture_webp` exigida; o
+`otimizar.mjs` não toca nos bytes da imagem. Nunca reencodar a partir de um JPEG (a perda dupla anula o ganho).
 
 CONTRATO DE UV (para o TD, se o texto definitivo virar canvas do site):
 - Malha única `cartoes` (5 cartões, 1 material `cartoes_papel`, 1 chamada de desenho).
-- TEXCOORD_0 `UVMap` = atlas 1024×864 (JPEG embutido como baseColor). Cartão k (0 = fundo/mais antigo … 4 = frente/hoje)
+- TEXCOORD_0 `UVMap` = atlas 1024×864 (WebP embutido como baseColor). Cartão k (0 = fundo/mais antigo … 4 = frente/hoje)
   na célula col = k % 2, lin = k // 2 (lin 0 no topo da imagem), 512×288 px; a face impressa ocupa 504×280 px a partir de
   (col·512 + 4, lin·288 + 4); 4 px de sangria com a cor de fundo. Célula 5 (col 1, lin 2): faixas lisas do verso e das
   bordas, uma por cartão (k·84 px a partir de x = 516).
@@ -14,6 +21,7 @@ CONTRATO DE UV (para o TD, se o texto definitivo virar canvas do site):
 - Impressão em mm: d = u·90 (a partir da borda longe do pivô), y = v·50.
 """
 import math
+import os
 import sys
 
 W, H, ESP, RAIO = 90.0, 50.0, 0.5, 2.5          # cartão de visita (mm): 90×50, papel 0,5 mm, cantos 2,5 mm
@@ -252,8 +260,14 @@ def atlas(saida):
         dr.rectangle((CEL[0] + PAD + 84 * k, 2 * CEL[1], CEL[0] + PAD + 84 * k + 83, 3 * CEL[1] - 1),
                      fill=CARTOES[k]['verso'])
         print('CARTAO', k, CARTOES[k]['carimbo'], rel)
-    at.save(saida, quality=int(sys.argv[2]) if len(sys.argv) > 2 else 80, optimize=True, subsampling=0)
-    print('ATLAS', saida)
+    q = int(sys.argv[2]) if len(sys.argv) > 2 else 70
+    sem_perda = os.path.splitext(saida)[0] + '.png'
+    at.save(sem_perda, optimize=True)                               # referência sem perda (não vai para o glb)
+    if saida.lower().endswith('.webp'):
+        at.save(saida, 'WEBP', quality=q, method=6)                 # codificado uma vez, da imagem sem perda
+    else:
+        at.save(saida, quality=q, optimize=True, subsampling=0)
+    print('ATLAS', saida, os.path.getsize(saida), 'B; sem perda', sem_perda)
 
 
 if __name__ == '__main__':

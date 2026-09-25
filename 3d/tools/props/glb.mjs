@@ -48,6 +48,7 @@ export function lerGlb(caminho) {
       lado = [buf.readUInt32BE(o + 16), buf.readUInt32BE(o + 20)]
     } else if (bv && im.mimeType === 'image/jpeg')
       lado = jpegLado(buf, 20 + len + 8 + (bv.byteOffset ?? 0), bv.byteLength)
+    else if (bv && im.mimeType === 'image/webp') lado = webpLado(buf, 20 + len + 8 + (bv.byteOffset ?? 0))
     return { nome: im.name ?? `img${i}`, mime: im.mimeType ?? im.uri, bytes: bv?.byteLength ?? null, lado }
   })
   return {
@@ -74,6 +75,19 @@ export function lerGlb(caminho) {
     cameras: (j.cameras ?? []).length,
     luzes: j.extensions?.KHR_lights_punctual?.lights?.length ?? 0,
   }
+}
+
+/** Largura × altura de um WebP (RIFF): pedaço VP8 (com perda), VP8L (sem perda) ou VP8X (estendido). */
+function webpLado(buf, o) {
+  if (buf.toString('ascii', o, o + 4) !== 'RIFF' || buf.toString('ascii', o + 8, o + 12) !== 'WEBP') return null
+  const tipo = buf.toString('ascii', o + 12, o + 16)
+  if (tipo === 'VP8 ') return [buf.readUInt16LE(o + 26) & 0x3fff, buf.readUInt16LE(o + 28) & 0x3fff]
+  if (tipo === 'VP8L') {
+    const b = buf.readUInt32LE(o + 21)
+    return [(b & 0x3fff) + 1, ((b >> 14) & 0x3fff) + 1]
+  }
+  if (tipo === 'VP8X') return [buf.readUIntLE(o + 24, 3) + 1, buf.readUIntLE(o + 27, 3) + 1]
+  return null
 }
 
 /** Largura × altura de um JPEG (marcador SOF). */

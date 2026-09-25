@@ -123,7 +123,7 @@ def folha(f, med, mat, site, arg):
     linha1 = os.path.join(PASTA, 'l1.png')
     subprocess.run(['montage', *t, '-tile', '3x', '-geometry', '+5+5', '-background', '#0c0c0c', linha1], check=True)
     atl = os.path.join(PASTA, 't4.png')
-    im(os.path.join(PASTA, 'atlas-cartoes.jpg'), '-crop', '1024x864+0+0', '-resize', '1024x', atl)
+    im(os.path.join(PASTA, 'atlas-cartoes.png'), '-crop', '1024x864+0+0', '-resize', '1024x', atl)
     txt = 'E8 faces (atlas rascunho, UV contrato no modulo)  |  %d tris  %.1f kB  |  %s' % (m['tris'], m['kB'], '  '.join(
         '%s h%.2f cab %s' % (x.split('x')[0], m[x]['h_cabeca'], 'ok' if m[x]['na_faixa'] else 'FORA')
         for x in comum.TELAS))

@@ -24,6 +24,8 @@ from prop_financeiro_direita_prova import caixa_px
 
 PASTA = '3d/captura/props/empreendedor/v4/movimento'
 VELHO = '3d/export/props/empreendedor.glb'
+# componentType glTF → (formato struct, bytes, divisor do inteiro normalizado; 0 = float)
+INTEIROS = {5126: ('f', 4, 0), 5120: ('b', 1, 127), 5121: ('B', 1, 255), 5122: ('h', 2, 32767), 5123: ('H', 2, 65535)}
 TEMPOS = (0.5, 0.9, 1.3, 1.7, 2.1)
 TEMPOS_FOG = (1.25, 1.45, 1.7, 2.1)
 PECAS = ('sup', 'bolo', 'beliche', 'notebook', 'kanban', 'cartoes', 'foguete')
@@ -106,8 +108,9 @@ def estado_final(arq_novo, fps):
 
 def prova_json(arq):
     """Pelo JSON do glb: a última chave de TODO canal do clip == TRS de repouso do nó alvo (0,5 mm no mundo,
-    0,5°, escala 0,1 %). Imprime a tabela e grava `prova-json.txt`."""
-    with open(arq, 'rb') as fh:
+    0,5°, escala 0,1 %). Imprime a tabela e grava `prova-json.txt`. glb com meshopt é lido por uma cópia sem ele
+    (`comum.sem_meshopt`); a rotação quantizada (inteiro normalizado) é desquantizada como no glTF."""
+    with open(comum.sem_meshopt(arq), 'rb') as fh:
         b = fh.read()
     n = struct.unpack_from('<I', b, 12)[0]
     j, bin0 = json.loads(b[20:20 + n]), 20 + n + 8
@@ -124,9 +127,10 @@ def prova_json(arq):
     def ultimo(ai):
         a = j['accessors'][ai]
         bv, k = j['bufferViews'][a['bufferView']], {'SCALAR': 1, 'VEC3': 3, 'VEC4': 4}[a['type']]
-        assert a['componentType'] == 5126 and not a.get('normalized')
-        off = bin0 + bv.get('byteOffset', 0) + a.get('byteOffset', 0) + bv.get('byteStride', 4 * k) * (a['count'] - 1)
-        return struct.unpack_from('<%df' % k, b, off)
+        fmt, tam, div = INTEIROS[a['componentType']]
+        assert a['componentType'] == 5126 or a.get('normalized'), 'acessor inteiro não normalizado'
+        off = bin0 + bv.get('byteOffset', 0) + a.get('byteOffset', 0) + bv.get('byteStride', tam * k) * (a['count'] - 1)
+        return tuple(max(x / div, -1.0) if div else x for x in struct.unpack_from('<%d%s' % (k, fmt), b, off))
     fmt = lambda v: '(' + ', '.join('%.5f' % x for x in v) + ')'    # noqa: E731
     linhas, ok = ['no                     canal        t_fim   ultima chave -> repouso: erro'], True
     for an in j['animations']:

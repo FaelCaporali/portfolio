@@ -10,7 +10,7 @@ O leque é inclinado 12° para trás, como quem estende a mão.
 
 CONTRATO DE UV: ver o cabeçalho de `prop_empreendedor_cartoes_arte.py` (malha `cartoes`; TEXCOORD_0 atlas 1024×864
 com a célula de cada cartão; TEXCOORD_1 `UVCartao` 0..1 por face, u = 0 na ponta longe do pivô, v = 1 em cima).
-Material único `cartoes_papel` (rugosidade 0,85, sem metal, sem transmissão, sem alfa): baseColor = atlas JPEG opaco
+Material único `cartoes_papel` (rugosidade 0,85, sem metal, sem transmissão, sem alfa): baseColor = atlas WebP opaco
 (RASCUNHO para julgar; o texto definitivo pode virar canvas do site sobre o mesmo contrato).
 Espaço local: Z para cima, frente para −Y, +X para a cabeça, origem no centro da base (regra da receita).
 """
@@ -27,8 +27,10 @@ import prop_empreendedor_cartoes_arte as A
 import prop_financeiro_v6 as v6
 from prop_financeiro_direita_papel import folha
 
-ATLAS = os.path.join(v6.ROOT, '3d/captura/props/empreendedor/v2/cartoes/atlas-cartoes.jpg')
-QUALIDADE = 65                                    # JPEG do atlas (o glb inteiro tem de ficar ≤ 120 kB)
+# WebP q70 codificado uma vez do atlas sem perda (`atlas-cartoes.png` ao lado); o exportador embute os bytes do arquivo
+# (EXT_texture_webp). Ver o cabeçalho de prop_empreendedor_cartoes_arte.py.
+ATLAS = os.path.join(v6.ROOT, '3d/captura/props/empreendedor/v2/cartoes/atlas-cartoes.webp')
+QUALIDADE = 70
 MM, INCLINA = 0.001, math.radians(-12)            # metros por mm; topo do leque 12° para trás (+Y)
 NI, NY = 7, 3                                     # colunas no miolo do comprimento e linhas na altura de cada face
 
@@ -97,7 +99,7 @@ def _material(mats):
     nt = m.node_tree
     bsdf = next(n for n in nt.nodes if n.type == 'BSDF_PRINCIPLED')
     img = bpy.data.images.load(ATLAS, check_existing=False)
-    img.name = 'cartoes_atlas'
+    img.name = 'atlas-cartoes'   # nome da imagem no glb (o exportador só usa o nome do arquivo para .png/.jpg)
     tx = nt.nodes.new('ShaderNodeTexImage')
     tx.image, tx.interpolation = img, 'Linear'
     nt.links.new(tx.outputs['Color'], bsdf.inputs['Base Color'])
