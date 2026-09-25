@@ -4,7 +4,8 @@
 //   zoom     : ?slot=<vida>&d=0 em 1440×900 com densidade 2; recorte da cabeça + adereço e detalhe do adereço
 //              (retângulos medidos pelo gancho de depuração; sem ele, os recortes fixos antigos).
 //   sequencia: ?slot=<vida> (carrossel normal) em 1440×900 com relógio falso: 17 quadros a cada 0,25 s de cena, com
-//              t=0 na MONTAGEM real (pula pelo indicador para a vida seguinte e volta; folha: props/folha_seq.py).
+//              t=0 na MONTAGEM real (pula pelo indicador para a vida seguinte e volta; folha: props/folha_seq.py);
+//              --tempos=0.3,0.5,2.5 captura só esses instantes. Grava <rótulo>-seq.json com as caixas por quadro.
 //   poses    : ?slot=<vida>&d=0 em 1440×900 dsf 2: ponteiro nos 4 cantos e no centro e arrasto para os dois lados e
 //              para cima (interpenetração com cabelo, barba e orelhas), recorte da cabeça + adereço em cada pose.
 // Extras: --q=chave=valor (parâmetro de URL, repetível), --reduzido (prefers-reduced-motion), --espera=16000 (ms até o
@@ -14,7 +15,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { TELAS, abrir, extras, launch, uniao } from './props/site.mjs'
 
-const { query, reduzido, espera, resto } = extras(process.argv.slice(2))
+const { query, reduzido, espera, tempos, resto } = extras(process.argv.slice(2))
 const [mode = 'estatico', slot = 'financeiro', out = '3d/captura/props/financeiro', tag = 'v1'] = resto
 const q = (base) => [base, query].filter(Boolean).join('&')
 const sufixo = reduzido ? '-reduzido' : ''
@@ -36,14 +37,14 @@ const palavra = (page) =>
 /** A palavra traz o texto duas vezes (medida + visível): basta conter o nome da vida. */
 const mesma = (palavraAtual, vida) => (palavraAtual ?? '').includes(vida)
 
-/** Escolhe a vida no indicador e avança o relógio falso em passos de 0,05 s até ela montar. */
+/** Escolhe a vida no indicador e avança o relógio falso em passos de 0,02 s até ela montar. */
 async function montar(page, vida) {
   await page.evaluate(
     (v) => [...document.querySelectorAll('nav[aria-label="Timeline"] button')].find((b) => b.ariaLabel === v)?.click(),
     vida,
   )
-  for (let i = 0; i < 120; i++) {
-    await page.clock.runFor(50)
+  for (let i = 0; i < 300; i++) {
+    await page.clock.runFor(20)
     if (mesma(await palavra(page), vida)) return
   }
   const agora = await page.evaluate(() => ({
@@ -142,14 +143,16 @@ if (mode === 'estatico') {
   await montar(page, vidas[(vidas.indexOf(alvo) + 1) % vidas.length])
   await montar(page, alvo)
   const caixas = []
-  for (let i = 0; i <= 16; i++) {
+  let agora = 0
+  for (const t of tempos ?? Array.from({ length: 17 }, (_, i) => i * 0.25)) {
+    await page.clock.runFor(Math.max(0, Math.round((t - agora) * 1000)))
+    agora = t
     // Sem GPU, o primeiro quadro depois de muitos passos do relógio falso demora: prazo longo no screenshot.
-    const path = `${out}/${tag}-seq-${(i * 0.25).toFixed(2)}s${sufixo}.png`
+    const path = `${out}/${tag}-seq-${t.toFixed(2)}s${sufixo}.png`
     await page.screenshot({ path, clip, timeout: 180_000 })
     // Caixas (px CSS) da cabeça e da peça neste quadro: prova de enquadramento estável ao longo do roteiro.
     const m = await page.evaluate(() => window.__heroDebug?.masks({}, false) ?? null)
-    caixas.push({ t: i * 0.25, cabeca: m?.cabeca.box ?? null, peca: m?.peca.boxTotal ?? null })
-    await page.clock.runFor(250)
+    caixas.push({ t, cabeca: m?.cabeca.box ?? null, peca: m?.peca.boxTotal ?? null })
   }
   writeFileSync(`${out}/${tag}-seq${sufixo}.json`, JSON.stringify(caixas, null, 2))
   await ctx.close()

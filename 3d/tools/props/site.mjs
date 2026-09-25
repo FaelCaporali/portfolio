@@ -16,20 +16,23 @@ export const TELAS = [
 
 /**
  * Argumentos extras depois dos posicionais: `--q=chave=valor` (repetível; vira parte da query),
- * `--reduzido` (prefers-reduced-motion: reduce), `--espera=16000` (ms até o estado final nos modos parados).
+ * `--reduzido` (prefers-reduced-motion: reduce), `--espera=16000` (ms até o estado final nos modos parados),
+ * `--tempos=0.3,0.5,2.5` (instantes, s desde a montagem, da `sequencia` em vez de 0 a 4 s a cada 0,25 s).
  */
 export function extras(argv) {
   const q = []
   let reduzido = false
   let espera = 16000
+  let tempos = null
   const resto = []
   for (const a of argv) {
     if (a.startsWith('--q=')) q.push(a.slice(4))
     else if (a === '--reduzido') reduzido = true
     else if (a.startsWith('--espera=')) espera = Number(a.slice(9))
+    else if (a.startsWith('--tempos=')) tempos = a.slice(9).split(',').map(Number)
     else resto.push(a)
   }
-  return { query: q.join('&'), reduzido, espera, resto }
+  return { query: q.join('&'), reduzido, espera, tempos, resto }
 }
 
 export const launch = () => chromium.launch({ args: ARGS })
