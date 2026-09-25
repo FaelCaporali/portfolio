@@ -1,9 +1,9 @@
-/** Adereços que flutuam ao lado da cabeça: lupa, foguete, veleiro, bússola, volante e laço do DevOps. */
+/** Adereços que flutuam ao lado da cabeça: lupa, veleiro, bússola, volante e laço do DevOps. */
 import { useFrame } from '@react-three/fiber'
 import { useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import { Float } from './Float'
-import { DOUBLE_SIDED, FLAME, GLASS, GLOSS, GLOW, GOLD, NEEDLE, useDisposal, useMat } from './materials'
+import { DOUBLE_SIDED, GLASS, GLOSS, GLOW, GOLD, NEEDLE, useDisposal, useMat } from './materials'
 
 export function Magnifier() {
   const rim = useMat('#e0324b', GLOSS)
@@ -19,37 +19,6 @@ export function Magnifier() {
         </mesh>
         <mesh position={[0, -0.068, 0]} material={rim}>
           <cylinderGeometry args={[0.0055, 0.0065, 0.07, 16]} />
-        </mesh>
-      </group>
-    </Float>
-  )
-}
-
-export function Rocket() {
-  const body = useMat('#f2f2f2', GLOSS)
-  const red = useMat('#ff7a1a', GLOSS)
-  const flame = useMat('#ffd166', FLAME)
-  return (
-    <Float position={[0.19, 0.2, -0.06]} speed={1.6} amp={0.01}>
-      <group rotation={[0, 0, -0.35]}>
-        <mesh material={body}>
-          <cylinderGeometry args={[0.018, 0.02, 0.07, 24]} />
-        </mesh>
-        <mesh position={[0, 0.05, 0]} material={red}>
-          <coneGeometry args={[0.018, 0.032, 24]} />
-        </mesh>
-        {[0, 1, 2].map((i) => (
-          <mesh
-            key={i}
-            position={[Math.cos((i * 2 * Math.PI) / 3) * 0.02, -0.03, Math.sin((i * 2 * Math.PI) / 3) * 0.02]}
-            rotation={[0, (-i * 2 * Math.PI) / 3, 0]}
-            material={red}
-          >
-            <boxGeometry args={[0.018, 0.022, 0.003]} />
-          </mesh>
-        ))}
-        <mesh position={[0, -0.05, 0]} rotation={[Math.PI, 0, 0]} material={flame}>
-          <coneGeometry args={[0.012, 0.03, 16]} />
         </mesh>
       </group>
     </Float>

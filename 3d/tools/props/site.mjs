@@ -1,6 +1,6 @@
 // Utilitários do estúdio 3D para o site real (servidor de desenvolvimento do Fael na 5199, nunca derrubado).
-// Usados por 3d/tools/captura_prop.mjs e 3d/tools/props/portoes.mjs. O gancho window.__heroDebug e o laboratório
-// ?lab= existem só no `pnpm dev` (src/features/hero/scene/dev/).
+// Usados por 3d/tools/captura_prop.mjs e 3d/tools/props/portoes.mjs. O gancho window.__heroDebug existe só no
+// `pnpm dev` (src/features/hero/scene/dev/). Sem laboratório: a peça em teste vai direto no site do branch.
 import { chromium } from '@playwright/test'
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { dirname } from 'node:path'
@@ -15,7 +15,7 @@ export const TELAS = [
 ]
 
 /**
- * Argumentos extras depois dos posicionais: `--q=lab=3d/export/props/lab/x.glb` (repetível; vira parte da query),
+ * Argumentos extras depois dos posicionais: `--q=chave=valor` (repetível; vira parte da query),
  * `--reduzido` (prefers-reduced-motion: reduce), `--espera=16000` (ms até o estado final nos modos parados).
  */
 export function extras(argv) {
@@ -25,8 +25,6 @@ export function extras(argv) {
   const resto = []
   for (const a of argv) {
     if (a.startsWith('--q=')) q.push(a.slice(4))
-    // --solo = --q=solo=1: com ?lab=, esconde o adereço da vida e mostra só o glb (candidato que o SUBSTITUI).
-    else if (a === '--solo') q.push('solo=1')
     else if (a === '--reduzido') reduzido = true
     else if (a.startsWith('--espera=')) espera = Number(a.slice(9))
     else resto.push(a)
@@ -36,7 +34,7 @@ export function extras(argv) {
 
 export const launch = () => chromium.launch({ args: ARGS })
 
-/** Abre a página, espera o busto, o glb do laboratório (se houver) e o adereço montado na cena. */
+/** Abre a página, espera o busto e o adereço montado na cena. */
 export async function abrir(browser, { viewport, dsf = 1, query, reduzido = false, relogio = false }) {
   const ctx = await browser.newContext({
     viewport,
@@ -47,12 +45,10 @@ export async function abrir(browser, { viewport, dsf = 1, query, reduzido = fals
   page.on('pageerror', (e) => console.error('pageerror', e.message))
   page.on('console', (m) => m.type() === 'error' && console.error('console', m.text()))
   if (relogio) await page.clock.install()
-  const lab = new URLSearchParams(query).get('lab')
-  const esperas = [page.waitForResponse((r) => r.url().includes('busto-s13.glb'), { timeout: 90_000 })]
-  if (lab) esperas.push(page.waitForResponse((r) => r.url().endsWith(lab.replace(/^\//, '')), { timeout: 90_000 }))
+  const busto = page.waitForResponse((r) => r.url().includes('busto-s13.glb'), { timeout: 90_000 })
   await page.goto(`${BASE}/?${query}`)
   await page.locator('canvas').waitFor({ timeout: 90_000 })
-  await Promise.all(esperas)
+  await busto
   await page.waitForFunction(() => window.__heroDebug?.ready() === true, null, { timeout: 90_000 })
   return { ctx, page }
 }

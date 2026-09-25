@@ -1,5 +1,6 @@
 import type { PropId } from '../../../../content/journey'
-import { Compass, InfinityLoop, Magnifier, Rocket, Sailboat, Wheel } from './floating'
+import { Empreendedor } from './empreendedor/Empreendedor'
+import { Compass, InfinityLoop, Magnifier, Sailboat, Wheel } from './floating'
 import { Calculadora } from './ledger/Calculadora'
 import { Ledger } from './ledger/Ledger'
 import { Brim, Dome, Headphones, Sunglasses, Tears } from './head'
@@ -27,7 +28,7 @@ export function Props({ id }: { id: PropId }) {
     case 'headphones':
       return <Headphones />
     case 'rocket':
-      return <Rocket />
+      return <Empreendedor />
     case 'headset':
       return <Headphones color="#26222e" mic />
     case 'sailor':

@@ -6,11 +6,8 @@
 //   sequencia: ?slot=<vida> (carrossel normal) em 1440×900 com relógio falso: 17 quadros a cada 0,25 s de cena.
 //   poses    : ?slot=<vida>&d=0 em 1440×900 dsf 2: ponteiro nos 4 cantos e no centro e arrasto para os dois lados e
 //              para cima (interpenetração com cabelo, barba e orelhas), recorte da cabeça + adereço em cada pose.
-// Extras: --q=lab=3d/export/props/lab/x.glb (parâmetro de URL, repetível), --solo (= --q=solo=1: com lab, esconde o
-//         adereço da vida e mostra só o glb; sem ele o lab SOMA ao adereço), --reduzido (prefers-reduced-motion),
-//         --espera=16000 (ms até o estado final nos modos parados).
-// Candidato sozinho nas 3 telas: node 3d/tools/captura_prop.mjs estatico empreendedor <pasta> <rótulo> \
-//         --q=lab=3d/export/props/lab/<glb> --solo
+// Extras: --q=chave=valor (parâmetro de URL, repetível), --reduzido (prefers-reduced-motion), --espera=16000 (ms até o
+//         estado final nos modos parados). Sem laboratório: a peça em teste vai direto no site do branch.
 // Sem GPU (SwiftShader) a cena roda a poucos quadros por segundo e não mede FPS de celular; o relógio do herói limita
 // o passo por quadro a 0,1 s, então nos modos parados o tempo de cena corre mais devagar que o real.
 import { mkdirSync, writeFileSync } from 'node:fs'

@@ -1,13 +1,12 @@
 import { useGLTF } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
-import { Suspense, lazy, useMemo, useRef, useState, type RefObject } from 'react'
+import { useMemo, useRef, type RefObject } from 'react'
 import * as THREE from 'three'
 import bustUrl from '../../../../3d/export/s13/busto-s13.glb?url'
 import type { Expression, PropId } from '../../../content/journey'
 import { stepDrag, type DragState } from '../model/drag'
 import { createFace, stepFace } from '../model/face'
 import { createGaze, stepGaze, type Pointer } from '../model/gaze'
-import { readLab } from './dev/lab'
 import { dissolveUniforms } from './dissolve'
 import { Props } from './props/Props'
 import { applyEyes, applyFace, buildRig } from './rig'
@@ -15,9 +14,6 @@ import { Vortex } from './Vortex'
 
 /** Pivô de rotação da cabeça: base do pescoço, no espaço do glb (Y para cima, rosto para +Z). */
 const PIVOT = new THREE.Vector3(0, 0.05, -0.13)
-
-/** Laboratório do estúdio 3D (`?lab=<glb>[&solo=1]`): só existe no servidor de desenvolvimento; o build o descarta. */
-const LabProp = import.meta.env.DEV ? lazy(() => import('./dev/LabProp').then((m) => ({ default: m.LabProp }))) : null
 
 interface BustProps {
   expr: Expression
@@ -39,7 +35,6 @@ export function Bust({ expr, prop, pointer, drag, particles }: BustProps) {
   const face = useRef(createFace())
   const gaze = useRef(createGaze())
   const eye = useMemo(() => ({ quat: new THREE.Quaternion(), euler: new THREE.Euler() }), [])
-  const [lab] = useState(() => (LabProp ? readLab(window.location.search) : null))
 
   useFrame((_, dt) => {
     stepFace(face.current, expr, dt)
@@ -68,13 +63,7 @@ export function Bust({ expr, prop, pointer, drag, particles }: BustProps) {
             <primitive object={scene} />
           </group>
           <group name="prop">
-            {/* O laboratório SOMA à vida (peça complementar julgada junto com o aprovado); com solo=1, SUBSTITUI. */}
-            {LabProp && lab?.solo ? null : <Props id={prop} />}
-            {LabProp && lab ? (
-              <Suspense fallback={null}>
-                <LabProp url={lab.url} />
-              </Suspense>
-            ) : null}
+            <Props id={prop} />
           </group>
           <Vortex skin={rig.skin} fraction={particles} />
         </group>
