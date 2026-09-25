@@ -31,8 +31,9 @@ float disField(vec3 p) {
 const EDGE = 'vec3(1.0, 0.86, 0.62)'
 const BG_SRGB = 'vec3(0.0431, 0.0431, 0.0549)' // #0b0b0e
 
-/** Pescoço: o corte da malha some num degradê até a cor do fundo. */
-const NECK_FADE = `gl_FragColor.rgb = mix(${BG_SRGB}, gl_FragColor.rgb, smoothstep(0.012, 0.075, vLocalY));\n`
+/** Pescoço: o corte da malha some num degradê até a cor do fundo (altura no espaço do glb: a posição crua da malha
+ * quantizada vem em inteiros normalizados, e a desquantização está na matriz do nó). */
+const NECK_FADE = `gl_FragColor.rgb = mix(${BG_SRGB}, gl_FragColor.rgb, smoothstep(0.012, 0.075, vDisPos.y));\n`
 /** Borda quente onde a pele está se desfazendo. */
 const EDGE_GLOW = `gl_FragColor.rgb = mix(gl_FragColor.rgb, ${EDGE}, (1.0 - smoothstep(uD, uD + 0.035, disN)) * step(0.001, uD));\n`
 
@@ -42,19 +43,13 @@ export function withDissolve<T extends THREE.Material>(m: T, opts: { neckFade?: 
     sh.uniforms.uD = dissolveUniforms.uD
     sh.uniforms.uToGlb = dissolveUniforms.uToGlb
     sh.vertexShader = sh.vertexShader
-      .replace(
-        '#include <common>',
-        '#include <common>\nuniform mat4 uToGlb;\nvarying vec3 vDisPos;\nvarying float vLocalY;',
-      )
+      .replace('#include <common>', '#include <common>\nuniform mat4 uToGlb;\nvarying vec3 vDisPos;')
       .replace(
         '#include <project_vertex>',
-        '#include <project_vertex>\nvDisPos = (uToGlb * modelMatrix * vec4(transformed, 1.0)).xyz;\nvLocalY = transformed.y;',
+        '#include <project_vertex>\nvDisPos = (uToGlb * modelMatrix * vec4(transformed, 1.0)).xyz;',
       )
     sh.fragmentShader = sh.fragmentShader
-      .replace(
-        '#include <common>',
-        `#include <common>\nuniform float uD;\nvarying vec3 vDisPos;\nvarying float vLocalY;\n${NOISE_GLSL}`,
-      )
+      .replace('#include <common>', `#include <common>\nuniform float uD;\nvarying vec3 vDisPos;\n${NOISE_GLSL}`)
       .replace(
         '#include <clipping_planes_fragment>',
         '#include <clipping_planes_fragment>\nfloat disN = disField(vDisPos);\nif (disN < uD) discard;',

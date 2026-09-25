@@ -66,7 +66,7 @@ export function Bust({ expr, prop, pointer, drag, particles }: BustProps) {
           <group name="prop">
             <Props id={prop} />
           </group>
-          <Vortex skin={rig.skin} fraction={particles} />
+          <Vortex skin={rig.skin} toGlb={rig.skinToGlb} fraction={particles} />
         </group>
       </group>
     </group>

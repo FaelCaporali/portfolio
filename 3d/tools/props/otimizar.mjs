@@ -2,7 +2,8 @@
 // KHR_mesh_quantization, SEM Draco. Por quê: o drei busca o decodificador Draco em https://www.gstatic.com e a CSP de
 // produção (public/_headers: connect-src 'self') bloqueia; o do meshopt já vem no bundle (three-stdlib, ~6,5 kB gzip).
 //
-// Uso: node 3d/tools/props/otimizar.mjs <entrada.glb> [saida.glb] [--posicao-float]   (sem saída: sobrescreve)
+// Uso: node 3d/tools/props/otimizar.mjs <entrada.glb> [saida.glb] [--posicao-float] [--malha-em-filho]
+//        [--normal=<bits, padrão 10>] [--webp=<imagem>=<arquivo.webp>]   (sem saída: sobrescreve)
 //      node 3d/tools/props/otimizar.mjs --cru <entrada.glb> <saida.glb>   (tira o meshopt: o importador glTF do
 //      Blender 4.5 não lê EXT_meshopt_compression; comum.importar_glb usa este modo sozinho)
 //
@@ -17,8 +18,19 @@
 // saída e compara o inventário (nós, malhas, skins e juntas, clipes e canais, materiais, atributos, vértices, imagens,
 // morfos); se algo mudou, não grava e sai com código 1. (`gltf-transform meshopt` do CLI, com opções padrão, trocou as
 // 7 skins do empreendedor por 13 cópias.) Depois: `node 3d/tools/props/glb.mjs <saida>` para ler o JSON.
+// --malha-em-filho (busto S13): a desquantização iria para o TRS do nó da malha (o quantize compõe escala e translação
+//   na matriz local). O site gira Olho_D/Olho_E pelo quaternion: o pivô sairia do centro do olho. Com a opção, a malha
+//   de CADA nó passa, antes da quantização, a um filho novo `<nó>_malha` (TRS identidade, depois só a desquantização);
+//   o nó original fica com nome, TRS, filhos e extras intactos. O inventário aceita só esses filhos novos.
+// --webp=<imagem>=<arquivo> (repetível): troca os bytes da imagem de nome <imagem> pelos do arquivo WebP, como estão
+//   (sem reencodar aqui), com EXT_texture_webp exigida. O inventário aceita só essa troca (mime e tamanho).
 import { NodeIO } from '@gltf-transform/core'
-import { ALL_EXTENSIONS, EXTMeshoptCompression, KHRDracoMeshCompression } from '@gltf-transform/extensions'
+import {
+  ALL_EXTENSIONS,
+  EXTMeshoptCompression,
+  EXTTextureWebP,
+  KHRDracoMeshCompression,
+} from '@gltf-transform/extensions'
 import { quantize, reorder } from '@gltf-transform/functions'
 import draco3d from 'draco3d'
 import { MeshoptDecoder, MeshoptEncoder } from 'meshoptimizer'
@@ -28,6 +40,9 @@ import { gzipSync } from 'node:zlib'
 const args = process.argv.slice(2)
 const posicaoFloat = args.includes('--posicao-float')
 const cru = args.includes('--cru')
+const malhaEmFilho = args.includes('--malha-em-filho')
+const bitsNormal = Number(args.find((a) => a.startsWith('--normal='))?.slice(9) ?? 10)
+const webp = args.filter((a) => a.startsWith('--webp=')).map((a) => a.slice(7).split('='))
 const [entrada, saida = entrada] = args.filter((a) => !a.startsWith('--'))
 if (!entrada) {
   console.error('uso: node 3d/tools/props/otimizar.mjs <entrada.glb> [saida.glb] [--posicao-float]')
@@ -46,7 +61,10 @@ function inventario(doc) {
   const r = doc.getRoot()
   const prims = r.listMeshes().flatMap((m) => m.listPrimitives().map((p) => ({ m, p })))
   return {
-    nos: r.listNodes().map((n) => `${n.getName()}>${n.getSkin()?.getName() ?? ''}`),
+    nos: r
+      .listNodes()
+      .map((n) => `${n.getName()}>${n.getSkin()?.getName() ?? ''}`)
+      .sort(),
     malhas: r.listMeshes().map((m) => `${m.getName()}:${m.listPrimitives().length}`),
     skins: r.listSkins().map((s) => `${s.getName()}:${s.listJoints().map((j) => j.getName())}`),
     clipes: r.listAnimations().map((a) => `${a.getName()}:${a.listChannels().length}`),
@@ -101,6 +119,22 @@ if (cru) {
   process.exit(0)
 }
 const antes = inventario(doc)
+if (malhaEmFilho) {
+  for (const no of root.listNodes().filter((n) => n.getMesh())) {
+    const filho = doc.createNode(`${no.getName()}_malha`).setMesh(no.getMesh()).setWeights(no.getWeights())
+    no.setMesh(null).setWeights([]).addChild(filho)
+    antes.nos.push(`${filho.getName()}>`)
+  }
+  antes.nos.sort()
+}
+for (const [nomeImg, arq] of webp) {
+  const tex = root.listTextures().find((t) => t.getName() === nomeImg)
+  if (!tex) throw new Error(`--webp: imagem ${nomeImg} não existe`)
+  const bytes = new Uint8Array(readFileSync(arq))
+  tex.setImage(bytes).setMimeType('image/webp')
+  antes.imagens = antes.imagens.map((i) => (i.startsWith(`${nomeImg}:`) ? `${nomeImg}:image/webp:${bytes.byteLength}` : i))
+}
+if (webp.length) doc.createExtension(EXTTextureWebP).setRequired(true)
 const skinOriginal = new Map(root.listNodes().flatMap((n) => (n.getSkin() ? [[n, n.getSkin()]] : [])))
 
 await doc.transform(
@@ -109,7 +143,7 @@ await doc.transform(
     pattern: posicaoFloat ? /^(?!POSITION$)/ : /.*/,
     quantizationVolume: 'scene',
     quantizePosition: 16,
-    quantizeNormal: 10,
+    quantizeNormal: bitsNormal,
     quantizeTexcoord: 12,
     cleanup: false,
   }),

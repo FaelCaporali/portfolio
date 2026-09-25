@@ -68,7 +68,7 @@ function texelReader(tex: THREE.Texture) {
 
 /** fraction: parte das partículas desenhada (qualidade adaptativa). A amostragem é aleatória, então o começo do
  * buffer já é uma amostra uniforme da pele: basta encurtar o drawRange, sem refazer a geometria. */
-export function Vortex({ skin, fraction }: { skin: THREE.Mesh; fraction: number }) {
+export function Vortex({ skin, toGlb, fraction }: { skin: THREE.Mesh; toGlb: THREE.Matrix4; fraction: number }) {
   const { gl } = useThree()
   const { geometry, material, uSize, uSwirl } = useMemo(() => {
     const sampler = new MeshSurfaceSampler(new THREE.Mesh(skin.geometry)).build()
@@ -84,6 +84,7 @@ export function Vortex({ skin, fraction }: { skin: THREE.Mesh; fraction: number 
       uv = new THREE.Vector2()
     for (let i = 0; i < COUNT; i++) {
       sampler.sample(p, nrm, c, uv)
+      p.applyMatrix4(toGlb)
       pos.set([p.x, p.y, p.z], i * 3)
       read(uv.x, uv.y, col, i * 3)
       seed[i] = Math.random()
@@ -103,7 +104,7 @@ export function Vortex({ skin, fraction }: { skin: THREE.Mesh; fraction: number 
       blending: THREE.AdditiveBlending,
     })
     return { geometry: g, material: m, uSize: size, uSwirl: swirl }
-  }, [skin])
+  }, [skin, toGlb])
 
   useEffect(() => {
     geometry.setDrawRange(0, Math.round(COUNT * fraction))

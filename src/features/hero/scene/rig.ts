@@ -13,6 +13,8 @@ const isMesh = (o: THREE.Object3D): o is THREE.Mesh => (o as Partial<THREE.Mesh>
 export interface Rig {
   /** Malha da pele: fonte das partículas do furacão. */
   skin: THREE.Mesh
+  /** Geometria da pele → espaço do glb (no glb quantizado, a desquantização está nos nós acima da malha). */
+  skinToGlb: THREE.Matrix4
   channels: Channels
   eyes: { node: THREE.Object3D; base: THREE.Quaternion }[]
 }
@@ -84,8 +86,19 @@ function findEyes(root: THREE.Object3D): Rig['eyes'] {
   })
 }
 
+/** Produto das matrizes locais da malha até a raiz do glb (a cena pode já estar pendurada no grupo do site). */
+function toRoot(mesh: THREE.Object3D, root: THREE.Object3D): THREE.Matrix4 {
+  const m = new THREE.Matrix4()
+  for (let o: THREE.Object3D | null = mesh; o && o !== root; o = o.parent) {
+    o.updateMatrix()
+    m.premultiply(o.matrix)
+  }
+  return m
+}
+
 export function buildRig(scene: THREE.Object3D): Rig {
-  return { skin: prepareMaterials(scene), channels: collectChannels(scene), eyes: findEyes(scene) }
+  const skin = prepareMaterials(scene)
+  return { skin, skinToGlb: toRoot(skin, scene), channels: collectChannels(scene), eyes: findEyes(scene) }
 }
 
 /** Estado do rosto → shape keys do glb. */
