@@ -141,12 +141,17 @@ if (mode === 'estatico') {
   )
   await montar(page, vidas[(vidas.indexOf(alvo) + 1) % vidas.length])
   await montar(page, alvo)
+  const caixas = []
   for (let i = 0; i <= 16; i++) {
     // Sem GPU, o primeiro quadro depois de muitos passos do relógio falso demora: prazo longo no screenshot.
     const path = `${out}/${tag}-seq-${(i * 0.25).toFixed(2)}s${sufixo}.png`
     await page.screenshot({ path, clip, timeout: 180_000 })
+    // Caixas (px CSS) da cabeça e da peça neste quadro: prova de enquadramento estável ao longo do roteiro.
+    const m = await page.evaluate(() => window.__heroDebug?.masks({}, false) ?? null)
+    caixas.push({ t: i * 0.25, cabeca: m?.cabeca.box ?? null, peca: m?.peca.boxTotal ?? null })
     await page.clock.runFor(250)
   }
+  writeFileSync(`${out}/${tag}-seq${sufixo}.json`, JSON.stringify(caixas, null, 2))
   await ctx.close()
 }
 await browser.close()
