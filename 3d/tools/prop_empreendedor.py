@@ -3,6 +3,7 @@
 Headless (fonte de verdade, reprodutível):
     blender -b --python 3d/tools/prop_empreendedor.py -- [glb=3d/export/props/lab] [so=sup,bolo]
         [provas=3d/captura/props/empreendedor/v1/mostruario|0] [blend=3d/blend/props/empreendedor_v1_mostruario.blend|0]
+    blender -b --python 3d/tools/prop_empreendedor.py -- cena=a|b [provas=0]   (volta 3: emp_todos_<a|b>.glb)
 
 Forma e material na mesma receita (padrão que entregou no financeiro). Candidatos registrados por id em CANDIDATOS;
 a parte 2 (gerais E5 e emp_todos.glb) registra os seus aqui. Cada candidato: coleção `emp_<id>`, raiz vazia `emp_<id>`
@@ -90,6 +91,9 @@ def tris(objs):
 
 
 def main():
+    if ARGS.get('cena'):                           # volta 3: cena composta (A ou B), ver prop_empreendedor_cena.py
+        import prop_empreendedor_cena as cena
+        return cena.rodar(ARGS['cena'], construir, tris, PASTA_GLB, ARGS.get('provas', '1') != '0')
     v6.reset()
     ids = ARGS['so'].split(',') if ARGS.get('so') else list(CANDIDATOS)
     feitos = {}
