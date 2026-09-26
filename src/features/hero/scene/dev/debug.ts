@@ -34,6 +34,8 @@ export interface HeroDebug {
   info: () => ReturnType<typeof rendererInfo>
   masks: (rects?: Record<string, Box>, images?: boolean) => ReturnType<typeof measureMasks>
   setPropVisible: (v: boolean) => void
+  /** PNG do canvas com o busto numa pose de shape keys (ausentes em 0), renderizado na hora; o rosto volta depois. */
+  face: (keys: Record<string, number>) => string
 }
 
 declare global {
@@ -200,6 +202,22 @@ function measureMasks(s: RootState, rects: Record<string, Box> = {}, images = tr
   }
 }
 
+function facePose(s: RootState, keys: Record<string, number>) {
+  const g = groups(s.scene)
+  if (!g) return ''
+  const saved: [number[], number[]][] = []
+  g.bust.traverse((o) => {
+    if (!isMesh(o) || !o.morphTargetDictionary || !o.morphTargetInfluences) return
+    const inf = o.morphTargetInfluences
+    saved.push([inf, [...inf]])
+    for (const [name, i] of Object.entries(o.morphTargetDictionary)) inf[i] = keys[name] ?? 0
+  })
+  s.gl.render(s.scene, s.camera)
+  const png = s.gl.domElement.toDataURL('image/png')
+  for (const [inf, v] of saved) v.forEach((x, i) => (inf[i] = x))
+  return png
+}
+
 export function createHeroDebug(get: () => RootState): HeroDebug {
   return {
     ready: () => {
@@ -217,5 +235,6 @@ export function createHeroDebug(get: () => RootState): HeroDebug {
       const g = groups(get().scene)
       if (g) g.prop.visible = v
     },
+    face: (keys) => facePose(get(), keys),
   }
 }
