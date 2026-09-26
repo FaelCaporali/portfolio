@@ -1,9 +1,9 @@
-/** Adereços que flutuam ao lado da cabeça: lupa, veleiro, bússola, volante e laço do DevOps. */
+/** Adereços que flutuam ao lado da cabeça: lupa, bússola, volante e laço do DevOps. */
 import { useFrame } from '@react-three/fiber'
 import { useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import { Float } from './Float'
-import { DOUBLE_SIDED, GLASS, GLOSS, GLOW, GOLD, NEEDLE, useDisposal, useMat } from './materials'
+import { GLASS, GLOSS, GLOW, GOLD, NEEDLE, useDisposal, useMat } from './materials'
 
 export function Magnifier() {
   const rim = useMat('#e0324b', GLOSS)
@@ -20,31 +20,6 @@ export function Magnifier() {
         <mesh position={[0, -0.068, 0]} material={rim}>
           <cylinderGeometry args={[0.0055, 0.0065, 0.07, 16]} />
         </mesh>
-      </group>
-    </Float>
-  )
-}
-
-export function Sailboat() {
-  const hull = useMat('#f2f2f2', GLOSS)
-  const sail = useMat('#2ea8ff', DOUBLE_SIDED)
-  const sailGeo = useMemo(() => {
-    const g = new THREE.BufferGeometry()
-    g.setAttribute('position', new THREE.Float32BufferAttribute([0, 0.005, 0, 0, 0.075, 0, 0.045, 0.005, 0], 3))
-    g.computeVertexNormals()
-    return g
-  }, [])
-  useDisposal(sailGeo)
-  return (
-    <Float position={[-0.2, 0.1, -0.05]} speed={1.1} amp={0.008}>
-      <group rotation={[0.1, 0.6, 0]}>
-        <mesh scale={[1, 0.35, 0.4]} material={hull}>
-          <sphereGeometry args={[0.04, 24, 12, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2]} />
-        </mesh>
-        <mesh position={[0, 0.04, 0]} material={hull}>
-          <cylinderGeometry args={[0.0015, 0.0015, 0.08, 8]} />
-        </mesh>
-        <mesh geometry={sailGeo} material={sail} />
       </group>
     </Float>
   )

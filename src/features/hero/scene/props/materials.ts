@@ -20,10 +20,8 @@ export const MATTE: THREE.MeshStandardMaterialParameters = {}
 export const GLOSS = { roughness: 0.25 }
 export const GOLD = { metalness: 0.55, roughness: 0.28, emissive: new THREE.Color('#5a3d00'), emissiveIntensity: 0.6 }
 export const GLOW = { emissive: new THREE.Color('#29d8ff'), emissiveIntensity: 1.6 }
-export const LENS = { roughness: 0.05, metalness: 0.6 }
 export const GLASS = { transparent: true, opacity: 0.18, roughness: 0.05 }
 export const FLAME = { emissive: new THREE.Color('#ff7a1a'), emissiveIntensity: 2 }
-export const DOUBLE_SIDED = { side: THREE.DoubleSide }
 export const NEEDLE = { emissive: new THREE.Color('#ff4d4d'), emissiveIntensity: 0.6 }
 export const TEAR = { transparent: true, opacity: 0.85, roughness: 0.05 }
 

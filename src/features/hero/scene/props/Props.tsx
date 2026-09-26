@@ -1,10 +1,11 @@
 import type { PropId } from '../../../../content/journey'
 import { Empreendedor } from './empreendedor/Empreendedor'
-import { Compass, InfinityLoop, Magnifier, Sailboat, Wheel } from './floating'
+import { Compass, InfinityLoop, Magnifier, Wheel } from './floating'
 import { Calculadora } from './ledger/Calculadora'
 import { Ledger } from './ledger/Ledger'
-import { Brim, Dome, Headphones, Sunglasses, Tears } from './head'
+import { Brim, Dome, Headphones, Tears } from './head'
 import { Neural } from './orbits'
+import { Vela } from './vela/Vela'
 
 /**
  * Adereços por vida — BLOCKOUT em primitivas, para aprovar forma, tamanho e posição antes da modelagem no Blender.
@@ -32,14 +33,7 @@ export function Props({ id }: { id: PropId }) {
     case 'headset':
       return <Headphones color="#26222e" mic />
     case 'sailor':
-      return (
-        <>
-          <Dome color="#f4f4f2" />
-          <Brim color="#1d3557" />
-          <Sunglasses />
-          <Sailboat />
-        </>
-      )
+      return <Vela />
     case 'compass':
       return <Compass />
     case 'infinity':

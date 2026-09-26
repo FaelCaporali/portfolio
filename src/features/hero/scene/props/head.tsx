@@ -1,8 +1,8 @@
-/** Adereços presos à cabeça: casco e aba de boné, fones, óculos e lágrimas. */
+/** Adereços presos à cabeça: casco e aba de boné, fones e lágrimas. */
 import { useFrame } from '@react-three/fiber'
 import { useMemo, useRef } from 'react'
 import * as THREE from 'three'
-import { GLOSS, LENS, TEAR, useDisposal, useMat } from './materials'
+import { GLOSS, TEAR, useDisposal, useMat } from './materials'
 
 /** Casco sobre o crânio (boné, chapéu): elipsoide cortado, centro e raios medidos. */
 export function Dome({ color, y = 0.232 }: { color: string; y?: number }) {
@@ -65,28 +65,6 @@ export function Headphones({ color = '#1b1d22', mic = false }: { color?: string;
           </mesh>
         </>
       )}
-    </group>
-  )
-}
-
-export function Sunglasses() {
-  const frame = useMat('#111214', GLOSS)
-  const lens = useMat('#0d2233', LENS)
-  return (
-    <group position={[0, 0.183, 0.03]}>
-      {[-1, 1].map((s) => (
-        <mesh key={s} position={[s * 0.041, 0, 0]} rotation={[Math.PI / 2, 0, 0]} scale={[1, 1, 0.8]} material={lens}>
-          <cylinderGeometry args={[0.026, 0.026, 0.004, 32]} />
-        </mesh>
-      ))}
-      <mesh position={[0, 0.008, 0]} material={frame}>
-        <boxGeometry args={[0.03, 0.004, 0.004]} />
-      </mesh>
-      {[-1, 1].map((s) => (
-        <mesh key={s} position={[s * 0.088, 0.004, -0.07]} rotation={[0, s * 0.12, 0]} material={frame}>
-          <boxGeometry args={[0.004, 0.004, 0.14]} />
-        </mesh>
-      ))}
     </group>
   )
 }

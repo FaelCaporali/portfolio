@@ -6,6 +6,8 @@
  */
 import type { RootState } from '@react-three/fiber'
 import * as THREE from 'three'
+import { folga } from './folga'
+import { centro, cor, mascara, objeto, projetar, type Regra } from './medidas'
 import {
   contact,
   countIn,
@@ -36,6 +38,16 @@ export interface HeroDebug {
   setPropVisible: (v: boolean) => void
   /** PNG do canvas com o busto numa pose de shape keys (ausentes em 0), renderizado na hora; o rosto volta depois. */
   face: (keys: Record<string, number>) => string
+  /** Adereço vestido (medidas.ts): cor com partes escondidas, máscaras por nome, projeção e objetos do frame. */
+  medidas: {
+    cor: (ocultar?: string[]) => ReturnType<typeof cor>
+    mascara: (regras: Regra[]) => ReturnType<typeof mascara>
+    projetar: (p: [number, number, number]) => [number, number]
+    centro: (nome: string) => ReturnType<typeof centro>
+    objeto: (nome: string) => THREE.Object3D | null
+    /** Folga mínima (m, espaço do glb) entre as malhas de cada padrão e o busto, na pose atual (folga.ts). */
+    folga: (padroes: string[], raio?: number) => ReturnType<typeof folga>
+  }
 }
 
 declare global {
@@ -236,5 +248,13 @@ export function createHeroDebug(get: () => RootState): HeroDebug {
       if (g) g.prop.visible = v
     },
     face: (keys) => facePose(get(), keys),
+    medidas: {
+      cor: (ocultar) => cor(get(), ocultar),
+      mascara: (regras) => mascara(get(), regras),
+      projetar: (p) => projetar(get(), p),
+      centro: (nome) => centro(get(), nome),
+      objeto: (nome) => objeto(get(), nome),
+      folga: (padroes, raio) => folga(get(), padroes, raio),
+    },
   }
 }
