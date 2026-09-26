@@ -2,7 +2,7 @@
 // cena desde a MONTAGEM da vida (t=0 no auge do furacão) e, em cada quadro, o portão arte ↔ cena (olhos e boca, texto
 // e interface, borda) e a legibilidade (fração visível de cada barco; ao menos um barco inteiro na janela da vida).
 // Uso: node 3d/tools/props/volta_vela.mjs <pasta> <rótulo> [--telas=1440x900,1024x768,360x740] [--tempos=0,0.25,...]
-//        [--reduzido]
+//        [--reduzido] [--janela=1,3.5] [--respiro=4] [--borda=2]
 // Grava <rótulo>-volta-<tela>-<t>s.png (tela inteira) e <rótulo>-volta.json. Sai 1 se algum quadro reprovar.
 import { writeFileSync, mkdirSync } from 'node:fs'
 import { LIMITES as L } from './limites.mjs'
@@ -16,10 +16,14 @@ const telas = TELAS.filter(([w, h]) => (pedidas ?? ['1440x900']).includes(`${w}x
 const ts = tempos ?? Array.from({ length: 17 }, (_, i) => i * 0.25)
 const sufixo = reduzido ? '-reduzido' : ''
 /** Janela da vida em que a peça tem de ler: cabeça completa (1 s) até o começo da saída (3,5 s). */
-const JANELA = [1, 3.5]
+const JANELA = (resto.find((a) => a.startsWith('--janela='))?.slice(9).split(',').map(Number) ?? [1, 3.5])
 const BARCOS = ['vela_laser', 'vela_optimist']
 /** Barco "inteiro visível": fração da silhueta não escondida pela cabeça. */
 const INTEIRO = 0.9
+/** Respiro (px CSS) da peça até a interface e até a borda da tela (ADENDO 6: ≥ 16 px). */
+const num = (k, d) => Number(resto.find((a) => a.startsWith(`--${k}=`))?.split('=')[1] ?? d)
+const RESPIRO = num('respiro', L.arteCena.margemUi)
+const BORDA = num('borda', L.arteCena.bordaMinPx)
 mkdirSync(pasta, { recursive: true })
 
 const palavra = (page) =>
@@ -60,10 +64,30 @@ function medirQuadro({ rects, barcos }) {
         if ((x - cx) ** 2 + (y - cy) ** 2 <= r * r) n += nav.data[y * nav.w + x]
     return [z.nome, Math.round(n / (k * k))]
   })
+  // Interface e borda: os BARCOS (o percurso); o que está vestido (boné, óculos, apito) é medido à parte.
+  const emRects = (mask) =>
+    Object.entries(rects)
+      .map(([nome, r]) => {
+        let n = 0
+        for (let y = Math.max(0, Math.floor(r.y * k)); y < Math.min(mask.h, Math.ceil((r.y + r.h) * k)); y++)
+          for (let x = Math.max(0, Math.floor(r.x * k)); x < Math.min(mask.w, Math.ceil((r.x + r.w) * k)); x++)
+            n += mask.data[y * mask.w + x]
+        return [nome, Math.round(n / (k * k))]
+      })
+      .filter(([, px]) => px > 0)
+  let [x0, y0, x1, y1] = [Infinity, Infinity, -1, -1]
+  for (let i = 0; i < nav.data.length; i++) {
+    if (!nav.data[i]) continue
+    const x = i % nav.w
+    const y = (i - x) / nav.w
+    ;[x0, y0, x1, y1] = [Math.min(x0, x), Math.min(y0, y), Math.max(x1, x), Math.max(y1, y)]
+  }
+  const vestidos = M.mascara([['^vela_(bone|oculos|apito)', 'preto'], ['^prop$', 'oculto']])
   return {
     rosto,
-    sobreUi: Object.entries(m.sobreUi).filter(([, px]) => px > 0),
-    box: m.peca.box,
+    sobreUi: emRects(nav),
+    vestidosSobreUi: emRects(vestidos),
+    box: x1 < 0 ? null : { x: x0 / k, y: y0 / k, w: (x1 - x0 + 1) / k, h: (y1 - y0 + 1) / k },
     dpr: k,
     visivel: vis,
   }
@@ -89,7 +113,7 @@ await page.clock.pauseAt((await page.evaluate(() => Date.now())) + 1000)
   await montar(page, vidas[(vidas.indexOf(alvo) + 1) % vidas.length])
   await montar(page, alvo)
   const ui = await retangulosUi(page)
-  const rects = Object.fromEntries(Object.entries(ui.rects).map(([k, r]) => [k, dilatar(r, L.arteCena.margemUi)]))
+  const rects = Object.fromEntries(Object.entries(ui.rects).map(([k, r]) => [k, dilatar(r, RESPIRO)]))
   const quadros = []
   let agora = 0
   for (const t of ts) {
@@ -104,7 +128,7 @@ await page.clock.pauseAt((await page.evaluate(() => Date.now())) + 1000)
     const f = []
     for (const [z, px] of q.rosto) if (px > L.arteCena.pxRostoMax) f.push(`${px} px sobre ${z}`)
     for (const [n, px] of q.sobreUi) f.push(`${Math.round(px)} px sobre ${n}`)
-    if (borda != null && borda < L.arteCena.bordaMinPx) f.push(`encosta na borda (${Math.round(borda)} px)`)
+    if (borda != null && borda < BORDA) f.push(`encosta na borda (${Math.round(borda)} px)`)
     if (naJanela && !inteiro) f.push('nenhum barco inteiro visível')
     // Só reprova dentro da janela da vida (antes de 1 s a cabeça ainda se forma; depois de 3,5 s ela se desfaz).
     if (naJanela) for (const x of f) falhas.push(`${tela} t=${t}: ${x}`)
