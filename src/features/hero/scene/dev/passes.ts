@@ -4,6 +4,7 @@
  * a parte dela escondida pela cabeça e o contorno da cabeça, em pixels do buffer de desenho.
  */
 import * as THREE from 'three'
+import { FADE_UV1_VERT } from '../dissolve'
 
 export type Paint = 'preto' | 'branco' | 'oculto'
 
@@ -34,6 +35,29 @@ function flat(color: string, clip: THREE.Plane[] | null) {
   return new THREE.MeshBasicMaterial({ color, toneMapped: false, side: THREE.DoubleSide, clippingPlanes: clip })
 }
 
+/**
+ * Adereço com degradê próprio no 2º UV (`withDissolve` com `fadeUv1`): material de máscara que descarta o fragmento
+ * onde o degradê passou da metade (ali a malha já se confunde com o fundo e não conta). Sem degradê: null.
+ */
+export function mascaraCortada(o: THREE.Mesh, cor: string): THREE.Material | null {
+  const mat = Array.isArray(o.material) ? o.material[0] : o.material
+  if (mat?.userData.fadeUv1 !== true || !o.geometry.hasAttribute('uv1')) return null
+  const m = new THREE.MeshBasicMaterial({ color: cor, toneMapped: false, side: THREE.DoubleSide })
+  m.onBeforeCompile = (sh) => {
+    sh.vertexShader = sh.vertexShader
+      .replace('#include <common>', `#include <common>\n${FADE_UV1_VERT}`)
+      .replace('#include <project_vertex>', '#include <project_vertex>\nvDisFade = uv1.x;')
+    sh.fragmentShader = sh.fragmentShader
+      .replace('#include <common>', '#include <common>\nvarying float vDisFade;')
+      .replace(
+        '#include <clipping_planes_fragment>',
+        '#include <clipping_planes_fragment>\nif (vDisFade < 0.5) discard;',
+      )
+  }
+  m.customProgramCacheKey = () => 'mascara-fade-uv1'
+  return m
+}
+
 function meshesOf(root: THREE.Object3D) {
   const list: THREE.Mesh[] = []
   root.traverse((o) => {
@@ -62,20 +86,26 @@ export function renderPass(gl: THREE.WebGLRenderer, scene: THREE.Scene, camera: 
     o.visible = false
     hidden.push(o)
   }
-  const paint = (root: THREE.Object3D, p: Paint, b: THREE.Material, w: THREE.Material) => {
+  const cortados: THREE.Material[] = []
+  const paint = (root: THREE.Object3D, p: Paint, b: THREE.Material, w: THREE.Material, cortar = false) => {
     if (p === 'oculto') {
       hide(root)
       return
     }
+    const cor = p === 'preto' ? '#000000' : '#ffffff'
     for (const m of meshesOf(root)) {
       saved.set(m, m.material)
-      m.material = p === 'preto' ? b : w
+      const c = cortar ? mascaraCortada(m, cor) : null
+      if (c) {
+        cortados.push(c)
+        m.material = c
+      } else m.material = p === 'preto' ? b : w
     }
   }
   scene.traverse((o) => {
     if (isPoints(o)) hide(o)
   })
-  paint(g.prop, s.prop, black, white)
+  paint(g.prop, s.prop, black, white, true)
   paint(g.bust, s.bust, bustBlack, bustWhite)
 
   const background = scene.background
@@ -98,7 +128,7 @@ export function renderPass(gl: THREE.WebGLRenderer, scene: THREE.Scene, camera: 
   scene.background = background
   saved.forEach((mat, mesh) => (mesh.material = mat))
   hidden.forEach((o) => (o.visible = true))
-  ;[black, white, bustBlack, bustWhite].forEach((m) => m.dispose())
+  ;[black, white, bustBlack, bustWhite, ...cortados].forEach((m) => m.dispose())
   target.dispose()
 
   const data = new Uint8Array(size.x * size.y)

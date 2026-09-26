@@ -1,4 +1,4 @@
-/** Adereços que flutuam ao lado da cabeça: lupa, bússola, volante e laço do DevOps. */
+/** Adereços que flutuam ao lado da cabeça: lupa, bússola e laço do DevOps. */
 import { useFrame } from '@react-three/fiber'
 import { useMemo, useRef } from 'react'
 import * as THREE from 'three'
@@ -44,36 +44,6 @@ export function Compass() {
         </mesh>
         <mesh ref={n} position={[0, 0, 0.008]} material={needle}>
           <coneGeometry args={[0.006, 0.05, 4]} />
-        </mesh>
-      </group>
-    </Float>
-  )
-}
-
-export function Wheel() {
-  const m = useMat('#2a2c31', GLOSS)
-  return (
-    <Float position={[0.2, 0.12, -0.04]} speed={0.9} amp={0.006}>
-      <group rotation={[0.1, -0.5, 0.25]}>
-        <mesh material={m}>
-          <torusGeometry args={[0.075, 0.009, 14, 56]} />
-        </mesh>
-        {[0, 1, 2].map((i) => (
-          <mesh
-            key={i}
-            rotation={[0, 0, (i * 2 * Math.PI) / 3 + Math.PI / 2]}
-            position={[
-              Math.cos((i * 2 * Math.PI) / 3 + Math.PI / 2) * 0.037,
-              Math.sin((i * 2 * Math.PI) / 3 + Math.PI / 2) * 0.037,
-              0,
-            ]}
-            material={m}
-          >
-            <boxGeometry args={[0.075, 0.009, 0.006]} />
-          </mesh>
-        ))}
-        <mesh rotation={[Math.PI / 2, 0, 0]} material={m}>
-          <cylinderGeometry args={[0.018, 0.018, 0.012, 24]} />
         </mesh>
       </group>
     </Float>

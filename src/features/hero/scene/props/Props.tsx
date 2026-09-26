@@ -1,10 +1,11 @@
 import type { PropId } from '../../../../content/journey'
 import { Empreendedor } from './empreendedor/Empreendedor'
-import { Compass, InfinityLoop, Magnifier, Wheel } from './floating'
+import { Compass, InfinityLoop, Magnifier } from './floating'
 import { Calculadora } from './ledger/Calculadora'
 import { Ledger } from './ledger/Ledger'
-import { Brim, Dome, Headphones, Tears } from './head'
+import { Headphones } from './head'
 import { Neural } from './orbits'
+import { Uber } from './uber/Uber'
 import { Vela } from './vela/Vela'
 
 /**
@@ -39,13 +40,6 @@ export function Props({ id }: { id: PropId }) {
     case 'infinity':
       return <InfinityLoop />
     case 'uber':
-      return (
-        <>
-          <Dome color="#111214" />
-          <Brim color="#111214" />
-          <Wheel />
-          <Tears />
-        </>
-      )
+      return <Uber />
   }
 }

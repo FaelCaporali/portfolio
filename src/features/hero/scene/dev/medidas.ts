@@ -7,7 +7,7 @@
  */
 import type { RootState } from '@react-three/fiber'
 import * as THREE from 'three'
-import { isMesh, type Mask } from './passes'
+import { isMesh, mascaraCortada, type Mask } from './passes'
 
 export type Tinta = 'preto' | 'branco' | 'oculto'
 /** Regra de máscara: a primeira que casa decide a tinta da malha; nenhuma casa → branco (oclusor). */
@@ -81,6 +81,7 @@ export function mascara(s: RootState, regras: Regra[]): Mask {
   const preto = new THREE.MeshBasicMaterial({ color: '#000000', toneMapped: false, side: THREE.DoubleSide })
   const branco = new THREE.MeshBasicMaterial({ color: '#ffffff', toneMapped: false, side: THREE.DoubleSide })
   const trocados = new Map<THREE.Mesh, THREE.Mesh['material']>()
+  const cortados: THREE.Material[] = []
   const escondidos: THREE.Object3D[] = []
   s.scene.traverse((o) => {
     if (isPoints(o) && o.visible) {
@@ -97,7 +98,10 @@ export function mascara(s: RootState, regras: Regra[]): Mask {
       return
     }
     trocados.set(o, o.material)
-    o.material = tinta === 'preto' ? preto : branco
+    // Adereço com degradê próprio: só a parte visível conta (passes.ts, mascaraCortada).
+    const c = mascaraCortada(o, tinta === 'preto' ? '#000000' : '#ffffff')
+    if (c) cortados.push(c)
+    o.material = c ?? (tinta === 'preto' ? preto : branco)
   })
   const background = s.scene.background
   const clear = s.gl.getClearColor(new THREE.Color())
@@ -114,6 +118,7 @@ export function mascara(s: RootState, regras: Regra[]): Mask {
   escondidos.forEach((o) => (o.visible = true))
   preto.dispose()
   branco.dispose()
+  cortados.forEach((m) => m.dispose())
   const data = new Uint8Array(img.w * img.h)
   for (let i = 0; i < data.length; i++) data[i] = (img.data[i * 4] ?? 255) < 128 ? 1 : 0
   // Deixa o quadro como estava para o próximo screenshot.

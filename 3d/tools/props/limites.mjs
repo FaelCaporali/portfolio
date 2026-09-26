@@ -39,3 +39,18 @@ export const LIMITES = {
     mimes: ['image/jpeg', 'image/webp', 'image/ktx2'],
   },
 }
+
+/**
+ * Exceções por vida, com o motivo na ficha da vida; as outras vidas ficam nos limites acima.
+ * uber (FICHA-PRODUCAO.md, ADENDO 6): volante, duas mãos realistas com pele e normal próprios, lágrimas e celular (em
+ * teste); a ficha fixa 350 kB e 12 chamadas de desenho.
+ */
+export const POR_VIDA = {
+  uber: { orcamento: { bytesMax: 350 * 1024, chamadasMax: 12 } },
+}
+
+/** Limites valendo para a vida (os gerais com as exceções dela por cima). */
+export function limitesDa(vida) {
+  const exc = POR_VIDA[vida] ?? {}
+  return Object.fromEntries(Object.entries(LIMITES).map(([k, v]) => [k, { ...v, ...(exc[k] ?? {}) }]))
+}

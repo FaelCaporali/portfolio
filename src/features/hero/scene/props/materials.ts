@@ -23,7 +23,6 @@ export const GLOW = { emissive: new THREE.Color('#29d8ff'), emissiveIntensity: 1
 export const GLASS = { transparent: true, opacity: 0.18, roughness: 0.05 }
 export const FLAME = { emissive: new THREE.Color('#ff7a1a'), emissiveIntensity: 2 }
 export const NEEDLE = { emissive: new THREE.Color('#ff4d4d'), emissiveIntensity: 0.6 }
-export const TEAR = { transparent: true, opacity: 0.85, roughness: 0.05 }
 
 /** Material padrão dos adereços, com a desintegração. */
 export function useMat(color: string, finish: THREE.MeshStandardMaterialParameters = MATTE) {

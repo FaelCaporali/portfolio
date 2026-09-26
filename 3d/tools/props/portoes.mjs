@@ -8,13 +8,14 @@
 import { execFileSync } from 'node:child_process'
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { lerGlb } from './glb.mjs'
-import { LIMITES as L } from './limites.mjs'
+import { limitesDa } from './limites.mjs'
 import { TELAS, abrir, dilatar, extras, gravarPng, launch, retangulosUi, uniao } from './site.mjs'
 
 const { query, espera, resto } = extras(process.argv.slice(2))
 const [vida = 'financeiro', pasta = '3d/captura/props/ferramental', rot = 'portoes'] = resto.filter(
   (a) => !a.startsWith('--'),
 )
+const L = limitesDa(vida)
 const opt = (k) =>
   resto
     .find((a) => a === `--${k}` || a.startsWith(`--${k}=`))

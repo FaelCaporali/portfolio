@@ -1,28 +1,7 @@
-/** Adereços presos à cabeça: casco e aba de boné, fones e lágrimas. */
-import { useFrame } from '@react-three/fiber'
-import { useMemo, useRef } from 'react'
+/** Adereços presos à cabeça: fones. */
+import { useMemo } from 'react'
 import * as THREE from 'three'
-import { GLOSS, TEAR, useDisposal, useMat } from './materials'
-
-/** Casco sobre o crânio (boné, chapéu): elipsoide cortado, centro e raios medidos. */
-export function Dome({ color, y = 0.232 }: { color: string; y?: number }) {
-  const m = useMat(color)
-  return (
-    <mesh position={[0, y, -0.12]} scale={[0.098, 0.092, 0.132]} material={m}>
-      <sphereGeometry args={[1, 40, 20, 0, Math.PI * 2, 0, Math.PI * 0.5]} />
-    </mesh>
-  )
-}
-
-/** Aba de boné: meia elipse só para a frente, saindo da borda do casco. */
-export function Brim({ color, y = 0.236, depth = 0.09 }: { color: string; y?: number; depth?: number }) {
-  const m = useMat(color)
-  return (
-    <mesh position={[0, y, 0.0]} rotation={[0.22, 0, 0]} scale={[0.082, 1, depth]} material={m}>
-      <cylinderGeometry args={[1, 1, 0.006, 40, 1, false, -Math.PI / 2, Math.PI]} />
-    </mesh>
-  )
-}
+import { GLOSS, useDisposal, useMat } from './materials'
 
 export function Headphones({ color = '#1b1d22', mic = false }: { color?: string; mic?: boolean }) {
   const m = useMat(color, GLOSS)
@@ -66,37 +45,5 @@ export function Headphones({ color = '#1b1d22', mic = false }: { color?: string;
         </>
       )}
     </group>
-  )
-}
-
-export function Tears() {
-  const m = useMat('#9fd3ff', TEAR)
-  const drops = useRef<THREE.Mesh[]>([])
-  useFrame(({ clock }) => {
-    drops.current.forEach((d, i) => {
-      const t = (clock.elapsedTime * 0.7 + i * 0.37) % 1
-      d.position.y = 0.162 - t * 0.075
-      d.position.z = 0.012 + t * 0.012
-      d.scale.setScalar(t < 0.1 ? t * 10 : 1)
-    })
-  })
-  return (
-    <>
-      {[-1, 1].flatMap((s) =>
-        [0, 1].map((k) => (
-          <mesh
-            key={`${s}${k}`}
-            ref={(el) => {
-              if (el) drops.current[s + 1 + k] = el
-            }}
-            position={[s * 0.05, 0.16, 0.01]}
-            scale={[1, 1.5, 1]}
-            material={m}
-          >
-            <sphereGeometry args={[0.0045, 12, 10]} />
-          </mesh>
-        )),
-      )}
-    </>
   )
 }

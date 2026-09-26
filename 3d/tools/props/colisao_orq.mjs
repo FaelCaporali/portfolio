@@ -3,21 +3,37 @@
 // amostrada em tempo real durante ≥ 1 volta, em várias poses (ponteiro no centro e nos cantos, arrasto).
 // Distância = vértice da peça × vértice mais próximo do obstáculo (malha do S13 com ~2 mm entre vértices); "dentro"
 // quando o ponto está do lado de dentro da normal do vértice mais próximo. Sai 1 se algum quadro tiver folga < limite.
-// Uso: node 3d/tools/props/colisao_orq.mjs [vida=vela] [pasta] [limite_mm=5] [--url=http://localhost:5199]
+// Uso: node 3d/tools/props/colisao_orq.mjs [vida=vela] [pasta] [limite_mm=5] [--peca=<regex>] [--obst=<regex>]
+//   --peca: malhas medidas (padrão por vida em PADROES; vela: os barcos). --obst: o que está vestido e conta como
+//   obstáculo além do busto (vela: boné, óculos, apito; vazio = só o busto). URL do site: variável SITE (site.mjs).
+//   --tela=LxA (padrão 1440x900): o ponteiro das poses escala com a tela (a vela foi medida no 1440). Com outra tela,
+//   o json sai como colisao-<tela>.json.
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { abrir, launch } from './site.mjs'
 
 // Sem GPU o relógio do herói anda mais devagar que o real (passo ≤ 0,1 s por quadro): amostrar tempo real de sobra.
 const JANELA_MS = 12000
 const args = process.argv.slice(2)
-const [vida = 'vela', pasta = '3d/captura/props/vela/v1/orquestrador', limiteMm = '5'] = args.filter((a) => !a.startsWith('--'))
-const PECA = /^vela_(laser|optimist)/
-const OBSTACULO = /^vela_(bone|oculos|apito)/
+const [vida = 'vela', pasta = `3d/captura/props/${vida}/v1/orquestrador`, limiteMm = '5'] = args.filter(
+  (a) => !a.startsWith('--'),
+)
+/** Peça × obstáculo vestido por vida (sobrescritos por --peca/--obst). Uber: volante e mãos contra o busto. */
+const PADROES = {
+  vela: { peca: '^vela_(laser|optimist)', obst: '^vela_(bone|oculos|apito)' },
+  uber: { peca: '^uber_(volante|mao_)', obst: '' },
+}
+const opc = (k) => args.find((a) => a.startsWith(`--${k}=`))?.slice(k.length + 3)
+const padrao = PADROES[vida] ?? PADROES.vela
+const PECA = opc('peca') ?? padrao.peca
+const OBSTACULO = opc('obst') ?? padrao.obst
 const limite = Number(limiteMm) / 1000
 mkdirSync(pasta, { recursive: true })
 
+const [W, H] = (opc('tela') ?? '1440x900').split('x').map(Number)
+const sx = W / 1440
+const sy = H / 900
 const browser = await launch()
-const { page } = await abrir(browser, { viewport: { width: 1440, height: 900 }, query: `slot=${vida}&d=0` })
+const { page } = await abrir(browser, { viewport: { width: W, height: H }, query: `slot=${vida}&d=0` })
 await page.waitForTimeout(2500)
 
 /** Uma amostra: folga mínima assinada (m, espaço do glb) e onde ocorreu. */
@@ -28,7 +44,7 @@ const amostra = () =>
       const prop = d.medidas.objeto('prop')
       const bust = d.medidas.objeto('bust')
       const reP = new RegExp(peca)
-      const reO = new RegExp(obst)
+      const reO = obst ? new RegExp(obst) : null
       const nomes = (o) => {
         const n = []
         for (let p = o; p && p !== prop && p !== bust; p = p.parent) n.push(p.name)
@@ -62,7 +78,7 @@ const amostra = () =>
           }
         })
       coleta(bust, () => true)
-      coleta(prop, (o) => nomes(o).some((n) => reO.test(n)))
+      if (reO) coleta(prop, (o) => nomes(o).some((n) => reO.test(n)))
       const C = 0.01
       const grade = new Map()
       const chave = (x, y, z) => `${Math.floor(x / C)},${Math.floor(y / C)},${Math.floor(z / C)}`
@@ -111,19 +127,21 @@ const amostra = () =>
       })
       return { pior, obstaculos: obs.length / 6 }
     },
-    { peca: PECA.source, obst: OBSTACULO.source },
+    { peca: PECA, obst: OBSTACULO },
   )
 
+const mover = (x, y, o) => page.mouse.move(x * sx, y * sy, o)
 const poses = [
-  ['centro', async () => page.mouse.move(720, 450)],
-  ['sup-esq', async () => page.mouse.move(40, 40)],
-  ['sup-dir', async () => page.mouse.move(1400, 40)],
-  ['inf-esq', async () => page.mouse.move(40, 860)],
-  ['inf-dir', async () => page.mouse.move(1400, 860)],
-  ['arrasto-esq', async () => { await page.mouse.move(1000, 450); await page.mouse.down(); await page.mouse.move(700, 450, { steps: 8 }) }],
-  ['arrasto-dir', async () => { await page.mouse.move(1000, 450); await page.mouse.down(); await page.mouse.move(1300, 450, { steps: 8 }) }],
+  ['centro', async () => mover(720, 450)],
+  ['sup-esq', async () => mover(40, 40)],
+  ['sup-dir', async () => mover(1400, 40)],
+  ['inf-esq', async () => mover(40, 860)],
+  ['inf-dir', async () => mover(1400, 860)],
+  ['arrasto-esq', async () => { await mover(1000, 450); await page.mouse.down(); await mover(700, 450, { steps: 8 }) }],
+  ['arrasto-dir', async () => { await mover(1000, 450); await page.mouse.down(); await mover(1300, 450, { steps: 8 }) }],
 ]
-const resultado = { vida, limiteMm: Number(limiteMm), poses: {} }
+const tela = `${W}x${H}`
+const resultado = { vida, tela, peca: PECA, obstaculo: OBSTACULO || null, limiteMm: Number(limiteMm), poses: {} }
 let reprovou = false
 for (const [nome, entrar] of poses) {
   await entrar()
@@ -138,15 +156,25 @@ for (const [nome, entrar] of poses) {
     n++
     if (a.pior.folga < pior.folga) {
       pior = { ...a.pior, t: (Date.now() - t0) / 1000 }
-      await page.screenshot({ path: `${pasta}/colisao-${nome}.png` })
+      await page.screenshot({ path: `${pasta}/colisao-${tela === '1440x900' ? '' : `${tela}-`}${nome}.png` })
     }
   }
   await page.mouse.up()
-  resultado.poses[nome] = { amostras: n, obstaculos: obst, folgaMm: +(pior.folga * 1000).toFixed(2), malha: pior.malha, p: pior.p, t: pior.t }
+  // Sem obstáculo nas células vizinhas (grade de 1 cm), a folga é ≥ 10 mm: registrado como tal, não como número.
+  const longe = !Number.isFinite(pior.folga)
+  resultado.poses[nome] = {
+    amostras: n,
+    obstaculos: obst,
+    folgaMm: longe ? null : +(pior.folga * 1000).toFixed(2),
+    ...(longe ? { folgaMinimaMm: 10, nota: 'nenhum vértice da peça a menos de 1 cm do obstáculo' } : {}),
+    malha: pior.malha,
+    p: pior.p,
+    t: pior.t,
+  }
   if (pior.folga < limite) reprovou = true
   console.log(`${nome}: ${n} amostras, folga mínima ${(pior.folga * 1000).toFixed(2)} mm (${pior.malha}) ${pior.folga < limite ? 'REPROVA' : 'ok'}`)
 }
 resultado.aprovado = !reprovou
-writeFileSync(`${pasta}/colisao.json`, JSON.stringify(resultado, null, 2))
+writeFileSync(`${pasta}/colisao${tela === '1440x900' ? '' : `-${tela}`}.json`, JSON.stringify(resultado, null, 2))
 await browser.close()
 process.exitCode = reprovou ? 1 : 0
