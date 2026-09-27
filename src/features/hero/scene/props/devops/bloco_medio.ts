@@ -4,6 +4,7 @@
  * (por serviço) · SNS → SES, com o contrato do evento embaixo. Devolve o y de baixo.
  */
 import { COR, TAM, check, descartada, fonteMono, grupo, servico, seta, type Tela } from './estilo'
+import { JANELA } from './decisoes'
 import type { Quadro } from './pincel'
 import { T } from './roteiro'
 
@@ -15,11 +16,36 @@ export function blocoAssincronoLinha(tl: Tela, r: Quadro) {
   const W = r.x1 - r.x0
   const X = (f: number) => r.x0 + f * W
   const y = r.y0 + k.nome * 1.7 + ap / 2 + 2
-  descartada(tl, { id: 'rabbitmq', x: X(0.08), y, nome: 'RabbitMQ', t: t0 + 0.05 })
-  servico(tl, { id: 'sqs', x: X(0.22), y, nome: 'SQS', lado: ap, t: t0 })
-  check(tl, X(0.22) + ap / 2 + 6, y - ap / 2 + 2, T.decide[0], 8)
-  servico(tl, { id: 'lambda', x: X(0.42), y, nome: 'Lambda', nota: 'bursty', lado: ap, t: t0 + 0.15 })
-  servico(tl, { id: 'fargate', x: X(0.56), y, nome: 'Fargate', nota: 'steady', lado: ap, t: t0 + 0.2 })
+  // D18: pares em movimento (decisoes.ts); no diagrama, cada um aparece ao pousar.
+  const [s0, s1] = JANELA.sqs
+  const [c0, c1] = JANELA.computacao
+  tl.p.pares.push(
+    {
+      exclusivo: true,
+      de: s0,
+      ate: s1,
+      palco: r,
+      itens: [
+        { id: 'sqs', nome: 'SQS', nota: 'managed', x: X(0.22), y, lado: ap, vence: true },
+        { id: 'rabbitmq', nome: 'RabbitMQ', nota: 'self-run', x: X(0.08), y, lado: ap, vence: false },
+      ],
+    },
+    {
+      exclusivo: false,
+      de: c0,
+      ate: c1,
+      palco: r,
+      itens: [
+        { id: 'lambda', nome: 'Lambda', nota: 'bursty jobs', x: X(0.42), y, lado: ap, vence: true },
+        { id: 'fargate', nome: 'Fargate', nota: 'steady APIs', x: X(0.56), y, lado: ap, vence: true },
+      ],
+    },
+  )
+  descartada(tl, { id: 'rabbitmq', x: X(0.08), y, nome: 'RabbitMQ', t: s1 })
+  servico(tl, { id: 'sqs', x: X(0.22), y, nome: 'SQS', lado: ap, t: s1 })
+  check(tl, X(0.22) + ap / 2 + 6, y - ap / 2 + 2, s1, 8)
+  servico(tl, { id: 'lambda', x: X(0.42), y, nome: 'Lambda', nota: 'bursty', lado: ap, t: c1 })
+  servico(tl, { id: 'fargate', x: X(0.56), y, nome: 'Fargate', nota: 'steady', lado: ap, t: c1 })
   servico(tl, { id: 'sns', x: X(0.74), y, nome: 'SNS', lado: ap, t: t0 + 0.25 })
   servico(tl, { id: 'ses', x: X(0.9), y, nome: 'SES', nota: 'email', lado: ap, t: t0 + 0.3 })
   const m = ap / 2 + 3

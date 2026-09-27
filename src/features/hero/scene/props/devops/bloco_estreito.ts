@@ -6,6 +6,7 @@
  */
 import { desenharIcone } from './icones'
 import { COR, TAM, check, descartada, grupo, servico, seta, type Tela } from './estilo'
+import { JANELA } from './decisoes'
 import type { Quadro } from './pincel'
 import { GRUPO } from './revela'
 import { T } from './roteiro'
@@ -47,9 +48,23 @@ export function blocoEstreito(tl: Tela, esq: Quadro | null, dir: Quadro | null) 
       { t: quando(0.3), dur: 0.1, fluxo: true },
     )
     const yq = esq.y1 - k.apoio / 2 - k.nome * 1.4
-    servico(tl, { id: 'sqs', x: esq.x0 + W * 0.28, y: yq, nome: 'SQS', lado: k.apoio, t: T.apoio[0] })
-    check(tl, esq.x0 + W * 0.28 + k.apoio / 2 + 5, yq - k.apoio / 2 + 2, T.decide[0], 7)
-    descartada(tl, { id: 'rabbitmq', x: esq.x0 + W * 0.74, y: yq, nome: 'Rabbit', t: T.apoio[0] + 0.05 })
+    // D18: o par cresce na coluna, o RabbitMQ é cortado e o SQS pousa (decisoes.ts).
+    const [s0, s1] = JANELA.sqs
+    const xq = esq.x0 + W * 0.28
+    const xr = esq.x0 + W * 0.74
+    tl.p.pares.push({
+      exclusivo: true,
+      de: s0,
+      ate: s1,
+      palco: esq,
+      itens: [
+        { id: 'sqs', nome: 'SQS', x: xq, y: yq, lado: k.apoio, vence: true },
+        { id: 'rabbitmq', nome: 'RabbitMQ', x: xr, y: yq, lado: k.apoio, vence: false },
+      ],
+    })
+    servico(tl, { id: 'sqs', x: xq, y: yq, nome: 'SQS', lado: k.apoio, t: s1 })
+    check(tl, xq + k.apoio / 2 + 5, yq - k.apoio / 2 + 2, s1, 7)
+    descartada(tl, { id: 'rabbitmq', x: xr, y: yq, nome: 'Rabbit', t: s1 })
   }
   if (dir) {
     const W = dir.x1 - dir.x0
@@ -76,8 +91,21 @@ export function blocoEstreito(tl: Tela, esq: Quadro | null, dir: Quadro | null) 
       const t = i < 2 ? T.icones[1] : T.tasks + (i - 2) * 0.07
       tl.p.imagem({ t }, tx, ty, lt, (ctx) => desenharIcone(ctx, tl.img, 'task', tx, ty, lt))
     }
-    servico(tl, { id: 'rds', x: dir.x0 + W * 0.3, y: y2, nome: 'RDS', lado: k.apoio, t: quando(0.85) })
-    servico(tl, { id: 'dynamodb', x: dir.x0 + W * 0.72, y: y2, nome: 'Dynamo', lado: k.apoio, t: quando(0.9) })
+    const [d0, d1] = JANELA.dados
+    const xd = dir.x0 + W * 0.3
+    const xy = dir.x0 + W * 0.72
+    tl.p.pares.push({
+      exclusivo: false,
+      de: d0,
+      ate: d1,
+      palco: dir,
+      itens: [
+        { id: 'rds', nome: 'RDS', nota: 'orders', x: xd, y: y2, lado: k.apoio, vence: true },
+        { id: 'dynamodb', nome: 'DynamoDB', nota: 'sessions', x: xy, y: y2, lado: k.apoio, vence: true },
+      ],
+    })
+    servico(tl, { id: 'rds', x: xd, y: y2, nome: 'RDS', lado: k.apoio, t: d1 })
+    servico(tl, { id: 'dynamodb', x: xy, y: y2, nome: 'Dynamo', lado: k.apoio, t: d1 })
     const m = ic / 2 + 3
     seta(
       tl,

@@ -31,7 +31,8 @@ export const T = {
   openapi: 1.55,
   cfn: 2.35,
   entrega: 2.55,
-  decide: [2.3, 2.5],
+  /** Estado B do grupo `decisao` (alternativa esmaecida e riscada), antes do primeiro pouso (decisoes.ts, D18). */
+  decide: [2.2, 2.4],
   blueGreen: [3.0, 3.4],
   deploy: [3.35, 3.5],
   trafego: [3.45, 3.7],

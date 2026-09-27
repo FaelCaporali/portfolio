@@ -5,6 +5,7 @@
  * Texto se DIGITA (um instante por caractere); linha e caixa se DESENHAM (instante ao longo do comprimento); ícone
  * surge inteiro. Chamado só no resize (nunca por quadro).
  */
+import type { Par } from './decisoes'
 import { PASSO_T } from './revela'
 
 export interface Marca {
@@ -41,6 +42,8 @@ export class Pincel {
   readonly marcos: { x: number; y: number; t: number }[] = []
   /** Pontos com nome para o olhar (o CloudWatch do alarme). */
   readonly alvos: Partial<Record<'alarme', { x: number; y: number; t: number }>> = {}
+  /** Pares de tradeoff registrados pelos blocos (decisoes.ts: a dinâmica de destaque, corte e encaixe). */
+  readonly pares: Par[] = []
 
   /** `escala`: px do canvas por unidade do desenho (dpr no fundo). */
   constructor(q: Quadro, escala: number) {

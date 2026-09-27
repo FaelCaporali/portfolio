@@ -118,8 +118,8 @@ function useArquitetoScene() {
       }))
       tracos.definir(voos)
     }
-    const planos = (tempo: number) => {
-      fundo.atualizar(q, tempo)
+    const planos = (tempo: number, parar = false) => {
+      fundo.atualizar(q, tempo, parar)
       if (!planta) return
       planta.revela.u.uT.value = q.t
       planta.revela.u.uEst.value.set(q.est)
@@ -147,7 +147,7 @@ function useArquitetoScene() {
     }
     const parado = () => {
       quadroFinal(q)
-      planos(0)
+      planos(0, true)
       tracos.linhas.visible = false
       alvoDoAdereco.peso = 0
     }

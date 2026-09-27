@@ -7,6 +7,7 @@
  */
 import { desenharIcone } from './icones'
 import { COR, TAM, check, fonteMono, fonteNome, grupo, servico, seta, type Tela } from './estilo'
+import { JANELA } from './decisoes'
 import type { Quadro } from './pincel'
 import { GRUPO } from './revela'
 import { T } from './roteiro'
@@ -112,8 +113,20 @@ export function blocoFluxo(tl: Tela, z: Quadro, xEvento: number): SaidaFluxo {
   tasks(tl, { x0: X(P.asg[0]), x1: X(P.asg[1]), y: yB }, ap)
   const xRds = X(P.rds)
   const xRedis = X(P.redis)
-  servico(tl, { id: 'rds', x: xRds, y: ya, nome: 'RDS', nota: nota('orders'), t: quando(0.85) })
-  servico(tl, { id: 'dynamodb', x: xRds, y: yB, nome: 'DynamoDB', nota: nota('sessions'), lado: ap, t: quando(0.9) })
+  // D18: RDS × DynamoDB por serviço: os dois crescem, ganham o ✓ e cada um encaixa no seu serviço (decisoes.ts).
+  const [d0, d1] = JANELA.dados
+  tl.p.pares.push({
+    exclusivo: false,
+    de: d0,
+    ate: d1,
+    palco: z,
+    itens: [
+      { id: 'rds', nome: 'RDS', nota: 'orders · ACID', x: xRds, y: ya, lado: ic, vence: true },
+      { id: 'dynamodb', nome: 'DynamoDB', nota: 'sessions · KV', x: xRds, y: yB, lado: ap, vence: true },
+    ],
+  })
+  servico(tl, { id: 'rds', x: xRds, y: ya, nome: 'RDS', nota: nota('orders'), t: d1 })
+  servico(tl, { id: 'dynamodb', x: xRds, y: yB, nome: 'DynamoDB', nota: nota('sessions'), lado: ap, t: d1 })
   servico(tl, { id: 'redis', x: xRedis, y: ya, nome: 'Redis', nota: nota('cache'), lado: ap, t: quando(0.95) })
 
   // Setas com contrato (D9) e tráfego.

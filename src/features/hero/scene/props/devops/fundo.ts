@@ -12,7 +12,8 @@ import { blocoFluxo } from './bloco_fluxo'
 import { blocoAssincronoLinha } from './bloco_medio'
 import { blocoAssincrono, blocoEntrega, blocoIntegracoes, blocoObservabilidade, blocoRuntime } from './bloco_lados'
 import type { Formato } from './composicao'
-import type { Tela } from './estilo'
+import { criarDecisoes, type Par } from './decisoes'
+import { TAM, type Tela } from './estilo'
 import { Pincel, type Quadro } from './pincel'
 import { criarRevela, type Revela } from './revela'
 import type { Quadro as QuadroRoteiro } from './roteiro'
@@ -60,6 +61,7 @@ export function criarFundo() {
     mesh.visible = false
     return { nome, r, geo, mesh }
   })
+  const decisoes = criarDecisoes()
   /** Marcos (ícones) da última pintura e as zonas vigentes (lidos por tracos.ts e pelas ferramentas do estúdio). */
   const estado = {
     marcos: [] as { x: number; y: number; t: number }[],
@@ -93,6 +95,7 @@ export function criarFundo() {
     const escala = Math.min(ESCALA_MAX, window.devicePixelRatio || 1)
     estado.zonas = zonas
     estado.marcos = []
+    let pares: Par[] = []
     for (const p of paineis) {
       const q: Quadro | null = rects[p.nome]
       if (!q) {
@@ -104,6 +107,7 @@ export function criarFundo() {
       if (!estado.marcos.length) {
         estado.marcos = pincel.marcos
         estado.alarme = pincel.alvos.alarme ?? null
+        pares = pincel.pares
       }
       p.r.texturas(pincel.cor, pincel.dados)
       noPlano(q.x0, q.y0, camera, ref.w, ref.h, a)
@@ -113,6 +117,8 @@ export function criarFundo() {
       p.mesh.userData.rect = { ...q }
       p.mesh.visible = true
     }
+    // Tradeoffs (D18): o tamanho de destaque é 1,7× o ícone do fluxo principal, limitado pelo palco de cada par.
+    decisoes.definir(pares, img, TAM[f].icone * 1.7, (x, y, out) => noPlano(x, y, camera, ref.w, ref.h, out))
   }
 
   /** Ponto da tela (px CSS) no plano do fundo, em coordenadas do grupo do fundo (para os traços e o olhar). */
@@ -124,7 +130,8 @@ export function criarFundo() {
   }
 
   /** Uniformes do quadro (sem alocar). `tempo`: relógio do tráfego. */
-  const atualizar = (q: QuadroRoteiro, tempo: number) => {
+  const atualizar = (q: QuadroRoteiro, tempo: number, parado = false) => {
+    decisoes.atualizar(q.t, parado)
     for (const p of paineis) {
       p.r.u.uT.value = q.t
       p.r.u.uEst.value.set(q.est)
@@ -133,10 +140,11 @@ export function criarFundo() {
     }
   }
   const dispose = () => {
+    decisoes.dispose()
     for (const p of paineis) {
       p.r.dispose()
       p.geo.dispose()
     }
   }
-  return { meshes: paineis.map((p) => p.mesh), estado, ajustar, pontoNoFundo, atualizar, dispose }
+  return { meshes: [...paineis.map((p) => p.mesh), decisoes.mesh], estado, ajustar, pontoNoFundo, atualizar, dispose }
 }

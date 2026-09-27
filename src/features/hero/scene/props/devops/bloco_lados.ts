@@ -24,6 +24,7 @@ import {
   seta,
   type Tela,
 } from './estilo'
+import { JANELA } from './decisoes'
 import type { Quadro } from './pincel'
 import { GRUPO } from './revela'
 import { T } from './roteiro'
@@ -38,9 +39,21 @@ export function blocoAssincrono(tl: Tela, z: Quadro, y: number) {
   const xR = z.x0 + 0.76 * W
   const ap = k.apoio
   const y1 = y + ap / 2 + 3
-  servico(tl, { id: 'sqs', x: xL, y: y1, nome: 'SQS', nota: 'managed', lado: ap, t: t0 })
-  check(tl, xL + ap / 2 + 7, y1 - ap / 2 + 2, T.decide[0], 9)
-  descartada(tl, { id: 'rabbitmq', x: xR, y: y1, nome: 'RabbitMQ', nota: 'self-run', t: t0 + 0.05 })
+  // D18: o par cresce, o ✓ marca o SQS, o RabbitMQ é cortado e o SQS pousa aqui (decisoes.ts).
+  const [s0, s1] = JANELA.sqs
+  tl.p.pares.push({
+    exclusivo: true,
+    de: s0,
+    ate: s1,
+    palco: z,
+    itens: [
+      { id: 'sqs', nome: 'SQS', nota: 'managed', x: xL, y: y1, lado: ap, vence: true },
+      { id: 'rabbitmq', nome: 'RabbitMQ', nota: 'self-run', x: xR, y: y1, lado: ap, vence: false },
+    ],
+  })
+  servico(tl, { id: 'sqs', x: xL, y: y1, nome: 'SQS', nota: 'managed', lado: ap, t: s1 })
+  check(tl, xL + ap / 2 + 7, y1 - ap / 2 + 2, s1, 9)
+  descartada(tl, { id: 'rabbitmq', x: xR, y: y1, nome: 'RabbitMQ', nota: 'self-run', t: s1 })
   let yy = y1 + ap / 2 + k.nome + k.nota * 2
   const fm = fonteMono(k.nota)
   tl.p.texto(
@@ -59,8 +72,19 @@ export function blocoAssincrono(tl: Tela, z: Quadro, y: number) {
   yy += k.nota * 2.2
   tl.p.texto({ t: t0 + 0.1 }, z.x0 + 2, yy, fonteNome(k.nota), [['compute per service', COR.titulo]], 0.006)
   const y2 = yy + k.nota * 0.8 + ap / 2 + 4
-  servico(tl, { id: 'lambda', x: xL, y: y2, nome: 'Lambda', nota: 'bursty jobs', lado: ap, t: t0 + 0.15 })
-  servico(tl, { id: 'fargate', x: xR, y: y2, nome: 'Fargate', nota: 'steady APIs', lado: ap, t: t0 + 0.2 })
+  const [c0, c1] = JANELA.computacao
+  tl.p.pares.push({
+    exclusivo: false,
+    de: c0,
+    ate: c1,
+    palco: z,
+    itens: [
+      { id: 'lambda', nome: 'Lambda', nota: 'bursty jobs', x: xL, y: y2, lado: ap, vence: true },
+      { id: 'fargate', nome: 'Fargate', nota: 'steady APIs', x: xR, y: y2, lado: ap, vence: true },
+    ],
+  })
+  servico(tl, { id: 'lambda', x: xL, y: y2, nome: 'Lambda', nota: 'bursty jobs', lado: ap, t: c1 })
+  servico(tl, { id: 'fargate', x: xR, y: y2, nome: 'Fargate', nota: 'steady APIs', lado: ap, t: c1 })
   const y3 = y2 + ap + k.nome * 2 + k.nota * 2
   servico(tl, { id: 'sns', x: xL, y: y3, nome: 'SNS', nota: 'fan-out', lado: ap, t: t0 + 0.25 })
   servico(tl, { id: 'ses', x: xR, y: y3, nome: 'SES', nota: 'email', lado: ap, t: t0 + 0.3 })
@@ -218,9 +242,23 @@ export function blocoRuntime(tl: Tela, r: Quadro) {
   const y = r.y0 + k.nome * 1.8 + ap / 2
   const largo = tl.f === 'largo'
   const x1 = r.x0 + 0.28 * W
-  servico(tl, { id: 'ecs', x: x1, y, nome: largo ? 'ECS · Fargate' : 'Fargate', lado: ap, t: t0 + 0.1 })
-  check(tl, x1 + ap / 2 + 7, y - ap / 2 + 2, T.decide[0] + 0.05, 9)
-  descartada(tl, { id: 'docker', x: r.x0 + 0.72 * W, y, nome: largo ? 'Docker Swarm' : 'Swarm', t: t0 + 0.15 })
+  const nEcs = largo ? 'ECS · Fargate' : 'Fargate'
+  const nSwarm = largo ? 'Docker Swarm' : 'Swarm'
+  const xs = r.x0 + 0.72 * W
+  const [r0, r1] = JANELA.runtime
+  tl.p.pares.push({
+    exclusivo: true,
+    de: r0,
+    ate: r1,
+    palco: r,
+    itens: [
+      { id: 'ecs', nome: nEcs, x: x1, y, lado: ap, vence: true },
+      { id: 'docker', nome: nSwarm, x: xs, y, lado: k.apoio, vence: false },
+    ],
+  })
+  servico(tl, { id: 'ecs', x: x1, y, nome: nEcs, lado: ap, t: r1 })
+  check(tl, x1 + ap / 2 + 7, y - ap / 2 + 2, r1, 9)
+  descartada(tl, { id: 'docker', x: xs, y, nome: nSwarm, t: r1 })
   const y1 = y + ap / 2 + k.nome * 1.6
   grupo(tl, { x0: r.x0, y0: r.y0, x1: r.x1, y1 }, { titulo: 'Runtime decision', cor: COR.titulo, t: T.grupos + 0.2 })
   return y1
