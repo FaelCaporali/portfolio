@@ -74,4 +74,26 @@ export const VIDAS = {
     // Fases do roteiro (s desde a montagem, props/qa/roteiro.ts): voo até a chegada, preso depois da trava.
     fases: { vooDe: 0.75, vooAte: 1.7, presoDe: 1.95, presoAte: 3.3 },
   },
+  // FICHA-PRODUCAO.md do devops, FECHAMENTO: prancheta presa à mesa (arq_mesa, com a planta desenhada no site), o
+  // diagrama no fundo (arq_fundo, três painéis) e os traços que sobem; tudo conta para UI e borda (0 px, 16 px).
+  devops: {
+    pecas: {
+      tudo: '^devops$',
+      mesa: '^arq_mesa$',
+      folha: '^arq_folha$',
+      fundo: '^arq_fundo$',
+      tracos: '^arq_tracos$',
+    },
+    rosto: '^arq_(mesa|tracos)$',
+    iris: '^arq_nenhum$',
+    // Respiro do lábio à borda de cima do TAMPO.
+    aro: '^arq_tampo$',
+    // No retrato estreito, o desenho da planta não fica sob o título (o papel azul pode, com contraste ≥ 4,5:1).
+    maos: '^arq_planta$',
+    rotuloMaos: 'planta',
+    olhos: [],
+    irisRaio: 0,
+    // Todos os quadros contam até o fim da pausa de 3,5 s (montagem + 1 s + 3,5 s = 4,5 s), como no qa.
+    janela: [0, 4.5],
+  },
 }

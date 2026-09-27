@@ -1,6 +1,7 @@
 import type { PropId } from '../../../../content/journey'
 import { Empreendedor } from './empreendedor/Empreendedor'
-import { Compass, InfinityLoop } from './floating'
+import { Arquiteto } from './devops/Arquiteto'
+import { Compass } from './floating'
 import { Fullstack } from './fullstack/Fullstack'
 import { Calculadora } from './ledger/Calculadora'
 import { Ledger } from './ledger/Ledger'
@@ -39,8 +40,8 @@ export function Props({ id }: { id: PropId }) {
       return <Vela />
     case 'compass':
       return <Compass />
-    case 'infinity':
-      return <InfinityLoop />
+    case 'architect':
+      return <Arquiteto />
     case 'uber':
       return <Uber />
   }

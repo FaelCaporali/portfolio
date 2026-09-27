@@ -53,6 +53,8 @@ export const POR_VIDA = {
   uber: { orcamento: { bytesMax: 350 * 1024, chamadasMax: 12 } },
   fullstack: { orcamento: { bytesMax: 250 * 1024, chamadasMax: 10, triangulosMax: 20000 } },
   qa: { orcamento: { bytesMax: 300 * 1024, chamadasMax: 12, triangulosMax: 25000 } },
+  // devops (FICHA-PRODUCAO.md, Composição e métricas): prancheta com régua, escalímetro e folha; 250 kB, 12, 20 k.
+  devops: { orcamento: { bytesMax: 250 * 1024, chamadasMax: 12, triangulosMax: 20000 } },
 }
 
 /** Limites valendo para a vida (os gerais com as exceções dela por cima). */

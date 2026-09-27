@@ -1,9 +1,9 @@
-/** Adereços que flutuam ao lado da cabeça: bússola e laço do DevOps. */
+/** Adereço que flutua ao lado da cabeça: bússola (o laço do DevOps saiu com a vida "Solutions Architect"). */
 import { useFrame } from '@react-three/fiber'
-import { useMemo, useRef } from 'react'
+import { useRef } from 'react'
 import * as THREE from 'three'
 import { Float } from './Float'
-import { GLOSS, GLOW, GOLD, NEEDLE, useDisposal, useMat } from './materials'
+import { GOLD, NEEDLE, useMat } from './materials'
 
 export function Compass() {
   const body = useMat('#ffd166', GOLD)
@@ -24,45 +24,6 @@ export function Compass() {
         </mesh>
         <mesh ref={n} position={[0, 0, 0.008]} material={needle}>
           <coneGeometry args={[0.006, 0.05, 4]} />
-        </mesh>
-      </group>
-    </Float>
-  )
-}
-
-/** Laço do infinito (build → deploy → monitora → volta), com um pulso correndo por ele. */
-export function InfinityLoop() {
-  const loop = useMat('#ff6ec7', GLOSS)
-  const pulse = useMat('#ffe3f4', GLOW)
-  const curve = useMemo(
-    () =>
-      new THREE.CatmullRomCurve3(
-        Array.from({ length: 48 }, (_, i) => {
-          // Lemniscata de Bernoulli, com um leve cruzamento em profundidade para o tubo não se atravessar.
-          const t = (i / 48) * Math.PI * 2
-          const k = 1 + Math.sin(t) ** 2
-          return new THREE.Vector3(
-            (0.036 * Math.cos(t)) / k,
-            (0.036 * Math.sin(t) * Math.cos(t)) / k,
-            0.005 * Math.sin(t),
-          )
-        }),
-        true,
-      ),
-    [],
-  )
-  const tube = useMemo(() => new THREE.TubeGeometry(curve, 128, 0.0042, 12, true), [curve])
-  useDisposal(tube)
-  const dot = useRef<THREE.Mesh>(null)
-  useFrame(({ clock }) => {
-    dot.current?.position.copy(curve.getPointAt((clock.elapsedTime * 0.35) % 1))
-  })
-  return (
-    <Float position={[0.15, 0.25, -0.03]} speed={1.2} amp={0.008}>
-      <group rotation={[0.15, -0.45, 0.1]}>
-        <mesh geometry={tube} material={loop} />
-        <mesh ref={dot} material={pulse}>
-          <sphereGeometry args={[0.007, 16, 12]} />
         </mesh>
       </group>
     </Float>

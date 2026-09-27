@@ -6,7 +6,7 @@
 export type ExprKey = 'mouthSmile' | 'browInnerUp' | 'browOuterUp' | 'browDown'
 
 export type PropId =
-  'neural' | 'qa' | 'ledger' | 'fullstack' | 'rocket' | 'headset' | 'sailor' | 'compass' | 'uber' | 'infinity'
+  'neural' | 'qa' | 'ledger' | 'fullstack' | 'rocket' | 'headset' | 'sailor' | 'compass' | 'uber' | 'architect'
 
 export type Expression = Partial<Record<ExprKey, number>>
 
@@ -101,11 +101,14 @@ export const stages: Stage[] = [
   },
   {
     id: 'devops',
-    prop: 'infinity',
-    slot: 'DevOps Engineer',
+    prop: 'architect',
+    // Decisão do Fael (27/09, REQUISITOS D1): "Solutions Architect", sem AWS no título (a AWS está nos ícones da cena).
+    slot: 'Solutions Architect',
     track: 'tech',
     accent: '#ff6ec7',
     expr: { browDown: 0.2, mouthSmile: 0.2 },
+    // Da planta à produção (monólito, decomposição, diagrama, entrega, produção) pede 3,5 s, como o QA.
+    hold: 3.5,
   },
   {
     id: 'techlead',
