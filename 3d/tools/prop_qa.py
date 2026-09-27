@@ -12,7 +12,7 @@ glb (espaço do S13: Y para cima, +Z para a câmera, +X = esquerda do Fael). Rai
       Base = POUSO/captura (élitros fechados, asas dobradas, patas abertas); `voo` = 1 abre as asas e encolhe as patas.
   `qa_lupa_mao` (EMPTY no CENTRO DA LENTE; eixos da lupa: +Z normal da lente, −Y = cabo)
       → `qa_lupa` (EMPTY no centro da lente) → `qa_lupa_malha` (latão + nogueira), `qa_lupa_lente` (vidro)
-      → `qa_mao` (EMPTY no ponto da pegada, eixos da lupa) → `qa_mao_malha` (pele), `qa_mao_unhas`
+      → `qa_mao` (só com mao=1; padrão SEM mão, Q19) → `qa_mao_malha` (pele), `qa_mao_unhas`
   `qa_caixa` (EMPTY no centro da aresta de apoio na mesa) → `qa_caixa_malha`, `qa_caixa_vidro`
 Cada nó com nome da ficha é EMPTY e a malha vai num filho `_malha` (a quantização do otimizar.mjs põe a
 desquantização no TRS do nó da malha: pivô e filhos ficam intactos só assim). 2ª UV `Fade` (TEXCOORD_1.x) em todas
@@ -40,6 +40,8 @@ import prop_uber_unha as UN  # noqa: E402
 import prop_vela_base as B  # noqa: E402
 
 ROOT, ARGS = v6.ROOT, v6.ARGS
+MAO = ARGS.get('mao', '0') == '1'          # Q19 (FICHA v2): sem mão; mao=1 remonta a mão da v2
+H_NO_PADRAO = 0.2063                       # nó do cabo da v2 (medido pela pegada): a lupa sai idêntica sem a mão
 GLB = os.path.join(ROOT, ARGS.get('glb', '3d/export/props/qa.glb'))
 BLEND = ARGS.get('blend', '3d/blend/props/qa_v1.blend')
 TEX = os.path.join(ROOT, '3d/captura/props/qa/v1/blender/texturas')
@@ -122,7 +124,20 @@ def bug(raiz, mats, M_bug, p=None):
     return objs
 
 
+def lupa_so(raiz, mats, M_lupa):
+    """Q19: `qa_lupa_mao` (centro da lente) → só `qa_lupa` (mesma origem e eixos) → malha e lente."""
+    rig, info = LP.rigido(mats['rigido'], H_NO_PADRAO)
+    lente = LP.lente(mats['lente'])
+    no = U.vazio('qa_lupa_mao', raiz, M_lupa)
+    lu = _malha_no('qa_lupa', no, M_lupa, rig)
+    lente.matrix_world = U.m_bl(M_lupa)
+    U.pendurar(lente, lu)
+    return [no, lu, rig, lente], {'lupa': info}
+
+
 def lupa_mao(raiz, mats, M_lupa, busto):
+    if not MAO:
+        return lupa_so(raiz, mats, M_lupa)
     x, y, z, o = M_lupa[:3, 0], M_lupa[:3, 1], M_lupa[:3, 2], M_lupa[:3, 3]
     ob, d = QM.construir(np.array(U.bl(o)), np.array(U.bl(y)), LP.RG, LP.H_VIROLA, np.array(U.bl(ANTEBRACO)),
                          np.array(U.bl(DORSO)))
