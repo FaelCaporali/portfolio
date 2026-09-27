@@ -1,48 +1,61 @@
 /**
- * Âncora no CARRO (ficha do uber, ADENDO 6): volante, mãos e celular não seguem a cabeça. Num carro o volante fica
- * parado e é a cabeça que se move atrás dele (olhar e arrasto). Os nós vão para o grupo `uber_carro`, filho da raiz
- * (dentro do `frame`, que gira com a cabeça), e a cada atualização de matrizes o grupo desfaz o giro da cabeça: fica
- * onde estaria com a cabeça em repouso (Bust.tsx: pivô → cabeça → frame; a cabeça só gira, sem translação).
+ * Âncora no "carro" (ficha do uber, ADENDO 6; ficha do fullstack, FECHAMENTO): a peça presa ao mundo não segue a
+ * cabeça. Num carro o volante fica parado e é a cabeça que se move atrás dele (olhar e arrasto); na mesa, o notebook.
+ * Os nós vão para um grupo (`opcoes.nome`), filho da raiz (dentro do `frame`, que gira com a cabeça), e a cada
+ * atualização de matrizes o grupo desfaz o giro da cabeça: fica onde estaria com a cabeça em repouso (Bust.tsx: pivô →
+ * cabeça → frame; a cabeça só gira, sem translação).
  * A conta está em `updateMatrixWorld`, que o renderizador chama depois de todos os useFrame: nenhum atraso de quadro.
  *
- * Ajuste do grupo no espaço do glb (site, sem mexer no glb): escala em volta do centro do aro, deslocamento e pegada
- * (as mãos correm pelo aro, em volta da coluna, na direção das 12 h).
+ * Ajuste do grupo no espaço do glb (site, sem mexer no glb): escala em volta do pivô (a origem do nó de composição:
+ * centro do aro no Uber, centro da borda de cima da tampa no fullstack), deslocamento e, se houver mãos, a pegada (as
+ * mãos correm pelo aro, em volta do eixo +Z do pivô, na direção das 12 h).
  */
 import * as THREE from 'three'
 
 export interface Grupo {
-  /** Escala do grupo em volta do centro do aro (1 = glb). */
+  /** Escala do grupo em volta do pivô (1 = glb). */
   escala: number
   /** Deslocamento no espaço do glb (m): −z aproxima do busto, −y desce. */
   desloc: readonly [number, number, number]
   /** Graus que cada mão corre pelo aro na direção das 12 h (fecha a pegada; negativo abre): [esquerda, direita] do
-   * Fael (a esquerda dele fica à direita da tela). */
-  pegada: readonly [number, number]
+   * Fael (a esquerda dele fica à direita da tela). Sem mãos, fica de fora. */
+  pegada?: readonly [number, number]
 }
 
-const MAOS = { uber_mao_esq: [1, 0], uber_mao_dir: [-1, 1] } as const
+/** Mão filha do pivô: [sinal do giro em volta de +Z, lado (0 = esquerda do Fael, 1 = direita)]. */
+export type Maos = Readonly<Record<string, readonly [1 | -1, 0 | 1]>>
+
+export interface OpcoesAncora {
+  /** Nome do grupo criado na raiz (ex.: `uber_carro`). */
+  nome: string
+  /** Mãos (nós filhos do pivô) que a pegada gira; sem elas, a pegada não faz nada. */
+  maos?: Maos
+}
+
+const SEM_PEGADA: readonly [number, number] = [0, 0]
 
 /**
- * Cria `uber_carro` na raiz e move para ele os nós do carro; o ajuste gira em volta do centro do aro (origem de
- * `uber_volante`). `grupo()` é lido a cada atualização (nada alocado).
+ * Cria o grupo na raiz e move para ele os nós presos ao mundo; o ajuste gira em volta da origem de `pivo`.
+ * `grupo()` é lido a cada atualização (nada alocado).
  */
 export function criarAncora(
   raiz: THREE.Object3D,
-  nos: string[],
-  volante: THREE.Object3D | null,
+  nos: readonly string[],
+  pivo: THREE.Object3D | null,
   grupo: () => Grupo,
+  opcoes: OpcoesAncora,
 ): THREE.Group {
   const carro = new THREE.Group()
-  carro.name = 'uber_carro'
+  carro.name = opcoes.nome
   raiz.add(carro)
   for (const n of nos) {
     const o = raiz.getObjectByName(n)
     if (o) carro.add(o)
   }
-  const centro = volante ? volante.position.clone() : new THREE.Vector3()
-  const maos = Object.entries(MAOS).flatMap(([n, sinal]) => {
-    const o = volante?.getObjectByName(n)
-    return o ? [{ o, sinal: sinal[0], lado: sinal[1], p: o.position.clone(), q: o.quaternion.clone() }] : []
+  const centro = pivo ? pivo.position.clone() : new THREE.Vector3()
+  const maos = Object.entries(opcoes.maos ?? {}).flatMap(([n, [sinal, lado]]) => {
+    const o = pivo?.getObjectByName(n)
+    return o ? [{ o, sinal, lado, p: o.position.clone(), q: o.quaternion.clone() }] : []
   })
   const eixo = new THREE.Vector3(0, 0, 1)
   const giro = new THREE.Quaternion()
@@ -60,7 +73,7 @@ export function criarAncora(
   const ajuste = new THREE.Matrix4()
   const t = new THREE.Matrix4()
   let frame: THREE.Object3D | null = null
-  let pegada: readonly [number, number] = [0, 0]
+  let pegada: readonly [number, number] = SEM_PEGADA
   carro.matrixAutoUpdate = false
   carro.updateMatrixWorld = () => {
     const pai = carro.parent
@@ -73,8 +86,9 @@ export function criarAncora(
       cadeia.copy(frame.matrixWorld).invert().multiply(pai.matrixWorld)
       repouso.multiplyMatrices(base.matrixWorld, frame.matrix)
       const g = grupo()
-      if (g.pegada[0] !== pegada[0] || g.pegada[1] !== pegada[1]) {
-        pegada = g.pegada
+      const pg = g.pegada ?? SEM_PEGADA
+      if (pg[0] !== pegada[0] || pg[1] !== pegada[1]) {
+        pegada = pg
         pegar(pegada)
       }
       const [dx, dy, dz] = g.desloc

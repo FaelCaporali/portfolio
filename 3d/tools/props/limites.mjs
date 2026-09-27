@@ -44,9 +44,12 @@ export const LIMITES = {
  * Exceções por vida, com o motivo na ficha da vida; as outras vidas ficam nos limites acima.
  * uber (FICHA-PRODUCAO.md, ADENDO 6): volante, duas mãos realistas com pele e normal próprios, lágrimas e celular (em
  * teste); a ficha fixa 350 kB e 12 chamadas de desenho.
+ * fullstack (FICHA-PRODUCAO.md, FECHAMENTO): notebook (tampa, base com teclado) e 12 adesivos num atlas; a ficha fixa
+ * 250 kB, 10 chamadas e 20 k triângulos.
  */
 export const POR_VIDA = {
   uber: { orcamento: { bytesMax: 350 * 1024, chamadasMax: 12 } },
+  fullstack: { orcamento: { bytesMax: 250 * 1024, chamadasMax: 10, triangulosMax: 20000 } },
 }
 
 /** Limites valendo para a vida (os gerais com as exceções dela por cima). */

@@ -17,10 +17,12 @@ const args = process.argv.slice(2)
 const [vida = 'vela', pasta = `3d/captura/props/${vida}/v1/orquestrador`, limiteMm = '5'] = args.filter(
   (a) => !a.startsWith('--'),
 )
-/** Peça × obstáculo vestido por vida (sobrescritos por --peca/--obst). Uber: volante e mãos contra o busto. */
+/** Peça × obstáculo vestido por vida (sobrescritos por --peca/--obst). Uber: volante e mãos contra o busto.
+ * Fullstack: o notebook inteiro (tampa, base e adesivos, nós `fs_*`) contra o busto. */
 const PADROES = {
   vela: { peca: '^vela_(laser|optimist)', obst: '^vela_(bone|oculos|apito)' },
   uber: { peca: '^uber_(volante|mao_)', obst: '' },
+  fullstack: { peca: '^fs_', obst: '' },
 }
 const opc = (k) => args.find((a) => a.startsWith(`--${k}=`))?.slice(k.length + 3)
 const padrao = PADROES[vida] ?? PADROES.vela

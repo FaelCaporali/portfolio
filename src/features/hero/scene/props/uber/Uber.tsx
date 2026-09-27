@@ -3,7 +3,7 @@
  * NA FRENTE do rosto (U1), as mãos nele (U2, U3, U5) e uma lágrima escorrendo de cada olho (U4). Em teste (U7): o
  * celular num suporte, com um mapa e uma rota (celular.ts). Forma e material: o glb do estúdio (raiz `uber`).
  *
- * Volante, mãos e celular ficam presos ao CARRO (ancora.ts, ficha ADENDO 6): a cabeça se move atrás deles (olhar e
+ * Volante, mãos e celular ficam presos ao CARRO (../ancora.ts, ficha ADENDO 6): a cabeça se move atrás deles (olhar e
  * arrasto); as lágrimas, na pele, seguem a cabeça. Escala, deslocamento e pegada do grupo são do site (GRUPO, por
  * formato de tela). O volante faz correções pequenas de direção em volta do eixo da coluna, e as mãos, filhas dele,
  * giram junto. A metade de baixo do volante, os punhos e os antebraços somem num degradê para o fundo como o pescoço
@@ -18,13 +18,15 @@ import * as THREE from 'three'
 import uberUrl from '../../../../../../3d/export/props/uber.glb?url'
 import { withDissolve } from '../../dissolve'
 import { useDisposal } from '../materials'
-import { criarAncora, type Grupo } from './ancora'
+import { criarAncora, type Grupo, type Maos } from '../ancora'
 import { criarCelular } from './celular'
 import { criarLagrima } from './lagrima'
 
 const VOLANTE = 'uber_volante'
 /** Nós presos ao carro. */
 const CARRO = [VOLANTE, 'uber_celular']
+/** Mãos filhas do volante que a pegada corre pelo aro: [sinal do giro, lado] (a esquerda do Fael é o lado 0). */
+const MAOS: Maos = { uber_mao_esq: [1, 0], uber_mao_dir: [-1, 1] }
 /**
  * Ajuste do grupo do carro (medido com 3d/tools/props/volta_prop.mjs e colisao_orq.mjs, ADENDO 6): tela larga e
  * retrato estreito (largura < altura). Ordem das ferramentas: aproximar do busto (−z), fechar a pegada, reduzir a
@@ -142,7 +144,7 @@ function useUberScene() {
     copy.getObjectByName('uber_celular')?.position.add(DESLOC_CELULAR)
     // Ajuste vigente (o mesmo objeto; o componente troca os valores pelo formato da tela).
     const grupo: Grupo = { ...GRUPO.largo }
-    const carro = criarAncora(copy, CARRO, volante, () => grupo)
+    const carro = criarAncora(copy, CARRO, volante, () => grupo, { nome: 'uber_carro', maos: MAOS })
     carro.userData.grupo = grupo
     // Giro máximo vigente (rad), trocado com o formato da tela.
     const giroMax = { rad: GIRO_MAX.largo }
