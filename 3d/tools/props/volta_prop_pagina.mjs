@@ -185,3 +185,109 @@ export function medirQuadroProp(cfg) {
   }
   return { dpr: k, partes, rosto, iris, respiro, sobreUi: emRects(tudo), titulo }
 }
+
+/**
+ * Tamanho na tela de cada adesivo (px CSS) de uma malha única com um EMPTY por adesivo (fullstack): ilhas da malha
+ * (índices conectados) atribuídas ao empty mais próximo do centro da ilha; caixa dos vértices projetados.
+ * cfg: { malha: nome da malha, prefixo: prefixo dos empties (o resto do nome é o rótulo) }.
+ */
+export function medirAdesivos(cfg) {
+  const M = window.__heroDebug.medidas
+  const k = window.__heroDebug.camera().dpr
+  const malha = M.objeto(cfg.malha)
+  if (!malha) return null
+  const frame = M.objeto('bust').parent
+  frame.updateWorldMatrix(true, true)
+  const inv = frame.matrixWorld.clone().invert()
+  const V = malha.position.constructor
+  const emp = []
+  frame.traverse((o) => {
+    if (o.name.startsWith(cfg.prefixo) && o !== malha && !o.isMesh) {
+      emp.push({ nome: o.name.slice(cfg.prefixo.length), p: new V().setFromMatrixPosition(o.matrixWorld).applyMatrix4(inv) })
+    }
+  })
+  const g = malha.geometry
+  const pos = g.getAttribute('position')
+  const idx = g.index
+  const pai = Array.from({ length: pos.count }, (_, i) => i)
+  const raiz = (i) => {
+    while (pai[i] !== i) i = pai[i] = pai[pai[i]]
+    return i
+  }
+  if (idx) for (let t = 0; t < idx.count; t += 3) {
+    const a = raiz(idx.getX(t))
+    pai[raiz(idx.getX(t + 1))] = a
+    pai[raiz(idx.getX(t + 2))] = a
+  }
+  const m = inv.clone().multiply(malha.matrixWorld)
+  const ilhas = new Map()
+  const v = new V()
+  for (let i = 0; i < pos.count; i++) {
+    malha.getVertexPosition(i, v).applyMatrix4(m)
+    const r = raiz(i)
+    if (!ilhas.has(r)) ilhas.set(r, [])
+    ilhas.get(r).push([v.x, v.y, v.z])
+  }
+  const caixas = {}
+  for (const pts of ilhas.values()) {
+    const c = pts.reduce((s, p) => s.map((x, j) => x + p[j] / pts.length), [0, 0, 0])
+    const e = emp.reduce((b, x) => (!b || x.p.distanceTo(new V(...c)) < b.p.distanceTo(new V(...c)) ? x : b), null)
+    if (!e) continue
+    const b = (caixas[e.nome] ??= [Infinity, Infinity, -Infinity, -Infinity])
+    for (const p of pts) {
+      const [x, y] = M.projetar(p)
+      ;[b[0], b[1], b[2], b[3]] = [Math.min(b[0], x), Math.min(b[1], y), Math.max(b[2], x), Math.max(b[3], y)]
+    }
+  }
+  return Object.fromEntries(
+    Object.entries(caixas).map(([n, b]) => {
+      const [w, h] = [(b[2] - b[0]) / k, (b[3] - b[1]) / k]
+      return [n, { maior: +Math.max(w, h).toFixed(1), menor: +Math.min(w, h).toFixed(1) }]
+    }),
+  )
+}
+
+/**
+ * Pele sob a luz do adereço: pixels do busto visíveis (o adereço oclui), estourados (algum canal ≥ 250),
+ * saturação HSV p99 e luminância média do queixo (abaixo do lábio). Com `cfg.luz` (nome da luz), o mesmo sem ela,
+ * no mesmo quadro (a luz volta no quadro seguinte).
+ */
+export function medirPele(cfg) {
+  const H = window.__heroDebug
+  const M = H.medidas
+  const k = H.camera().dpr
+  const pele = M.mascara([['^bust$', 'preto']])
+  const [, yl] = cfg.lab.labio ? M.projetar(cfg.lab.labio) : [0, Infinity]
+  const medir = () => {
+    const img = M.cor()
+    const sats = []
+    let [n, estouro, lq, nq] = [0, 0, 0, 0]
+    for (let i = 0; i < pele.data.length; i++) {
+      if (!pele.data[i]) continue
+      const [r, g, b] = [img.data[i * 4], img.data[i * 4 + 1], img.data[i * 4 + 2]]
+      const mx = Math.max(r, g, b)
+      n++
+      if (mx >= 250) estouro++
+      sats.push(mx ? (mx - Math.min(r, g, b)) / mx : 0)
+      if (Math.floor(i / pele.w) > yl) {
+        lq += 0.2126 * r + 0.7152 * g + 0.0722 * b
+        nq++
+      }
+    }
+    sats.sort((a, b) => a - b)
+    return {
+      px: Math.round(n / (k * k)),
+      estouro: Math.round(estouro / (k * k)),
+      satP99: +(sats[Math.floor(sats.length * 0.99)] ?? 0).toFixed(3),
+      lumQueixo: nq ? +(lq / nq).toFixed(1) : null,
+    }
+  }
+  const com = medir()
+  const luz = cfg.luz ? M.objeto(cfg.luz) : null
+  if (!luz) return com
+  const antes = luz.intensity
+  luz.intensity = 0
+  const sem = medir()
+  luz.intensity = antes
+  return { ...com, semLuz: sem }
+}

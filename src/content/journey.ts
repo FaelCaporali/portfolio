@@ -6,7 +6,7 @@
 export type ExprKey = 'mouthSmile' | 'browInnerUp' | 'browOuterUp' | 'browDown'
 
 export type PropId =
-  'neural' | 'magnifier' | 'ledger' | 'headphones' | 'rocket' | 'headset' | 'sailor' | 'compass' | 'uber' | 'infinity'
+  'neural' | 'magnifier' | 'ledger' | 'fullstack' | 'rocket' | 'headset' | 'sailor' | 'compass' | 'uber' | 'infinity'
 
 export type Expression = Partial<Record<ExprKey, number>>
 
@@ -77,7 +77,7 @@ export const stages: Stage[] = [
   },
   {
     id: 'fullstack',
-    prop: 'headphones',
+    prop: 'fullstack',
     slot: 'FullStack Dev',
     track: 'tech',
     accent: '#3ddc84',

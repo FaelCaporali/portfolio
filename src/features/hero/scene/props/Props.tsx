@@ -1,6 +1,7 @@
 import type { PropId } from '../../../../content/journey'
 import { Empreendedor } from './empreendedor/Empreendedor'
 import { Compass, InfinityLoop, Magnifier } from './floating'
+import { Fullstack } from './fullstack/Fullstack'
 import { Calculadora } from './ledger/Calculadora'
 import { Ledger } from './ledger/Ledger'
 import { Headphones } from './head'
@@ -27,8 +28,8 @@ export function Props({ id }: { id: PropId }) {
           <Calculadora />
         </>
       )
-    case 'headphones':
-      return <Headphones />
+    case 'fullstack':
+      return <Fullstack />
     case 'rocket':
       return <Empreendedor />
     case 'headset':

@@ -12,7 +12,14 @@
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { LIMITES as L } from './limites.mjs'
 import { TELAS, abrir, dilatar, extras, launch, retangulosUi } from './site.mjs'
-import { aplicarCaso, labioInferior, medirQuadroProp, rectsTitulo } from './volta_prop_pagina.mjs'
+import {
+  aplicarCaso,
+  labioInferior,
+  medirAdesivos,
+  medirPele,
+  medirQuadroProp,
+  rectsTitulo,
+} from './volta_prop_pagina.mjs'
 
 /** Padrões por vida (nome da malha, de um ancestral até o frame, ou do material). */
 const VIDAS = {
@@ -38,6 +45,30 @@ const VIDAS = {
       [0.04, 0.18, 0.0],
     ],
     irisRaio: 0.006,
+  },
+  // FICHA-PRODUCAO.md do fullstack, FECHAMENTO: notebook preso à mesa, adesivos numa malha só (um EMPTY por adesivo).
+  fullstack: {
+    pecas: {
+      // O notebook (grupo da mesa); a chuva de código (fs_chuva, no fundo) é medida à parte (volta_prop_chuva.mjs).
+      tudo: '^fs_mesa$',
+      tampa: '^fs_notebook_tampa',
+      base: '^fs_notebook_base',
+      adesivos: '^fs_adesivos',
+    },
+    rosto: '^fs_(notebook|adesiv)',
+    // Sem lágrimas: nenhuma íris a medir.
+    iris: '^fs_nenhum$',
+    // Respiro do lábio à borda de cima da TAMPA (adesivos incluídos, por garantia).
+    aro: '^fs_(notebook_tampa|adesivos)',
+    // No retrato estreito, nenhum adesivo sob o título (a tampa escura pode passar, com contraste ≥ 4,5:1).
+    maos: '^fs_adesivos',
+    rotuloMaos: 'adesivo',
+    olhos: [],
+    irisRaio: 0,
+    adesivos: { malha: 'fs_adesivos_malha', prefixo: 'fs_adesivo_' },
+    // Maior lado mínimo (px CSS) no 360: Node ≥ 24, nível 3 ≥ 8.
+    legivel: { 360: { node: 24, r: 8, c: 8, laravel: 8 } },
+    luz: 'fs_luz_tela',
   },
 }
 
@@ -132,6 +163,8 @@ async function quadro(page, w, ui, rects, rotulo, recarregou) {
   const dentro = (r, c) => c && r.x >= c.x - 1 && r.y >= c.y - 1 && r.x + r.w <= c.x + c.w + 1 && r.y + r.h <= c.y + c.h + 1
   const rectsQ = tit ? Object.fromEntries(Object.entries(rects).filter(([n]) => !dentro(ui.rects[n], tit.caixa))) : rects
   const q = await page.evaluate(medirQuadroProp, { ...cfgVida, rects: rectsQ, lab, titulo: tit?.glifos })
+  q.adesivos = cfgVida.adesivos ? await page.evaluate(medirAdesivos, cfgVida.adesivos) : null
+  q.pele = await page.evaluate(medirPele, { lab, luz: cfgVida.luz })
   if (recarregou()) throw new Error('a página recarregou')
   const b = q.partes.tudo
   const borda = b && Math.min(b.x, b.y, ui.canvas.w - (b.x + b.w), ui.canvas.h - (b.y + b.h))
@@ -140,10 +173,14 @@ async function quadro(page, w, ui, rects, rotulo, recarregou) {
   for (const [z, px] of q.iris) if (px > 0) f.push(`lágrima ${px} px sobre ${z}`)
   for (const [n, px] of q.sobreUi) f.push(`${px} px sobre ${n}`)
   for (const g of q.titulo ?? []) {
-    if (g.mao > 0) f.push(`mão ${g.mao} px sob ${g.nome}`)
+    if (g.mao > 0) f.push(`${cfgVida.rotuloMaos ?? 'mão'} ${g.mao} px sob ${g.nome}`)
     if (g.contraste < CONTRASTE) f.push(`${g.nome} com contraste ${g.contraste}:1 sobre a peça (< ${CONTRASTE})`)
   }
   if (borda != null && borda < BORDA) f.push(`a ${Math.round(borda)} px da borda`)
+  for (const [n, min] of Object.entries(cfgVida.legivel?.[w] ?? {})) {
+    const a = q.adesivos?.[n]
+    if (!a || a.maior < min) f.push(`adesivo ${n} com ${a?.maior ?? 0} px (< ${min})`)
+  }
   const r = q.respiro.borda
   if (r != null && r < (ARO[w] ?? 0)) f.push(`aro a ${r} px do lábio inferior (< ${ARO[w]})`)
   return { ...q, borda, falhas: f }
@@ -239,6 +276,13 @@ for (const [tela, qs] of Object.entries(saida)) {
     const resp = `aro→lábio ${q.respiro.labio ?? '-'}/borda ${q.respiro.borda ?? '-'}/sulco ${q.respiro.sulco ?? '-'} px`
     const linha = `borda ${Math.round(q.borda ?? -1)} gota ${larg(p.gota)} px tela ${alt(p.tela)} px`
     console.log(`${tela} ${q.t} ${resp} ${linha} ${q.falhas.join('; ')}`)
+    if (q.adesivos) {
+      const ad = Object.entries(q.adesivos).map(([n, a]) => `${n} ${a.maior}`)
+      console.log(`  adesivos (maior lado px): ${ad.join(', ')}`)
+    }
+    const pl = q.pele
+    const sem = pl.semLuz ? ` (sem luz ${pl.semLuz.estouro}/${pl.semLuz.satP99}/${pl.semLuz.lumQueixo})` : ''
+    console.log(`  pele estouro/satP99/lumQueixo ${pl.estouro}/${pl.satP99}/${pl.lumQueixo}${sem}`)
   }
 }
 console.log(falhas.length ? `REPROVA (${falhas.length})\n - ${falhas.slice(0, 30).join('\n - ')}` : 'PASSA')
