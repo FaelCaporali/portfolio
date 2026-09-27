@@ -7,6 +7,8 @@ import { dissolveUniforms } from './dissolve'
 interface DirectorProps {
   first: boolean
   reducedMotion: boolean
+  /** Pausa própria da vida atual (s; ausente = a padrão do carrossel). */
+  hold?: number
   /** Conferência: desintegração parada neste valor. */
   frozenDissolve: number | null
   drag: RefObject<DragState>
@@ -17,7 +19,16 @@ interface DirectorProps {
 }
 
 /** Liga o relógio do carrossel ao quadro do Canvas: aplica a desintegração e avisa as trocas de vida e de fase. */
-export function Director({ first, reducedMotion, frozenDissolve, drag, requested, onPhase, onNext }: DirectorProps) {
+export function Director({
+  first,
+  reducedMotion,
+  hold,
+  frozenDissolve,
+  drag,
+  requested,
+  onPhase,
+  onNext,
+}: DirectorProps) {
   const clock = useRef(createClock())
   useFrame((_, dt) => {
     if (frozenDissolve !== null) {
@@ -29,6 +40,7 @@ export function Director({ first, reducedMotion, frozenDissolve, drag, requested
       reducedMotion,
       held: isHeld(drag.current),
       jump: requested.current !== null,
+      hold,
     })
     dissolveUniforms.uD.value = t.dissolve
     if (t.next) onNext()

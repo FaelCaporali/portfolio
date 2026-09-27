@@ -20,57 +20,8 @@ import {
   medirQuadroProp,
   rectsTitulo,
 } from './volta_prop_pagina.mjs'
-
-/** Padrões por vida (nome da malha, de um ancestral até o frame, ou do material). */
-const VIDAS = {
-  uber: {
-    pecas: {
-      tudo: '^uber$',
-      volante: '^uber_volante$',
-      maos: '^uber_mao_',
-      rastro: '^uber_lagrima_(esq|dir)_rastro',
-      gota: '^uber_lagrima_(esq|dir)_gota$',
-      celular: '^uber_celular$',
-      tela: '^uber_celular_tela',
-    },
-    // O que não pode cobrir olhos e boca (as lágrimas descem da pálpebra de propósito: medidas contra a íris).
-    rosto: '^uber_(volante|mao_|celular)',
-    iris: '^uber_lagrima_',
-    // Respiro do lábio ao ARO (a malha do volante; as mãos, filhas dele, respondem pela zona da boca).
-    aro: '^uber_volante_malha',
-    maos: '^uber_mao_',
-    // Centros dos olhos no glb (SITE.md) e raio da íris.
-    olhos: [
-      [-0.04, 0.18, 0.0],
-      [0.04, 0.18, 0.0],
-    ],
-    irisRaio: 0.006,
-  },
-  // FICHA-PRODUCAO.md do fullstack, FECHAMENTO: notebook preso à mesa, adesivos numa malha só (um EMPTY por adesivo).
-  fullstack: {
-    pecas: {
-      // O notebook (grupo da mesa); a chuva de código (fs_chuva, no fundo) é medida à parte (volta_prop_chuva.mjs).
-      tudo: '^fs_mesa$',
-      tampa: '^fs_notebook_tampa',
-      base: '^fs_notebook_base',
-      adesivos: '^fs_adesivos',
-    },
-    rosto: '^fs_(notebook|adesiv)',
-    // Sem lágrimas: nenhuma íris a medir.
-    iris: '^fs_nenhum$',
-    // Respiro do lábio à borda de cima da TAMPA (adesivos incluídos, por garantia).
-    aro: '^fs_(notebook_tampa|adesivos)',
-    // No retrato estreito, nenhum adesivo sob o título (a tampa escura pode passar, com contraste ≥ 4,5:1).
-    maos: '^fs_adesivos',
-    rotuloMaos: 'adesivo',
-    olhos: [],
-    irisRaio: 0,
-    adesivos: { malha: 'fs_adesivos_malha', prefixo: 'fs_adesivo_' },
-    // Maior lado mínimo (px CSS) no 360: Node ≥ 24, nível 3 ≥ 8.
-    legivel: { 360: { node: 24, r: 8, c: 8, laravel: 8 } },
-    luz: 'fs_luz_tela',
-  },
-}
+import { julgarTamanhos, medirQa } from './volta_prop_qa.mjs'
+import { VIDAS } from './volta_vidas.mjs'
 
 const { reduzido, tempos, espera, resto } = extras(process.argv.slice(2))
 const pos = resto.filter((a) => !a.startsWith('--'))
@@ -89,7 +40,7 @@ const caso = opc('caso')
 const comPoses = resto.includes('--poses')
 const sufixo = (reduzido ? '-reduzido' : '') + (caso ? `-${caso}` : '')
 /** Janela da vida em que a peça tem de ler: cabeça completa (1 s) até o começo da saída (3,5 s). */
-const JANELA = opc('janela')?.split(',').map(Number) ?? [1, 3.5]
+const JANELA = opc('janela')?.split(',').map(Number) ?? cfgVida.janela ?? [1, 3.5]
 const RESPIRO = num('respiro', 16)
 const BORDA = num('borda', 16)
 /** Contraste mínimo de cada glifo do título sobre a peça no retrato estreito (WCAG AA, ADENDO 6). */
@@ -152,13 +103,13 @@ async function naPagina(w, h, dsf, opcoes, fn) {
 }
 
 /** Mede e julga um quadro. */
-async function quadro(page, w, ui, rects, rotulo, recarregou) {
+async function quadro(page, w, ui, rects, rotulo, recarregou, t = Number.NaN) {
   if (!labio) labio = await page.evaluate(labioInferior)
   const tela = `${w}x${ui.canvas.h}`
   await page.screenshot({ path: `${pasta}/${rot}-volta-${tela}-${rotulo}${sufixo}.png`, timeout: 180_000 })
   const lab = { labio: labio.labio, borda: labio.borda, sulco: labio.sulco }
   // Retrato estreito: o título sai da regra de 0 px e entra na de legibilidade (botões e links continuam em 0 px).
-  const estreito = ui.canvas.w < ui.canvas.h
+  const estreito = ui.canvas.w < ui.canvas.h && !cfgVida.tituloComoUi
   const tit = estreito ? await page.evaluate(rectsTitulo) : null
   const dentro = (r, c) => c && r.x >= c.x - 1 && r.y >= c.y - 1 && r.x + r.w <= c.x + c.w + 1 && r.y + r.h <= c.y + c.h + 1
   const rectsQ = tit ? Object.fromEntries(Object.entries(rects).filter(([n]) => !dentro(ui.rects[n], tit.caixa))) : rects
@@ -183,6 +134,11 @@ async function quadro(page, w, ui, rects, rotulo, recarregou) {
   }
   const r = q.respiro.borda
   if (r != null && r < (ARO[w] ?? 0)) f.push(`aro a ${r} px do lábio inferior (< ${ARO[w]})`)
+  // Tamanhos por fase do roteiro (qa: bug em voo, bug preso, lente), medidos em toda tela e julgados onde há mínimo.
+  if (cfgVida.tamanhos) {
+    q.tamanhos = await page.evaluate(medirQa, cfgVida.pecas)
+    f.push(...julgarTamanhos(q.tamanhos, cfgVida.tamanhos[w], cfgVida.fases, t))
+  }
   return { ...q, borda, falhas: f }
 }
 
@@ -203,7 +159,7 @@ async function volta(w, h, dsf) {
       await page.clock.runFor(Math.max(0, Math.round((t - agora) * 1000)))
       agora = t
       if (caso && agora === ts[0]) casoAplicado = await page.evaluate(aplicarCaso, caso)
-      const q = await quadro(page, w, ui, rects, `${t.toFixed(2)}s`, recarregou)
+      const q = await quadro(page, w, ui, rects, `${t.toFixed(2)}s`, recarregou, t)
       quadros.push({ t, janela: t >= JANELA[0] && t <= JANELA[1], ...q })
     }
     return quadros
@@ -280,6 +236,7 @@ for (const [tela, qs] of Object.entries(saida)) {
       const ad = Object.entries(q.adesivos).map(([n, a]) => `${n} ${a.maior}`)
       console.log(`  adesivos (maior lado px): ${ad.join(', ')}`)
     }
+    if (q.tamanhos) console.log(`  tamanhos (maior lado px): ${JSON.stringify(q.tamanhos)}`)
     const pl = q.pele
     const sem = pl.semLuz ? ` (sem luz ${pl.semLuz.estouro}/${pl.semLuz.satP99}/${pl.semLuz.lumQueixo})` : ''
     console.log(`  pele estouro/satP99/lumQueixo ${pl.estouro}/${pl.satP99}/${pl.lumQueixo}${sem}`)

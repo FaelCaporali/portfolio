@@ -8,6 +8,8 @@
 //   obstáculo além do busto (vela: boné, óculos, apito; vazio = só o busto). URL do site: variável SITE (site.mjs).
 //   --tela=LxA (padrão 1440x900): o ponteiro das poses escala com a tela (a vela foi medida no 1440). Com outra tela,
 //   o json sai como colisao-<tela>.json.
+//   --entrada: antes das poses, a entrada da vida com relógio falso desde a montagem (a cada 40 ms até 4,5 s), que no
+//   tempo real passa antes da primeira amostra (qa: a rota de entrada do bug e a subida da lupa).
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { abrir, launch } from './site.mjs'
 
@@ -18,11 +20,13 @@ const [vida = 'vela', pasta = `3d/captura/props/${vida}/v1/orquestrador`, limite
   (a) => !a.startsWith('--'),
 )
 /** Peça × obstáculo vestido por vida (sobrescritos por --peca/--obst). Uber: volante e mãos contra o busto.
- * Fullstack: o notebook inteiro (tampa, base e adesivos) contra o busto; a chuva de código do fundo fica de fora. */
+ * Fullstack: o notebook inteiro (tampa, base e adesivos) contra o busto; a chuva de código do fundo fica de fora.
+ * Qa: o bug (voo inteiro) e a mão com a lupa contra o busto; sem obstáculo vestido. */
 const PADROES = {
   vela: { peca: '^vela_(laser|optimist)', obst: '^vela_(bone|oculos|apito)' },
   uber: { peca: '^uber_(volante|mao_)', obst: '' },
   fullstack: { peca: '^fs_(notebook|adesiv)', obst: '' },
+  qa: { peca: '^qa_(bug|lupa|mao)', obst: '' },
 }
 const opc = (k) => args.find((a) => a.startsWith(`--${k}=`))?.slice(k.length + 3)
 const padrao = PADROES[vida] ?? PADROES.vela
@@ -39,8 +43,8 @@ const { page } = await abrir(browser, { viewport: { width: W, height: H }, query
 await page.waitForTimeout(2500)
 
 /** Uma amostra: folga mínima assinada (m, espaço do glb) e onde ocorreu. */
-const amostra = () =>
-  page.evaluate(
+const amostra = (pg = page) =>
+  pg.evaluate(
     ({ peca, obst }) => {
       const d = window.__heroDebug
       const prop = d.medidas.objeto('prop')
@@ -132,6 +136,42 @@ const amostra = () =>
     { peca: PECA, obst: OBSTACULO },
   )
 
+/** Entrada da vida com relógio falso (como volta_prop.mjs): monta outra vida e volta, e amostra a cada 40 ms. */
+async function entrada() {
+  const aberta = await abrir(browser, { viewport: { width: W, height: H }, query: `slot=${vida}`, relogio: true })
+  const pg = aberta.page
+  // Margem larga: a página das poses desenha ao mesmo tempo e o relógio da página anda enquanto a ordem chega.
+  await pg.clock.pauseAt((await pg.evaluate(() => Date.now())) + 8000)
+  const palavra = () =>
+    pg.evaluate(() => document.querySelector('.slot-word:not(.is-leaving)')?.textContent?.replace(/\s+/g, ' ').trim())
+  const montar = async (alvo) => {
+    await pg.evaluate(
+      (v) => [...document.querySelectorAll('nav[aria-label="Timeline"] button')].find((b) => b.ariaLabel === v)?.click(),
+      alvo,
+    )
+    for (let i = 0; i < 300; i++) {
+      await pg.clock.runFor(20)
+      if ((await palavra())?.includes(alvo) && (await pg.evaluate(() => window.__heroDebug?.ready() === true))) return
+    }
+    throw new Error(`a vida ${alvo} não montou`)
+  }
+  const vidas = await pg.evaluate(() =>
+    [...document.querySelectorAll('nav[aria-label="Timeline"] button')].map((b) => b.getAttribute('aria-label') ?? ''),
+  )
+  await montar(vidas[(vidas.indexOf(aberta.vidaInicial) + 1) % vidas.length])
+  await montar(aberta.vidaInicial)
+  let pior = { folga: Infinity }
+  let n = 0
+  for (let t = 0; t <= 4500; t += 40) {
+    const a = await amostra(pg)
+    n++
+    if (a.pior.folga < pior.folga) pior = { ...a.pior, t: t / 1000 }
+    await pg.clock.runFor(40)
+  }
+  await aberta.ctx.close()
+  return { amostras: n, pior }
+}
+
 const mover = (x, y, o) => page.mouse.move(x * sx, y * sy, o)
 const poses = [
   ['centro', async () => mover(720, 450)],
@@ -145,6 +185,13 @@ const poses = [
 const tela = `${W}x${H}`
 const resultado = { vida, tela, peca: PECA, obstaculo: OBSTACULO || null, limiteMm: Number(limiteMm), poses: {} }
 let reprovou = false
+if (args.includes('--entrada')) {
+  const { amostras, pior } = await entrada()
+  const longe = !Number.isFinite(pior.folga)
+  resultado.poses.entrada = { amostras, folgaMm: longe ? null : +(pior.folga * 1000).toFixed(2), ...pior, folga: undefined }
+  if (pior.folga < limite) reprovou = true
+  console.log(`entrada: ${amostras} amostras, folga mínima ${(pior.folga * 1000).toFixed(2)} mm (${pior.malha}) t=${pior.t} ${pior.folga < limite ? 'REPROVA' : 'ok'}`)
+}
 for (const [nome, entrar] of poses) {
   await entrar()
   await page.waitForTimeout(400)

@@ -30,6 +30,8 @@ export interface TickInput {
   held: boolean
   /** Uma vida foi escolhida no indicador: sai do repouso agora, mesmo com o busto seguro. */
   jump: boolean
+  /** Pausa própria da vida (s), no lugar da padrão (Stage.hold; a vida qa, decisão do Fael Q17). */
+  hold?: number
 }
 
 export interface Tick {
@@ -47,7 +49,7 @@ export function tick(c: CarouselClock, dt: number, input: TickInput): Tick {
   c.time += Math.min(dt, MAX_DT)
 
   if (c.phase === 'hold') {
-    if (!input.jump && c.time < (input.first ? TIMING.holdFirst : TIMING.hold)) {
+    if (!input.jump && c.time < (input.hold ?? (input.first ? TIMING.holdFirst : TIMING.hold))) {
       return { dissolve: 0, next: false, phase: null }
     }
     c.time = 0

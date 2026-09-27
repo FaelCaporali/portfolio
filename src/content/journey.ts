@@ -6,7 +6,7 @@
 export type ExprKey = 'mouthSmile' | 'browInnerUp' | 'browOuterUp' | 'browDown'
 
 export type PropId =
-  'neural' | 'magnifier' | 'ledger' | 'fullstack' | 'rocket' | 'headset' | 'sailor' | 'compass' | 'uber' | 'infinity'
+  'neural' | 'qa' | 'ledger' | 'fullstack' | 'rocket' | 'headset' | 'sailor' | 'compass' | 'uber' | 'infinity'
 
 export type Expression = Partial<Record<ExprKey, number>>
 
@@ -26,6 +26,8 @@ export interface Stage {
   /** Adereço da vida (blockout em src/features/hero/scene/props/). */
   prop: PropId
   expr: Expression
+  /** Pausa própria da vida no carrossel (s); ausente = a padrão (model/carousel.ts TIMING). */
+  hold?: number
 }
 
 /** Vida em que o carrossel abre: a de IA, que chama atenção (decisão do Fael, 23/09). */
@@ -87,13 +89,15 @@ export const stages: Stage[] = [
   },
   {
     id: 'qa',
-    prop: 'magnifier',
+    prop: 'qa',
     slot: 'QA Analyst',
     track: 'tech',
     accent: '#e0324b',
     fact: 'Estruturou a área de qualidade da Brickup. Feature flags e monitoramento levaram os defeitos abertos de cerca de 300 para menos de 100.',
     where: 'Brickup · desde 2023 · CTFL ISTQB',
     expr: { browDown: 0.5 },
+    // A narrativa do adereço (alerta, lupa, bug report, caso de teste, caixa) pede 3,5 s: máximo do Fael (Q17).
+    hold: 3.5,
   },
   {
     id: 'devops',

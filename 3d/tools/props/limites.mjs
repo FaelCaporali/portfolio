@@ -46,10 +46,13 @@ export const LIMITES = {
  * teste); a ficha fixa 350 kB e 12 chamadas de desenho.
  * fullstack (FICHA-PRODUCAO.md, FECHAMENTO): notebook (tampa, base com teclado) e 12 adesivos num atlas; a ficha fixa
  * 250 kB, 10 chamadas e 20 k triângulos.
+ * qa (FICHA-PRODUCAO.md, Elementos): bug com élitros, asas e patas articulados, mão realista com a lupa (vidro) e a caixa
+ * entomológica com os espécimes; a ficha fixa 300 kB, 12 chamadas e 25 k triângulos.
  */
 export const POR_VIDA = {
   uber: { orcamento: { bytesMax: 350 * 1024, chamadasMax: 12 } },
   fullstack: { orcamento: { bytesMax: 250 * 1024, chamadasMax: 10, triangulosMax: 20000 } },
+  qa: { orcamento: { bytesMax: 300 * 1024, chamadasMax: 12, triangulosMax: 25000 } },
 }
 
 /** Limites valendo para a vida (os gerais com as exceções dela por cima). */

@@ -1,29 +1,9 @@
-/** Adereços que flutuam ao lado da cabeça: lupa, bússola e laço do DevOps. */
+/** Adereços que flutuam ao lado da cabeça: bússola e laço do DevOps. */
 import { useFrame } from '@react-three/fiber'
 import { useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import { Float } from './Float'
-import { GLASS, GLOSS, GLOW, GOLD, NEEDLE, useDisposal, useMat } from './materials'
-
-export function Magnifier() {
-  const rim = useMat('#e0324b', GLOSS)
-  const glass = useMat('#cfe8ff', GLASS)
-  return (
-    <Float position={[-0.045, 0.172, 0.06]} speed={1.3} amp={0.004}>
-      <group rotation={[0, 0.25, 0.5]}>
-        <mesh material={rim}>
-          <torusGeometry args={[0.034, 0.0045, 12, 48]} />
-        </mesh>
-        <mesh rotation={[Math.PI / 2, 0, 0]} material={glass}>
-          <cylinderGeometry args={[0.032, 0.032, 0.002, 40]} />
-        </mesh>
-        <mesh position={[0, -0.068, 0]} material={rim}>
-          <cylinderGeometry args={[0.0055, 0.0065, 0.07, 16]} />
-        </mesh>
-      </group>
-    </Float>
-  )
-}
+import { GLOSS, GLOW, GOLD, NEEDLE, useDisposal, useMat } from './materials'
 
 export function Compass() {
   const body = useMat('#ffd166', GOLD)

@@ -1,11 +1,12 @@
 import type { PropId } from '../../../../content/journey'
 import { Empreendedor } from './empreendedor/Empreendedor'
-import { Compass, InfinityLoop, Magnifier } from './floating'
+import { Compass, InfinityLoop } from './floating'
 import { Fullstack } from './fullstack/Fullstack'
 import { Calculadora } from './ledger/Calculadora'
 import { Ledger } from './ledger/Ledger'
 import { Headphones } from './head'
 import { Neural } from './orbits'
+import { Qa } from './qa/Qa'
 import { Uber } from './uber/Uber'
 import { Vela } from './vela/Vela'
 
@@ -19,8 +20,8 @@ export function Props({ id }: { id: PropId }) {
   switch (id) {
     case 'neural':
       return <Neural />
-    case 'magnifier':
-      return <Magnifier />
+    case 'qa':
+      return <Qa />
     case 'ledger':
       return (
         <>

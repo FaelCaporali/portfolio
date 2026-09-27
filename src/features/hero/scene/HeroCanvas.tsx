@@ -75,6 +75,7 @@ export function HeroCanvas({
         <Director
           first={first}
           reducedMotion={options.reducedMotion}
+          hold={stage.hold}
           frozenDissolve={options.frozenDissolve}
           drag={drag}
           requested={requested}

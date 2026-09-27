@@ -6,7 +6,7 @@ import bustUrl from '../../../../3d/export/s13/busto-s13.glb?url'
 import type { Expression, PropId } from '../../../content/journey'
 import { stepDrag, type DragState } from '../model/drag'
 import { createFace, stepFace } from '../model/face'
-import { createGaze, stepGaze, type Pointer } from '../model/gaze'
+import { alvoDoAdereco, createGaze, mirarAlvo, stepGaze, type Pointer } from '../model/gaze'
 import { dissolveUniforms } from './dissolve'
 import { Props } from './props/Props'
 import { applyEyes, applyFace, buildRig } from './rig'
@@ -44,6 +44,8 @@ export function Bust({ expr, prop, pointer, drag, particles }: BustProps) {
     stepDrag(drag.current, dt)
     const g = gaze.current
     stepGaze(g, pointer.current, drag.current, dt)
+    // Vida com alvo próprio (qa): os olhos deixam o ponteiro e perseguem o alvo; a cabeça acompanha um pouco.
+    mirarAlvo(g, alvoDoAdereco, dt)
     head.current?.rotation.set(-g.headUp, g.headRight, 0)
     eye.euler.set(-g.eyeUp, g.eyeRight, 0, 'YXZ')
     applyEyes(rig, eye.quat.setFromEuler(eye.euler))
