@@ -5,9 +5,9 @@ import { Compass } from './floating'
 import { Fullstack } from './fullstack/Fullstack'
 import { Calculadora } from './ledger/Calculadora'
 import { Ledger } from './ledger/Ledger'
-import { Headphones } from './head'
 import { Neural } from './orbits'
 import { Qa } from './qa/Qa'
+import { TechLead } from './techlead/TechLead'
 import { Uber } from './uber/Uber'
 import { Vela } from './vela/Vela'
 
@@ -34,8 +34,8 @@ export function Props({ id }: { id: PropId }) {
       return <Fullstack />
     case 'rocket':
       return <Empreendedor />
-    case 'headset':
-      return <Headphones color="#26222e" mic />
+    case 'techlead':
+      return <TechLead />
     case 'sailor':
       return <Vela />
     case 'compass':

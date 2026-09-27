@@ -96,4 +96,26 @@ export const VIDAS = {
     // Todos os quadros contam até o fim da pausa de 3,5 s (montagem + 1 s + 3,5 s = 4,5 s), como no qa.
     janela: [0, 4.5],
   },
+  // FICHA-PRODUCAO.md do techlead, FECHAMENTO: o headset vestido (tl_headset: arco, conchas, haste, microfone, LED;
+  // o primitivo até o glb passar na daily) e o fundo preso ao mundo (tl_fundo: quatro painéis e os cartões do Jira).
+  // Tudo conta para UI e borda (0 px, 16 px), título incluído; nada sobre olhos e boca (o microfone fica ao lado do
+  // canto da boca, nunca sobre ela).
+  techlead: {
+    pecas: {
+      tudo: '^techlead$',
+      headset: '^tl_headset$',
+      mic: '^tl_mic$',
+      fundo: '^tl_fundo$',
+      cartoes: '^tl_cartoes$',
+    },
+    rosto: '^tl_(headset|fundo)$',
+    iris: '^tl_nenhum$',
+    aro: '^tl_nenhum$',
+    maos: '^tl_nenhum$',
+    olhos: [],
+    irisRaio: 0,
+    tituloComoUi: true,
+    // Pausa de 3,5 s, como o qa e o devops: todos os quadros até 4,5 s contam.
+    janela: [0, 4.5],
+  },
 }

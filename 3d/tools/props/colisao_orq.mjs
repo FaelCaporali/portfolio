@@ -27,6 +27,9 @@ const PADROES = {
   uber: { peca: '^uber_(volante|mao_)', obst: '' },
   fullstack: { peca: '^fs_(notebook|adesiv)', obst: '' },
   qa: { peca: '^qa_(bug|lupa|mao)', obst: '' },
+  // Techlead (FICHA-PRODUCAO, FECHAMENTO): o headset inteiro contra o busto, com limite -1 (as conchas encostam por
+  // design, nada atravessa mais de 1 mm); a cápsula sozinha com --peca=^tl_mic$ e limite 10 (≥ 1 cm da pele).
+  techlead: { peca: '^tl_headset$', obst: '' },
 }
 const opc = (k) => args.find((a) => a.startsWith(`--${k}=`))?.slice(k.length + 3)
 const padrao = PADROES[vida] ?? PADROES.vela

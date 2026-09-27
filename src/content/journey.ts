@@ -6,7 +6,7 @@
 export type ExprKey = 'mouthSmile' | 'browInnerUp' | 'browOuterUp' | 'browDown'
 
 export type PropId =
-  'neural' | 'qa' | 'ledger' | 'fullstack' | 'rocket' | 'headset' | 'sailor' | 'compass' | 'uber' | 'architect'
+  'neural' | 'qa' | 'ledger' | 'fullstack' | 'rocket' | 'techlead' | 'sailor' | 'compass' | 'uber' | 'architect'
 
 export type Expression = Partial<Record<ExprKey, number>>
 
@@ -112,13 +112,16 @@ export const stages: Stage[] = [
   },
   {
     id: 'techlead',
-    prop: 'headset',
+    prop: 'techlead',
     slot: 'Tech Lead',
     track: 'tech',
     accent: '#b388ff',
     fact: 'Desenhou e implantou a arquitetura AWS da Beamble e a migração do legado para microsserviços, com logística integrada a Uber, UPS e DHL.',
     where: 'La Fabrique Flottante · 2025',
-    expr: { mouthSmile: 0.5 },
+    // Escuta atenta (REQUISITOS T1): sobrancelhas soltas e sorriso leve, só com chaves que já existem.
+    expr: { browInnerUp: 0.25, mouthSmile: 0.25 },
+    // Da escuta ao burndown, com a destrava (6 batidas: props/techlead/roteiro.ts), pede 3,5 s, como o QA e o devops.
+    hold: 3.5,
   },
   {
     id: 'ai',
