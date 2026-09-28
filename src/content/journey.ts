@@ -6,12 +6,16 @@
  */
 type ExprKey = 'mouthSmile' | 'browInnerUp' | 'browOuterUp' | 'browDown'
 
+/** Uma vida do herói; também é a âncora dela na página da trajetória (/journey#<id>). */
+export type StageId =
+  'financeiro' | 'empreendedor' | 'vela' | 'uber' | 'fullstack' | 'qa' | 'devops' | 'techlead' | 'ai'
+
 export type PropId = 'ai' | 'qa' | 'ledger' | 'fullstack' | 'rocket' | 'techlead' | 'sailor' | 'uber' | 'architect'
 
 export type Expression = Partial<Record<ExprKey, number>>
 
 export interface Stage {
-  id: string
+  id: StageId
   slot: string
   track: 'tech' | 'antes'
   /** Vida que ficou no passado: o herói diz "Yesterday I was" em vez de "Today I am" (decisão do Fael, 23/09). */

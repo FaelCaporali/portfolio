@@ -15,13 +15,12 @@ export interface ProfileLink {
 }
 
 /**
- * Página da trajetória cronológica (ainda não existe; tarefa própria). `live: false` tira o botão do herói até a
- * página ir ao ar (Fael, 28/09: "Oculte por hora o botão de 'see the full journey'").
+ * Página da trajetória (journey.html). O botão do herói leva direto à vida que está na tela (/journey#qa), como o
+ * Fael pediu em 23/09: "levar do hero para a linha do tempo, direto no fato".
  */
-export const journeyLink: ProfileLink & { live: boolean } = {
+export const journeyLink: ProfileLink = {
   label: 'See the full journey',
-  href: '/trajetoria',
-  live: false,
+  href: '/journey',
 }
 
 /** Currículo: baixa direto no idioma escolhido (versão 2026-09). */

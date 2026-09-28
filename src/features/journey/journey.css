@@ -1,0 +1,26 @@
+/* Mesma base do herói (Tailwind, fundo, fonte e as variantes), mais o que é só da trajetória. */
+@import '../../index.css';
+
+/* Cor padrão antes de qualquer vida; cada .life-<id> troca (CSS gerado de journey.ts, vite.config.ts). */
+:root {
+  --accent: #fff;
+}
+html {
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Ponto da vida em leitura, como o ponto atual do herói: cheio e com brilho. */
+[data-dot][aria-current] .dot {
+  opacity: 1;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent);
+  transform: scale(1.25);
+}
+.rail-fill {
+  transition: background-color 0.4s ease;
+}

@@ -13,6 +13,10 @@ export default {
     const { pathname } = new URL(request.url)
     if (pathname === CONTACT_PATH) return handleContact(request, env)
     if (pathname.startsWith('/api/')) return json(404, { ok: false, error: 'not_found' })
+    // Endereço antigo da trajetória, anunciado antes de a página ganhar o nome em inglês do resto do site.
+    if (pathname === '/trajetoria' || pathname === '/trajetoria/') {
+      return Response.redirect(new URL('/journey', request.url).href, 301)
+    }
     return withPageCsp(await env.ASSETS.fetch(request))
   },
 
