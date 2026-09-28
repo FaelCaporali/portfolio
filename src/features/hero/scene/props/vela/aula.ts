@@ -20,7 +20,7 @@ import { angulo, noPercurso, poligono } from './circuito'
  * Pentágono visto de cima (x, z), na ordem de navegação, começando na ponta da frente (a virada). As duas pernas da
  * frente ficam a 45° do vento (rumos −37° e 53° com o vento a 8°): orça fechada nos dois bordos.
  */
-export const VERTICES = [
+const VERTICES = [
   // Folga (Fael, 25/09: "o barco atravessa minha bochecha"): pentágono afastado da cabeça com os MESMOS rumos (ponta
   // da frente andando ao longo da perna que chega nela; perna da direita 2 cm para fora; perna de trás 3 cm para trás)
   // e a frente mais baixa. Tamanho, ritmo, manobras e vento iguais. Prova: colisao_orq.mjs e folga_vela.mjs (≥ 5 mm
@@ -32,11 +32,15 @@ export const VERTICES = [
   [-0.16, 0.0125],
 ] as const
 /** Raio dos cantos (m). */
-export const RAIO = 0.035
+const RAIO = 0.035
 /** Plano inclinado: altura do centro de giro na frente (z máximo) e atrás (z mínimo). */
-export const ALTURA = { frente: -0.03, tras: 0.22 } as const
-/** Uma volta (s) e o instante da virada do Laser (proa no vento, s desde a montagem; dentro da pausa, 1,2–2,8 s). */
+const ALTURA = { frente: -0.03, tras: 0.22 } as const
+/**
+ * Uma volta (s) e o instante da virada do Laser (proa no vento, s desde a montagem; dentro da pausa, 1,2–2,8 s).
+ * @public lidos também por 3d/tools/props/diagrama_vela.mjs, que transpila este arquivo.
+ */
 export const VOLTA = 3.0
+/** @public idem (diagrama_vela.mjs). */
 export const VIRA_LASER = 1.5
 /** Atraso do Optimist no mesmo percurso (s): vira em VIRA_LASER + ATRASO. */
 export const ATRASO = 0.6
@@ -45,6 +49,7 @@ export const ESCALA = 1
 /**
  * De onde vem o vento verdadeiro (horizontal, unitário): da direita da tela, 8° para trás. A perna de trás fica ao
  * largo (172°, um bordo só) e o jaibe cai no canto de trás-esquerda, escondido pela cabeça.
+ * @public lido também por 3d/tools/props/diagrama_vela.mjs.
  */
 export const VENTO_DE = { x: Math.cos((8 * Math.PI) / 180), z: -Math.sin((8 * Math.PI) / 180) } as const
 
@@ -68,7 +73,7 @@ const ADERNA: Tabela = [
   [135, 0.35],
   [180, 0],
 ]
-export const ADERNA_MAX = 18 * G
+const ADERNA_MAX = 18 * G
 /** |α| → velocidade relativa: quase parado no meio da virada, lento na orça, rápido no través e no largo. */
 const VELOCIDADE: Tabela = [
   [0, 0.3],
@@ -91,7 +96,7 @@ function tabela(t: Tabela, x: number) {
 
 const embrulha = (a: number) => Math.atan2(Math.sin(a), Math.cos(a))
 /** α: de onde vem o vento em relação à proa (> 0 = vento por bombordo, −z do casco; sotavento a boreste). */
-export const alfaDe = (rumo: number) => embrulha(angulo(VENTO_DE.x, VENTO_DE.z) - rumo)
+const alfaDe = (rumo: number) => embrulha(angulo(VENTO_DE.x, VENTO_DE.z) - rumo)
 export { angulo }
 
 export interface Ponto {

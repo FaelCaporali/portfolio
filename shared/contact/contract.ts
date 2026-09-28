@@ -18,7 +18,7 @@ export const LIMITS = {
   token: 2048,
 } as const
 
-export const FIELDS = ['name', 'contact', 'message'] as const
+const FIELDS = ['name', 'contact', 'message'] as const
 export type Field = (typeof FIELDS)[number]
 
 /** Corpo do POST. `website` é a isca para robôs: invisível para pessoas, que o deixam vazio. */
@@ -32,7 +32,7 @@ export interface ContactRequest {
 }
 
 /** Por que o envio foi recusado. Genéricos de propósito: nenhum detalhe interno sai do Worker. */
-export const CONTACT_ERROR_CODES = [
+const CONTACT_ERROR_CODES = [
   'method',
   'forbidden',
   'unsupported',

@@ -9,7 +9,7 @@ export interface Quality {
   particles: number
 }
 
-export const QUALITY_LEVELS: readonly Quality[] = [
+const QUALITY_LEVELS: readonly Quality[] = [
   { maxDpr: 1, particles: 0.35 },
   { maxDpr: 1.5, particles: 0.65 },
   { maxDpr: 2, particles: 1 },

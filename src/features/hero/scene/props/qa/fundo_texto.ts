@@ -204,7 +204,7 @@ const TESTE_CURTO: readonly Logica[] = [
 ]
 
 /** Uma célula da grade: caractere e cor. */
-export interface Celula {
+interface Celula {
   ch: string
   cor: string
 }

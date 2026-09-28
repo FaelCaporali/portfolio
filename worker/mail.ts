@@ -2,8 +2,8 @@
 import { asPhone } from '../shared/contact/validation'
 import type { Delivery, Message } from './message'
 
-export const SENDER = { email: 'worker@mail.caporali.dev', name: 'Portfólio · contato' }
-export const DESTINATION = 'fael@caporali.dev'
+const SENDER = { email: 'worker@mail.caporali.dev', name: 'Portfólio · contato' }
+const DESTINATION = 'fael@caporali.dev'
 
 const BRT = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo', dateStyle: 'short', timeStyle: 'short' })
 
@@ -31,7 +31,7 @@ export function compose(m: Message): EmailMessageBuilder {
 }
 
 /** Código do erro da binding (E_...), nunca a mensagem, que pode ecoar dados. */
-export function errorCode(e: unknown): string {
+function errorCode(e: unknown): string {
   const code = (e as { code?: unknown } | null)?.code
   if (typeof code === 'string' && /^E_[A-Z_]{1,40}$/.test(code)) return code
   const match = e instanceof Error ? /\bE_[A-Z_]{1,40}\b/.exec(e.message) : null

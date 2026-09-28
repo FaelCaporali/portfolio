@@ -19,7 +19,7 @@ const FALA: readonly (readonly Trecho[])[] = [
   [['They never know '], ['which documents to send', 'necessidade'], [',']],
   [['so we need '], ['a simple guided flow', 'requisito'], [' this quarter.']],
 ]
-export const POSTITS: readonly { tipo: Tipo; rotulo: string; texto: string }[] = [
+const POSTITS: readonly { tipo: Tipo; rotulo: string; texto: string }[] = [
   { tipo: 'problema', rotulo: 'PROBLEM', texto: 'Users give up at sign-up' },
   { tipo: 'necessidade', rotulo: 'NEED', texto: 'Know which docs to send' },
   { tipo: 'requisito', rotulo: 'REQUIREMENT', texto: 'Guided 3-step upload' },
@@ -51,7 +51,7 @@ function balao(tl: Tela, x: number, y: number, larguraMax: number, txt: string, 
 }
 
 /** Onda de áudio pelo caminho `via` (a voz corre por ela até o fim: canal de fluxo), desenhando-se em `dur` s. */
-export function onda(tl: Tela, via: readonly Ponto[], amp: number, t: number, dur: number) {
+function onda(tl: Tela, via: readonly Ponto[], amp: number, t: number, dur: number) {
   const segs: [Ponto, Ponto, number, number][] = []
   let total = 0
   for (let i = 1; i < via.length; i++) {

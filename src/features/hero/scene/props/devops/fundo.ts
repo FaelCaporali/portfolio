@@ -20,7 +20,7 @@ import type { Quadro as QuadroRoteiro } from './roteiro'
 import { PAINEIS, paineisPara, zonasPara, type Referencias, type Zonas } from './zonas'
 
 /** Profundidade dos painéis no espaço do glb (atrás do rosto, ao lado da cabeça), como o fundo do QA. */
-export const Z_FUNDO = -0.22
+const Z_FUNDO = -0.22
 /** Resolução do canvas: px por px CSS (dpr, até 2). */
 const ESCALA_MAX = 2
 const BRILHO = 0.92

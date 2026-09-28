@@ -110,5 +110,3 @@ export function criarBarco(root: THREE.Object3D, nome: string, retranca: string,
   }
   return { pose, medidas: { rest, ladoGlb, bojo: bojo.length, fitas: fitas.length } }
 }
-
-export type Barco = NonNullable<ReturnType<typeof criarBarco>>

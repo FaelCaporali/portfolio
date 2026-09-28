@@ -13,7 +13,7 @@ import { COR, MONO } from './estilo'
 import { desenharIcone, type Icone } from './icones'
 import type { Quadro } from './pincel'
 
-export interface ItemPar {
+interface ItemPar {
   id: Icone
   nome: string
   nota?: string

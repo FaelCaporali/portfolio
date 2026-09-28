@@ -52,7 +52,7 @@ const contar = (c: number, [a, b]: readonly [number, number], n: number) =>
   c < a ? 0 : Math.min(n, 1 + Math.floor(((c - a) / (b - a)) * n))
 
 /** Para onde os olhos vão: o bug (um pouco à frente), a lente (o bug preso) ou a vaga da caixa. */
-export type Alvo = 'bug' | 'lente' | 'vaga'
+type Alvo = 'bug' | 'lente' | 'vaga'
 
 export interface Quadro {
   /** Índice da rota em ROTAS e s de voo nela (a rota é esticada até a chegada em T.chega). */

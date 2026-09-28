@@ -43,7 +43,7 @@ const TRAVESSIA = [3.6, 2.5] as const
 /** Brilho do rastro (a frente é 1) e do acento na linha da frente. */
 const COR = { rastro: 0.55, acento: '#3ddc84', brilhoAcento: 0.12 }
 
-export type Formato = keyof typeof FORMATO
+type Formato = keyof typeof FORMATO
 
 /** Linhas de código consecutivas (sem linha vazia nem só de comentário), coloridas uma vez. */
 function linhasDeCodigo(): Token[][] {

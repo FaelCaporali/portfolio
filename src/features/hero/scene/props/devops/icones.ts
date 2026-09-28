@@ -6,7 +6,7 @@
  */
 import atlasUrl from './icones.webp?url'
 
-export const ICONES = [
+const ICONES = [
   'route53',
   'cloudfront',
   's3',

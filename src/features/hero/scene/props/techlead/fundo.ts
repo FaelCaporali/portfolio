@@ -23,7 +23,7 @@ import { Z_SAIDA, criarSaida } from './saida'
 import { PAINEIS, zonasPara, type Medida, type Zonas } from './zonas'
 
 /** Profundidade dos painéis no espaço do glb (atrás do rosto, ao lado da cabeça), como o fundo do QA e do devops. */
-export const Z_FUNDO = -0.22
+const Z_FUNDO = -0.22
 /** Resolução do canvas: px por px CSS (dpr, até 2). */
 const ESCALA_MAX = 2
 const BRILHO = 0.92

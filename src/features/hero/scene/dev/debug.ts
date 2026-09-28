@@ -22,7 +22,7 @@ import {
 } from './passes'
 
 /** Queixo aproximado no espaço do glb (boca y 0,10; base do busto y 0): a "cabeça" dos portões fica acima dele. */
-export const CHIN_Y = 0.04
+const CHIN_Y = 0.04
 /** Olhos e boca no espaço do glb (medidos na malha do S13) e raio da zona que a peça não pode cobrir. */
 const FACE_ZONES = [
   { nome: 'olhoD', p: [-0.04, 0.18, 0.0], r: 0.016 },

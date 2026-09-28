@@ -63,7 +63,7 @@ export interface Servico {
 }
 
 /** Texto centralizado em x. */
-export function centro(tl: Tela, m: Marca, x: number, y: number, fonte: string, txt: string, cor: string, dt = 0) {
+function centro(tl: Tela, m: Marca, x: number, y: number, fonte: string, txt: string, cor: string, dt = 0) {
   const w = tl.p.medir(fonte, txt)
   tl.p.texto(m, x - w / 2, y, fonte, [[txt, cor]], dt)
 }

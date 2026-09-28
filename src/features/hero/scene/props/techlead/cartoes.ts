@@ -18,7 +18,7 @@ const DE = T.destrava
  * Coluna 0 To Do, 1 In Progress, 2 Done; duas linhas. O primeiro é o cartão que TRAVA (destrava, T10): fica Blocked
  * em In Progress e corre para Done depois do conselho. Pontos: 18 no sprint; 13 feitos no fim (o degrau do burndown).
  */
-export const CARTOES: readonly Cartao[] = [
+const CARTOES: readonly Cartao[] = [
   {
     chave: 'APP-101',
     resumo: 'Checkout API',

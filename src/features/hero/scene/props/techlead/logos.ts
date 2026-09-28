@@ -5,7 +5,7 @@
  */
 import atlasUrl from './logos.webp?url'
 
-export const LOGOS = ['jira', 'figma', 'excalidraw', 'mermaid'] as const
+const LOGOS = ['jira', 'figma', 'excalidraw', 'mermaid'] as const
 export type Logo = (typeof LOGOS)[number]
 
 /** Célula do atlas (px) e colunas da grade: as do script. */

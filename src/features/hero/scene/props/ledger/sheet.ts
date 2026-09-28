@@ -4,8 +4,8 @@
  */
 
 /** Área útil do vidro (m), igual a GLASS_W/GLASS_H do script do Blender. */
-export const GLASS_W = 0.165
-export const GLASS_H = 0.118
+const GLASS_W = 0.165
+const GLASS_H = 0.118
 
 /** Canvas com a mesma proporção do vidro. */
 export const CANVAS_W = 768

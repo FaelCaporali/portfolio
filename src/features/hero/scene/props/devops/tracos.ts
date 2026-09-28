@@ -19,7 +19,7 @@ const ABRE = 0.09
 const SOBE = 0.04
 const COR = new THREE.Color('#e6f0ff')
 
-export interface Voo {
+interface Voo {
   /** Origem no espaço da folha (malha) e destino no espaço do grupo do fundo. */
   de: THREE.Vector3
   para: THREE.Vector3

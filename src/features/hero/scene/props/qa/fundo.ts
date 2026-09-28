@@ -20,7 +20,7 @@ const FONTE = "ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono
 /** Brilho do texto (alfa): claro o bastante para ler de relance (Q23), abaixo do rosto. */
 const BRILHO = 0.95
 /** Profundidade do plano no espaço do glb (atrás do rosto, ao lado da cabeça). */
-export const Z_FUNDO = -0.22
+const Z_FUNDO = -0.22
 
 const VERT = /* glsl */ `
 varying vec2 vUv;

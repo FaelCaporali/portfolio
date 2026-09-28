@@ -22,7 +22,7 @@ export const GRUPO = {
   deploy: 4,
   monolito: 5,
 } as const
-export const N_GRUPOS = 8
+const N_GRUPOS = 8
 /** Resolução do instante no canal R (s por unidade) e o que um pixel leva para acender. */
 export const PASSO_T = 1 / 50
 const FADE = 0.14

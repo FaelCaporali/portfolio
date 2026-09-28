@@ -9,7 +9,7 @@ import type { RootState } from '@react-three/fiber'
 import * as THREE from 'three'
 import { isMesh, mascaraCortada, type Mask } from './passes'
 
-export type Tinta = 'preto' | 'branco' | 'oculto'
+type Tinta = 'preto' | 'branco' | 'oculto'
 /** Regra de máscara: a primeira que casa decide a tinta da malha; nenhuma casa → branco (oclusor). */
 export type Regra = [padrao: string, tinta: Tinta]
 
