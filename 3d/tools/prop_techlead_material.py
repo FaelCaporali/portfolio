@@ -12,8 +12,9 @@ import numpy as np
 
 import prop_financeiro_v6 as v6
 import prop_vela_base as B
+import tempfile
 
-TMP = '/home/fael/.claude/jobs/510c5105/tmp'
+TMP = tempfile.gettempdir()     # respeita o TMPDIR
 N = 1024
 # células (u0, v0, u1, v1) do atlas
 CEL = {'plastico': (0.0, 0.0, 0.25, 0.25), 'acetinado': (0.25, 0.0, 0.5, 0.25), 'aco': (0.5, 0.0, 0.75, 0.25),

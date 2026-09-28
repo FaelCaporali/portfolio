@@ -11,8 +11,9 @@ import subprocess
 
 import bpy
 import numpy as np
+import tempfile
 
-TMP = '/home/fael/.claude/jobs/510c5105/tmp'
+TMP = tempfile.gettempdir()     # respeita o TMPDIR
 # região → (célula, rugosidade, variação, metal)
 REGIOES = {'anodizado': 0, 'aco': 1, 'aluminio': 2, 'plastico': 3, 'nylon': 4, 'borracha': 5, 'pcb': 6, 'vidro': 7}
 ORM = {'anodizado': (0.42, 0.05, 1.0), 'aco': (0.30, 0.06, 1.0), 'aluminio': (0.34, 0.06, 1.0),

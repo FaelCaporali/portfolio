@@ -2,7 +2,7 @@
 CONCEITO v2 E1, E6, E7). E3 (rastro) e E5 (anel de alerta) são procedurais no site.
 
 Headless (fonte de verdade, reprodutível):
-    TMPDIR=/home/fael/.claude/jobs/510c5105/tmp blender -b --python 3d/tools/prop_qa.py -- \
+    TMPDIR=<pasta temporária> blender -b --python 3d/tools/prop_qa.py -- \
         [glb=3d/export/props/qa.glb] [blend=3d/blend/props/qa_v1.blend|0] [provas=3d/captura/props/qa/v1/blender|0]
 
 glb (espaço do S13: Y para cima, +Z para a câmera, +X = esquerda do Fael). Raiz `qa` →

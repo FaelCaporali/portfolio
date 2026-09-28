@@ -13,8 +13,9 @@ import numpy as np
 
 import prop_financeiro_v6 as v6
 import prop_vela_base as B
+import tempfile
 
-TMP = '/home/fael/.claude/jobs/510c5105/tmp'
+TMP = tempfile.gettempdir()     # respeita o TMPDIR
 AZUL = '#1d4a85'                     # azul-blueprint (cianotipia), base da folha
 # Células do atlas (u0, v0, u1, v1) e margem interna (fração da célula: ≥ 4 px no ORM de 256 × 128).
 CEL = {'madeira': (0.0, 0.0, 0.5, 1.0), 'escala1': (0.5, 0.875, 1.0, 1.0), 'escala2': (0.5, 0.75, 1.0, 0.875),

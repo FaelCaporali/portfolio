@@ -15,8 +15,9 @@ from mathutils import Matrix, Vector
 
 import prop_financeiro_v6 as v6
 import prop_vela_base as B
+import tempfile
 
-TMP = '/home/fael/.claude/jobs/510c5105/tmp'
+TMP = tempfile.gettempdir()     # respeita o TMPDIR
 C = Matrix(((1, 0, 0, 0), (0, 0, -1, 0), (0, 1, 0, 0), (0, 0, 0, 1)))       # glb → Blender
 
 
