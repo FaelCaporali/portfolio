@@ -75,11 +75,6 @@ Apagadas após 90 dias pelo cron. O aviso de privacidade entra na tarefa de moni
 `"remote": true` na binding `send_email` faz o dev local mandar e-mail de verdade pela Cloudflare (o resto continua
 local). Exige `wrangler login`. Serve para validar a entrega e o SPF/DKIM/DMARC antes do deploy; tirar antes de publicar.
 
-## Deploy (uma vez, com o site pronto)
+## Deploy
 
-1. `pnpm exec wrangler login`
-2. `pnpm db:migrate` (esquema no D1 remoto `fael-caporali`)
-3. Widget Turnstile para `fael.caporali.dev`: sitekey pública em `.env.production`; secret direto no Worker
-   (`wrangler secret put TURNSTILE_SECRET`), nunca em arquivo.
-4. `pnpm deploy`. O domínio `fael.caporali.dev` sai do Worker `fael-caporali-placeholder` e passa para `fael-caporali`.
-5. Envio real ponta a ponta e conferência de SPF/DKIM/DMARC no cabeçalho recebido no Gmail.
+Primeiro deploy, CI e limites do plano: [DEPLOY.md](DEPLOY.md).
