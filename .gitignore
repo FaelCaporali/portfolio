@@ -72,3 +72,5 @@ __pycache__/
 
 # agentes e workflows do estúdio (citam .wai, privado)
 .claude/
+
+.env
