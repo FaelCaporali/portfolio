@@ -44,5 +44,8 @@ comando do pnpm), com `VITE_TURNSTILE_SITEKEY` no ambiente.
 ## Limites do plano grátis que tocam o site
 
 - Assets: 20.000 arquivos por versão, 25 MiB por arquivo; `_headers` com até 100 regras e 2.000 caracteres por linha.
-- Só `/api/*` acorda o Worker (`run_worker_first`): o site estático não gasta as 100.000 requisições/dia.
+- Só a API e as páginas HTML acordam o Worker (`run_worker_first`): uma visita gasta 1 requisição das 100.000/dia;
+  JS, modelos, PDFs e ícones saem direto dos assets.
+- CSP com nonce nas páginas (`worker/page.ts`): a Cloudflare põe o mesmo nonce nos scripts que injeta (JS Detections do
+  Bot Fight Mode e Web Analytics), sem `'unsafe-inline'`.
 - Worker: 10 ms de CPU por requisição (o contato espera rede, não CPU), 5 crons por conta (usa 1).

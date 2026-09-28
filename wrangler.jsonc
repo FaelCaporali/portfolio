@@ -11,8 +11,9 @@
   "assets": {
     "binding": "ASSETS",
     "not_found_handling": "single-page-application",
-    // Só a API acorda o Worker; o resto sai direto dos assets (não consome requisições do plano).
-    "run_worker_first": ["/api/*"]
+    // A API e as páginas HTML acordam o Worker (a página ganha a CSP com nonce, worker/page.ts). Arquivos estáticos
+    // saem direto dos assets, sem consumir requisições do plano.
+    "run_worker_first": ["/*", "!/assets/*", "!/cv/*", "!/favicon.svg", "!/favicon.ico", "!/apple-touch-icon.png"]
   },
   // Envio grátis só para destino verificado. Destino e remetente fixos na binding: mesmo com o código explorado,
   // o Worker não consegue mandar e-mail para mais ninguém nem em nome de outro endereço.

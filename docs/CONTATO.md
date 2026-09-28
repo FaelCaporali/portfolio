@@ -6,7 +6,7 @@ Construído em 23/09/2026. Custo zero: Workers (plano grátis), D1, Turnstile e 
 ## Arquitetura
 
 Um Worker só (`wrangler.jsonc`, nome `fael-caporali`, domínio `fael.caporali.dev`) serve o build do Vite e a API.
-Só `/api/*` acorda o Worker (`run_worker_first`); o resto sai direto dos assets.
+A API e as páginas HTML acordam o Worker (`run_worker_first`); JS, modelos, PDFs e ícones saem direto dos assets.
 
 ```
 navegador ── POST /api/contact ──▶ Worker ──▶ D1 (grava) ──▶ send_email ──▶ fael@caporali.dev ──▶ Email Routing ──▶ Gmail
@@ -14,22 +14,23 @@ navegador ── POST /api/contact ──▶ Worker ──▶ D1 (grava) ──�
                             cron */15 min: reenvia pendentes, apaga > 90 dias
 ```
 
-| Arquivo                                  | Papel                                                                                    |
-| ---------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `shared/contact/contract.ts`             | contrato com o site: rota, ação do Turnstile, limites, campos, resposta, códigos de erro |
-| `shared/contact/validation.ts`           | limpeza e validação dos campos (funções puras, usadas pelo Worker e pelo widget)         |
-| `worker/index.ts`                        | roteamento (`/api/contact`, 404 JSON no resto de `/api/`, assets) e cron                 |
-| `worker/contact.ts`                      | o endpoint: ordem das checagens, respostas, logs sem dado pessoal                        |
-| `worker/http.ts`                         | resposta JSON endurecida, leitura do corpo com teto                                      |
-| `worker/turnstile.ts`                    | conferência do token no servidor                                                         |
-| `worker/message.ts`                      | a mensagem e a política: tentativas, retenção, teto diário                               |
-| `worker/repository.ts`                   | D1 (consultas parametrizadas)                                                            |
-| `worker/mail.ts`                         | composição do e-mail (só texto) e envio pela binding                                     |
-| `worker/cron.ts`                         | reenvio de pendentes e limpeza após 90 dias                                              |
-| `worker/migrations/`                     | esquema do D1 (`messages`)                                                               |
-| `src/features/contact/ContactWidget.tsx` | formulário + atalhos (e-mail e WhatsApp)                                                 |
-| `src/features/contact/CopyContacts.tsx`  | linha do herói: clique copia e-mail/telefone                                             |
-| `public/_headers`                        | cabeçalhos de segurança do site (CSP etc.)                                               |
+| Arquivo                                  | Papel                                                                                            |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `shared/contact/contract.ts`             | contrato com o site: rota, ação do Turnstile, limites, campos, resposta, códigos de erro         |
+| `shared/contact/validation.ts`           | limpeza e validação dos campos (funções puras, usadas pelo Worker e pelo widget)                 |
+| `worker/index.ts`                        | roteamento (`/api/contact`, 404 JSON no resto de `/api/`, assets) e cron                         |
+| `worker/contact.ts`                      | o endpoint: ordem das checagens, respostas, logs sem dado pessoal                                |
+| `worker/http.ts`                         | resposta JSON endurecida, leitura do corpo com teto                                              |
+| `worker/turnstile.ts`                    | conferência do token no servidor                                                                 |
+| `worker/message.ts`                      | a mensagem e a política: tentativas, retenção, teto diário                                       |
+| `worker/repository.ts`                   | D1 (consultas parametrizadas)                                                                    |
+| `worker/mail.ts`                         | composição do e-mail (só texto) e envio pela binding                                             |
+| `worker/cron.ts`                         | reenvio de pendentes e limpeza após 90 dias                                                      |
+| `worker/migrations/`                     | esquema do D1 (`messages`)                                                                       |
+| `src/features/contact/ContactWidget.tsx` | formulário + atalhos (e-mail e WhatsApp)                                                         |
+| `src/features/contact/CopyContacts.tsx`  | linha do herói: clique copia e-mail/telefone                                                     |
+| `public/_headers`                        | cabeçalhos de segurança do site (CSP etc.)                                                       |
+| `worker/page.ts`                         | CSP das páginas com nonce por requisição (scripts injetados pela Cloudflare sem `unsafe-inline`) |
 
 O e-mail vai para `fael@caporali.dev` (destino verificado; o roteamento entrega no Gmail). Assim a mensagem chega
 "para" o endereço profissional e a resposta sai por ele ("Enviar como" + "responder do mesmo endereço", docs/EMAIL.md).

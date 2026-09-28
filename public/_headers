@@ -1,6 +1,7 @@
 # Cabeçalhos de segurança dos arquivos estáticos (Workers Static Assets). As respostas da API definem os próprios
 # (worker/contact.ts). CSP: só o próprio site e o Turnstile (script + iframe; o script dele compila WebAssembly, daí
-# 'wasm-unsafe-eval', que não libera eval de JavaScript); blob:/data: para o glb e as texturas.
+# 'wasm-unsafe-eval', que não libera eval de JavaScript); blob:/data: para o glb e as texturas. Nas páginas HTML o
+# Worker troca esta CSP por uma com nonce por requisição e o Web Analytics (worker/page.ts).
 /*
   Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; connect-src 'self' blob: data:; img-src 'self' blob: data:; style-src 'self'; font-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
   Strict-Transport-Security: max-age=31536000; includeSubDomains
