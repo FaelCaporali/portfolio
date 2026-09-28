@@ -14,7 +14,7 @@ pelo mesmo Worker da Cloudflare que entrega o site.
 | `e2e/`    | testes de ponta a ponta (Playwright) contra o servidor de dev                                                              |
 | `public/` | assets estáticos e cabeçalhos de segurança (`_headers`)                                                                    |
 | `3d/`     | pipeline do busto e do personagem cartoon: Blender 4.5 headless, MPFB, MediaPipe ([3d/README.md](3d/README.md))            |
-| `docs/`   | pipeline 3D, contato, e-mail e pesquisas de referência                                                                     |
+| `docs/`   | pipeline 3D, contato, deploy e pesquisas de referência                                                                     |
 
 O site é organizado por feature, e cada feature separa camadas:
 
