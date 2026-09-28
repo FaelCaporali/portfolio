@@ -20,8 +20,6 @@ export interface Stage {
   fact?: string
   /** Onde e quando, como no CV/Lattes. */
   where?: string
-  /** Pergunta da entrevista que ainda falta responder. */
-  pending?: string
   accent: string
   /** Adereço da vida (blockout em src/features/hero/scene/props/). */
   prop: PropId
@@ -54,7 +52,6 @@ export const stages: Stage[] = [
     accent: '#ff7a1a',
     fact: 'Negócios próprios: SUP LagoaSanta, confeitaria, hostel e escola de vela.',
     where: '2009–2022',
-    pending: 'A2 — ordem, anos e qual negócio vira a imagem',
     expr: { mouthSmile: 0.8, browOuterUp: 0.3 },
   },
   {
@@ -64,7 +61,6 @@ export const stages: Stage[] = [
     slot: 'Sailing Instructor',
     track: 'antes',
     accent: '#2ea8ff',
-    pending: 'A3 — onde, que barco, escola própria ou não',
     expr: { mouthSmile: 1 },
   },
   {
@@ -74,7 +70,6 @@ export const stages: Stage[] = [
     slot: 'Uber Driver',
     track: 'antes',
     accent: '#8a8a8a',
-    pending: 'A4 — período e tom',
     expr: { browInnerUp: 0.8 },
   },
   {
