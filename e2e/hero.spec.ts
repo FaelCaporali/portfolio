@@ -16,7 +16,8 @@ test('herói: vida, títulos, links e o busto sem erro no console', async ({ pag
   await page.goto('/')
   // Nome acessível: a frase inteira, com espaço, e não letra a letra.
   await expect(page.getByRole('heading', { level: 1 })).toHaveAccessibleName(/^Today I am an? \S/)
-  await expect(page.getByRole('link', { name: 'See the full journey' })).toHaveAttribute('href', '/trajetoria')
+  // Oculto até a página da trajetória ir ao ar (journeyLink.live).
+  await expect(page.getByRole('link', { name: 'See the full journey' })).toHaveCount(0)
   await expect(page.getByRole('link', { name: 'LinkedIn' })).toHaveAttribute('target', '_blank')
   // Atalho do código: um só visível por tamanho de tela (canto no largo, junto das pílulas no celular).
   await expect(page.getByRole('link', { name: 'View source on GitHub' })).toHaveCount(1)

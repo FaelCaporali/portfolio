@@ -62,12 +62,14 @@ export function HeroCopy({ ref, stage, leaving }: HeroCopyProps) {
         aria-label="Links"
         className="pointer-events-auto mt-6 flex flex-col items-start gap-3 sm:mt-7 lg:mt-8 lg:gap-4 short:mt-3 short:gap-2"
       >
-        <a
-          href={journeyLink.href}
-          className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-neutral-950 transition-colors hover:bg-white/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white short:py-2"
-        >
-          {journeyLink.label} <span aria-hidden>→</span>
-        </a>
+        {journeyLink.live && (
+          <a
+            href={journeyLink.href}
+            className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-neutral-950 transition-colors hover:bg-white/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white short:py-2"
+          >
+            {journeyLink.label} <span aria-hidden>→</span>
+          </a>
+        )}
         {/* Três pílulas: cabem numa linha desde 320 px. */}
         <ul className="flex flex-wrap gap-1.5 sm:gap-2">
           <li>

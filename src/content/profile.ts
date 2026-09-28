@@ -14,8 +14,15 @@ export interface ProfileLink {
   href: string
 }
 
-/** Página da trajetória cronológica (ainda não existe; tarefa própria). */
-export const journeyLink: ProfileLink = { label: 'See the full journey', href: '/trajetoria' }
+/**
+ * Página da trajetória cronológica (ainda não existe; tarefa própria). `live: false` tira o botão do herói até a
+ * página ir ao ar (Fael, 28/09: "Oculte por hora o botão de 'see the full journey'").
+ */
+export const journeyLink: ProfileLink & { live: boolean } = {
+  label: 'See the full journey',
+  href: '/trajetoria',
+  live: false,
+}
 
 /** Currículo: baixa direto no idioma escolhido (versão 2026-09). */
 export const resumes: ProfileLink[] = [
@@ -41,7 +48,7 @@ export const directContacts: DirectContact[] = [
   { kind: 'phone', label: 'WhatsApp', value: '+55 31 99196-2016', href: 'https://wa.me/5531991962016' },
 ]
 
-/** Código deste portfólio. PLACEHOLDER: o repositório público ainda não existe; trocar pela URL definitiva. */
+/** Código deste portfólio (repositório público no GitHub). */
 export const sourceLink: ProfileLink = {
   label: 'View source on GitHub',
   href: 'https://github.com/FaelCaporali/portfolio',
