@@ -34,7 +34,7 @@ test('?slot começa na vida pedida e o carrossel troca sozinho', async ({ page }
   const slot = page.locator('.slot-word .sr-only')
   await expect(slot).toHaveText('Sailing Instructor')
   // Sem GPU o headless roda a ~7 FPS e o relógio limita o passo por quadro: a troca leva mais que os ~5 s reais.
-  await expect(slot).not.toHaveText('Sailing Instructor', { timeout: 45_000 })
+  await expect(slot).not.toHaveText('Sailing Instructor', { timeout: 90_000 })
 })
 
 test('indicador cronológico: clique leva à vida escolhida', async ({ page }) => {

@@ -4,9 +4,11 @@ import { defineConfig, devices } from '@playwright/test'
 export default defineConfig({
   testDir: 'e2e',
   fullyParallel: true,
-  // Sem GPU, cada página renderiza o busto por software: poucos workers e mais tempo por teste.
-  workers: 2,
-  timeout: 60_000,
+  // Sem GPU, cada página renderiza o busto por software: poucos workers e mais tempo por teste. No runner do CI
+  // (4 CPUs) duas páginas ao mesmo tempo derrubam o quadro por segundo, e o carrossel não troca a tempo: um só.
+  workers: process.env.CI ? 1 : 2,
+  // Medido num contêiner com 4 CPUs (28/09): contato 41 s, carrossel 32 s. O dobro no CI dá folga para runner lento.
+  timeout: process.env.CI ? 120_000 : 60_000,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? 'github' : 'list',

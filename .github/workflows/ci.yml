@@ -11,9 +11,10 @@ on:
 permissions:
   contents: read
 
+# Push novo cancela a execução anterior do mesmo ramo, menos na main: lá o deploy nunca para no meio.
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
   quality:
