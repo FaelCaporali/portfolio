@@ -32,7 +32,7 @@ jobs:
       # Variáveis de dev do Worker: só chaves de TESTE públicas do Turnstile (o .dev.vars fica fora do git).
       - run: cp .dev.vars.example .dev.vars
       - run: pnpm check
-      # Prova que o build sai; a chave de teste só vale aqui (o deploy usa a do .env.production).
+      # Prova que o build sai; a chave de teste só vale aqui (o deploy usa a do ambiente production).
       - run: pnpm run build
         env:
           VITE_TURNSTILE_SITEKEY: 1x00000000000000000000AA
@@ -87,8 +87,10 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      # Chave pública do Turnstile vem do .env.production; sem ela o vite.config.ts recusa o build.
+      # Chave do Turnstile do segredo do ambiente production; sem ela o vite.config.ts recusa o build.
       - run: pnpm run build
+        env:
+          VITE_TURNSTILE_SITEKEY: ${{ secrets.VITE_TURNSTILE_SITEKEY }}
       # Idempotente: só aplica as migrações novas do D1 remoto.
       - run: pnpm exec wrangler d1 migrations apply fael-caporali --remote
       - run: pnpm exec wrangler deploy

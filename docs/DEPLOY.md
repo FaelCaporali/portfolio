@@ -14,25 +14,32 @@ Um Worker só (`fael-caporali`) serve o site e a API do contato em `fael.caporal
 O `deploy` só roda com a variável de repositório `DEPLOY_ENABLED=true`; sem ela aparece como pulado. Actions fixadas por
 commit.
 
-## Primeiro deploy (uma vez, local)
+## Segredos e variáveis (GitHub)
 
-O domínio ainda está no Worker `fael-caporali-placeholder`, e a troca pede confirmação: o primeiro deploy é feito à mão.
+Ambiente `production` (Settings → Environments), com "Deployment branches" só na `main`:
 
-1. `pnpm exec wrangler login`
-2. Widget do Turnstile para `fael.caporali.dev` (painel → Turnstile). A sitekey é pública: vai em `.env.production`
-   (`VITE_TURNSTILE_SITEKEY=...`, versionado). A secret vai direto no Worker, nunca em arquivo:
-   `pnpm exec wrangler secret put TURNSTILE_SECRET`.
-3. `pnpm db:migrate` (esquema no D1 remoto).
-4. `pnpm run deploy` (`pnpm deploy` sem `run` é outro comando do pnpm). Confirmar a troca do domínio do placeholder.
-5. Envio real ponta a ponta e conferência de SPF/DKIM/DMARC no cabeçalho recebido.
+| Segredo                  | O que é                                                                                               |
+| ------------------------ | ----------------------------------------------------------------------------------------------------- |
+| `CLOUDFLARE_API_TOKEN`   | token de API: modelo **Edit Cloudflare Workers** + **Account › D1 › Edit**, só na zona `caporali.dev` |
+| `CLOUDFLARE_ACCOUNT_ID`  | conta da Cloudflare                                                                                   |
+| `VITE_TURNSTILE_SITEKEY` | chave pública do widget do Turnstile de `fael.caporali.dev`; entra no build                           |
 
-## Ligar o deploy pelo CI
+Variável do repositório (Settings → Secrets and variables → Actions → Variables): `DEPLOY_ENABLED` = `true`. Tem de
+ser do repositório, não do ambiente: o `if` do job é avaliado antes de o ambiente carregar.
 
-1. Token em [Account API tokens](https://dash.cloudflare.com/?to=/:account/api-tokens): modelo **Edit Cloudflare
-   Workers**, mais **Account › D1 › Edit**; escopo só na conta e na zona `caporali.dev`.
-2. No GitHub (Settings → Secrets and variables → Actions): segredos `CLOUDFLARE_API_TOKEN` e `CLOUDFLARE_ACCOUNT_ID`;
-   variável `DEPLOY_ENABLED` = `true`.
-3. (Opcional) Settings → Environments → `production`: revisor obrigatório, se o deploy precisar de aprovação.
+Fork e pull request não recebem esses segredos: o deploy só roda em push na `main` deste repositório.
+
+## Primeiro deploy
+
+Pelo próprio CI. Sem terminal interativo, o `wrangler deploy` assume o domínio `fael.caporali.dev` que estava no
+Worker `fael-caporali-placeholder` (sem tempo fora do ar). Depois dele, uma vez:
+
+1. `TURNSTILE_SECRET` no Worker (painel → Workers → `fael-caporali` → Settings → Variables and Secrets), com o segredo
+   do widget. Até lá o formulário recusa o envio e mostra o e-mail e o WhatsApp.
+2. Envio real ponta a ponta e conferência de SPF/DKIM/DMARC no cabeçalho recebido.
+
+Deploy local, se um dia precisar: `pnpm exec wrangler login` e `pnpm run deploy` (`pnpm deploy` sem `run` é outro
+comando do pnpm), com `VITE_TURNSTILE_SITEKEY` no ambiente.
 
 ## Limites do plano grátis que tocam o site
 

@@ -35,10 +35,12 @@ pnpm install
 cp .dev.vars.example .dev.vars                                  # chaves de teste do Turnstile
 pnpm exec wrangler d1 migrations apply fael-caporali --local    # primeira vez
 pnpm dev                                                         # http://localhost:5199
-pnpm check                                                       # tipos, ESLint, Prettier e testes (Worker + front)
+pnpm check                                                       # tipos, ESLint, knip, Prettier e testes
 pnpm e2e                                                         # Playwright contra o pnpm dev (sobe sozinho)
-pnpm build                                                       # exige VITE_TURNSTILE_SITEKEY em .env.production
+pnpm build                                                       # exige VITE_TURNSTILE_SITEKEY no ambiente
 ```
+
+Deploy pelo GitHub Actions a cada push na `main`: [docs/DEPLOY.md](docs/DEPLOY.md).
 
 Qualidade: TypeScript estrito (`tsconfig.base.json`), ESLint com typescript-eslint, React, jsx-a11y e SonarJS
 (`eslint.config.js`), Prettier a 120 colunas; até 300 linhas por arquivo.

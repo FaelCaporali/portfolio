@@ -6,7 +6,7 @@ import { cloudflare } from '@cloudflare/vite-plugin'
 export default defineConfig(({ command, mode }) => {
   // Sem a chave pública o Turnstile não renderiza e o formulário nunca envia: build de produção sem ela não sai.
   if (command === 'build' && mode === 'production' && !loadEnv(mode, '.').VITE_TURNSTILE_SITEKEY) {
-    throw new Error('VITE_TURNSTILE_SITEKEY ausente (.env.production)')
+    throw new Error('VITE_TURNSTILE_SITEKEY ausente (no CI: segredo do ambiente production)')
   }
   return {
     // cloudflare(): o Worker (worker/index.ts, API do contato) roda dentro do Vite no dev e no preview, com as

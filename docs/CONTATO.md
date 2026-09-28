@@ -68,7 +68,8 @@ Apagadas após 90 dias pelo cron. O aviso de privacidade entra na tarefa de moni
   widget e do contrato em jsdom (`src/features/contact/*.test.tsx`, `shared/contact/*.test.ts`).
 - `pnpm e2e`: envio de ponta a ponta pelo widget contra o `pnpm dev` (`e2e/contact.spec.ts`).
 - `pnpm cf-typegen` depois de mudar `wrangler.jsonc`.
-- O build de produção exige `VITE_TURNSTILE_SITEKEY` (`.env.production`); sem ela, falha de propósito.
+- O build de produção exige `VITE_TURNSTILE_SITEKEY` (no CI, segredo do ambiente `production`); sem ela, falha de
+  propósito.
 
 ## Envio real sem publicar o site
 
