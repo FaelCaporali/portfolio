@@ -5,7 +5,7 @@
  * post-its de traço Excalidraw (Problem / Need / Requirement). No fim do ciclo, um novo balão recomeça.
  */
 import type { Ponto, Quadro } from './pincel'
-import { T } from './roteiro'
+import { ESCALA, T } from './roteiro'
 import { ACENTO, COR, GRUPO, TAM, avatar, caixaMao, fonte, preencher, quebrar, type Tela } from './estilo'
 
 type Tipo = 'problema' | 'necessidade' | 'requisito'
@@ -25,6 +25,9 @@ const POSTITS: readonly { tipo: Tipo; rotulo: string; texto: string }[] = [
   { tipo: 'requisito', rotulo: 'REQUIREMENT', texto: 'Guided 3-step upload' },
 ]
 const CLIENTE = '#8b95a5'
+/** Offsets da escuta e do entendimento pelo fator da batida (roteiro.ts, RITMO.md). */
+const KE = ESCALA.escuta
+const KN = ESCALA.entendimento
 
 /** Balão com avatar genérico; devolve a caixa do balão. */
 function balao(tl: Tela, x: number, y: number, larguraMax: number, txt: string, t: number) {
@@ -143,12 +146,12 @@ export function chamada(tl: Tela, r: Quadro, ouvido: Ponto, desvio?: number) {
   onda(tl, via, k.corpo * 0.55, T.onda[0], T.onda[1] - T.onda[0])
   const cc = fonte(k.rotulo, 700)
   const y = q.y1 + k.corpo * 1.4
-  tl.p.forma({ t: T.legenda[0] - 0.05 }, (ctx, tinta) => {
+  tl.p.forma({ t: T.legenda[0] - 0.05 * KE }, (ctx, tinta) => {
     ctx.strokeStyle = tinta(COR.fraco)
     ctx.lineWidth = 1
     ctx.strokeRect(r.x0 + 0.5, y - k.rotulo * 0.7, k.rotulo * 2.2, k.rotulo * 1.4)
   })
-  tl.p.texto({ t: T.legenda[0] - 0.05 }, r.x0 + k.rotulo * 0.3, y, cc, [['CC', COR.fraco]])
+  tl.p.texto({ t: T.legenda[0] - 0.05 * KE }, r.x0 + k.rotulo * 0.3, y, cc, [['CC', COR.fraco]])
   const x = r.x0 + k.rotulo * 3
   const fim = desvio ? Math.min(r.x1, desvio - 12) : r.x1
   return legenda(tl, x, y, fim - x - 4, [T.legenda[0], T.legenda[1]])
@@ -203,16 +206,16 @@ export function postits(tl: Tela, r: Quadro, mini = false) {
     const x0 = emLinha ? r.x0 + i * (w + gap) : r.x0 + (i % 2) * Math.min(12, (r.x1 - r.x0 - w) * 0.5)
     const y0 = emLinha ? r.y0 : r.y0 + i * (h + gap)
     const q: Quadro = { x0, y0, x1: x0 + w, y1: y0 + h }
-    const t = T.postits + i * 0.15
+    const t = T.postits + i * 0.15 * KN
     const cor = COR[pi.tipo]
     preencher(tl.p, { t }, q, `${cor}2e`, 40 + i)
-    caixaMao(tl.p, { t }, q, { cor, largura: 1.4, dur: 0.16, semente: 10 + i * 7 })
-    tl.p.texto({ t: t + 0.03 }, q.x0 + pad, q.y0 + pad + k.rotulo * 0.6, fr, [[pi.rotulo, cor]], 0.01)
+    caixaMao(tl.p, { t }, q, { cor, largura: 1.4, dur: 0.16 * KN, semente: 10 + i * 7 })
+    tl.p.texto({ t: t + 0.03 * KN }, q.x0 + pad, q.y0 + pad + k.rotulo * 0.6, fr, [[pi.rotulo, cor]], 0.01)
     if (mini) return
     const linhas = quebrar(tl.p, ft, pi.texto, w - 2 * pad)
     linhas.slice(0, 2).forEach((l, j) => {
       const yl = q.y0 + pad + k.rotulo * 1.3 + (j + 0.6) * k.corpo * 1.3
-      tl.p.texto({ t: t + 0.08 + j * 0.06 }, q.x0 + pad, yl, ft, [[l, COR.texto]], 0.005)
+      tl.p.texto({ t: t + (0.08 + j * 0.06) * KN }, q.x0 + pad, yl, ft, [[l, COR.texto]], 0.005)
     })
   })
   tl.alvos.postits = { x: (r.x0 + r.x1) / 2, y: (r.y0 + r.y1) / 2 }

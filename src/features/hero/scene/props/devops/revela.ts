@@ -4,7 +4,8 @@
  * reenviado por quadro. Duas texturas:
  * - COR (sRGB), com duas metades: em cima o estado A de cada elemento, embaixo o estado B (alarme OK × ALARM, target
  *   group blue × green, alternativa normal × descartada, deploy rodando × verde);
- * - DADOS (linear, sem filtro), por pixel: R = instante em que o pixel aparece (1/50 s; é assim que o texto se digita
+ * - DADOS (linear, sem filtro), por pixel: R = instante em que o pixel aparece (1/40 s, até 6,4 s: cobre a pausa de 5 s
+ *   e a saída em 6,0; é assim que o texto se digita
  *   e o traço se desenha), G = grupo de estado (0–7, uEst escolhe a metade), B = posição ao longo da seta (2 px por
  *   unidade; o tráfego corre por ela quando uFluxo > 0).
  * Uma chamada por malha. Desintegração: no fundo, apaga com uD (como o fundo do QA); na folha, o mesmo campo do busto
@@ -24,7 +25,7 @@ export const GRUPO = {
 } as const
 const N_GRUPOS = 8
 /** Resolução do instante no canal R (s por unidade) e o que um pixel leva para acender. */
-export const PASSO_T = 1 / 50
+export const PASSO_T = 1 / 40
 const FADE = 0.14
 
 const VERT = /* glsl */ `

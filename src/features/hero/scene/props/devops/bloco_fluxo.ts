@@ -10,10 +10,13 @@ import { COR, TAM, check, fonteMono, fonteNome, grupo, servico, seta, type Tela 
 import { JANELA } from './decisoes'
 import type { Quadro } from './pincel'
 import { GRUPO } from './revela'
-import { T } from './roteiro'
+import { ESCALA, T } from './roteiro'
 
 /** Instante de um ícone do fluxo pela posição (da esquerda para a direita, como o traço chega). */
 const quando = (fx: number) => T.icones[0] + (T.icones[1] - T.icones[0]) * fx
+/** Offsets da subida (grupos, ícones, apoio) e da produção (tasks) pelo fator do evento (roteiro.ts, RITMO.md). */
+const KS = ESCALA.sobe
+const KP = ESCALA.producao
 
 /** Posições (fração da largura da zona) por formato. */
 const POS = {
@@ -79,12 +82,12 @@ export function blocoFluxo(tl: Tela, z: Quadro, xEvento: number): SaidaFluxo {
     { icone: 'g_nuvem', titulo: 'AWS Cloud', cor: COR.nuvem, t: T.grupos },
   )
   const vpc = { x0: X(P.vpc), y0: Y(0.1), x1: z.x1 - 8, y1: z.y1 - 7 }
-  grupo(tl, vpc, { icone: 'g_vpc', titulo: 'VPC', cor: COR.vpc, t: T.grupos + 0.08 })
+  grupo(tl, vpc, { icone: 'g_vpc', titulo: 'VPC', cor: COR.vpc, t: T.grupos + 0.08 * KS })
   const sub0 = vpc.y0 + k.nome * 1.9
   const sub = (x0: number, x1: number, icone: 'g_publica' | 'g_privada', titulo: string, cor: string, t: number) =>
     grupo(tl, { x0, y0: sub0, x1, y1: vpc.y1 - 4 }, { icone, titulo: medio ? '' : titulo, cor, t })
-  sub(X(P.pub[0]), X(P.pub[1]), 'g_publica', 'Public', COR.publica, T.grupos + 0.14)
-  sub(X(P.priv), vpc.x1 - 4, 'g_privada', 'Private', COR.privada, T.grupos + 0.18)
+  sub(X(P.pub[0]), X(P.pub[1]), 'g_publica', 'Public', COR.publica, T.grupos + 0.14 * KS)
+  sub(X(P.priv), vpc.x1 - 4, 'g_privada', 'Private', COR.privada, T.grupos + 0.18 * KS)
 
   // Borda: usuários → DNS → CDN → API.
   const ya = sub0 + (medio ? ic * 0.95 : ic * 0.8)
@@ -94,8 +97,8 @@ export function blocoFluxo(tl: Tela, z: Quadro, xEvento: number): SaidaFluxo {
   servico(tl, { id: 's3', x: X(P.cf), y: yB, nome: 'S3', nota: nota('assets'), lado: ap, t: T.apoio[0] })
   const nApi = 'API Gateway'
   servico(tl, { id: 'apigateway', x: X(P.api), y: ya, nome: nApi, nota: nota('auth · throttle'), t: quando(0.35) })
-  servico(tl, { id: 'iam', x: X(P.iam), y: yB, nome: 'IAM', nota: nota('roles'), lado: ap, t: T.apoio[0] + 0.1 })
-  const tSec = T.apoio[0] + 0.15
+  servico(tl, { id: 'iam', x: X(P.iam), y: yB, nome: 'IAM', nota: nota('roles'), lado: ap, t: T.apoio[0] + 0.1 * KS })
+  const tSec = T.apoio[0] + 0.15 * KS
   servico(tl, { id: 'secrets', x: X(P.sec), y: yB, nome: 'Secrets', nota: nota('rotation'), lado: ap, t: tSec })
 
   // VPC: ALB com os dois target groups (blue/green, D6) → serviço ECS on Fargate → dados.
@@ -109,7 +112,7 @@ export function blocoFluxo(tl: Tela, z: Quadro, xEvento: number): SaidaFluxo {
   const fn = fonteNome(k.nome)
   const nEcs = medio ? 'ECS · Fargate' : 'ECS on Fargate'
   const xn = (xEcs + xFg) / 2 - tl.p.medir(fn, nEcs) / 2
-  tl.p.texto({ t: quando(0.7) + 0.06 }, xn, ya + ic / 2 + k.nome * 0.85, fn, [[nEcs, COR.nome]], 0.004)
+  tl.p.texto({ t: quando(0.7) + 0.06 * KS }, xn, ya + ic / 2 + k.nome * 0.85, fn, [[nEcs, COR.nome]], 0.004)
   tasks(tl, { x0: X(P.asg[0]), x1: X(P.asg[1]), y: yB }, ap)
   const xRds = X(P.rds)
   const xRedis = X(P.redis)
@@ -131,7 +134,7 @@ export function blocoFluxo(tl: Tela, z: Quadro, xEvento: number): SaidaFluxo {
 
   // Setas com contrato (D9) e tráfego.
   const m = ic / 2 + 4
-  const dur = 0.15
+  const dur = 0.15 * KS
   const setaH = (x0: number, x1: number, t: number, contrato?: string) =>
     seta(
       tl,
@@ -153,7 +156,7 @@ export function blocoFluxo(tl: Tela, z: Quadro, xEvento: number): SaidaFluxo {
       [X(P.cf), ya + m + k.nome * (medio ? 1 : 2.1)],
       [X(P.cf), yB - ap / 2 - 3],
     ],
-    { t: T.apoio[0], dur: 0.1 },
+    { t: T.apoio[0], dur: 0.1 * KS },
   )
   // Tasks → DynamoDB (embaixo) e ECS → Redis (por cima do RDS): cache-aside.
   seta(
@@ -189,7 +192,7 @@ export function blocoFluxo(tl: Tela, z: Quadro, xEvento: number): SaidaFluxo {
       [xs, z.y1 - 4],
       [xs, z.y1 + 22],
     ],
-    { t: T.apoio[1], dur: 0.12, fluxo: true },
+    { t: T.apoio[1], dur: 0.12 * KS, fluxo: true },
   )
   return { x: xs, y: z.y1 + 22 }
 }
@@ -203,7 +206,7 @@ function targetGroups(tl: Tela, x: number, y: number) {
   const chip = (cx: number, nome: string, cor: string, ativo: 'a' | 'b') => {
     for (const lado of ['a', 'b'] as const) {
       const on = lado === ativo
-      tl.p.forma({ t: T.apoio[0] + 0.05, g: GRUPO.blueGreen, so: lado }, (ctx, tinta) => {
+      tl.p.forma({ t: T.apoio[0] + 0.05 * KS, g: GRUPO.blueGreen, so: lado }, (ctx, tinta) => {
         ctx.strokeStyle = tinta(cor)
         ctx.globalAlpha = on ? 1 : 0.35
         ctx.lineWidth = on ? 1.6 : 1
@@ -237,7 +240,7 @@ function tasks(tl: Tela, r: { x0: number; x1: number; y: number }, ap: number) {
       icone: curto ? undefined : 'g_asg',
       titulo: curto ? '' : 'Auto Scaling',
       cor: COR.asg,
-      t: T.grupos + 0.25,
+      t: T.grupos + 0.25 * KS,
       tracejado: [4, 3],
     },
   )
@@ -245,8 +248,8 @@ function tasks(tl: Tela, r: { x0: number; x1: number; y: number }, ap: number) {
   const passo = (r.x1 - r.x0 - 8 - lado) / (n - 1)
   for (let i = 0; i < n; i++) {
     const x = r.x0 + 4 + lado / 2 + i * passo
-    const t = i < 2 ? T.icones[1] : T.tasks + (i - 2) * 0.07
+    const t = i < 2 ? T.icones[1] : T.tasks + (i - 2) * 0.07 * KP
     tl.p.imagem({ t }, x, r.y, lado, (ctx) => desenharIcone(ctx, tl.img, 'task', x, r.y, lado))
   }
-  if (k.nota >= 10) check(tl, r.x1 - 7, y0 + 6, T.tasks + 0.15, 8)
+  if (k.nota >= 10) check(tl, r.x1 - 7, y0 + 6, T.tasks + 0.15 * KP, 8)
 }

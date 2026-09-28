@@ -93,8 +93,8 @@ export const VIDAS = {
     rotuloMaos: 'planta',
     olhos: [],
     irisRaio: 0,
-    // Todos os quadros contam até o fim da pausa de 3,5 s (montagem + 1 s + 3,5 s = 4,5 s), como no qa.
-    janela: [0, 4.5],
+    // Todos os quadros contam até o fim da pausa de 5 s (montagem + 1 s + 5 s = 6,0 s; RITMO.md).
+    janela: [0, 6],
   },
   // FICHA-PRODUCAO.md do techlead, FECHAMENTO: o headset vestido (tl_headset: arco, conchas, haste, microfone, LED;
   // o primitivo até o glb passar na daily) e o fundo preso ao mundo (tl_fundo: quatro painéis e os cartões do Jira).
@@ -115,7 +115,27 @@ export const VIDAS = {
     olhos: [],
     irisRaio: 0,
     tituloComoUi: true,
-    // Pausa de 3,5 s, como o qa e o devops: todos os quadros até 4,5 s contam.
-    janela: [0, 4.5],
+    // Pausa de 5 s, como o devops (RITMO.md): todos os quadros até 6,0 s contam.
+    janela: [0, 6],
+  },
+  // FICHA-PRODUCAO.md da ai, §4: o robô na mesa (ai_mesa → ai_robo, tela ai_tela) e o fundo preso ao mundo (ai_fundo:
+  // as três janelas, o fio do 8 e o elo). Tudo conta para UI e borda (0 px, 16 px), título incluído; nada sobre olhos e
+  // boca; respiro do topo da cabeça do robô ao lábio inferior (--aro, padrão 12/8/4).
+  ai: {
+    pecas: {
+      tudo: '^ai$',
+      robo: '^ai_robo$',
+      tela: '^ai_tela$',
+      fundo: '^ai_fundo$',
+    },
+    rosto: '^ai_(mesa|fundo)$',
+    iris: '^ai_nenhum$',
+    aro: '^ai_robo$',
+    maos: '^ai_nenhum$',
+    olhos: [],
+    irisRaio: 0,
+    tituloComoUi: true,
+    // Pausa de 5 s (regra global do Fael): montagem 1 s + 5 s = 6 s.
+    janela: [0, 6],
   },
 }

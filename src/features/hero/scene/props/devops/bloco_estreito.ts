@@ -9,9 +9,12 @@ import { COR, TAM, check, descartada, grupo, servico, seta, type Tela } from './
 import { JANELA } from './decisoes'
 import type { Quadro } from './pincel'
 import { GRUPO } from './revela'
-import { T } from './roteiro'
+import { ESCALA, T } from './roteiro'
 
 const quando = (f: number) => T.icones[0] + (T.icones[1] - T.icones[0]) * f
+/** Offsets da subida e da produção (tasks) pelo fator do evento (roteiro.ts, RITMO.md). */
+const KS = ESCALA.sobe
+const KP = ESCALA.producao
 
 export function blocoEstreito(tl: Tela, esq: Quadro | null, dir: Quadro | null) {
   const k = TAM[tl.f]
@@ -37,7 +40,7 @@ export function blocoEstreito(tl: Tela, esq: Quadro | null, dir: Quadro | null) 
         [x, y0 + 6 + m + k.nome],
         [x, y1 - m],
       ],
-      { t: quando(0.1), dur: 0.1, fluxo: true },
+      { t: quando(0.1), dur: 0.1 * KS, fluxo: true },
     )
     seta(
       tl,
@@ -45,7 +48,7 @@ export function blocoEstreito(tl: Tela, esq: Quadro | null, dir: Quadro | null) 
         [x, y1 + m + k.nome],
         [x, y2 - m],
       ],
-      { t: quando(0.3), dur: 0.1, fluxo: true },
+      { t: quando(0.3), dur: 0.1 * KS, fluxo: true },
     )
     const yq = esq.y1 - k.apoio / 2 - k.nome * 1.4
     // D18: o par cresce na coluna, o RabbitMQ é cortado e o SQS pousa (decisoes.ts).
@@ -78,7 +81,7 @@ export function blocoEstreito(tl: Tela, esq: Quadro | null, dir: Quadro | null) 
         icone: 'g_vpc',
         titulo: 'VPC',
         cor: COR.vpc,
-        t: T.grupos + 0.1,
+        t: T.grupos + 0.1 * KS,
       },
     )
     servico(tl, { id: 'alb', x, y: y0 + 6, nome: 'ALB', t: quando(0.55) })
@@ -88,7 +91,7 @@ export function blocoEstreito(tl: Tela, esq: Quadro | null, dir: Quadro | null) 
     for (let i = 0; i < 4; i++) {
       const tx = x + ic / 2 + 4 + lt / 2 + (i % 2) * (lt + 2)
       const ty = y1 - lt / 2 - 1 + Math.floor(i / 2) * (lt + 2)
-      const t = i < 2 ? T.icones[1] : T.tasks + (i - 2) * 0.07
+      const t = i < 2 ? T.icones[1] : T.tasks + (i - 2) * 0.07 * KP
       tl.p.imagem({ t }, tx, ty, lt, (ctx) => desenharIcone(ctx, tl.img, 'task', tx, ty, lt))
     }
     const [d0, d1] = JANELA.dados
@@ -113,7 +116,7 @@ export function blocoEstreito(tl: Tela, esq: Quadro | null, dir: Quadro | null) 
         [x, y0 + 6 + m + k.nome],
         [x, y1 - m],
       ],
-      { t: quando(0.6), dur: 0.1, fluxo: true },
+      { t: quando(0.6), dur: 0.1 * KS, fluxo: true },
     )
     seta(
       tl,
@@ -121,7 +124,7 @@ export function blocoEstreito(tl: Tela, esq: Quadro | null, dir: Quadro | null) 
         [x, y1 + m + k.nome],
         [x, y2 - k.apoio / 2 - 3],
       ],
-      { t: quando(0.8), dur: 0.1, fluxo: true },
+      { t: quando(0.8), dur: 0.1 * KS, fluxo: true },
     )
     // CloudWatch com o alarme (D7): anel vermelho no estado B.
     const lc = k.icone

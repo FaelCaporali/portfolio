@@ -10,7 +10,7 @@ import type { Formato } from './composicao'
 import { COR, MONO, TAM, type Tela } from './estilo'
 import { desenharIcone, type Icone } from './icones'
 import type { Quadro } from './pincel'
-import { T } from './roteiro'
+import { ESCALA, T } from './roteiro'
 
 type Trecho = readonly [string, string]
 
@@ -133,7 +133,8 @@ function cartoes(f: Formato): Cartao[] {
     icone: 'lightsail',
     linhas: ADR[v],
     de: T.adr,
-    ate: 1.35,
+    // Termina de se escrever no meio da decomposição (1,35 s na pausa de 3,5 s).
+    ate: T.decompoe[0] + 0.4 * ESCALA.decompoe,
     yaml: false,
   }
   const api: Cartao = {
@@ -141,7 +142,7 @@ function cartoes(f: Formato): Cartao[] {
     icone: 'apigateway',
     linhas: OPENAPI[v],
     de: T.openapi,
-    ate: 2.4,
+    ate: T.decisoes[0] + 0.4 * ESCALA.decisoes,
     yaml: true,
   }
   const cfn: Cartao = {
@@ -149,7 +150,7 @@ function cartoes(f: Formato): Cartao[] {
     icone: 'cloudformation',
     linhas: CFN[v],
     de: T.cfn,
-    ate: 3.15,
+    ate: T.cfn + 0.8 * ESCALA.entrega,
     yaml: true,
   }
   // No 1024 os três não cabem legíveis: o contrato OpenAPI fica na seta API Gateway → ALB e o do evento no assíncrono.

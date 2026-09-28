@@ -1,5 +1,5 @@
 /**
- * DECISÕES POR TRADEOFF em movimento (REQUISITOS D18; FICHA, batida 2,0–2,8 s): os dois elementos comparados CRESCEM
+ * DECISÕES POR TRADEOFF em movimento (REQUISITOS D18; clímax, 2,0–2,85 s): os dois elementos comparados CRESCEM
  * lado a lado (ícone e nome legíveis de relance), o ✓ marca a escolha e, nos pares excludentes (SQS × RabbitMQ, ECS on
  * Fargate × Docker Swarm), o perdedor é CORTADO (risco vermelho) e some; o escolhido volta ao tamanho e DESLIZA para
  * o seu lugar no diagrama. Nos pares por serviço (RDS × DynamoDB, Lambda × Fargate) os dois ganham o ✓ e cada um
@@ -12,6 +12,7 @@ import { withDissolve } from '../../dissolve'
 import { COR, MONO } from './estilo'
 import { desenharIcone, type Icone } from './icones'
 import type { Quadro } from './pincel'
+import { ESCALA, T } from './roteiro'
 
 interface ItemPar {
   id: Icone
@@ -33,12 +34,17 @@ export interface Par {
   itens: readonly [ItemPar, ItemPar]
 }
 
-/** Janela de cada par dentro da batida de decisões (roteiro): escalonados, pousam antes de 2,9 s. */
+const D0 = T.decisoes[0]
+const KD = ESCALA.decisoes
+/**
+ * Janela de cada par dentro das decisões (roteiro, T.decisoes): escalonados na velocidade homologada, o último pousa
+ * em 2,85 s e o diagrama fica parado (respiro) até o CloudFormation, em 3,15 s.
+ */
 export const JANELA = {
-  sqs: [2.0, 2.45],
-  runtime: [2.05, 2.5],
-  dados: [2.15, 2.6],
-  computacao: [2.4, 2.85],
+  sqs: [D0, D0 + 0.45 * KD],
+  runtime: [D0 + 0.05 * KD, D0 + 0.5 * KD],
+  dados: [D0 + 0.15 * KD, D0 + 0.6 * KD],
+  computacao: [D0 + 0.4 * KD, D0 + 0.85 * KD],
 } as const
 
 /** Célula de um cartão no atlas (px): ícone em cima, nome e nota embaixo. */

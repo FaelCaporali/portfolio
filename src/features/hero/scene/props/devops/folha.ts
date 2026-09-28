@@ -11,7 +11,7 @@ import { desenharIcone } from './icones'
 import { MONO } from './estilo'
 import { Pincel, type Ponto } from './pincel'
 import { GRUPO, criarRevela } from './revela'
-import { T } from './roteiro'
+import { ESCALA, T } from './roteiro'
 
 /** Canvas da folha (A5 paisagem, 210 × 148). */
 const LARG = 1024
@@ -38,6 +38,9 @@ const fonte = (px: number, peso = '') => `${peso} ${px}px ${MONO}`.trim()
 
 function pintarPlanta(p: Pincel, img: HTMLImageElement) {
   const m0 = T.monolito[0]
+  // Offsets pelo fator do seu evento (roteiro.ts, RITMO.md).
+  const KP = ESCALA.planta
+  const KD = ESCALA.decompoe
   // Grade e carimbo: já estão no papel quando a vida entra.
   p.forma({ t: 0 }, (ctx, tinta) => {
     ctx.strokeStyle = tinta(GRADE)
@@ -57,19 +60,20 @@ function pintarPlanta(p: Pincel, img: HTMLImageElement) {
   p.texto({ t: 0 }, 760, 48, fonte(20), [['REV A · 1:100', TRACO]])
   // Monólito (D14): caixa, ícone do Lightsail, módulos.
   const box: [number, number, number, number] = [56, 110, 370, 440]
-  p.caixa({ t: m0 }, box[0], box[1], box[2], box[3], { cor: TRACO, largura: 3, dur: 0.3 })
+  p.caixa({ t: m0 }, box[0], box[1], box[2], box[3], { cor: TRACO, largura: 3, dur: 0.3 * KP })
   const ic = 72
-  p.imagem({ t: m0 + 0.15 }, box[0] + 20 + ic / 2, box[1] + 20 + ic / 2, ic, (ctx) =>
+  p.imagem({ t: m0 + 0.15 * KP }, box[0] + 20 + ic / 2, box[1] + 20 + ic / 2, ic, (ctx) =>
     desenharIcone(ctx, img, 'lightsail', box[0] + 20 + ic / 2, box[1] + 20 + ic / 2, ic),
   )
-  p.texto({ t: m0 + 0.2 }, box[0] + 110, box[1] + 44, fonte(30, '700'), [['MONOLITH', TRACO]], 0.02)
-  p.texto({ t: m0 + 0.25 }, box[0] + 110, box[1] + 80, fonte(20), [['Lightsail · 1 DB', TRACO]], 0.01)
+  p.texto({ t: m0 + 0.2 * KP }, box[0] + 110, box[1] + 44, fonte(30, '700'), [['MONOLITH', TRACO]], 0.02)
+  p.texto({ t: m0 + 0.25 * KP }, box[0] + 110, box[1] + 80, fonte(20), [['Lightsail · 1 DB', TRACO]], 0.01)
   const modulos = ['orders', 'users', 'billing', 'email', 'integrations']
   modulos.forEach((n, i) => {
     const y = box[1] + 140 + i * 38
-    const t = m0 + 0.3 + i * 0.04
-    p.caixa({ t }, box[0] + 24, y - 15, box[2] - 24, y + 17, { cor: TRACO, largura: 1.5, dur: 0.1, tracejado: [8, 5] })
-    p.texto({ t: t + 0.05 }, box[0] + 40, y + 1, fonte(20), [[n, TRACO]], 0.008)
+    const t = m0 + (0.3 + i * 0.04) * KP
+    const tr = { cor: TRACO, largura: 1.5, dur: 0.1 * KP, tracejado: [8, 5] }
+    p.caixa({ t }, box[0] + 24, y - 15, box[2] - 24, y + 17, tr)
+    p.texto({ t: t + 0.05 * KP }, box[0] + 40, y + 1, fonte(20), [[n, TRACO]], 0.008)
   })
   // Risco a lápis (análise): um X sobre o monólito.
   const [r0, r1] = T.risca
@@ -84,15 +88,15 @@ function pintarPlanta(p: Pincel, img: HTMLImageElement) {
     [box[2] + 16, 275],
     [440, 275],
   ]
-  p.linha({ t: d0 }, seta, { cor: TRACO, largura: 3, dur: 0.1, seta: true })
+  p.linha({ t: d0 }, seta, { cor: TRACO, largura: 3, dur: 0.1 * KD, seta: true })
   const gw: [number, number, number, number] = [470 - CX / 2, 110, 810 + CX / 2, 150]
   for (const lado of ['a', 'b'] as const) {
     const cor = lado === 'a' ? TRACO : 'rgba(236, 244, 255, 0.28)'
-    const m = { t: d0 + 0.05, g, so: lado }
-    p.caixa(m, gw[0], gw[1], gw[2], gw[3], { cor, largura: 2.5, dur: 0.12 })
-    p.texto({ ...m, t: d0 + 0.1 }, gw[0] + 16, 131, fonte(20, '700'), [['API GATEWAY · ALB', cor]], 0.006)
+    const m = { t: d0 + 0.05 * KD, g, so: lado }
+    p.caixa(m, gw[0], gw[1], gw[2], gw[3], { cor, largura: 2.5, dur: 0.12 * KD })
+    p.texto({ ...m, t: d0 + 0.1 * KD }, gw[0] + 16, 131, fonte(20, '700'), [['API GATEWAY · ALB', cor]], 0.006)
     SERVICOS.forEach((s, i) => {
-      const t = d0 + 0.12 + i * ((d1 - d0 - 0.2) / SERVICOS.length)
+      const t = d0 + 0.12 * KD + i * ((d1 - d0 - 0.2 * KD) / SERVICOS.length)
       const mi = { t, g, so: lado }
       p.linha(
         mi,
@@ -100,10 +104,10 @@ function pintarPlanta(p: Pincel, img: HTMLImageElement) {
           [s.x, 150],
           [s.x, s.y - CY / 2],
         ],
-        { cor, largura: 2, dur: 0.05 },
+        { cor, largura: 2, dur: 0.05 * KD },
       )
-      p.caixa(mi, s.x - CX / 2, s.y - CY / 2, s.x + CX / 2, s.y + CY / 2, { cor, largura: 2.5, dur: 0.1 })
-      p.texto({ ...mi, t: t + 0.06 }, s.x - CX / 2 + 14, s.y, fonte(22, '600'), [[s.nome, cor]], 0.008)
+      p.caixa(mi, s.x - CX / 2, s.y - CY / 2, s.x + CX / 2, s.y + CY / 2, { cor, largura: 2.5, dur: 0.1 * KD })
+      p.texto({ ...mi, t: t + 0.06 * KD }, s.x - CX / 2 + 14, s.y, fonte(22, '600'), [[s.nome, cor]], 0.008)
     })
   }
 }

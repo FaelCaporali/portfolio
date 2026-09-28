@@ -1,19 +1,41 @@
 /**
  * Roteiro da vida devops (FICHA-PRODUCAO.md, FECHAMENTO, "Roteiro"; D12–D14). c = s desde o começo do ciclo; o ciclo 0
- * começa na MONTAGEM da vida (auge do furacão: o busto se reconstrói em 1 s; pausa de 3,5 s, a saída começa em 4,5).
- * Os textos do fundo vêm ADIANTADOS às batidas (lição do QA):
- *   0,0–0,7  análise (D14): na planta, o MONÓLITO (ícone do Lightsail) se desenha; o ADR já se escreve no fundo;
- *   0,7–1,4  análise: o monólito é riscado e decomposto em serviços (traço técnico);
- *   1,4–2,0  sai do papel (D12): os traços SOBEM da folha e, no fundo, viram o diagrama (grupos, ícones, setas);
- *   2,0–2,8  decisões e contratos: os pares de tradeoff se marcam (SQS ✓, RabbitMQ riscado; Fargate ✓, Swarm
- *            riscado), as setas ganham contrato; o cartão OpenAPI já está escrito;
- *   2,8–3,6  entrega: CloudFormation e pipeline se escrevem; no ALB o tráfego passa do target group blue ao green;
- *   3,6–4,5  produção: tráfego corre pelas setas, o alarme do CloudWatch acende, o ECS ganha tasks (auto scale) e o
- *            alarme volta ao normal; estado final completo.
+ * começa na MONTAGEM da vida (auge do furacão: o busto se reconstrói em 1 s; pausa de 5 s, a saída começa em 6,0).
+ * Os textos do fundo vêm ADIANTADOS às batidas (lição do QA). Ritmo da pausa de 5 s (.wai/3d/estudio/RITMO.md):
+ * O tempo a mais sai do FIM, nunca do começo: até as decisões, os tempos homologados (pausa de 3,5 s); depois,
+ * um pouco mais devagar:
+ *   0,1–1,4   análise (D14): na planta, o MONÓLITO (ícone do Lightsail) se desenha, é riscado e decomposto; o ADR;
+ *   1,4–2,0   sai do papel (D12): os traços SOBEM da folha e, no fundo, viram o diagrama (grupos, ícones, setas);
+ *   2,0–2,85  DECISÕES (clímax, D18): os pares de tradeoff crescem lado a lado, ✓, corte e encaixe (SQS ✓, RabbitMQ
+ *             cortado; Fargate ✓, Swarm cortado); as setas ganham contrato; RESPIRO de 0,3 s com tudo pousado;
+ *   3,15–5,25 entrega e produção: a sequência homologada inteira × 1,05 (CloudFormation, pipeline, blue → green,
+ *             tráfego, alarme, tasks, alarme normal); o estado final completo fica parado de 5,25 até a saída.
+ * Os offsets internos dos blocos escalam pelo fator do seu evento (ESCALA sobre o homologado).
  * Com a pausa segurada o ciclo recomeça com o fundo limpo (Arquiteto.tsx). Só números: o estado sai num objeto
  * reaproveitado.
  */
 import { GRUPO } from './revela'
+
+/**
+ * Fator de cada evento sobre o tempo homologado (RITMO.md, regra 5): da planta às decisões, 1 (os tempos e os
+ * offsets homologados); do CloudFormation ao normal, 1,05 (um pouco mais devagar, nunca mais rápido).
+ */
+export const ESCALA = {
+  planta: 1,
+  risca: 1,
+  decompoe: 1,
+  sobe: 1,
+  decisoes: 1,
+  entrega: 1.05,
+  producao: 1.05,
+} as const
+const K = ESCALA
+const SOBE = 1.4
+const DECIDE = 2.0
+/** Respiro de 0,3 s depois do último pouso das decisões (2,85). */
+const CFN = DECIDE + 0.85 * K.decisoes + 0.3
+/** Instante homologado da entrega e da produção (CFN em 2,35) levado ao CFN novo, × 1,05. */
+const ent = (t: number) => CFN + (t - 2.35) * K.entrega
 
 export const T = {
   /** Planta (folha.ts). */
@@ -21,26 +43,28 @@ export const T = {
   risca: [0.75, 0.95],
   decompoe: [0.95, 1.4],
   /** Traços sobem da folha ao fundo (tracos.ts). */
-  sobe: [1.4, 2.0],
+  sobe: [SOBE, 2.0],
   /** Fundo (instantes de revelação pintados no canvas; diagrama.ts e cartoes.ts). */
-  adr: 0.15,
-  grupos: 1.4,
-  icones: [1.5, 1.95],
-  apoio: [1.75, 2.15],
-  contratos: 2.1,
-  openapi: 1.55,
-  cfn: 2.35,
-  entrega: 2.55,
+  adr: 0.1 + 0.05 * K.planta,
+  grupos: SOBE,
+  icones: [SOBE + 0.1 * K.sobe, SOBE + 0.55 * K.sobe],
+  apoio: [SOBE + 0.35 * K.sobe, SOBE + 0.75 * K.sobe],
+  contratos: DECIDE + 0.1 * K.decisoes,
+  openapi: SOBE + 0.15 * K.sobe,
+  cfn: CFN,
+  entrega: ent(2.55),
+  /** Decisões (clímax): os pares em movimento (decisoes.ts, JANELA) pousam até 2,85; respiro até o CFN. */
+  decisoes: [DECIDE, DECIDE + 0.85 * K.decisoes],
   /** Estado B do grupo `decisao` (alternativa esmaecida e riscada), antes do primeiro pouso (decisoes.ts, D18). */
-  decide: [2.2, 2.4],
-  blueGreen: [3.0, 3.4],
-  deploy: [3.35, 3.5],
-  trafego: [3.45, 3.7],
-  alarme: [3.75, 3.85],
-  tasks: 3.95,
-  normal: [4.2, 4.35],
-  /** Fim do ciclo (início da saída do carrossel). */
-  fim: 4.5,
+  decide: [DECIDE + 0.2 * K.decisoes, DECIDE + 0.4 * K.decisoes],
+  blueGreen: [ent(3.0), ent(3.4)],
+  deploy: [ent(3.35), ent(3.5)],
+  trafego: [ent(3.45), ent(3.7)],
+  alarme: [ent(3.75), ent(3.85)],
+  tasks: ent(3.95),
+  normal: [ent(4.2), ent(4.35)],
+  /** Fim do ciclo (início da saída do carrossel: 1 s de reconstrução + 5 s de pausa). */
+  fim: 6,
 } as const
 
 const liso = (x: number) => {
@@ -93,10 +117,10 @@ export function quadroEm(c: number, q: Quadro) {
   q.risca = entre(c, T.risca)
   q.decompoe = entre(c, T.decompoe)
   q.sobe = Math.min(1, Math.max(0, (c - T.sobe[0]) / (T.sobe[1] - T.sobe[0])))
-  q.olhar = entre(c, [0.5, 0.9])
+  q.olhar = entre(c, [T.monolito[0] + 0.4 * K.planta, T.risca[0] + 0.15 * K.risca])
   q.alvo = 'folha'
-  if (c >= T.sobe[0] + 0.2) q.alvo = 'fundo'
-  if (c >= T.alarme[0] - 0.1 && c < T.normal[1]) q.alvo = 'alarme'
+  if (c >= T.sobe[0] + 0.2 * K.sobe) q.alvo = 'fundo'
+  if (c >= T.alarme[0] - 0.1 * K.producao && c < T.normal[1]) q.alvo = 'alarme'
   return q
 }
 

@@ -5,17 +5,19 @@
  * escuro do Mermaid. Nunca arquitetura (a fronteira com o Solutions Architect).
  */
 import type { Ponto, Quadro } from './pincel'
-import { T } from './roteiro'
+import { ESCALA, T } from './roteiro'
 import { COR, TAM, caixaMao, fonte, fonteMono, logo, rabisco, type Tela } from './estilo'
 
 const FLUXO = ['User', 'Opens sign-up', 'Uploads documents', 'Account ready'] as const
+/** Offsets da solução pelo fator da batida (roteiro.ts, RITMO.md). */
+const K = ESCALA.solucao
 
 /** Cabeçalho: logo e rótulo; devolve o x do fim. */
 function rotulo(tl: Tela, x: number, y: number, id: Parameters<typeof logo>[1], txt: string, t: number, mono = false) {
   const k = TAM[tl.f]
   logo(tl, id, x + k.logo / 2, y, k.logo, t)
   const fnt = mono ? fonteMono(k.meta) : fonte(k.meta, 500)
-  return x + k.logo + 5 + tl.p.texto({ t: t + 0.04 }, x + k.logo + 5, y, fnt, [[txt, COR.fraco]], 0.006)
+  return x + k.logo + 5 + tl.p.texto({ t: t + 0.04 * K }, x + k.logo + 5, y, fnt, [[txt, COR.fraco]], 0.006)
 }
 
 /** Mockup de celular em `q`, desenhando-se de t0 a t1. */
@@ -36,7 +38,7 @@ function mockup(tl: Tela, q: Quadro, t0: number, t1: number) {
   const rr = k.rotulo * 0.38
   for (let i = 0; i < 3; i++) {
     const cx = x0 + rr + i * rr * 3.2
-    p.forma({ t: t0 + d * 1.5 + i * 0.02 }, (ctx, tinta) => {
+    p.forma({ t: t0 + d * 1.5 + i * 0.02 * K }, (ctx, tinta) => {
       ctx.strokeStyle = tinta(COR.traco)
       ctx.fillStyle = tinta(COR.requisito)
       ctx.lineWidth = 1.2
@@ -53,10 +55,10 @@ function mockup(tl: Tela, q: Quadro, t0: number, t1: number) {
     const c = k.rotulo * 0.8
     const yy = y + i * k.corpo * 1.15
     const t = t0 + d * (2.5 + i * 0.5)
-    caixaMao(p, { t }, { x0, y0: yy - c / 2, x1: x0 + c, y1: yy + c / 2 }, { ...tr(20 + i), dur: 0.06 })
-    if (i < 2) rabisco(p, { t: t + 0.04 }, [x0 + c * 0.2, yy], [x0 + c * 0.9, yy + c * 0.4], tr(30 + i))
+    caixaMao(p, { t }, { x0, y0: yy - c / 2, x1: x0 + c, y1: yy + c / 2 }, { ...tr(20 + i), dur: 0.06 * K })
+    if (i < 2) rabisco(p, { t: t + 0.04 * K }, [x0 + c * 0.2, yy], [x0 + c * 0.9, yy + c * 0.4], tr(30 + i))
     const fim = x0 + c * 1.6 + (x1 - x0 - c * 1.6) * ([0.8, 0.62, 0.7][i] ?? 0.7)
-    rabisco(p, { t: t + 0.05 }, [x0 + c * 1.6, yy], [fim, yy], tr(40 + i))
+    rabisco(p, { t: t + 0.05 * K }, [x0 + c * 1.6, yy], [fim, yy], tr(40 + i))
   }
   y += k.corpo * 3.1
   // Envio do documento: o quadro com o X de imagem.
@@ -90,7 +92,7 @@ function no(tl: Tela, q: Quadro, txt: string, t: number, capsula: boolean) {
   const w0 = tl.p.medir(fonte(k.corpo), txt)
   const fnt = fonte(w0 > cabe ? (k.corpo * cabe) / w0 : k.corpo)
   const w = tl.p.medir(fnt, txt)
-  tl.p.texto({ t: t + 0.03 }, (q.x0 + q.x1 - w) / 2, (q.y0 + q.y1) / 2, fnt, [[txt, COR.mTexto]], 0.006)
+  tl.p.texto({ t: t + 0.03 * K }, (q.x0 + q.x1 - w) / 2, (q.y0 + q.y1) / 2, fnt, [[txt, COR.mTexto]], 0.006)
 }
 
 /** Fluxo de uso em Mermaid (flowchart TD) a partir de y, na largura de `r`; devolve o fim em y. */
@@ -98,7 +100,7 @@ function fluxo(tl: Tela, r: Quadro, y: number) {
   const k = TAM[tl.f]
   const t0 = T.fluxo[0]
   const passo = (T.fluxo[1] - t0) / FLUXO.length
-  rotulo(tl, r.x0, y, 'mermaid', 'flowchart TD', t0 - 0.05, true)
+  rotulo(tl, r.x0, y, 'mermaid', 'flowchart TD', t0 - 0.05 * K, true)
   let yy = y + k.logo * 0.9
   const alto = k.corpo * 2
   const seta = k.corpo * 1.25
@@ -110,7 +112,7 @@ function fluxo(tl: Tela, r: Quadro, y: number) {
     if (i > 0) {
       const a: Ponto = [cx, yy - seta + 1]
       const b: Ponto = [cx, yy - 1]
-      tl.p.linha({ t: t - 0.06 }, [a, b], { cor: COR.mSeta, largura: 1.2, dur: 0.06, seta: true })
+      tl.p.linha({ t: t - 0.06 * K }, [a, b], { cor: COR.mSeta, largura: 1.2, dur: 0.06 * K, seta: true })
     }
     no(tl, { x0, y0: yy, x1: x0 + w, y1: yy + alto }, txt, t, i === 0)
     yy += alto + seta
@@ -130,9 +132,9 @@ export function solucao(tl: Tela, r: Quadro) {
   const mh = Math.max(k.corpo * 11, Math.min(mw * 1.55, r.y1 - r.y0 - cab - k.logo * 0.5 - k.corpo - fluxoAlto))
   const sobra = r.y1 - r.y0 - (cab + k.logo * 0.5 + mh + k.corpo + fluxoAlto)
   let y = r.y0 + Math.max(0, sobra / 2) + k.logo / 2
-  const x = rotulo(tl, r.x0, y, 'excalidraw', 'wireframe', T.mockup[0] - 0.1)
-  if (juntos) rotulo(tl, x + 8, y, 'figma', 'prototype', T.mockup[0] - 0.05)
-  else rotulo(tl, r.x0, y + k.logo * 1.1, 'figma', 'prototype', T.mockup[0] - 0.05)
+  const x = rotulo(tl, r.x0, y, 'excalidraw', 'wireframe', T.mockup[0] - 0.1 * K)
+  if (juntos) rotulo(tl, x + 8, y, 'figma', 'prototype', T.mockup[0] - 0.05 * K)
+  else rotulo(tl, r.x0, y + k.logo * 1.1, 'figma', 'prototype', T.mockup[0] - 0.05 * K)
   y += cab
   const mx = r.x0 + (w - mw) / 2
   mockup(tl, { x0: mx, y0: y, x1: mx + mw, y1: y + mh }, T.mockup[0], T.mockup[1])

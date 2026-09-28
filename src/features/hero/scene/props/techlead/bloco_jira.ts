@@ -7,11 +7,14 @@
  */
 import type { Ponto, Quadro } from './pincel'
 import { conversa } from './bloco_destrava'
-import { T } from './roteiro'
+import { ESCALA, T } from './roteiro'
 import { ACENTO, COR, PESSOAS, TAM, avatar, fonte, fonteMono, logo, type Tela } from './estilo'
 
 const COLUNAS = ['TO DO', 'IN PROGRESS', 'DONE'] as const
 const LINHAS = 2
+/** Offsets da coordenação e da cadência pelo fator da batida (roteiro.ts, RITMO.md). */
+const K = ESCALA.coordenacao
+const KA = ESCALA.cadencia
 
 /** Equipe em `r`: o Fael no centro (acento, `</>`), os avatares em volta e as linhas dele para todos. */
 function equipe(tl: Tela, r: Quadro) {
@@ -29,10 +32,10 @@ function equipe(tl: Tela, r: Quadro) {
     const t = t0 + (i * (t1 - t0)) / PESSOAS.length
     const a: Ponto = [cx + Math.cos(ang) * rf, cy + Math.sin(ang) * rf]
     const b: Ponto = [x - Math.cos(ang) * ra, y - Math.sin(ang) * ra]
-    tl.p.linha({ t }, [a, b], { cor: `${ACENTO}b0`, largura: 1, dur: 0.08 })
-    avatar(tl.p, x, y, ra, cor, t + 0.06)
+    tl.p.linha({ t }, [a, b], { cor: `${ACENTO}b0`, largura: 1, dur: 0.08 * K })
+    avatar(tl.p, x, y, ra, cor, t + 0.06 * K)
   })
-  tl.p.forma({ t: t0 - 0.05 }, (ctx, tinta) => {
+  tl.p.forma({ t: t0 - 0.05 * K }, (ctx, tinta) => {
     ctx.fillStyle = tinta(ACENTO)
     ctx.beginPath()
     ctx.arc(cx, cy, rf, 0, Math.PI * 2)
@@ -57,7 +60,7 @@ function sprints(tl: Tela, x0: number, x1: number, y: number) {
       [a, y],
       [c, y],
     ],
-    { cor: COR.linha, largura: 1.2, dur: 0.15 },
+    { cor: COR.linha, largura: 1.2, dur: 0.15 * K },
   )
   tl.p.linha(
     { t: T.sprint[0] },
@@ -73,7 +76,7 @@ function sprints(tl: Tela, x0: number, x1: number, y: number) {
   )
   const nomes = ['Sprint 13', 'Sprint 14', 'Sprint 15']
   nos.forEach((x, i) => {
-    tl.p.forma({ t: T.quadro + 0.05 * i }, (ctx, tinta) => {
+    tl.p.forma({ t: T.quadro + 0.05 * K * i }, (ctx, tinta) => {
       ctx.fillStyle = tinta([COR.feito, ACENTO, '#2c333a'][i] ?? COR.linha)
       ctx.strokeStyle = tinta(COR.linha)
       ctx.beginPath()
@@ -85,7 +88,7 @@ function sprints(tl: Tela, x0: number, x1: number, y: number) {
     const w = tl.p.medir(fr, txt)
     const xt = Math.min(Math.max(x - w / 2, x0), x1 - w)
     const cor = i === 1 ? ACENTO : COR.fraco
-    tl.p.texto({ t: T.quadro + 0.05 * i }, xt, y - k.rotulo * 1.05, fr, [[txt, cor]], 0.006)
+    tl.p.texto({ t: T.quadro + 0.05 * K * i }, xt, y - k.rotulo * 1.05, fr, [[txt, cor]], 0.006)
   })
 }
 
@@ -111,7 +114,7 @@ function release(tl: Tela, x1: number, y: number) {
     ctx.lineTo(x0 + k.meta * 1.25, y - k.meta * 0.35)
     ctx.stroke()
   })
-  tl.p.texto({ t: T.release + 0.03 }, x0 + k.meta * 1.6, y, fr, [[txt, COR.feito]], 0.008)
+  tl.p.texto({ t: T.release + 0.03 * KA }, x0 + k.meta * 1.6, y, fr, [[txt, COR.feito]], 0.008)
 }
 
 /**
@@ -122,7 +125,7 @@ function burndown(tl: Tela, r: Quadro, mini: boolean) {
   const k = TAM[tl.f]
   const titulo = mini ? 0 : k.meta * 1.9
   const g: Quadro = { x0: r.x0 + 2, y0: r.y0 + titulo, x1: r.x1 - 2, y1: r.y1 - 1 }
-  const t0 = T.plato[0] - 0.1
+  const t0 = T.plato[0] - 0.1 * K
   if (!mini) {
     tl.p.texto({ t: t0 }, r.x0, r.y0 + k.meta * 0.75, fonte(k.rotulo, 700), [['BURNDOWN', COR.jChave]])
     release(tl, r.x1, r.y0 + k.meta * 0.75)
@@ -137,11 +140,11 @@ function burndown(tl: Tela, r: Quadro, mini: boolean) {
     {
       cor: COR.linha,
       largura: 1,
-      dur: 0.12,
+      dur: 0.12 * K,
     },
   )
   tl.p.linha(
-    { t: t0 + 0.05 },
+    { t: t0 + 0.05 * K },
     [
       [g.x0, g.y0 + 2],
       [g.x1, g.y1 - 1],
@@ -149,7 +152,7 @@ function burndown(tl: Tela, r: Quadro, mini: boolean) {
     {
       cor: '#5e6c84',
       largura: 1,
-      dur: 0.15,
+      dur: 0.15 * K,
       tracejado: [4, 3],
     },
   )
@@ -181,7 +184,7 @@ function kanban(tl: Tela, r: Quadro, mini: boolean) {
   const slots: Quadro[][] = []
   COLUNAS.forEach((nome, i) => {
     const x0 = r.x0 + i * (cw + gap)
-    const t = T.quadro + i * 0.05
+    const t = T.quadro + i * 0.05 * K
     const alto = cab + LINHAS * (ch + pad) + pad
     tl.p.forma({ t }, (ctx, tinta) => {
       ctx.fillStyle = tinta(COR.jColuna)
@@ -222,7 +225,7 @@ export function quadroJira(tl: Tela, r: Quadro, mini = false): Jira {
   const k = TAM[tl.f]
   if (mini) {
     const h = r.y1 - r.y0
-    logo(tl, 'jira', r.x0 + k.logo / 2, r.y0 + k.logo / 2, k.logo, T.quadro - 0.1)
+    logo(tl, 'jira', r.x0 + k.logo / 2, r.y0 + k.logo / 2, k.logo, T.quadro - 0.1 * K)
     const y1 = r.y0 + h * 0.42
     const slots = kanban(tl, { x0: r.x0, y0: r.y0 + k.logo + 4, x1: r.x1, y1 }, true)
     const chegada = conversa(tl, { x0: r.x0, y0: y1 + 6, x1: r.x1, y1: r.y0 + h * 0.74 }, true)
@@ -234,9 +237,9 @@ export function quadroJira(tl: Tela, r: Quadro, mini = false): Jira {
   const xe = r.x1 - chatW - 14
   const cab = k.logo * 1.5
   const yc = r.y0 + k.logo * 0.6
-  logo(tl, 'jira', r.x0 + k.logo / 2, yc, k.logo, T.quadro - 0.1)
+  logo(tl, 'jira', r.x0 + k.logo / 2, yc, k.logo, T.quadro - 0.1 * K)
   const xs = r.x0 + k.logo + 6
-  const w = tl.p.texto({ t: T.quadro - 0.05 }, xs, yc, fonte(k.corpo, 600), [['Sprint board', COR.texto]], 0.01)
+  const w = tl.p.texto({ t: T.quadro - 0.05 * K }, xs, yc, fonte(k.corpo, 600), [['Sprint board', COR.texto]], 0.01)
   sprints(tl, xs + w + k.corpo * 1.5, xe, yc + k.rotulo * 0.4)
   const y0 = r.y0 + cab + k.rotulo
   const slots = kanban(tl, { x0: r.x0, y0, x1: xe, y1: r.y1 }, false)

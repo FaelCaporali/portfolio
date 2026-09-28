@@ -27,9 +27,11 @@ import {
 import { JANELA } from './decisoes'
 import type { Quadro } from './pincel'
 import { GRUPO } from './revela'
-import { T } from './roteiro'
+import { ESCALA, T } from './roteiro'
 
 const t0 = T.apoio[0]
+/** Offsets do apoio e dos grupos (subida) e dos contratos (decisões) pelo fator do evento (roteiro.ts, RITMO.md). */
+const { sobe: KS, decisoes: KD, entrega: KE } = ESCALA
 
 /** SQS × RabbitMQ, Lambda × Fargate e SNS → SES em coluna, a partir de `y` (a ponta da seta do evento). */
 export function blocoAssincrono(tl: Tela, z: Quadro, y: number) {
@@ -68,9 +70,9 @@ export function blocoAssincrono(tl: Tela, z: Quadro, y: number) {
     0.01,
   )
   yy += k.nota * 1.3
-  tl.p.texto({ t: T.contratos + 0.15 }, z.x0 + 2, yy, fm, [['schema: JSON', COR.contrato]], 0.01)
+  tl.p.texto({ t: T.contratos + 0.15 * KD }, z.x0 + 2, yy, fm, [['schema: JSON', COR.contrato]], 0.01)
   yy += k.nota * 2.2
-  tl.p.texto({ t: t0 + 0.1 }, z.x0 + 2, yy, fonteNome(k.nota), [['compute per service', COR.titulo]], 0.006)
+  tl.p.texto({ t: t0 + 0.1 * KS }, z.x0 + 2, yy, fonteNome(k.nota), [['compute per service', COR.titulo]], 0.006)
   const y2 = yy + k.nota * 0.8 + ap / 2 + 4
   const [c0, c1] = JANELA.computacao
   tl.p.pares.push({
@@ -86,8 +88,8 @@ export function blocoAssincrono(tl: Tela, z: Quadro, y: number) {
   servico(tl, { id: 'lambda', x: xL, y: y2, nome: 'Lambda', nota: 'bursty jobs', lado: ap, t: c1 })
   servico(tl, { id: 'fargate', x: xR, y: y2, nome: 'Fargate', nota: 'steady APIs', lado: ap, t: c1 })
   const y3 = y2 + ap + k.nome * 2 + k.nota * 2
-  servico(tl, { id: 'sns', x: xL, y: y3, nome: 'SNS', nota: 'fan-out', lado: ap, t: t0 + 0.25 })
-  servico(tl, { id: 'ses', x: xR, y: y3, nome: 'SES', nota: 'email', lado: ap, t: t0 + 0.3 })
+  servico(tl, { id: 'sns', x: xL, y: y3, nome: 'SNS', nota: 'fan-out', lado: ap, t: t0 + 0.25 * KS })
+  servico(tl, { id: 'ses', x: xR, y: y3, nome: 'SES', nota: 'email', lado: ap, t: t0 + 0.3 * KS })
   const m = ap / 2 + 3
   seta(
     tl,
@@ -95,7 +97,7 @@ export function blocoAssincrono(tl: Tela, z: Quadro, y: number) {
       [xL, y1 + m + k.nome * 2],
       [xL, y2 - m],
     ],
-    { t: t0 + 0.12, dur: 0.1, fluxo: true },
+    { t: t0 + 0.12 * KS, dur: 0.1 * KS, fluxo: true },
   )
   seta(
     tl,
@@ -103,7 +105,7 @@ export function blocoAssincrono(tl: Tela, z: Quadro, y: number) {
       [xL, y2 + m + k.nome * 2],
       [xL, y3 - m],
     ],
-    { t: t0 + 0.22, dur: 0.1, fluxo: true },
+    { t: t0 + 0.22 * KS, dur: 0.1 * KS, fluxo: true },
   )
   seta(
     tl,
@@ -111,7 +113,7 @@ export function blocoAssincrono(tl: Tela, z: Quadro, y: number) {
       [xL + m, y3],
       [xR - m, y3],
     ],
-    { t: t0 + 0.28, dur: 0.1, fluxo: true },
+    { t: t0 + 0.28 * KS, dur: 0.1 * KS, fluxo: true },
   )
 }
 
@@ -133,18 +135,19 @@ export function blocoObservabilidade(tl: Tela, r: Quadro) {
   tl.p.imagem({ t: t0 }, cx, yc, lado, (ctx) => desenharIcone(ctx, tl.img, 'cloudwatch', cx, yc, lado))
   tl.p.alvos.alarme = { x: cx, y: yc, t: t0 }
   const tx = x + lado + 8
-  tl.p.texto({ t: t0 + 0.05 }, tx, yc - k.nome * 1.05, fonteNome(k.nome * 1.1), [['CloudWatch', COR.nome]], 0.004)
+  tl.p.texto({ t: t0 + 0.05 * KS }, tx, yc - k.nome * 1.05, fonteNome(k.nome * 1.1), [['CloudWatch', COR.nome]], 0.004)
   const papel = tl.f === 'largo' ? 'metrics · logs · alarms' : 'logs · alarms'
-  tl.p.texto({ t: t0 + 0.1 }, tx, yc + 0.1, fonteNota(k.nota), [[papel, COR.nota]], 0.004)
+  tl.p.texto({ t: t0 + 0.1 * KS }, tx, yc + 0.1, fonteNota(k.nota), [[papel, COR.nota]], 0.004)
   const ya = yc + k.nome * 1.15
   const la = Math.round(k.nota * 1.3)
-  tl.p.imagem({ t: t0 + 0.12 }, tx + la / 2, ya, la, (ctx) => desenharIcone(ctx, tl.img, 'alarme', tx + la / 2, ya, la))
+  const xa = tx + la / 2
+  tl.p.imagem({ t: t0 + 0.12 * KS }, xa, ya, la, (ctx) => desenharIcone(ctx, tl.img, 'alarme', xa, ya, la))
   const fm = fonteMono(k.nota)
-  tl.p.texto({ t: t0 + 0.15, g: GRUPO.alarme, so: 'a' }, tx + la + 4, ya, fm, [
+  tl.p.texto({ t: t0 + 0.15 * KS, g: GRUPO.alarme, so: 'a' }, tx + la + 4, ya, fm, [
     ['OK', COR.ok],
     [' p99 < 300ms', COR.nota],
   ])
-  tl.p.texto({ t: t0 + 0.15, g: GRUPO.alarme, so: 'b' }, tx + la + 4, ya, fm, [
+  tl.p.texto({ t: t0 + 0.15 * KS, g: GRUPO.alarme, so: 'b' }, tx + la + 4, ya, fm, [
     ['ALARM', COR.alarme],
     [' CPU > 70%', COR.nome],
   ])
@@ -159,11 +162,11 @@ export function blocoObservabilidade(tl: Tela, r: Quadro) {
     ['posthog', 'PostHog', tl.f === 'largo' ? 'product analytics' : 'analytics'],
   ] as const
   linhas.forEach(([id, nome, nota], i) => {
-    item(tl, x, y + i * passo, id, nome, nota, t0 + 0.2 + i * 0.05)
+    item(tl, x, y + i * passo, id, nome, nota, t0 + (0.2 + i * 0.05) * KS)
   })
   y += (linhas.length - 1) * passo
   const y1 = y + passo * 0.6
-  grupo(tl, { x0: r.x0, y0: r.y0, x1: r.x1, y1 }, { titulo: 'Observability', cor: COR.titulo, t: T.grupos + 0.1 })
+  grupo(tl, { x0: r.x0, y0: r.y0, x1: r.x1, y1 }, { titulo: 'Observability', cor: COR.titulo, t: T.grupos + 0.1 * KS })
   return y1
 }
 
@@ -188,10 +191,10 @@ export function blocoIntegracoes(tl: Tela, r: Quadro) {
   })
   const yn = y + ap / 2 + k.nome * 0.85
   const fn = fonteNome(k.nome)
-  tl.p.texto({ t: t0 + 0.05 }, xs[0] - tl.p.medir(fn, '3rd-party') / 2, yn, fn, [['3rd-party', COR.nome]], 0.004)
+  tl.p.texto({ t: t0 + 0.05 * KS }, xs[0] - tl.p.medir(fn, '3rd-party') / 2, yn, fn, [['3rd-party', COR.nome]], 0.004)
   const nApi = tl.f === 'largo' ? 'API Gateway' : 'API GW'
-  servico(tl, { id: 'apigateway', x: xs[1], y, nome: nApi, lado: ap, t: t0 + 0.05 })
-  servico(tl, { id: 'fargate', x: xs[2], y, nome: 'proxy', lado: ap, t: t0 + 0.1 })
+  servico(tl, { id: 'apigateway', x: xs[1], y, nome: nApi, lado: ap, t: t0 + 0.05 * KS })
+  servico(tl, { id: 'fargate', x: xs[2], y, nome: 'proxy', lado: ap, t: t0 + 0.1 * KS })
   const m = ap / 2 + 3
   seta(
     tl,
@@ -199,7 +202,7 @@ export function blocoIntegracoes(tl: Tela, r: Quadro) {
       [xs[0] + m, y],
       [xs[1] - m, y],
     ],
-    { t: t0 + 0.08, dur: 0.08, fluxo: true },
+    { t: t0 + 0.08 * KS, dur: 0.08 * KS, fluxo: true },
   )
   seta(
     tl,
@@ -207,7 +210,7 @@ export function blocoIntegracoes(tl: Tela, r: Quadro) {
       [xs[1] + m, y],
       [xs[2] - m, y],
     ],
-    { t: t0 + 0.12, dur: 0.08, fluxo: true },
+    { t: t0 + 0.12 * KS, dur: 0.08 * KS, fluxo: true },
   )
   const fm = fonteMono(k.nota)
   const rot = 'webhook · HMAC'
@@ -224,13 +227,13 @@ export function blocoIntegracoes(tl: Tela, r: Quadro) {
       [xs[0], yv],
       [xs[0], yl],
     ],
-    { t: t0 + 0.15, dur: 0.12 },
+    { t: t0 + 0.15 * KS, dur: 0.12 * KS },
   )
   const eg = 'egress · retry · breaker'
   const xe = r.x0 + (W - tl.p.medir(fm, eg)) / 2
-  tl.p.texto({ t: T.contratos + 0.1 }, xe, yv + k.nota * 1.2, fm, [[eg, COR.contrato]], 0.01)
+  tl.p.texto({ t: T.contratos + 0.1 * KD }, xe, yv + k.nota * 1.2, fm, [[eg, COR.contrato]], 0.01)
   const y1 = yv + k.nota * 2.3
-  grupo(tl, { x0: r.x0, y0: r.y0, x1: r.x1, y1 }, { titulo: 'Integrations', cor: COR.titulo, t: T.grupos + 0.15 })
+  grupo(tl, { x0: r.x0, y0: r.y0, x1: r.x1, y1 }, { titulo: 'Integrations', cor: COR.titulo, t: T.grupos + 0.15 * KS })
   return y1
 }
 
@@ -260,7 +263,8 @@ export function blocoRuntime(tl: Tela, r: Quadro) {
   check(tl, x1 + ap / 2 + 7, y - ap / 2 + 2, r1, 9)
   descartada(tl, { id: 'docker', x: xs, y, nome: nSwarm, t: r1 })
   const y1 = y + ap / 2 + k.nome * 1.6
-  grupo(tl, { x0: r.x0, y0: r.y0, x1: r.x1, y1 }, { titulo: 'Runtime decision', cor: COR.titulo, t: T.grupos + 0.2 })
+  const tg = T.grupos + 0.2 * KS
+  grupo(tl, { x0: r.x0, y0: r.y0, x1: r.x1, y1 }, { titulo: 'Runtime decision', cor: COR.titulo, t: tg })
   return y1
 }
 
@@ -273,16 +277,16 @@ export function blocoEntrega(tl: Tela, r: Quadro) {
   const te = T.entrega
   item(tl, x, y, 'codepipeline', 'CodePipeline', '', te)
   y += passo
-  const fb = item(tl, x, y, 'codebuild', 'CodeBuild', '', te + 0.08)
-  item(tl, fb + 6, y, 'docker', 'image', '', te + 0.12, Math.round(k.apoio * 0.7))
+  const fb = item(tl, x, y, 'codebuild', 'CodeBuild', '', te + 0.08 * KE)
+  item(tl, fb + 6, y, 'docker', 'image', '', te + 0.12 * KE, Math.round(k.apoio * 0.7))
   y += passo
-  item(tl, x, y, 'codedeploy', 'CodeDeploy', 'blue/green', te + 0.16)
+  item(tl, x, y, 'codedeploy', 'CodeDeploy', 'blue/green', te + 0.16 * KE)
   y += passo
-  item(tl, x, y, 'cloudformation', 'CloudFormation', 'IaC', te + 0.2)
+  item(tl, x, y, 'cloudformation', 'CloudFormation', 'IaC', te + 0.2 * KE)
   y += passo * 0.85
   const fm = fonteMono(k.nota)
-  tl.p.texto({ t: te + 0.3, g: GRUPO.deploy, so: 'a' }, x, y, fm, [['● deploying green', COR.nota]], 0.01)
-  tl.p.texto({ t: te + 0.3, g: GRUPO.deploy, so: 'b' }, x, y, fm, [
+  tl.p.texto({ t: te + 0.3 * KE, g: GRUPO.deploy, so: 'a' }, x, y, fm, [['● deploying green', COR.nota]], 0.01)
+  tl.p.texto({ t: te + 0.3 * KE, g: GRUPO.deploy, so: 'b' }, x, y, fm, [
     ['✓ green live', COR.green],
     [' · blue off', COR.nota],
   ])
@@ -290,7 +294,7 @@ export function blocoEntrega(tl: Tela, r: Quadro) {
   grupo(
     tl,
     { x0: r.x0, y0: r.y0, x1: r.x1, y1 },
-    { icone: 'codepipeline', titulo: 'CI/CD', cor: COR.titulo, t: T.grupos + 0.25 },
+    { icone: 'codepipeline', titulo: 'CI/CD', cor: COR.titulo, t: T.grupos + 0.25 * KS },
   )
   return y1
 }

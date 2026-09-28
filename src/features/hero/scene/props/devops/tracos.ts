@@ -7,14 +7,16 @@
 import * as THREE from 'three'
 import { withDissolve } from '../../dissolve'
 import type { Ponto } from './pincel'
-import { T } from './roteiro'
+import { ESCALA, T } from './roteiro'
 
 /** Traços no máximo, segmentos do rastro de cada um e o comprimento do rastro (fração do voo). */
 const MAX = 16
 const SEG = 6
 const RASTRO = 0.3
+/** Offsets da subida pelo fator dela (roteiro.ts, RITMO.md). */
+const KS = ESCALA.sobe
 /** Duração do voo de cada traço (s) e o quanto a curva abre para o lado e sobe (m, glb). */
-const VOO = 0.45
+const VOO = 0.45 * KS
 const ABRE = 0.09
 const SOBE = 0.04
 const COR = new THREE.Color('#e6f0ff')
@@ -75,7 +77,7 @@ export function criarTracos() {
 
   /** Posições no instante c (s do ciclo); `folha` e `fundo` dão os espaços; o pai das linhas é `raiz`. */
   const atualizar = (t: number, folha: THREE.Object3D, fundo: THREE.Object3D, raiz: THREE.Object3D) => {
-    const noVoo = t > T.sobe[0] - 0.05 && t < T.sobe[1] + 0.35
+    const noVoo = t > T.sobe[0] - 0.05 * KS && t < T.sobe[1] + 0.35 * KS
     linhas.visible = noVoo && ativos > 0
     if (!linhas.visible) return
     inv.copy(raiz.matrixWorld).invert()
@@ -121,7 +123,7 @@ export function criarTracos() {
 /** Liga cada origem na planta (UV) a destinos no diagrama, na ordem da esquerda para a direita. */
 export function parear(origens: readonly Ponto[], destinos: readonly { x: number; y: number; t: number }[]) {
   const d = destinos
-    .filter((m) => m.t >= T.sobe[0] && m.t <= T.sobe[1] + 0.3)
+    .filter((m) => m.t >= T.sobe[0] && m.t <= T.sobe[1] + 0.3 * KS)
     .sort((m1, m2) => m1.x - m2.x)
     .slice(0, MAX)
   const o = [...origens].sort((p1, p2) => p1[0] - p2[0])

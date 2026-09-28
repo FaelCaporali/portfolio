@@ -6,9 +6,11 @@
 import { COR, TAM, check, descartada, fonteMono, grupo, servico, seta, type Tela } from './estilo'
 import { JANELA } from './decisoes'
 import type { Quadro } from './pincel'
-import { T } from './roteiro'
+import { ESCALA, T } from './roteiro'
 
 const t0 = T.apoio[0]
+/** Offsets do apoio e dos grupos pelo fator da subida (roteiro.ts, RITMO.md). */
+const KS = ESCALA.sobe
 
 export function blocoAssincronoLinha(tl: Tela, r: Quadro) {
   const k = TAM[tl.f]
@@ -46,8 +48,8 @@ export function blocoAssincronoLinha(tl: Tela, r: Quadro) {
   check(tl, X(0.22) + ap / 2 + 6, y - ap / 2 + 2, s1, 8)
   servico(tl, { id: 'lambda', x: X(0.42), y, nome: 'Lambda', nota: 'bursty', lado: ap, t: c1 })
   servico(tl, { id: 'fargate', x: X(0.56), y, nome: 'Fargate', nota: 'steady', lado: ap, t: c1 })
-  servico(tl, { id: 'sns', x: X(0.74), y, nome: 'SNS', lado: ap, t: t0 + 0.25 })
-  servico(tl, { id: 'ses', x: X(0.9), y, nome: 'SES', nota: 'email', lado: ap, t: t0 + 0.3 })
+  servico(tl, { id: 'sns', x: X(0.74), y, nome: 'SNS', lado: ap, t: t0 + 0.25 * KS })
+  servico(tl, { id: 'ses', x: X(0.9), y, nome: 'SES', nota: 'email', lado: ap, t: t0 + 0.3 * KS })
   const m = ap / 2 + 3
   const liga = (a: number, b: number, t: number) =>
     seta(
@@ -56,11 +58,11 @@ export function blocoAssincronoLinha(tl: Tela, r: Quadro) {
         [X(a) + m, y],
         [X(b) - m, y],
       ],
-      { t, dur: 0.08, fluxo: true },
+      { t, dur: 0.08 * KS, fluxo: true },
     )
-  liga(0.22, 0.42, t0 + 0.12)
-  liga(0.56, 0.74, t0 + 0.22)
-  liga(0.74, 0.9, t0 + 0.28)
+  liga(0.22, 0.42, t0 + 0.12 * KS)
+  liga(0.56, 0.74, t0 + 0.22 * KS)
+  liga(0.74, 0.9, t0 + 0.28 * KS)
   const yc = y + ap / 2 + k.nome * 1.1 + k.nota * 1.5
   const fm = fonteMono(k.nota)
   tl.p.texto(
@@ -76,6 +78,6 @@ export function blocoAssincronoLinha(tl: Tela, r: Quadro) {
     0.01,
   )
   const y1 = yc + k.nota * 1.1
-  grupo(tl, { x0: r.x0, y0: r.y0, x1: r.x1, y1 }, { titulo: 'Async', cor: COR.titulo, t: T.grupos + 0.1 })
+  grupo(tl, { x0: r.x0, y0: r.y0, x1: r.x1, y1 }, { titulo: 'Async', cor: COR.titulo, t: T.grupos + 0.1 * KS })
   return y1
 }

@@ -10,10 +10,12 @@ import { dissolveUniforms } from '../../dissolve'
 import type { Quadro } from './pincel'
 import type { Formato } from '../devops/composicao'
 import { pintarBloqueio, pintarCartao, type Cartao } from './cartoes_arte'
-import { T } from './roteiro'
+import { ESCALA, T } from './roteiro'
 
 const CO = T.coordenacao
-const DE = T.destrava
+/** Offsets da coordenação e dos desenhos da destrava pelo fator da batida (roteiro.ts, RITMO.md). */
+const KC = ESCALA.coordenacao
+const KD = ESCALA.destrava
 /**
  * Coluna 0 To Do, 1 In Progress, 2 Done; duas linhas. O primeiro é o cartão que TRAVA (destrava, T10): fica Blocked
  * em In Progress e corre para Done depois do conselho. Pontos: 18 no sprint; 13 feitos no fim (o degrau do burndown).
@@ -25,7 +27,7 @@ const CARTOES: readonly Cartao[] = [
     tipo: 'story',
     pontos: 8,
     inicio: [1, 0],
-    passos: [[DE + 0.58, DE + 0.75, 2, 1]],
+    passos: [[T.done[0], T.done[1], 2, 1]],
   },
   {
     chave: 'APP-102',
@@ -33,7 +35,7 @@ const CARTOES: readonly Cartao[] = [
     tipo: 'story',
     pontos: 5,
     inicio: [1, 1],
-    passos: [[CO + 0.1, CO + 0.3, 2, 0]],
+    passos: [[CO + 0.1 * KC, CO + 0.3 * KC, 2, 0]],
   },
   {
     chave: 'APP-103',
@@ -42,8 +44,8 @@ const CARTOES: readonly Cartao[] = [
     pontos: 3,
     inicio: [0, 0],
     passos: [
-      [CO + 0.25, CO + 0.45, 1, 1],
-      [DE + 0.75, DE + 0.85, 1, 0],
+      [CO + 0.25 * KC, CO + 0.45 * KC, 1, 1],
+      [T.puxa[0], T.puxa[1], 1, 0],
     ],
   },
   {
@@ -52,7 +54,7 @@ const CARTOES: readonly Cartao[] = [
     tipo: 'task',
     pontos: 2,
     inicio: [0, 1],
-    passos: [[CO + 0.4, CO + 0.5, 0, 0]],
+    passos: [[CO + 0.4 * KC, CO + 0.5 * KC, 0, 0]],
   },
 ]
 
@@ -201,14 +203,14 @@ export function criarCartoes() {
       vert(i, 2, x - sw, y - sh)
       vert(i, 3, x + sw, y - sh)
       const d = (surge[1] - surge[0]) / N
-      alfa.fill(liso((c - surge[0] - i * d) / 0.15), i * 4, i * 4 + 4)
+      alfa.fill(liso((c - surge[0] - i * d) / (0.15 * KC)), i * 4, i * 4 + 4)
       if (i > 0) return
       // A marca Blocked segue o primeiro cartão: acende no bloqueio e apaga quando o teste fica verde.
       vert(N, 0, x - sw, y + sh)
       vert(N, 1, x + sw, y + sh)
       vert(N, 2, x - sw, y - sh)
       vert(N, 3, x + sw, y - sh)
-      const b = liso((c - T.bloqueio) / 0.1) * (1 - liso((c - T.verde) / 0.1))
+      const b = liso((c - T.bloqueio) / (0.1 * KD)) * (1 - liso((c - T.verde) / (0.1 * KD)))
       alfa.fill(b, N * 4, N * 4 + 4)
     })
     aPos.needsUpdate = true

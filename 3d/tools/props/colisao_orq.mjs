@@ -30,6 +30,9 @@ const PADROES = {
   // Techlead (FICHA-PRODUCAO, FECHAMENTO): o headset inteiro contra o busto, com limite -1 (as conchas encostam por
   // design, nada atravessa mais de 1 mm); a cápsula sozinha com --peca=^tl_mic$ e limite 10 (≥ 1 cm da pele).
   techlead: { peca: '^tl_headset$', obst: '' },
+  // Ai (FICHA-PRODUCAO §1): o robô inteiro na mesa contra o busto (nada a < 1 cm: limite 10 mm), com a montagem pela
+  // --entrada (as peças chegam dos `explodido_m` sem atravessar o busto).
+  ai: { peca: '^ai_robo$', obst: '' },
 }
 const opc = (k) => args.find((a) => a.startsWith(`--${k}=`))?.slice(k.length + 3)
 const padrao = PADROES[vida] ?? PADROES.vela

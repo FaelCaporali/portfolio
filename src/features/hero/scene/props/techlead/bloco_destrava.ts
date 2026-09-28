@@ -7,7 +7,10 @@
  */
 import type { Ponto, Quadro } from './pincel'
 import { ACENTO, COR, PESSOAS, TAM, avatar, fonte, fonteMono, quebrar, type Tela } from './estilo'
-import { T } from './roteiro'
+import { ESCALA, T } from './roteiro'
+
+/** Offsets de desenho da destrava pelo fator da batida (roteiro.ts, RITMO.md). */
+const K = ESCALA.destrava
 
 const TENTATIVAS = ['restarted the service', 'raised the timeout', 'scaled to more pods'] as const
 const LOG = [
@@ -49,14 +52,14 @@ function conversaMini(tl: Tela, r: Quadro): Ponto {
     const y = r.y0 + passo * (i + 0.5)
     if (eu) fael(tl, r.x0 + ra, y, ra + 1, t)
     else avatar(tl.p, r.x0 + ra, y, ra, PESSOAS[i % PESSOAS.length] ?? COR.fraco, t)
-    tl.p.forma({ t: t + 0.03 }, (ctx, tinta) => {
+    tl.p.forma({ t: t + 0.03 * K }, (ctx, tinta) => {
       ctx.fillStyle = tinta(cor)
       ctx.beginPath()
       ctx.roundRect(r.x0 + 2 * ra + 3, y - 2.5, larg, 5, 2.5)
       ctx.fill()
     })
   }
-  TENTATIVAS.forEach((_, i) => linha(i, '#5a626c', w * ([0.55, 0.45, 0.5][i] ?? 0.5), T.conversa[0] + i * 0.1))
+  TENTATIVAS.forEach((_, i) => linha(i, '#5a626c', w * ([0.55, 0.45, 0.5][i] ?? 0.5), T.conversa[0] + i * 0.1 * K))
   linha(3, ACENTO, w * 0.6, T.conselho[0], true)
   linha(4, COR.feito, w * 0.4, T.verde)
   return [r.x1 - 2, r.y0 + passo * 2]
@@ -79,14 +82,14 @@ export function conversa(tl: Tela, r: Quadro, mini = false): Ponto {
   const L = L0 * s
   const M = M0 * s
   let y = r.y0 + M / 2
-  tl.p.texto({ t: T.conversa[0] - 0.05 }, r.x0, y, fonteMono(k.meta, 700), [['# checkout', COR.fraco]], 0.006)
+  tl.p.texto({ t: T.conversa[0] - 0.05 * K }, r.x0, y, fonteMono(k.meta, 700), [['# checkout', COR.fraco]], 0.006)
   y += M / 2 + L / 2
   const [c0, c1] = T.conversa
   TENTATIVAS.forEach((txt, i) => {
     const t = c0 + ((c1 - c0) * i) / TENTATIVAS.length
     avatar(tl.p, r.x0 + ra, y, ra, PESSOAS[i % PESSOAS.length] ?? COR.fraco, t)
-    const w = tl.p.texto({ t: t + 0.02 }, xt, y, ft, [[txt, COR.texto]], 0.004)
-    tl.p.texto({ t: t + 0.12 }, xt + w + 5, y, fonte(k.corpo, 700), [['✗', COR.bloqueio]])
+    const w = tl.p.texto({ t: t + 0.02 * K }, xt, y, ft, [[txt, COR.texto]], 0.004)
+    tl.p.texto({ t: t + 0.12 * K }, xt + w + 5, y, fonte(k.corpo, 700), [['✗', COR.bloqueio]])
     y += L
   })
   // Log: o checkout estourando o tempo com a mesma query repetida.
@@ -98,11 +101,11 @@ export function conversa(tl: Tela, r: Quadro, mini = false): Ponto {
     ctx.fillRect(xt - 4, yl, 2, 2 * M)
   })
   LOG.forEach((trechos, i) => {
-    tl.p.texto({ t: T.log[0] + i * 0.1 }, xt + 2, yl + M * (i + 0.5), fm, trechos, 0.005)
+    tl.p.texto({ t: T.log[0] + i * 0.1 * K }, xt + 2, yl + M * (i + 0.5), fm, trechos, 0.005)
   })
   y = yl + 2 * M + 3 + L / 2
   // O conselho do `</>`, com a marca de 2 minutos.
-  fael(tl, r.x0 + ra, y, ra + 1, T.conselho[0] - 0.03)
+  fael(tl, r.x0 + ra, y, ra + 1, T.conselho[0] - 0.03 * K)
   const [k0, k1] = T.conselho
   conselho.forEach((l, i) => {
     const t = k0 + ((k1 - k0) * i) / conselho.length
@@ -121,7 +124,7 @@ export function conversa(tl: Tela, r: Quadro, mini = false): Ponto {
   y += (conselho.length - 0.5) * L + 3
   // O diff de uma linha.
   DIFF.forEach(([txt, cor], i) => {
-    const t = T.diff + i * 0.04
+    const t = T.diff + i * 0.04 * K
     const yy = y + M * i
     tl.p.forma({ t }, (ctx, tinta) => {
       ctx.fillStyle = tinta(i === 0 ? 'rgba(248, 113, 104, 0.14)' : 'rgba(75, 206, 151, 0.14)')

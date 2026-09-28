@@ -67,7 +67,7 @@ export interface Tela {
 }
 
 /** Gerador determinístico (o mesmo tremor em todo resize). */
-export function aleatorio(semente: number) {
+function aleatorio(semente: number) {
   let a = semente >>> 0
   return () => {
     a = (a + 0x6d2b79f5) >>> 0

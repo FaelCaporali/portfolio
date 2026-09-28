@@ -37,7 +37,7 @@ test('?slot começa na vida pedida e o carrossel troca sozinho', async ({ page }
 })
 
 test('indicador cronológico: clique leva à vida escolhida', async ({ page }) => {
-  await page.goto('/?slot=consultant')
+  await page.goto('/?slot=fullstack')
   const timeline = page.getByRole('navigation', { name: 'Timeline' })
   await timeline.getByRole('button', { name: 'QA Analyst' }).click()
   await expect(timeline.getByRole('button', { name: 'QA Analyst' })).toHaveAttribute('aria-current', 'step')

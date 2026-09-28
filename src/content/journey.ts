@@ -1,12 +1,12 @@
 /**
  * Vidas do herói: "Today I am a [slot]" / "Yesterday I was a [slot]".
- * Decisão do Fael (23/09): 10 vidas em ordem cronológica (é a ordem do indicador); o carrossel abre em OPENING e segue
- * embaralhado (model/lineup.ts). Fatos e comprovação moram na página da trajetória, não aqui.
+ * Decisão do Fael (23/09): vidas em ordem cronológica (é a ordem do indicador); o carrossel abre em OPENING e segue
+ * embaralhado (model/lineup.ts). São 9 desde 27/09: o Tech Consultant saiu ("Tech consultant... serão 9 cenas").
+ * Fatos e comprovação moram na página da trajetória, não aqui.
  */
-export type ExprKey = 'mouthSmile' | 'browInnerUp' | 'browOuterUp' | 'browDown'
+type ExprKey = 'mouthSmile' | 'browInnerUp' | 'browOuterUp' | 'browDown'
 
-export type PropId =
-  'neural' | 'qa' | 'ledger' | 'fullstack' | 'rocket' | 'techlead' | 'sailor' | 'compass' | 'uber' | 'architect'
+export type PropId = 'ai' | 'qa' | 'ledger' | 'fullstack' | 'rocket' | 'techlead' | 'sailor' | 'uber' | 'architect'
 
 export type Expression = Partial<Record<ExprKey, number>>
 
@@ -107,8 +107,9 @@ export const stages: Stage[] = [
     track: 'tech',
     accent: '#ff6ec7',
     expr: { browDown: 0.2, mouthSmile: 0.2 },
-    // Da planta à produção (monólito, decomposição, diagrama, entrega, produção) pede 3,5 s, como o QA.
-    hold: 3.5,
+    // Da planta à produção (monólito, decomposição, diagrama, decisões, entrega, produção): 5 s (regra do Fael:
+    // máximo global; RITMO.md).
+    hold: 5,
   },
   {
     id: 'techlead',
@@ -120,28 +121,22 @@ export const stages: Stage[] = [
     where: 'La Fabrique Flottante · 2025',
     // Escuta atenta (REQUISITOS T1): sobrancelhas soltas e sorriso leve, só com chaves que já existem.
     expr: { browInnerUp: 0.25, mouthSmile: 0.25 },
-    // Da escuta ao burndown, com a destrava (6 batidas: props/techlead/roteiro.ts), pede 3,5 s, como o QA e o devops.
-    hold: 3.5,
+    // Da escuta ao burndown, com a destrava (6 batidas: props/techlead/roteiro.ts): 5 s (regra do Fael: máximo
+    // global; RITMO.md).
+    hold: 5,
   },
   {
     id: 'ai',
-    prop: 'neural',
-    slot: 'AI Software Developer',
+    prop: 'ai',
+    // Decisão do Fael (27/09, REQUISITOS I1): "AI Product Engineer", o termo do mercado para quem faz produto com LLM.
+    slot: 'AI Product Engineer',
     track: 'tech',
     accent: '#00e5ff',
     fact: 'Plataforma multi-tenant de agentes de IA para atendimento via WhatsApp em produção: RAG, avaliação automatizada de agentes e cobrança por consumo de tokens.',
     where: 'Marketing para Cartórios – AI · 2026',
-    expr: { mouthSmile: 0.3 },
-  },
-  {
-    id: 'consultant',
-    prop: 'compass',
-    slot: 'Tech Consultant',
-    track: 'tech',
-    accent: '#ffd166',
-    fact: 'Assumiu o legado de uma plataforma de trade-in e definiu stack, precificação e roadmap com fundadores de clientes.',
-    where: 'BID Tecnologia · Marketing para Cartórios – AI · 2025–2026',
-    pending: 'revisão do slot',
-    expr: { browDown: 0.3, mouthSmile: 0.2 },
+    // Foco sereno (FICHA-PRODUCAO 2.5): sobrancelhas levemente baixas e sorriso contido, com chaves que já existem.
+    expr: { browDown: 0.18, mouthSmile: 0.22 },
+    // A história em 5 cenas (props/ai/roteiro.ts) pede 5 s, o máximo global do Fael (REQUISITOS I10).
+    hold: 5,
   },
 ]

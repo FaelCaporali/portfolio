@@ -58,6 +58,9 @@ export const POR_VIDA = {
   // techlead (FICHA-PRODUCAO.md, Composição e aceite; FECHAMENTO): headset com arco, conchas, haste, microfone e LED;
   // 250 kB, 12 chamadas, 20 k triângulos.
   techlead: { orcamento: { bytesMax: 250 * 1024, chamadasMax: 12, triangulosMax: 20000 } },
+  // ai (FICHA-PRODUCAO.md §1): robô de mesa com carcaça, tampa fumê, placa, pescoço com servos e tela; 250 kB, 12
+  // chamadas, 20 k triângulos.
+  ai: { orcamento: { bytesMax: 250 * 1024, chamadasMax: 12, triangulosMax: 20000 } },
 }
 
 /** Limites valendo para a vida (os gerais com as exceções dela por cima). */
