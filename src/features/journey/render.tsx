@@ -10,6 +10,12 @@ export function renderJourney(): string {
   return renderToStaticMarkup(<JourneyPage />)
 }
 
+/**
+ * Uma classe por vida, mais o espectro das nove cores em ordem (o "journey" da abertura). O texto só fica
+ * transparente junto com o gradiente: sem esta folha, a palavra continua branca.
+ */
 export function lifeAccentsCss(): string {
-  return stages.map((s) => `.life-${s.id}{--accent:${s.accent}}`).join('\n')
+  const colors = stages.map((s) => s.accent).join(',')
+  const spectrum = `.journey-spectrum{background-image:linear-gradient(90deg,${colors});-webkit-background-clip:text;background-clip:text;color:transparent}`
+  return [...stages.map((s) => `.life-${s.id}{--accent:${s.accent}}`), spectrum].join('\n')
 }

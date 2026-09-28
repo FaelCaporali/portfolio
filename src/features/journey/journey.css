@@ -1,9 +1,15 @@
 /* Mesma base do herói (Tailwind, fundo, fonte e as variantes), mais o que é só da trajetória. */
 @import '../../index.css';
 
-/* Cor padrão antes de qualquer vida; cada .life-<id> troca (CSS gerado de journey.ts, vite.config.ts). */
-:root {
-  --accent: #fff;
+/* A cor da vida (cada .life-<id> troca; CSS gerado de journey.ts, vite.config.ts). Registrada como cor para a troca
+   do <body> (vida em leitura, main.ts) ser uma transição, não um salto. */
+@property --accent {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #fff;
+}
+body {
+  transition: --accent 0.8s ease;
 }
 html {
   scroll-behavior: smooth;
@@ -14,6 +20,89 @@ html {
   }
 }
 
+/* Texto pequeno na cor da vida: misturado ao branco para passar no contraste AA mesmo nas cores escuras. */
+.ink {
+  color: color-mix(in oklab, var(--accent) 72%, white);
+}
+
+/* Brilho de fundo da página, na cor da vida em leitura. */
+.page-glow {
+  background:
+    radial-gradient(70% 55% at 85% 0%, color-mix(in oklab, var(--accent) 16%, transparent), transparent 70%),
+    radial-gradient(50% 45% at 0% 100%, color-mix(in oklab, var(--accent) 8%, transparent), transparent 70%);
+}
+
+/* Antes da primeira vida o fundo é branco: mais discreto. */
+body:not([class*='life-']) .page-glow {
+  opacity: 0.35;
+}
+
+/* Abertura: brilho grande atrás do busto; main.ts passeia a cor pelas nove vidas. */
+.opening-glow {
+  --accent: #00e5ff;
+  top: -10%;
+  right: -15%;
+  width: min(120vw, 70rem);
+  aspect-ratio: 1;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in oklab, var(--accent) 30%, transparent),
+    color-mix(in oklab, var(--accent) 12%, transparent) 50%,
+    color-mix(in oklab, var(--accent) 3%, transparent) 80%,
+    transparent
+  );
+}
+.journey-spectrum {
+  padding-bottom: 0.08em;
+}
+
+/* Cena: luz ambiente e o disco de brilho atrás do adereço (gradiente, não filtro: barato no celular). */
+.scene-ambient {
+  background: radial-gradient(60% 70% at 50% 50%, color-mix(in oklab, var(--accent) 9%, transparent), transparent 75%);
+}
+.scene-glow {
+  background: radial-gradient(
+    closest-side,
+    color-mix(in oklab, var(--accent) 45%, transparent),
+    color-mix(in oklab, var(--accent) 12%, transparent) 60%,
+    transparent
+  );
+}
+
+/* Número do capítulo: contorno apagado, atrás do título. */
+.chapter-num {
+  color: transparent;
+  -webkit-text-stroke: 1px rgb(255 255 255 / 0.09);
+}
+
+/* Foco com a rolagem: main.ts escreve --focus (0 a 1) só com movimento liberado; sem ele, tudo inteiro. */
+[data-focus] {
+  --shrink: 0.03;
+  opacity: calc(0.3 + 0.7 * var(--focus, 1));
+  transform: scale(calc(1 - var(--shrink) * (1 - var(--focus, 1))));
+}
+.scene [data-focus] {
+  --shrink: 0.06;
+}
+/* Cartão em foco: a borda acende na cor da vida (sem JavaScript, fica a borda neutra). */
+li > [data-focus] {
+  border-color: color-mix(in oklab, var(--accent) calc(45% * var(--focus, 0)), rgb(255 255 255 / 0.1));
+}
+@media (min-width: 1024px) {
+  .scene [data-focus] {
+    filter: blur(calc((1 - var(--focus, 1)) * 5px));
+  }
+}
+
+img.is-missing {
+  visibility: hidden;
+}
+
+/* Barra de progresso: main.ts estica com a rolagem. */
+.progress {
+  transform: scaleX(0);
+}
+
 /* Ponto da vida em leitura, como o ponto atual do herói: cheio e com brilho. */
 [data-dot][aria-current] .dot {
   opacity: 1;
@@ -21,6 +110,9 @@ html {
   box-shadow: 0 0 10px var(--accent);
   transform: scale(1.25);
 }
-.rail-fill {
-  transition: background-color 0.4s ease;
+
+/* As capturas do herói saem com o fundo do site (o canvas não tem alfa): as bordas somem num esfumado radial, para a
+   imagem se fundir ao brilho da cena em vez de aparecer como um retângulo. */
+img[src^='/journey/'] {
+  mask-image: radial-gradient(ellipse 50% 50% at 50% 46%, #000 62%, transparent 100%);
 }

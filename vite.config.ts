@@ -67,9 +67,10 @@ export default defineConfig(({ command, mode }) => {
     // Demo remota pelo ngrok: o subdomínio muda a cada túnel, então libera o domínio inteiro (só no servidor de dev).
     // Porta fixa: ALLOWED_ORIGINS do .dev.vars aponta para ela (o Worker recusa outra origem).
     server: { port: 5199, strictPort: true, allowedHosts: ['.ngrok-free.app'] },
+    // Duas páginas no navegador: o herói e a trajetória. Só no ambiente do cliente; o do Worker tem a própria entrada.
+    environments: { client: { build: { rollupOptions: { input: { main: 'index.html', journey: 'journey.html' } } } } },
     build: {
       rollupOptions: {
-        input: { main: 'index.html', journey: 'journey.html' },
         output: {
           manualChunks: { three: ['three', '@react-three/fiber', '@react-three/drei'] },
         },

@@ -1,7 +1,13 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema-jsonc.json",
   // Ferramentas de linha de comando do estúdio 3D (medição, captura, atlas, otimização): cada script é uma entrada.
-  "entry": ["3d/tools/**/*.mjs"],
+  "entry": [
+    "3d/tools/**/*.mjs",
+    // Página da trajetória: journey.html carrega main.ts; o render é carregado pelo vite.config.ts por caminho
+    // (runnerImport), que o knip não segue.
+    "src/features/journey/main.ts",
+    "src/features/journey/render.tsx"
+  ],
   "ignore": [
     // Arquivo histórico: site da v7 do financeiro, recusada em 24/09 e guardada como referência (não é importada).
     "3d/tools/props/financeiro/site-v7/**"
@@ -11,8 +17,6 @@
   // O script `pnpm knip` define VITE_TURNSTILE_SITEKEY: o vite.config.ts recusa carregar em modo de build sem a chave
   // pública, e o knip carrega a config para achar os plugins. O valor não vai para build nenhum.
   "ignoreDependencies": [
-    // Decisão do Fael (23/09): o GSAP fica para o ScrollTrigger da página da trajetória, ainda não escrita.
-    "gsap",
     // Módulos virtuais do runtime (cloudflare:test, cloudflare:workers), fornecidos pelo workerd, não pelo npm.
     "cloudflare"
   ]
