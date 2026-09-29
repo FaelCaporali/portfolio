@@ -8,6 +8,12 @@ import { retryAndPurge } from './cron'
 import { json } from './http'
 import { withPageCsp } from './page'
 
+/**
+ * Página vazia do roteador (React Router, gerada no build ao lado das pré-renderizadas): num endereço que não existe,
+ * o navegador a hidrata e mostra "Page not found" (src/root.tsx), sem hidratar o herói no lugar errado.
+ */
+const NOT_FOUND_PAGE = '/__spa-fallback'
+
 export default {
   async fetch(request, env) {
     const { pathname } = new URL(request.url)
@@ -17,7 +23,12 @@ export default {
     if (pathname === '/trajetoria' || pathname === '/trajetoria/') {
       return Response.redirect(new URL('/journey', request.url).href, 301)
     }
-    return withPageCsp(await env.ASSETS.fetch(request))
+    const asset = await env.ASSETS.fetch(request)
+    if (asset.status === 404 && request.headers.get('Accept')?.includes('text/html')) {
+      const page = await env.ASSETS.fetch(new URL(NOT_FOUND_PAGE, request.url))
+      return withPageCsp(new Response(page.body, { status: 404, headers: page.headers }))
+    }
+    return withPageCsp(asset)
   },
 
   scheduled(controller, env, ctx) {

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
+import { useHydrated } from '../lib/useHydrated'
 import { backToClose } from './backToClose'
 import { useDismiss } from './useDismiss'
 
@@ -40,9 +41,13 @@ export function usePopover() {
     [close],
   )
 
+  // A página sai pronta do build: até a hidratação o botão existe mas não abre nada. Desligado até lá, o clique não se
+  // perde em silêncio.
+  const hydrated = useHydrated()
   const triggerProps = {
     ref: trigger,
     type: 'button' as const,
+    disabled: !hydrated,
     'aria-expanded': open,
     'aria-controls': panelId,
     onClick: () => {

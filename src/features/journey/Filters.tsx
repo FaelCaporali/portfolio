@@ -1,5 +1,6 @@
-import { useCallback, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
+import { useCallback, useRef, useState, type ReactNode } from 'react'
 import { cx } from '../../lib/cx'
+import { useHydrated } from '../../lib/useHydrated'
 import { useDismiss } from '../../ui/useDismiss'
 import type { Dated } from './layout'
 import { eyebrow } from './parts'
@@ -12,15 +13,6 @@ const GROUPS = [
 ] as const satisfies readonly { key: Group; label: string }[]
 
 type MenuId = 'years' | Group
-
-/** Falso no servidor e na hidratação; verdadeiro logo depois (o React renderiza de novo). */
-const noSubscribe = () => () => undefined
-const useHydrated = () =>
-  useSyncExternalStore(
-    noSubscribe,
-    () => true,
-    () => false,
-  )
 
 /**
  * A barra de filtros (J64: "range de data, stacks, skills, tools [...] facilitar o trabalho de recrutadores"). O HTML

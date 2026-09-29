@@ -1,6 +1,6 @@
 import { stages } from '../../content/journey'
 
-/** Peças comuns à página. Tudo vira HTML estático no build (render.tsx). */
+/** Peças comuns à página. Tudo sai no HTML do build (react-router.config.ts, prerender). */
 
 export const byId = new Map(stages.map((s) => [s.id, s]))
 

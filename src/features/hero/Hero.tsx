@@ -1,4 +1,5 @@
-import { useCallback, useRef, useState } from 'react'
+import { Suspense, lazy, useCallback, useRef, useState, useSyncExternalStore } from 'react'
+import { useNavigation } from 'react-router'
 import { OPENING, stages } from '../../content/journey'
 import { profile } from '../../content/profile'
 import { cyclicAt } from '../../lib/array'
@@ -10,27 +11,55 @@ import { useFreeArea } from './hooks/useFreeArea'
 import { usePointerGaze } from './hooks/usePointerGaze'
 import type { Phase } from './model/carousel'
 import { advance, createLineup } from './model/lineup'
-import { readHeroOptions } from './model/options'
-import { HeroCanvas } from './scene/HeroCanvas'
+import { readHeroOptions, type HeroOptions } from './model/options'
 
-const readOptions = () =>
-  readHeroOptions(
-    window.location.search,
-    stages.map((s) => s.id),
-    OPENING,
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches,
-  )
+const IDS = stages.map((s) => s.id)
+
+/*
+ * A cena 3D (three.js) só no navegador: o build pré-renderiza o texto do herói (react-router.config.ts) sem carregar
+ * o three. O download começa quando esta página carrega, sem esperar a hidratação.
+ */
+const loadCanvas = () => import('./scene/HeroCanvas').then((m) => ({ default: m.HeroCanvas }))
+const canvasModule = import.meta.env.SSR ? null : loadCanvas()
+const HeroCanvas = lazy(() => canvasModule ?? loadCanvas())
+
+/*
+ * As opções da página (?slot, ?d, movimento reduzido). No build e na hidratação não há endereço: null, e o texto é o
+ * da vida de abertura, igual ao HTML; logo depois, as do endereço. Guardadas por endereço: o React relê a cada render
+ * e precisa do mesmo objeto enquanto nada mudou.
+ */
+let cached: { search: string; options: HeroOptions } | undefined
+function clientOptions(): HeroOptions {
+  const { search } = window.location
+  if (cached?.search !== search) {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    cached = { search, options: readHeroOptions(search, IDS, OPENING, reduced) }
+  }
+  return cached.options
+}
+const noSubscribe = () => () => undefined
+const serverOptions = () => null
+const OPENING_START = readHeroOptions('', IDS, OPENING, false).start
 
 /**
  * Herói: "Today I am a [vida]" com o busto 3D que desintegra em furacão e volta com o adereço da próxima vida.
- * Aqui só o estado da página (vida atual e fase) e a composição; cena, texto e interação vivem nos módulos ao lado.
+ * Com ?slot o carrossel começa em outra vida: o herói recomeça nela assim que o navegador lê o endereço.
  */
 export function Hero() {
-  const [options] = useState(readOptions)
-  const [index, setIndex] = useState(options.start)
+  const options = useSyncExternalStore(noSubscribe, clientOptions, serverOptions)
+  const start = options?.start ?? OPENING_START
+  return <HeroView key={start} start={start} options={options} />
+}
+
+/**
+ * Aqui só o estado da página (vida atual e fase) e a composição; cena, texto e interação vivem nos módulos ao lado.
+ * `options` é null até a hidratação (sem cena).
+ */
+function HeroView({ start, options }: { start: number; options: HeroOptions | null }) {
+  const [index, setIndex] = useState(start)
   // A vida de abertura segura mais tempo só na chegada, não quando volta a aparecer.
   const [opening, setOpening] = useState(true)
-  const [initialLineup] = useState(() => createLineup(stages.length, options.start))
+  const [initialLineup] = useState(() => createLineup(stages.length, start))
   const lineup = useRef(initialLineup)
   const [phase, setPhase] = useState<Phase>('hold')
   const { drag, handlers } = useDragRotation()
@@ -50,6 +79,8 @@ export function Hero() {
     setOpening(false)
   }, [])
   const stage = cyclicAt(stages, index)
+  // Indo para outra página (o botão da trajetória): a cena para, e o quadro 3D não disputa o processador com ela.
+  const leavingPage = useNavigation().state !== 'idle'
   const select = (id: string) => {
     const i = stages.findIndex((s) => s.id === id)
     const target = i === index ? null : i
@@ -59,18 +90,23 @@ export function Hero() {
 
   return (
     <section className="relative h-svh overflow-hidden" aria-label="Apresentação">
-      <HeroCanvas
-        stage={stage}
-        first={opening}
-        options={options}
-        free={free}
-        pointer={pointer}
-        drag={drag}
-        requested={requested}
-        dragHandlers={handlers}
-        onPhase={setPhase}
-        onNext={next}
-      />
+      {options && (
+        <Suspense fallback={null}>
+          <HeroCanvas
+            paused={leavingPage}
+            stage={stage}
+            first={opening}
+            options={options}
+            free={free}
+            pointer={pointer}
+            drag={drag}
+            requested={requested}
+            dragHandlers={handlers}
+            onPhase={setPhase}
+            onNext={next}
+          />
+        </Suspense>
+      )}
 
       {/* Cabeçalho na largura toda: o nome à esquerda e, abaixo dele, o indicador centralizado na página. A base do
           cabeçalho é o topo do espaço livre do busto no celular (useFreeArea). */}

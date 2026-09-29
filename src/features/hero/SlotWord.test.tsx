@@ -4,18 +4,22 @@ import { SlotWord } from './SlotWord'
 
 describe('SlotWord', () => {
   it('uma letra por span, com a posição na frase inteira (escalona a animação)', () => {
-    const { container } = render(<SlotWord text="QA tester" color="#fff" leaving={false} />)
+    const { container } = render(<SlotWord text="QA tester" life="qa" leaving={false} />)
     const letters = [...container.querySelectorAll<HTMLElement>('.ch')]
     expect(letters.map((l) => l.textContent).join('')).toBe('QAtester')
-    expect(letters.map((l) => l.style.getPropertyValue('--i'))).toEqual(['0', '1', '2', '3', '4', '5', '6', '7'])
+    expect(letters.map((l) => [...l.classList].find((c) => /^ch-\d+$/.test(c)))).toEqual(
+      ['0', '1', '2', '3', '4', '5', '6', '7'].map((i) => `ch-${i}`),
+    )
+    // Sem estilo inline: a página sai pronta do build e a CSP não aceita atributo style.
+    expect(container.querySelector('[style]')).toBeNull()
   })
   it('o leitor de tela recebe a frase inteira; as letras são só visuais', () => {
-    const { container } = render(<SlotWord text="QA tester" color="#fff" leaving={false} />)
+    const { container } = render(<SlotWord text="QA tester" life="qa" leaving={false} />)
     expect(container.querySelector('.sr-only')).toHaveTextContent('QA tester')
     expect(container.querySelector('.ch')?.closest('[aria-hidden]')).not.toBeNull()
   })
   it('quebra só entre palavras e marca a saída', () => {
-    const { container } = render(<SlotWord text="AI software developer" color="#fff" leaving />)
+    const { container } = render(<SlotWord text="AI software developer" life="qa" leaving />)
     expect(container.querySelectorAll('.whitespace-nowrap')).toHaveLength(3)
     expect(container.firstElementChild).toHaveClass('slot-word', 'is-leaving')
   })

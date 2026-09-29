@@ -1,6 +1,6 @@
 import { defineConfig, devices } from '@playwright/test'
 
-/** e2e contra o `pnpm dev` real: Vite + Worker (D1, limite e e-mail simulados) + Turnstile com a chave de teste. */
+/** e2e contra o `pnpm dev` real: site (Vite) + Worker (D1, limite e e-mail simulados) + Turnstile de teste. */
 export default defineConfig({
   testDir: 'e2e',
   fullyParallel: true,
@@ -18,10 +18,10 @@ export default defineConfig({
     // O menor celular que o layout suporta sem ajuste (ver #39).
     { name: 'mobile', use: { ...devices['Pixel 5'], viewport: { width: 360, height: 740 } } },
   ],
-  webServer: {
-    command: 'pnpm dev',
-    url: 'http://localhost:5199',
-    reuseExistingServer: !process.env.CI,
-    timeout: 60_000,
-  },
+  // Os dois processos do `pnpm dev`: o Worker da API no wrangler (8787) e o servidor do site (5199), que encaminha
+  // /api ao Worker. Reaproveitados se já estiverem no ar (fora do CI).
+  webServer: [
+    { command: 'pnpm dev:api', port: 8787, reuseExistingServer: !process.env.CI, timeout: 60_000 },
+    { command: 'pnpm dev:web', url: 'http://localhost:5199', reuseExistingServer: !process.env.CI, timeout: 60_000 },
+  ],
 })

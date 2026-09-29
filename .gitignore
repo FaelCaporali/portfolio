@@ -1,6 +1,9 @@
 # ---- site
 node_modules
 dist
+# build do React Router (build/client: o site) e os tipos que ele gera
+/build
+/.react-router
 *.local
 .DS_Store
 *.tsbuildinfo

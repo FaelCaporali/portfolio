@@ -1,4 +1,5 @@
 import type { ReactNode, RefObject } from 'react'
+import { Link } from 'react-router'
 import { stages } from '../../content/journey'
 import { profile } from '../../content/profile'
 
@@ -25,16 +26,18 @@ export function Frame({
           aria-hidden
           className="progress absolute inset-x-0 bottom-[-1px] h-0.5 origin-left bg-(--accent)"
         />
-        {/* Três colunas: a volta ao herói, os pontos das vidas no centro e, no celular, o menu do mapa. */}
+        {/* Três colunas: a volta ao herói (pelo roteador, sem recarregar), os pontos das vidas no centro e, no
+            celular, o menu do mapa. */}
         <div className="mx-auto grid h-14 max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-2 px-4 sm:gap-3 sm:px-8">
-          <a
-            href="/"
+          <Link
+            to="/"
+            prefetch="intent"
             className="inline-flex min-h-6 shrink-0 items-center justify-self-start text-sm font-semibold text-white/85 hover:text-white"
           >
             <span aria-hidden>←</span>
             {/* Abaixo de 400 px só a seta: os nove pontos precisam da largura. */}
             <span className="sr-only min-[400px]:not-sr-only min-[400px]:ml-2">{profile.name}</span>
-          </a>
+          </Link>
           <LifeDots life={life} />
           {menu}
         </div>

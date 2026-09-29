@@ -3,12 +3,8 @@
   // Ferramentas de linha de comando do estúdio 3D (medição, captura, atlas, otimização): cada script é uma entrada.
   "entry": [
     "3d/tools/**/*.mjs",
-    // Página da trajetória: journey.html carrega main.tsx; o render é carregado pelo vite.config.ts por caminho
-    // (runnerImport), que o knip não segue.
-    "src/features/journey/main.tsx",
-    // O CSS da trajetória entra por <link> no journey.html (no <head>, J54), que o knip não lê.
-    "src/features/journey/journey.css",
-    "src/features/journey/render.tsx"
+    // Carregado pelo vite.config.ts por caminho (runnerImport), que o knip não segue: as cores das vidas.
+    "src/features/journey/accents.ts"
   ],
   "ignore": [
     // Arquivo histórico: site da v7 do financeiro, recusada em 24/09 e guardada como referência (não é importada).
@@ -18,6 +14,9 @@
   "ignoreBinaries": ["inkscape", "convert", "montage"],
   // O script `pnpm knip` define VITE_TURNSTILE_SITEKEY: o vite.config.ts recusa carregar em modo de build sem a chave
   // pública, e o knip carrega a config para achar os plugins. O valor não vai para build nenhum.
+  // O plugin do React Router lê também o vite.config.ts, onde não há appDirectory: procuraria o app em app/ e pediria
+  // as dependências do entry.server padrão. A configuração do roteador é só o react-router.config.ts.
+  "react-router": { "config": ["react-router.config.ts"] },
   "ignoreDependencies": [
     // Módulos virtuais do runtime (cloudflare:test, cloudflare:workers), fornecidos pelo workerd, não pelo npm.
     "cloudflare"

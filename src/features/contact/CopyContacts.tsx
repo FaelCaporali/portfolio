@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { directContacts, type DirectContact } from '../../content/profile'
 import { copyText } from '../../lib/clipboard'
+import { useHydrated } from '../../lib/useHydrated'
 
 /** Ícone do tipo de contato; vira um visto por um instante depois de copiar. */
 function KindIcon({ kind }: { kind: DirectContact['kind'] | 'copied' }) {
@@ -43,6 +44,8 @@ export function CopyContacts({ className = '' }: { className?: string }) {
   const [copied, setCopied] = useState<{ label: string; ok: boolean } | null>(null)
   const timer = useRef<number | undefined>(undefined)
   useEffect(() => () => window.clearTimeout(timer.current), [])
+  // Desligados até a hidratação (a página sai pronta do build): antes disso o clique não copiaria.
+  const hydrated = useHydrated()
 
   async function copy(c: DirectContact) {
     const ok = await copyText(c.value)
@@ -59,6 +62,7 @@ export function CopyContacts({ className = '' }: { className?: string }) {
           <li key={c.label} className="relative">
             <button
               type="button"
+              disabled={!hydrated}
               onClick={() => void copy(c)}
               title={`Copy ${c.kind === 'email' ? 'e-mail' : 'phone number'}`}
               className="group -mx-1.5 inline-flex cursor-copy items-center gap-1.5 rounded-md px-1.5 py-1 text-xs text-white/65 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-white min-[360px]:text-[13px] lg:text-sm"

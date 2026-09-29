@@ -3,7 +3,7 @@
  * "bater o olho" (datas, título, subtítulo, frase, conquistas e tags) e camada de detalhe (o corpo, que abre com um
  * clique). Conteúdo em journey.json; a fonte de cada checkpoint fica fora do repositório público
  * (.wai/trajetoria/fontes.json, pelo id). Requisitos J24–J37 em .wai/trajetoria/REQUISITOS.md.
- * Lido só no build (render.tsx): nada daqui vai para o JavaScript do navegador.
+ * Vai no pedaço da rota /journey (src/routes.ts) e no HTML dela, gerado no build: o herói não o baixa.
  */
 import data from './journey.json'
 import { stages, type StageId } from './journey'
@@ -41,7 +41,7 @@ const LIVES = new Set<string>(stages.map((s) => s.id))
 const PARTS = new Set<string>(['prologue', 'story'])
 const MONTH = /^\d{4}(-\d{2})?$/
 
-/** Confere o JSON no build: dado errado derruba o build em vez de sair quebrado na página. */
+/** Confere o JSON ao carregar: dado errado derruba o build e o teste (journey-timeline.test.ts), não sai na página. */
 function check(c: Checkpoint): Checkpoint {
   const where = `journey.json, ${c.id}`
   if (!PARTS.has(c.part)) throw new Error(`${where}: part inválido`)

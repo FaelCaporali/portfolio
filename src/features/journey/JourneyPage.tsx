@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { checkpoints, periodLabel, type Checkpoint as Data } from '../../content/journey-timeline'
 import type { Stage } from '../../content/journey'
 import { ContactWidget } from '../contact/ContactWidget'
@@ -11,13 +11,14 @@ import { IndexSheet, markId, Minimap, type Row } from './Minimap'
 import { byId } from './parts'
 import { matches, useFilters, type Group } from './useFilters'
 import { useJourneyMotion } from './useJourneyMotion'
+import './journey.css'
 
 /**
  * A página da trajetória: uma linha do tempo em duas partes, o prólogo (antes da tecnologia e a virada) e a história
  * (a carreira em tecnologia), como pediu o Fael (J24), desenhada como um mapa: um caminho contínuo e sinuoso de marco
- * em marco, com minimapa (J52). O build a renderiza em HTML (vite.config.ts, journeyPage) e o navegador a hidrata
- * (main.tsx). O conteúdo vem de journey.json; sem estilo inline no HTML (a CSP só aceita CSS do site): a cor de cada
- * marco é a classe `life-<id>`.
+ * em marco, com minimapa (J52). É a rota /journey (src/routes/journey.tsx): o build a renderiza em HTML e o navegador a
+ * hidrata. O conteúdo vem de journey.json; sem estilo inline (a CSP só aceita CSS do site): a cor de cada marco é a
+ * classe `life-<id>`.
  */
 
 /** O primeiro e o último ano de uma parte: as datas das partes saem do conteúdo, nunca escritas à mão (J41). */
@@ -66,13 +67,19 @@ const KNOWN = { tools: tagsIn('tools'), concepts: tagsIn('concepts'), skills: ta
 const LABELS = new Map(placed.map((i) => [markId(i), [periodLabel(i.c), i.c.title.en].filter(Boolean).join(' · ')]))
 
 export function JourneyPage() {
+  useEffect(() => {
+    // Link direto a um marco (/journey#vela): o navegador rola até ele ao abrir, com a rolagem suave da página, e o
+    // ScrollTrigger (useJourneyMotion) a interrompe quando mede a página. Aqui a ida é num salto.
+    const id = decodeURIComponent(location.hash.slice(1))
+    if (id) document.getElementById(id)?.scrollIntoView({ behavior: 'instant' })
+  }, [])
   const filters = useFilters(BOUNDS, KNOWN)
   const { state } = filters
   /** As paradas fora do filtro. */
   const out = useMemo(() => new Set(placed.filter((i) => !matches(i, state)).map(markId)), [state])
   /**
    * Com filtro, o ano grande passa para a primeira parada à vista de cada ano (na ordem da página); sem filtro, é o
-   * do build (layout.ts).
+   * do layout (layout.ts).
    */
   const firsts = useMemo(() => {
     const ids = new Set<string>()

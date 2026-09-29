@@ -19,6 +19,8 @@ const DebugHook = import.meta.env.DEV
   : null
 
 interface HeroCanvasProps {
+  /** Saindo do herói (o roteador carrega outra página): a cena para de desenhar e a troca de página não espera. */
+  paused: boolean
   stage: Stage
   first: boolean
   options: HeroOptions
@@ -33,6 +35,7 @@ interface HeroCanvasProps {
 
 /** A cena 3D do herói, atrás do texto: câmera, luz, busto e o relógio do carrossel. */
 export function HeroCanvas({
+  paused,
   stage,
   first,
   options,
@@ -51,6 +54,7 @@ export function HeroCanvas({
   return (
     <Canvas
       className="!absolute inset-0 cursor-grab touch-pan-y active:cursor-grabbing"
+      frameloop={paused ? 'never' : 'always'}
       {...dragHandlers}
       dpr={[1, quality.maxDpr]}
       camera={{ position: [0, 0.2, 1.05], near: 0.05, far: 10 }}

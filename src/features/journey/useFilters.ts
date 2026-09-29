@@ -44,8 +44,9 @@ function fromSearch(search: string, bounds: Bounds, known: Record<Group, Readonl
 }
 
 /*
- * O endereço como fonte externa do React. No servidor (e na hidratação) ele é vazio, sem filtro, igual ao HTML do
- * build; logo depois, o React relê o endereço de verdade. `replaceState` não avisa ninguém, então avisamos à mão.
+ * O endereço como fonte externa do React. No build (e na hidratação) ele é vazio, sem filtro, igual ao HTML
+ * pré-renderizado; logo depois, o React relê o endereço de verdade. Voltar e avançar avisam pelo popstate;
+ * `replaceState` não avisa ninguém, então avisamos à mão.
  */
 const listeners = new Set<() => void>()
 function subscribe(listener: () => void) {

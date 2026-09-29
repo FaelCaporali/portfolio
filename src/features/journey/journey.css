@@ -1,5 +1,4 @@
-/* Mesma base do herói (Tailwind, fundo, fonte e as variantes), mais o que é só da trajetória. */
-@import '../../index.css';
+/* Só o que é da trajetória: a base (Tailwind, fundo, fonte e as variantes) é o index.css, que o root.tsx põe antes. */
 
 /* A cor da vida (cada .life-<id> troca; CSS gerado de journey.ts, vite.config.ts). Registrada como cor para a troca
    do <body> (vida em leitura, useJourneyMotion) ser uma transição, não um salto. */

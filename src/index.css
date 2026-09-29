@@ -29,6 +29,20 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Cor da vida por classe (life-<id> dá --accent; CSS gerado de journey.ts), nunca estilo inline: as páginas saem
+   prontas do build e a CSP não aceita atributo style. A vida em destaque e os pontos do indicador (LifeTimeline):
+   o anel na cor da vida; o atual, cheio e com brilho (a cor a 60%). */
+.slot-word {
+  color: var(--accent);
+}
+.life-dot {
+  border-color: var(--accent);
+}
+.life-dot[data-on] {
+  background-color: var(--accent);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 60%, transparent);
+}
+
 /* Troca da vida: as letras saem girando para cima (acompanham o furacão) e as novas assentam em sequência. */
 .slot-word .ch {
   display: inline-block;
@@ -67,9 +81,11 @@ body {
   }
 }
 
-/* "Contact me" (J65), no herói (ContactWidget) e na trajetória (Frame): um anel nas nove cores das vidas girando devagar
-   em volta do botão, um brilho que respira atrás dele e, de tempos em tempos, um leve pulo de escala para puxar o olho.
-   As cores vêm de --spectrum-loop (render.tsx). Com movimento reduzido, fica só o anel, parado. */
+/* "Contact me" (J65), no herói e na trajetória (ContactWidget): um anel nas nove cores das vidas girando devagar em volta
+   do botão, um brilho parado atrás dele e, de tempos em tempos, um leve pulo de escala para puxar o olho. As cores vêm de
+   --spectrum-loop (features/journey/accents.ts). Com movimento reduzido, fica só o anel, parado.
+   O brilho não anima: um desfoque (blur) que muda a cada quadro, girando ou respirando, faz a GPU refazê-lo por cima do
+   canvas do herói, e o 3D atrasava (1º quadro de ~0,4 s para ~1 s) e engasgava na troca de vida (tarefas de ~0,9 s). */
 @property --cta-turn {
   syntax: '<angle>';
   inherits: false;
@@ -87,7 +103,6 @@ body {
   border-radius: inherit;
   pointer-events: none;
   background: conic-gradient(from var(--cta-turn), var(--spectrum-loop, #fff, #fff));
-  animation: cta-turn 6s linear infinite;
 }
 /* O anel: só a borda do gradiente (a máscara recorta o miolo). */
 .contact-cta::before {
@@ -100,16 +115,14 @@ body {
   mask:
     linear-gradient(#000 0 0) content-box exclude,
     linear-gradient(#000 0 0);
+  animation: cta-turn 6s linear infinite;
 }
-/* O brilho: o mesmo gradiente, desfocado, atrás do botão. */
+/* O brilho: o mesmo gradiente, desfocado, atrás do botão; acende mais no hover e no foco. */
 .contact-cta::after {
   inset: -5px;
   z-index: -1;
   filter: blur(12px);
   opacity: 0.35;
-  animation:
-    cta-turn 6s linear infinite,
-    cta-breathe 3.2s ease-in-out infinite;
   transition: opacity 0.3s ease;
 }
 .contact-cta:hover,
@@ -118,17 +131,11 @@ body {
 }
 .contact-cta:hover::after,
 .contact-cta:focus-visible::after {
-  animation: cta-turn 6s linear infinite;
   opacity: 0.8;
 }
 @keyframes cta-turn {
   to {
     --cta-turn: 360deg;
-  }
-}
-@keyframes cta-breathe {
-  50% {
-    opacity: 0.6;
   }
 }
 @keyframes cta-nudge {
@@ -149,8 +156,7 @@ body {
 }
 @media (prefers-reduced-motion: reduce) {
   .contact-cta,
-  .contact-cta::before,
-  .contact-cta::after {
+  .contact-cta::before {
     animation: none;
   }
 }

@@ -70,12 +70,14 @@ monitoramento).
 
 ## Desenvolvimento
 
-- `pnpm dev` (porta 5199): o Worker roda dentro do Vite; D1, limite e e-mail simulados. O e-mail vira arquivo em
+- `pnpm dev`: o site na porta 5199 (Vite + React Router) e o Worker no `wrangler dev` (porta 8787, `pnpm dev:api`),
+  para onde o Vite encaminha `/api`; D1, limite e e-mail simulados. O e-mail vira arquivo em
   `.wrangler/tmp/email/` (não sai de verdade). Chaves de teste do Turnstile em `.env.development` e `.dev.vars`
   (copiar de `.dev.vars.example`). Primeira vez: `pnpm exec wrangler d1 migrations apply fael-caporali --local`.
 - `pnpm test`: testes do Worker no runtime da Cloudflare (vitest + `@cloudflare/vitest-plugin`, `worker/test/`) e do
   widget e do contrato em jsdom (`src/features/contact/*.test.tsx`, `shared/contact/*.test.ts`).
 - `pnpm e2e`: envio de ponta a ponta pelo widget contra o `pnpm dev` (`e2e/contact.spec.ts`).
+- `pnpm preview`: o build (`build/client`) servido pelo Worker no `wrangler dev` (porta 4299), com a CSP de nonce.
 - `pnpm cf-typegen` depois de mudar `wrangler.jsonc`.
 - O build de produção exige `VITE_TURNSTILE_SITEKEY` (no CI, segredo do ambiente `production`); sem ela, falha de
   propósito.
