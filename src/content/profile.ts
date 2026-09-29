@@ -15,8 +15,8 @@ export interface ProfileLink {
 }
 
 /**
- * Página da trajetória (journey.html). O botão do herói leva direto à vida que está na tela (/journey#qa), como o
- * Fael pediu em 23/09: "levar do hero para a linha do tempo, direto no fato".
+ * Página da trajetória (journey.html). O botão do herói leva ao início dela, sempre (J48, 28/09: "por hora o btn deve
+ * levar ao início, sempre"); o salto direto para a vida da tela (pedido de 23/09) fica para depois.
  */
 export const journeyLink: ProfileLink = {
   label: 'See the full journey',
