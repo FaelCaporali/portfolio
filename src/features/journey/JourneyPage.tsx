@@ -2,7 +2,7 @@ import { checkpoints, type Checkpoint as Data } from '../../content/journey-time
 import type { Stage } from '../../content/journey'
 import { Checkpoint } from './Checkpoint'
 import { Frame } from './Frame'
-import { Closing, Intro, PartHead, type Part } from './Intro'
+import { Intro, PartHead, type Part } from './Intro'
 import { place } from './layout'
 import { Minimap, type Row } from './Minimap'
 import { byId } from './parts'
@@ -73,7 +73,6 @@ export function JourneyPage() {
             </section>
           ))}
         </div>
-        <Closing />
       </main>
       <Minimap rows={rows} />
     </>

@@ -1,10 +1,13 @@
 import { stages } from '../../content/journey'
-import { profile } from '../../content/profile'
+import { directContacts, profile } from '../../content/profile'
 
 /**
  * O que fica sempre à vista: brilho de fundo, barra de progresso e cabeçalho. Os três leem `--accent` do <body>, que
  * main.ts troca para a cor da vida em leitura (a transição da cor é do CSS, journey.css).
  */
+/** Sem fechamento na página (J55), o "Contact me" abre o e-mail. */
+const email = directContacts.find((c) => c.kind === 'email')
+
 export function Frame() {
   return (
     <>
@@ -22,7 +25,7 @@ export function Frame() {
           </a>
           <LifeDots />
           <a
-            href="#today"
+            href={email?.href}
             className="hidden min-h-8 shrink-0 items-center rounded-full border border-white/15 px-4 text-sm font-medium text-white/85 transition-colors hover:border-(--accent) hover:text-white sm:inline-flex"
           >
             Contact me

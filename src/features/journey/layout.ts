@@ -16,13 +16,9 @@ export interface Placed {
   life?: Stage
   lane: Lane
   /**
-   * Sobe ao lado do marco anterior, que está na outra metade. Só quando nenhum dos dois abre uma vida (o nome da vida
-   * ocupa a metade vazia) e o anterior não é largo. Sem colisão enquanto cada cartão tiver ao menos o dobro da subida.
-   */
-  tuck: boolean
-  /**
-   * O ano em contorno na metade vazia (J52: a tela ocupada): só quando o ano muda e a metade está livre, isto é, o
-   * marco não é largo, não abre vida e não subiu ao lado do anterior.
+   * O marcador grande de cada parada (J58: "marcos precisam de destaque similar"): o nome da vida quando uma vida
+   * começa aqui (Checkpoint.tsx); nos outros marcos, o ano em contorno. Na metade vazia ao lado do cartão, ou na
+   * linha de cima quando o marco é largo.
    */
   yearMark?: string
 }
@@ -34,20 +30,12 @@ function yearOf(c: Checkpoint) {
 
 export function place(items: { c: Checkpoint; scope?: Stage; life?: Stage }[]): Placed[] {
   let side: 'left' | 'right' = 'right'
-  let prev: Placed | undefined
-  let lastYear: string | undefined
   return items.map((item) => {
     let lane: Lane = 'wide'
     if (!item.c.focus) {
       side = side === 'left' ? 'right' : 'left'
       lane = side
     }
-    const tuck = lane !== 'wide' && !item.life && !!prev && prev.lane !== 'wide' && prev.lane !== lane && !prev.life
-    const year = yearOf(item.c)
-    const free = lane !== 'wide' && !item.life && !tuck
-    const placed: Placed = { ...item, lane, tuck, yearMark: free && year !== lastYear ? year : undefined }
-    lastYear = year ?? lastYear
-    prev = placed
-    return placed
+    return { ...item, lane, yearMark: item.life ? undefined : yearOf(item.c) }
   })
 }

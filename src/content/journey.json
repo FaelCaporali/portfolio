@@ -815,79 +815,8 @@
       }
     },
     {
-      "id": "own-products",
-      "order": 16,
-      "part": "story",
-      "period": {
-        "start": "2025",
-        "end": "present"
-      },
-      "title": {
-        "en": "Own products · HC Consultorias",
-        "pt": "Produtos próprios · HC Consultorias"
-      },
-      "subtitle": {
-        "en": "AI Product Engineer",
-        "pt": "AI Product Engineer"
-      },
-      "headline": {
-        "en": "Still an entrepreneur: products of my own, from idea to code, with AI as the engine and a person as the decision-maker.",
-        "pt": "Ainda empreendedor: produtos meus, da ideia ao código, com a IA como motor e uma pessoa como quem decide."
-      },
-      "highlights": {
-        "en": [
-          "Triadora: AI customer service within reach of any business, where the conversation path is an explicit, auditable decision tree and the model only writes the reply.",
-          "A cloud backup for CCTV recorders, and a shared base for mini-games and mini-apps.",
-          "WAI Framework: a six-phase method for building software with AI agents."
-        ],
-        "pt": [
-          "Triadora: atendimento com IA ao alcance de qualquer negócio, em que o caminho da conversa é uma árvore de decisão explícita e auditável e o modelo só escreve a resposta.",
-          "Um backup em nuvem para gravadores de CFTV e uma base comum para mini-games e mini-apps.",
-          "WAI Framework: um método em seis fases para construir software com agentes de IA."
-        ]
-      },
-      "body": {
-        "en": [
-          "Triadora comes from the idea of making AI customer service accessible. It runs on the WhatsApp Cloud API, Telegram, Discord and the web, with a visual flow editor, a simulator and a spending cap per customer, and it can swap one AI provider for another without touching the flows.",
-          "With AI I still design, write and review the code. My work is applications and features with AI as the engine: harnesses, context management, guardrails, retrieval and prompt engineering, with a person as the decision-maker and the AI as a well-orchestrated tool inside human-in-the-loop flows. The WAI Framework writes that down as a method."
-        ],
-        "pt": [
-          "A Triadora nasce da ideia de tornar o atendimento com IA acessível. Roda na WhatsApp Cloud API, no Telegram, no Discord e na web, com editor visual de fluxo, simulador e teto de gasto por cliente, e troca de provedor de IA sem mexer nos fluxos.",
-          "Com IA eu continuo desenhando, escrevendo e revisando o código. O meu trabalho são aplicações e funcionalidades com a IA como motor: harness, gestão de contexto, guardrails, busca e engenharia de prompt, com uma pessoa como quem decide e a IA como ferramenta bem orquestrada dentro de fluxos com humano no loop. O WAI Framework registra isso como método."
-        ]
-      },
-      "tags": {
-        "tools": [
-          "TypeScript",
-          "Node.js",
-          "Express",
-          "tRPC",
-          "Prisma",
-          "PostgreSQL",
-          "React",
-          "Nx",
-          "Docker",
-          "AWS CDK",
-          "AWS S3",
-          "ffmpeg",
-          "WhatsApp Cloud API"
-        ],
-        "concepts": [
-          "Decision trees",
-          "Guardrails",
-          "Context management",
-          "Human in the loop",
-          "Prompt engineering",
-          "Provider-agnostic AI",
-          "Hexagonal architecture",
-          "Multi-tenancy"
-        ],
-        "skills": ["Product engineering", "Entrepreneurship", "AI engineering"]
-      }
-    },
-    {
       "id": "bid",
-      "order": 17,
+      "order": 16,
       "part": "story",
       "focus": true,
       "period": {
@@ -960,7 +889,7 @@
     },
     {
       "id": "mpc",
-      "order": 18,
+      "order": 17,
       "part": "story",
       "focus": true,
       "life": "ai",
@@ -1041,7 +970,7 @@
     },
     {
       "id": "brickup-today",
-      "order": 19,
+      "order": 18,
       "part": "story",
       "period": {
         "start": "2026",
@@ -1073,6 +1002,76 @@
         "tools": ["n8n", "WhatsApp", "Evolution API"],
         "concepts": ["Conversational AI", "Tool calling", "Agent routing", "Financial workflows"],
         "skills": ["Mentoring", "AI engineering"]
+      }
+    },
+    {
+      "id": "own-products",
+      "order": 19,
+      "part": "story",
+      "period": {
+        "start": "2026",
+        "end": "present"
+      },
+      "title": {
+        "en": "Own products · HC Consultorias",
+        "pt": "Produtos próprios · HC Consultorias"
+      },
+      "subtitle": {
+        "en": "AI Product Engineer",
+        "pt": "AI Product Engineer"
+      },
+      "headline": {
+        "en": "Still an entrepreneur: products of my own, from idea to code, with AI as the engine and a person as the decision-maker.",
+        "pt": "Ainda empreendedor: produtos meus, da ideia ao código, com a IA como motor e uma pessoa como quem decide."
+      },
+      "highlights": {
+        "en": [
+          "A cloud backup for CCTV recorders, and a shared base for mini-games and mini-apps.",
+          "WAI Framework: a six-phase method for building software with AI agents.",
+          "Triadora, the newest, born in September 2026 to bring AI customer service within reach of any business."
+        ],
+        "pt": [
+          "Um backup em nuvem para gravadores de CFTV e uma base comum para mini-games e mini-apps.",
+          "WAI Framework: um método em seis fases para construir software com agentes de IA.",
+          "Triadora, o mais novo, nascido em setembro de 2026 para levar atendimento com IA ao alcance de qualquer negócio."
+        ]
+      },
+      "body": {
+        "en": [
+          "With AI I still design, write and review the code. My work is applications and features with AI as the engine: harnesses, context management, guardrails, retrieval and prompt engineering, with a person as the decision-maker and the AI as a well-orchestrated tool inside human-in-the-loop flows. The WAI Framework writes that down as a method.",
+          "Triadora follows the same idea: the conversation path is an explicit, auditable decision tree, and the model only writes the reply. The provider is a detail: one model can replace another, or none at all, without touching the flows."
+        ],
+        "pt": [
+          "Com IA eu continuo desenhando, escrevendo e revisando o código. O meu trabalho são aplicações e funcionalidades com a IA como motor: harness, gestão de contexto, guardrails, busca e engenharia de prompt, com uma pessoa como quem decide e a IA como ferramenta bem orquestrada dentro de fluxos com humano no loop. O WAI Framework registra isso como método.",
+          "A Triadora segue a mesma ideia: o caminho da conversa é uma árvore de decisão explícita e auditável, e o modelo só escreve a resposta. O provedor é um detalhe: um modelo troca por outro, ou por nenhum, sem mexer nos fluxos."
+        ]
+      },
+      "tags": {
+        "tools": [
+          "TypeScript",
+          "Node.js",
+          "Express",
+          "tRPC",
+          "Prisma",
+          "PostgreSQL",
+          "React",
+          "Nx",
+          "Docker",
+          "AWS CDK",
+          "AWS S3",
+          "ffmpeg"
+        ],
+        "concepts": [
+          "Decision trees",
+          "Guardrails",
+          "Context management",
+          "Human in the loop",
+          "Prompt engineering",
+          "Provider-agnostic AI",
+          "Hexagonal architecture",
+          "Multi-tenancy"
+        ],
+        "skills": ["Product engineering", "Entrepreneurship", "AI engineering"]
       }
     },
     {

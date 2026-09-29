@@ -1,5 +1,6 @@
+// As cores das vidas (geradas de journey.ts, vite.config.ts). O resto do CSS vem por <link> no journey.html, no <head>,
+// para o HTML nunca aparecer sem estilo (J54); no build, as duas partes entram no <head>.
 import 'virtual:journey-accents.css'
-import './journey.css'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 

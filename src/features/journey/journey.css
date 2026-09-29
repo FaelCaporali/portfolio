@@ -70,10 +70,10 @@ body:not([class*='life-']) .page-glow {
   background: #111116;
 }
 
-/* O ano em contorno na metade vazia: presente, mas abaixo de tudo. */
+/* O ano em contorno: o mesmo peso em todas as paradas, na cor da vida (J58). */
 .year-mark {
-  color: transparent;
-  -webkit-text-stroke: 1px color-mix(in oklab, var(--accent) 35%, transparent);
+  color: color-mix(in oklab, var(--accent) 7%, transparent);
+  -webkit-text-stroke: 1.5px color-mix(in oklab, var(--accent) 80%, white);
 }
 
 /* Como os rótulos de um mapa: um halo da cor do fundo deixa o nome legível quando o caminho passa por trás. */

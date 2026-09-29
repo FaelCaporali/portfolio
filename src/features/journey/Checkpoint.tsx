@@ -22,6 +22,12 @@ const LANDMARK: Record<Lane, string> = {
   right: 'lg:col-start-1 lg:col-end-7 lg:row-start-1 lg:self-center lg:pr-6 lg:text-right',
   wide: 'lg:col-start-2 lg:col-end-12 lg:row-start-1',
 }
+/* O ano em contorno: na metade vazia, alinhado ao topo; no marco largo, na linha de cima, do lado direito. */
+const YEAR: Record<Lane, string> = {
+  left: 'lg:col-start-8 lg:col-end-13 lg:row-start-1',
+  right: 'lg:col-start-1 lg:col-end-6 lg:row-start-1 lg:text-right',
+  wide: 'lg:col-start-2 lg:col-end-12 lg:row-start-1 lg:text-right',
+}
 /*
  * O ponto por onde passa o caminho (main.ts lê [data-node]). No celular ondula na margem esquerda; no desktop fica na
  * borda de cima do cartão, perto do canto de fora, para o caminho cruzar a tela de um lado ao outro.
@@ -38,7 +44,7 @@ const NODE: Record<Lane, string> = {
  * aqui, o nome dela vem grande ao lado, na cor dela (J52: a tela ocupada).
  */
 export function Checkpoint({ item }: { item: Placed }) {
-  const { c, scope, life, lane, tuck } = item
+  const { c, scope, life, lane, yearMark } = item
   const period = periodLabel(c)
   const wide = lane === 'wide'
   return (
@@ -50,18 +56,17 @@ export function Checkpoint({ item }: { item: Placed }) {
       className={cx(
         scope && `life-${scope.id}`,
         'checkpoint relative scroll-mt-20 pb-12 pl-10 sm:pb-14 lg:grid lg:grid-cols-12 lg:gap-x-8 lg:pl-0',
-        wide && life && 'lg:gap-y-8',
-        tuck && 'lg:-mt-28',
+        wide && (life ?? yearMark) && 'lg:gap-y-6',
       )}
     >
       {life && <Landmark life={life} lane={lane} />}
-      {item.yearMark && <YearMark year={item.yearMark} lane={lane} />}
+      {yearMark && <YearMark year={yearMark} lane={lane} />}
       <article
         className={cx(
           'card relative rounded-3xl border border-white/[0.08] p-5 sm:p-7',
           CARD[lane],
           wide && 'lg:p-10',
-          wide && life && 'lg:row-start-2',
+          wide && (life ?? yearMark) && 'lg:row-start-2',
         )}
       >
         <span
@@ -149,10 +154,8 @@ function YearMark({ year, lane }: { year: string; lane: Lane }) {
     <p
       aria-hidden
       className={cx(
-        'year-mark hidden text-[clamp(4.5rem,9vw,8.5rem)] leading-none font-semibold tracking-[-0.05em] tabular-nums lg:block lg:self-start',
-        lane === 'left'
-          ? 'lg:col-start-8 lg:col-end-13 lg:row-start-1'
-          : 'lg:col-start-1 lg:col-end-6 lg:row-start-1 lg:text-right',
+        'year-mark mb-3 text-[clamp(3.5rem,9vw,8.5rem)] leading-none font-semibold tracking-[-0.05em] tabular-nums lg:mb-0 lg:self-start',
+        YEAR[lane],
       )}
     >
       {year}
