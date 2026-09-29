@@ -1,8 +1,8 @@
 {
   "intro": {
     "lede": {
-      "en": "Ten years running my own ventures, then the switch to software in 2023. Every stop below left something I still use.",
-      "pt": "Dez anos tocando os meus próprios negócios, depois a virada para o software em 2023. Cada parada abaixo deixou algo que eu ainda uso."
+      "en": "Ten years running my own ventures, then the switch to software, which started with study. Every stop below left something I still use.",
+      "pt": "Dez anos tocando os meus próprios negócios, depois a virada para o software, que começou pelo estudo. Cada parada abaixo deixou algo que eu ainda uso."
     }
   },
   "checkpoints": [
@@ -55,24 +55,24 @@
       "highlights": {
         "en": [
           "Grew from assistant to financial coordinator, planning with the board.",
-          "Built and joined a team with the director, a financial consultant and a marketing consultant that grew the school's revenue.",
+          "Built and joined a team with the director, a financial consultant and a marketing consultant that more than doubled the school's revenue.",
           "Automated the management reports in VBA."
         ],
         "pt": [
           "Cresci de assistente a coordenador financeiro, planejando com a diretoria.",
-          "Montei e integrei um time com a diretora, um consultor financeiro e uma consultora de marketing que fez crescer o faturamento da escola.",
+          "Montei e integrei um time com a diretora, um consultor financeiro e uma consultora de marketing que mais que duplicou o faturamento da escola.",
           "Automatizei os relatórios gerenciais em VBA."
         ]
       },
       "body": {
         "en": [
           "Back from São João del-Rei, I joined Immersus as a financial assistant and grew into financial coordinator. The office taught me logic, analysis and how to set strategic goals, and I automated the management reports in VBA.",
-          "It was also where I first put together, and worked inside, a multidisciplinary team: the school's director, a financial consultant, a marketing consultant and me. Together we grew the company's revenue.",
+          "It was also where I first put together, and worked inside, a multidisciplinary team: the school's director, a financial consultant, a marketing consultant and me. Together we more than doubled the company's revenue.",
           "I stepped away for a while to run a confectionery, came back, and kept the job while I opened a hostel on the side."
         ],
         "pt": [
           "De volta de São João del-Rei, entrei na Immersus como assistente financeiro e cheguei a coordenador financeiro. O escritório me ensinou lógica, análise e a traçar metas estratégicas, e automatizei os relatórios gerenciais em VBA.",
-          "Foi também onde montei, e integrei, o meu primeiro time multidisciplinar: a diretora da escola, um consultor financeiro, uma consultora de marketing e eu. Juntos, fizemos o faturamento da empresa crescer.",
+          "Foi também onde montei, e integrei, o meu primeiro time multidisciplinar: a diretora da escola, um consultor financeiro, uma consultora de marketing e eu. Juntos, mais que duplicamos o faturamento da empresa.",
           "Me afastei por um período para tocar uma confeitaria, voltei, e mantive o emprego enquanto abria um hostel em paralelo."
         ]
       },
@@ -302,6 +302,7 @@
       "id": "brickup-ai",
       "order": 9,
       "part": "story",
+      "period": { "start": "2024" },
       "title": { "en": "Brickup", "pt": "Brickup" },
       "subtitle": {
         "en": "The AI era: planner and daily-report insights",

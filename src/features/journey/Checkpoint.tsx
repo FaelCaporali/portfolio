@@ -52,16 +52,7 @@ export function Checkpoint({ c, scope }: { c: Data; scope?: Stage }) {
           <p className={cx('mt-4 leading-relaxed text-white/85', prologue ? 'text-base' : 'text-lg')}>
             {c.headline.en}
           </p>
-          {c.highlights && (
-            <ul className="mt-5 space-y-2.5 text-[0.95rem] leading-relaxed text-white/75">
-              {c.highlights.en.map((h) => (
-                <li key={h} className="relative pl-5">
-                  <span aria-hidden className="absolute top-[0.6em] left-0 h-1.5 w-1.5 rounded-full bg-(--accent)" />
-                  {h}
-                </li>
-              ))}
-            </ul>
-          )}
+          {c.highlights && <Highlights items={c.highlights.en} className="mt-5 hidden sm:block" />}
         </div>
         <Tags tags={c.tags} />
         <details className="group mt-6 border-t border-white/[0.08] pt-4 lg:col-span-2">
@@ -72,6 +63,7 @@ export function Checkpoint({ c, scope }: { c: Data; scope?: Stage }) {
               +
             </span>
           </summary>
+          {c.highlights && <Highlights items={c.highlights.en} className="mt-4 sm:hidden" />}
           <div className="mt-3 max-w-[68ch] space-y-4 text-[0.98rem] leading-relaxed text-white/80">
             {c.body.en.map((p) => (
               <p key={p}>{p}</p>
@@ -90,6 +82,23 @@ export function Checkpoint({ c, scope }: { c: Data; scope?: Stage }) {
         )}
       </article>
     </li>
+  )
+}
+
+/**
+ * As conquistas. No celular elas ficam dentro de "Read the story" para encurtar a página (J40); do `sm` para cima,
+ * à vista. São duas cópias no HTML, uma escondida por `display: none`, que o leitor de tela também ignora.
+ */
+function Highlights({ items, className }: { items: string[]; className: string }) {
+  return (
+    <ul className={cx('space-y-2.5 text-[0.95rem] leading-relaxed text-white/75', className)}>
+      {items.map((h) => (
+        <li key={h} className="relative pl-5">
+          <span aria-hidden className="absolute top-[0.6em] left-0 h-1.5 w-1.5 rounded-full bg-(--accent)" />
+          {h}
+        </li>
+      ))}
+    </ul>
   )
 }
 

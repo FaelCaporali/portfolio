@@ -12,9 +12,17 @@ import { byId } from './parts'
  * cada marco é a classe `life-<id>` e o movimento, de main.ts.
  */
 
+/** O ano do primeiro marco datado da parte: as datas das partes saem do conteúdo, nunca escritas à mão (J41). */
+function firstYear(part: Data['part']): string {
+  const year = checkpoints.find((c) => c.part === part && c.period?.start)?.period?.start?.slice(0, 4)
+  if (!year) throw new Error(`journey.json: a parte ${part} não tem marco datado`)
+  return year
+}
+
+/** O prólogo vai até a história começar (com o estudo, J30 e J41); a história vai até hoje. */
 const PARTS: Record<Data['part'], Part> = {
-  prologue: { id: 'prologue', title: 'Prologue', span: '2006 – 2022' },
-  story: { id: 'story', title: 'The story', span: '2023 – today' },
+  prologue: { id: 'prologue', title: 'Prologue', span: `${firstYear('prologue')} – ${firstYear('story')}` },
+  story: { id: 'story', title: 'The story', span: `${firstYear('story')} – today` },
 }
 
 /** Cada marco pertence à última vida que começou até ele: é a cor dele e a vida acesa nos pontos do cabeçalho. */
