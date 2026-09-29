@@ -57,7 +57,7 @@ export function JourneyPage() {
     <>
       <Frame />
       <main className="text-white">
-        <Intro parts={groups.map((g) => g.part)} />
+        <Intro />
         <Filters items={scoped} />
         <div className="timeline relative mx-auto max-w-7xl px-5 pb-16 sm:px-8 lg:pr-20 xl:pr-60">
           {/* Sem JavaScript: o eixo reto. Com ele, main.ts desenha o caminho sinuoso no SVG e esconde o eixo. */}
