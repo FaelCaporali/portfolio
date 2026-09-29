@@ -76,6 +76,15 @@ body:not([class*='life-']) .page-glow {
   -webkit-text-stroke: 1px color-mix(in oklab, var(--accent) 35%, transparent);
 }
 
+/* Como os rótulos de um mapa: um halo da cor do fundo deixa o nome legível quando o caminho passa por trás. */
+.landmark p,
+.year-mark {
+  text-shadow:
+    0 0 3px #0b0b0e,
+    0 0 10px #0b0b0e,
+    0 0 22px #0b0b0e;
+}
+
 /* O nome da vida que começa: um brilho na cor dela por trás, para a metade vazia da tela ter luz. */
 .landmark::before {
   content: '';

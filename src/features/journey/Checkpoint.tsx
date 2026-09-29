@@ -60,7 +60,7 @@ export function Checkpoint({ item }: { item: Placed }) {
         className={cx(
           'card relative rounded-3xl border border-white/[0.08] p-5 sm:p-7',
           CARD[lane],
-          wide && 'lg:grid lg:grid-cols-[minmax(0,1fr)_15rem] lg:gap-x-10 lg:p-10',
+          wide && 'lg:p-10',
           wide && life && 'lg:row-start-2',
         )}
       >
@@ -98,7 +98,7 @@ export function Checkpoint({ item }: { item: Placed }) {
           {c.highlights && <Highlights items={c.highlights.en} className="mt-5 hidden sm:block" />}
         </div>
         <Tags tags={c.tags} wide={wide} />
-        <details className={cx('group mt-6 border-t border-white/[0.08] pt-4', wide && 'lg:col-span-2')}>
+        <details className="group mt-6 border-t border-white/[0.08] pt-4">
           <summary className="inline-flex min-h-9 cursor-pointer list-none items-center gap-2 text-sm font-medium text-white/70 hover:text-white focus-visible:outline-2 focus-visible:outline-white [&::-webkit-details-marker]:hidden">
             <span className="group-open:hidden">Read the story</span>
             <span className="hidden group-open:inline">Close the story</span>
@@ -179,7 +179,7 @@ function Highlights({ items, className }: { items: string[]; className: string }
 
 /**
  * Tags separadas em ferramentas, conceitos e habilidades (J26), num peso abaixo do texto: são o índice do que o marco
- * usou, não a história. No marco largo, uma coluna ao lado; nos outros, embaixo.
+ * usou, não a história. No marco largo, três colunas lado a lado; nos outros, um grupo embaixo do outro.
  */
 function Tags({ tags, wide }: { tags: Data['tags']; wide: boolean }) {
   const groups = TAG_GROUPS.flatMap((g) => {
@@ -191,7 +191,7 @@ function Tags({ tags, wide }: { tags: Data['tags']; wide: boolean }) {
     <dl
       className={cx(
         'mt-6 grid gap-3 sm:grid-cols-[5.5rem_minmax(0,1fr)] sm:gap-x-4',
-        wide && 'lg:mt-1 lg:grid-cols-1 lg:content-start lg:border-l lg:border-white/[0.08] lg:pl-8',
+        wide && 'lg:mt-8 lg:grid-flow-col lg:grid-cols-3 lg:grid-rows-[auto_1fr] lg:gap-x-8 lg:gap-y-2',
       )}
     >
       {groups.map((g) => (
