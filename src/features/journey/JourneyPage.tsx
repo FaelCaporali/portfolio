@@ -5,7 +5,7 @@ import { Frame } from './Frame'
 import { Intro, PartHead, type Part } from './Intro'
 import { Filters } from './Filters'
 import { date, place } from './layout'
-import { Minimap, type Row } from './Minimap'
+import { IndexSheet, Minimap, type Row } from './Minimap'
 import { byId } from './parts'
 
 /**
@@ -55,7 +55,7 @@ const rows: Row[] = groups.flatMap((g) => [
 export function JourneyPage() {
   return (
     <>
-      <Frame />
+      <Frame menu={<IndexSheet rows={rows} />} />
       <main className="text-white">
         <Intro />
         <Filters items={scoped} />
@@ -85,6 +85,8 @@ export function JourneyPage() {
         </div>
       </main>
       <Minimap rows={rows} />
+      {/* O ContactWidget do site, montado aqui por main.ts (contact.tsx). */}
+      <div id="contact" />
     </>
   )
 }

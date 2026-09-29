@@ -30,8 +30,9 @@ export function initFilters(onChange: () => void) {
   if (!root || !fromSel || !toSel) return
   const min = Number(fromSel.options[0]?.value)
   const max = Number(toSel.options[toSel.options.length - 1]?.value)
-  root.hidden = false
   setup({ root, fromSel, toSel, min, max }, onChange)
+  // A barra já ocupava o lugar dela desde o HTML (esqueleto, journey.css); agora os controles respondem.
+  root.removeAttribute('aria-busy')
 }
 
 /** O estado inicial vem do endereço, só com o que existe na barra. */

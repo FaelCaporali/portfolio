@@ -1,4 +1,5 @@
-import { useCallback, useId, useRef, useState } from 'react'
+import { useCallback, useEffect, useId, useRef, useState } from 'react'
+import { backToClose } from './backToClose'
 import { useDismiss } from './useDismiss'
 
 /**
@@ -16,6 +17,20 @@ export function usePopover() {
     setOpen(false)
   }, [])
   useDismiss(open, close, root)
+
+  // Botão voltar (J85): com o painel aberto, fecha o teclado, depois o painel, e só então navega.
+  const back = useRef<ReturnType<typeof backToClose>>(null)
+  useEffect(() => {
+    const b = backToClose(close)
+    back.current = b
+    return () => {
+      b.dispose()
+    }
+  }, [close])
+  useEffect(() => {
+    if (open) back.current?.opened()
+    else back.current?.closed()
+  }, [open])
 
   const triggerProps = {
     ref: trigger,

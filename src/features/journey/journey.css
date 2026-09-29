@@ -187,6 +187,28 @@ body:not([class*='life-']) .page-glow {
   transform: scale(1.25);
 }
 
+/* Filtros em esqueleto até o script ligar (aria-busy, filters.ts): o mesmo tamanho, sem clique, com um brilho lento. */
+.filters[aria-busy='true'] [data-filter-menu] > summary {
+  pointer-events: none;
+  color: transparent;
+  background: linear-gradient(90deg, rgb(255 255 255 / 0.04), rgb(255 255 255 / 0.1), rgb(255 255 255 / 0.04));
+  background-size: 200% 100%;
+  animation: filters-skeleton 1.4s ease-in-out infinite;
+}
+.filters[aria-busy='true'] [data-filter-menu] > summary * {
+  visibility: hidden;
+}
+@keyframes filters-skeleton {
+  to {
+    background-position: -200% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .filters[aria-busy='true'] [data-filter-menu] > summary {
+    animation: none;
+  }
+}
+
 /* Filtros (Filters.tsx, filters.ts): a tag escolhida acende; nos cartões, a tag que casa com o filtro ganha contorno;
    no minimapa, o marco fora do filtro fica apagado. */
 .filter-tag {

@@ -8,8 +8,8 @@ import { eyebrow } from './parts'
  * O minimapa (J52: "imprescindível"): a jornada inteira numa coluna, com o caminho sinuoso da página em
  * miniatura e cada marco clicável. Desenhado no build (as posições saem das faixas do layout, não da página),
  * então funciona sem JavaScript; main.ts só acende o marco em leitura e o trecho já lido.
- * Desktop: fixo à direita (do `xl` para cima, com rótulos). Celular e tablet: uma barra no pé da tela que abre o
- * índice.
+ * Desktop: fixo à direita (do `xl` para cima, com rótulos). Celular e tablet: um menu no canto de cima à direita do
+ * cabeçalho (IndexSheet), que abre o índice e fecha quando perde o foco.
  */
 
 export type Row = { kind: 'part'; part: Part } | { kind: 'mark'; item: Placed }
@@ -49,7 +49,7 @@ export function Minimap({ rows }: { rows: Row[] }) {
     <>
       <nav
         aria-label="Journey map"
-        className="minimap fixed top-20 right-3 bottom-6 z-20 hidden max-h-[44rem] lg:flex xl:right-6"
+        className="minimap fixed top-20 right-3 bottom-28 z-20 hidden max-h-[44rem] lg:flex xl:right-6"
       >
         <div className="relative flex min-h-0 flex-1">
           <svg
@@ -101,43 +101,63 @@ export function Minimap({ rows }: { rows: Row[] }) {
           </ol>
         </div>
       </nav>
-      <IndexSheet rows={rows} />
     </>
   )
 }
 
-/** Celular e tablet: a barra no pé da tela mostra o marco em leitura (main.ts) e abre o índice inteiro. */
-function IndexSheet({ rows }: { rows: Row[] }) {
+/**
+ * Celular e tablet: o botão de menu no cabeçalho (Frame) abre o índice inteiro, com o marco em leitura no topo
+ * (main.ts). O canto de baixo fica livre para o contato.
+ */
+export function IndexSheet({ rows }: { rows: Row[] }) {
   return (
-    <details className="index-sheet fixed inset-x-3 bottom-3 z-30 rounded-2xl border border-white/10 bg-[#0b0b0e]/90 backdrop-blur-md lg:hidden">
-      <summary className="flex min-h-12 cursor-pointer list-none items-center gap-3 px-4 text-sm text-white/85 [&::-webkit-details-marker]:hidden">
-        <span aria-hidden className="h-2 w-2 shrink-0 rounded-full bg-(--accent)" />
-        <span data-index-current className="min-w-0 truncate">
-          Journey map
-        </span>
-        <span className="ml-auto shrink-0 text-xs text-white/55">Index</span>
+    <details className="index-sheet group relative justify-self-end lg:hidden">
+      <summary
+        aria-label="Journey map"
+        className="grid h-9 w-9 cursor-pointer list-none place-items-center rounded-full border border-white/15 text-white/85 transition-colors group-open:border-white/40 hover:text-white focus-visible:outline-2 focus-visible:outline-white [&::-webkit-details-marker]:hidden"
+      >
+        <svg
+          aria-hidden
+          viewBox="0 0 24 24"
+          className="h-4 w-4"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        >
+          <path d="M4 7h16M4 12h16M4 17h16" className="group-open:hidden" />
+          <path d="M6 6l12 12M18 6L6 18" className="hidden group-open:block" />
+        </svg>
       </summary>
-      <ol className="max-h-[60vh] overflow-y-auto border-t border-white/10 px-2 py-2">
-        {rows.map((r) =>
-          r.kind === 'part' ? (
-            <li key={r.part.id} className={cx(eyebrow, 'px-3 pt-3 pb-1 text-[0.62rem]')}>
-              {r.part.title}
-            </li>
-          ) : (
-            <li key={markId(r.item)} className={cx(r.item.scope && `life-${r.item.scope.id}`)}>
-              <a
-                href={`#${markId(r.item)}`}
-                data-mini={markId(r.item)}
-                className="mini-link flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm text-white/75 hover:bg-white/5"
-              >
-                <span aria-hidden className="mini-dot h-2 w-2 shrink-0 rounded-full bg-(--accent)" />
-                <span className="w-10 shrink-0 text-xs text-white/50 tabular-nums">{year(r.item)}</span>
-                <span className="min-w-0 truncate">{r.item.c.title.en}</span>
-              </a>
-            </li>
-          ),
-        )}
-      </ol>
+      <div className="absolute top-full right-0 mt-3 w-[min(22rem,calc(100vw-2rem))] rounded-2xl border border-white/10 bg-[#0b0b0e]/95 shadow-2xl backdrop-blur-md">
+        <p className="flex items-center gap-3 border-b border-white/10 px-4 py-3 text-sm text-white/85">
+          <span aria-hidden className="h-2 w-2 shrink-0 rounded-full bg-(--accent)" />
+          <span data-index-current className="min-w-0 truncate">
+            Journey map
+          </span>
+        </p>
+        <ol className="max-h-[70vh] overflow-y-auto px-2 py-2">
+          {rows.map((r) =>
+            r.kind === 'part' ? (
+              <li key={r.part.id} className={cx(eyebrow, 'px-3 pt-3 pb-1 text-[0.62rem]')}>
+                {r.part.title}
+              </li>
+            ) : (
+              <li key={markId(r.item)} className={cx(r.item.scope && `life-${r.item.scope.id}`)}>
+                <a
+                  href={`#${markId(r.item)}`}
+                  data-mini={markId(r.item)}
+                  className="mini-link flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm text-white/75 hover:bg-white/5"
+                >
+                  <span aria-hidden className="mini-dot h-2 w-2 shrink-0 rounded-full bg-(--accent)" />
+                  <span className="w-10 shrink-0 text-xs text-white/50 tabular-nums">{year(r.item)}</span>
+                  <span className="min-w-0 truncate">{r.item.c.title.en}</span>
+                </a>
+              </li>
+            ),
+          )}
+        </ol>
+      </div>
     </details>
   )
 }

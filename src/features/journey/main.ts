@@ -3,6 +3,8 @@
 import 'virtual:journey-accents.css'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { backToClose } from '../../ui/backToClose'
+import { mountContact } from './contact'
 import { initFilters } from './filters'
 
 /**
@@ -11,6 +13,7 @@ import { initFilters } from './filters'
  * inteiro, sem se desenhar.
  */
 gsap.registerPlugin(ScrollTrigger)
+mountContact()
 
 const SVG = 'http://www.w3.org/2000/svg'
 const LINE = 0.55 // a linha de leitura, em fração da altura da tela
@@ -141,10 +144,43 @@ function remeasure() {
 if (timeline) new ResizeObserver(remeasure).observe(timeline)
 initFilters(remeasure)
 
-// No celular, escolher um marco no índice fecha a barra.
-sheet?.addEventListener('click', (e) => {
-  if (e.target instanceof Element && e.target.closest('a')) sheet.open = false
-})
+/*
+ * O menu do mapa no celular (IndexSheet, no cabeçalho): fecha ao escolher um marco, quando o foco sai dele, com um
+ * toque fora (no toque o foco nem sempre muda) ou com Esc.
+ */
+if (sheet) {
+  const close = () => {
+    sheet.open = false
+  }
+  // Botão voltar (J85): com o menu aberto, o voltar fecha o menu antes de navegar.
+  const back = backToClose(close)
+  sheet.addEventListener('toggle', () => {
+    if (sheet.open) back.opened()
+    else back.closed()
+  })
+  // Escolher um marco: tira do histórico a entrada do menu e só depois vai ao marco (senão o voltar cairia nela).
+  sheet.addEventListener('click', (e) => {
+    const a = e.target instanceof Element ? e.target.closest('a') : null
+    if (!a) return
+    e.preventDefault()
+    back.closed(() => {
+      location.hash = a.hash
+    })
+    close()
+  })
+  sheet.addEventListener('focusout', (e) => {
+    if (!(e.relatedTarget instanceof Node && sheet.contains(e.relatedTarget))) close()
+  })
+  document.addEventListener('pointerdown', (e) => {
+    if (sheet.open && e.target instanceof Node && !sheet.contains(e.target)) close()
+  })
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && sheet.open) {
+      close()
+      sheet.querySelector('summary')?.focus()
+    }
+  })
+}
 
 const mm = gsap.matchMedia()
 mm.add('(prefers-reduced-motion: no-preference)', () => {

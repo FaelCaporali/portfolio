@@ -11,8 +11,9 @@ const GROUPS = [
 
 /**
  * A barra de filtros (J64: "range de data, stacks, skills, tools [...] facilitar o trabalho de recrutadores"). O HTML
- * sai pronto do build, com todas as tags da jornada; sem JavaScript ela fica escondida (`hidden`) e a página segue
- * inteira. main.ts (filters.ts) liga os controles, esconde as paradas fora do filtro e guarda a escolha no endereço,
+ * sai pronto do build, com todas as tags da jornada e já no tamanho final (a página não pula quando o script
+ * chega): até lá, `aria-busy` deixa os botões em esqueleto (journey.css). Sem JavaScript a página segue inteira.
+ * main.ts (filters.ts) liga os controles, esconde as paradas fora do filtro e guarda a escolha no endereço,
  * para o link filtrado poder ser enviado.
  */
 export function Filters({ items }: { items: Dated[] }) {
@@ -22,7 +23,7 @@ export function Filters({ items }: { items: Dated[] }) {
   return (
     <div
       data-filters
-      hidden
+      aria-busy="true"
       className="filters sticky top-14 z-20 border-y border-white/[0.06] bg-[#0b0b0e]/85 backdrop-blur-md"
     >
       <div className="relative mx-auto flex max-w-7xl flex-wrap items-center gap-1.5 px-4 py-2 sm:gap-2 sm:px-8 sm:py-2.5 lg:pr-20 xl:pr-60">
