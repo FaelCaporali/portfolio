@@ -2,7 +2,7 @@
 @import '../../index.css';
 
 /* A cor da vida (cada .life-<id> troca; CSS gerado de journey.ts, vite.config.ts). Registrada como cor para a troca
-   do <body> (vida em leitura, main.ts) ser uma transição, não um salto. */
+   do <body> (vida em leitura, useJourneyMotion) ser uma transição, não um salto. */
 @property --accent {
   syntax: '<color>';
   inherits: true;
@@ -43,7 +43,7 @@ body:not([class*='life-']) .page-glow {
   padding-bottom: 0.08em;
 }
 
-/* Sem JavaScript, o eixo reto; com ele (main.ts põe .map-ready), o caminho sinuoso no lugar. */
+/* Sem JavaScript, o eixo reto; com ele (useJourneyMotion põe .map-ready), o caminho sinuoso no lugar. */
 .map-ready .rail {
   display: none;
 }
@@ -70,7 +70,7 @@ body:not([class*='life-']) .page-glow {
   background: #111116;
 }
 
-/* O ano em contorno, na cor da vida, só na primeira parada do ano (J61; Checkpoint.tsx e, com filtro, filters.ts). */
+/* O ano em contorno, na cor da vida, só na primeira parada do ano (J61; Checkpoint.tsx, também com filtro). */
 .year-mark {
   display: none;
   color: color-mix(in oklab, var(--accent) 7%, transparent);
@@ -142,7 +142,7 @@ body:not([class*='life-']) .page-glow {
   color: color-mix(in oklab, var(--accent) 60%, white);
 }
 
-/* Marco em leitura (main.ts marca .is-current): o ponto enche e brilha, o cartão acende a borda. Os outros ficam
+/* Marco em leitura (.is-current, JourneyPage): o ponto enche e brilha, o cartão acende a borda. Os outros ficam
    inteiros; nada se apaga. */
 .checkpoint .dot,
 .checkpoint .card {
@@ -162,9 +162,14 @@ body:not([class*='life-']) .page-glow {
   background: color-mix(in oklab, var(--accent) 5%, #111116);
 }
 
-/* Entrada: só o que está abaixo da tela ao abrir, e só com movimento liberado (main.ts põe .reveal e .is-in). */
+/* O marco escolhido no menu do mapa só recebe o foco como ponto de partida do Tab (Minimap: focusMark): sem anel. */
+[data-checkpoint]:focus {
+  outline: none;
+}
+
+/* Entrada: só o que está abaixo da tela ao abrir, e só com movimento liberado (useJourneyMotion: .reveal e .is-in). */
 @media (prefers-reduced-motion: no-preference) {
-  /* Só opacidade: deslocar o marco tiraria o caminho do lugar (main.ts mede os pontos). */
+  /* Só opacidade: deslocar o marco tiraria o caminho do lugar (useJourneyMotion mede os pontos). */
   .reveal {
     opacity: 0;
     transition: opacity 0.7s ease;
@@ -174,7 +179,7 @@ body:not([class*='life-']) .page-glow {
   }
 }
 
-/* Barra de progresso: main.ts estica com a rolagem. */
+/* Barra de progresso: useJourneyMotion estica com a rolagem. */
 .progress {
   transform: scaleX(0);
 }
@@ -187,7 +192,7 @@ body:not([class*='life-']) .page-glow {
   transform: scale(1.25);
 }
 
-/* Filtros em esqueleto até o script ligar (aria-busy, filters.ts): o mesmo tamanho, sem clique, com um brilho lento. */
+/* Filtros em esqueleto até a hidratação (aria-busy, Filters.tsx): o mesmo tamanho, sem clique, com um brilho lento. */
 .filters[aria-busy='true'] [data-filter-menu] > summary {
   pointer-events: none;
   color: transparent;
@@ -209,7 +214,7 @@ body:not([class*='life-']) .page-glow {
   }
 }
 
-/* Filtros (Filters.tsx, filters.ts): a tag escolhida acende; nos cartões, a tag que casa com o filtro ganha contorno;
+/* Filtros (Filters.tsx): a tag escolhida acende; nos cartões, a tag que casa com o filtro ganha contorno;
    no minimapa, o marco fora do filtro fica apagado. */
 .filter-tag {
   cursor: pointer;

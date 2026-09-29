@@ -31,6 +31,14 @@ export function usePopover() {
     if (open) back.current?.opened()
     else back.current?.closed()
   }, [open])
+  /** Fecha indo a `url` na mesma página (escolher um item do índice): a entrada do painel vira a do destino. */
+  const closeTo = useCallback(
+    (url: string) => {
+      back.current?.closedTo(url)
+      close()
+    },
+    [close],
+  )
 
   const triggerProps = {
     ref: trigger,
@@ -42,5 +50,5 @@ export function usePopover() {
     },
   }
 
-  return { open, close, root, panelId, triggerProps }
+  return { open, close, closeTo, root, panelId, triggerProps }
 }

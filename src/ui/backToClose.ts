@@ -1,7 +1,8 @@
 /**
  * Botão voltar com um painel aberto (contato, menu do mapa; J85): 1) fecha o teclado virtual, 2) fecha o painel,
  * 3) só então navega. Ao abrir, o painel ganha uma entrada no histórico (mesmo endereço) que o voltar consome.
- * Fechar por outro meio (Esc, toque fora, enviar, escolher um item) tira essa entrada, para o voltar seguinte navegar.
+ * Fechar por outro meio (Esc, toque fora, enviar) tira essa entrada, para o voltar seguinte navegar; escolher um item
+ * que leva a outro ponto da página troca essa entrada pela do destino.
  */
 export function backToClose(close: () => void) {
   let armed = false
@@ -30,16 +31,21 @@ export function backToClose(close: () => void) {
       armed = true
       history.pushState(history.state, '')
     },
-    /** O painel fechou por outro meio; `then` roda depois que a entrada saiu do histórico. */
-    closed(then?: () => void) {
-      if (!armed) {
-        then?.()
-        return
-      }
+    /** O painel fechou por outro meio (Esc, toque fora, enviar): a entrada dele sai do histórico. */
+    closed() {
+      if (!armed) return
       armed = false
       skip = true
-      if (then) window.addEventListener('popstate', then, { once: true })
       history.back()
+    },
+    /**
+     * O painel fechou indo a `url` na mesma página (um marco do índice): a entrada dele vira a do destino. Voltar no
+     * histórico e só então navegar não serve: o navegador restaura a rolagem depois do `popstate`, por cima da ida.
+     */
+    closedTo(url: string) {
+      if (armed) history.replaceState(history.state, '', url)
+      else history.pushState(history.state, '', url)
+      armed = false
     },
     dispose() {
       window.removeEventListener('popstate', onPop)

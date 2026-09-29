@@ -20,9 +20,9 @@ async function journeyRender(): Promise<JourneyRender> {
 const ACCENTS_ID = 'virtual:journey-accents.css'
 
 /**
- * Página da trajetória (/journey) como HTML estático: o React roda aqui, no build, e o navegador recebe o texto
- * pronto (indexável e legível sem JavaScript), sem React nem three.js. As cores das vidas saem de journey.ts como
- * classes num CSS gerado, porque a CSP das páginas não aceita estilo inline.
+ * Página da trajetória (/journey) renderizada no build: o navegador recebe o texto pronto (indexável e legível sem
+ * JavaScript) e o React hidrata a mesma árvore (src/features/journey/main.tsx), sem three.js. As cores das vidas saem
+ * de journey.ts como classes num CSS gerado, porque a CSP das páginas não aceita estilo inline.
  */
 function journeyPage(): Plugin {
   return {
@@ -39,7 +39,7 @@ function journeyPage(): Plugin {
         return html.replace('<!--journey-->', (await journeyRender()).renderJourney())
       },
     },
-    // O navegador não importa o texto (ele vem no HTML): editado o conteúdo ou a página, recarrega a página inteira.
+    // O HTML da página sai do render: editado o conteúdo ou a página, recarrega a página inteira.
     // O CSS das cores é virtual e o Vite o guarda: sem invalidar, a mudança só aparecia ao reiniciar o servidor.
     hotUpdate({ file, server }) {
       if (!/src\/(content|features\/journey)\//.test(file)) return

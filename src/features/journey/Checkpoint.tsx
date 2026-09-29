@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { periodLabel, type Checkpoint as Data } from '../../content/journey-timeline'
 import { cx } from '../../lib/cx'
 import type { Lane, Placed } from './layout'
@@ -22,8 +23,8 @@ const LANDMARK: Record<Lane, string> = {
   wide: 'lg:col-start-2 lg:col-end-12 lg:row-start-1 lg:text-center',
 }
 /*
- * O ponto por onde passa o caminho (main.ts lê [data-node]). No celular ondula na margem esquerda; no desktop fica na
- * borda de cima do cartão, perto do canto de fora, para o caminho cruzar a tela de um lado ao outro.
+ * O ponto por onde passa o caminho (useJourneyMotion lê [data-node]). No celular ondula na margem esquerda; no
+ * desktop fica na borda de cima do cartão, perto do canto de fora, para o caminho cruzar a tela de um lado ao outro.
  */
 const NODE: Record<Lane, string> = {
   left: '-left-[1.875rem] top-9 lg:top-0 lg:left-12',
@@ -39,35 +40,43 @@ const NODE: Record<Lane, string> = {
 const BIG =
   'text-[min(2.75rem,calc((100vw_-_5rem)/7.4))] lg:text-[min(5.6vw,3.875rem)] leading-[0.95] font-semibold tracking-[-0.045em]'
 
-/** As tags de um grupo num atributo, para o filtro (main.ts); "|" não aparece em nenhuma tag. */
-const joined = (items: string[] | undefined) => items?.join('|')
-
 /**
  * Um marco do mapa, em duas camadas (J27): o que se lê de relance (data, título, papel, a frase, as conquistas e as
  * tags) e a história, que abre com um clique (`<details>`: funciona sem JavaScript). Quando uma vida do herói começa
  * aqui, o nome dela vem grande ao lado, na cor dela (J52: a tela ocupada); quando o ano muda, o ano vem antes, no
  * caminho (J61).
  */
-export function Checkpoint({ item }: { item: Placed }) {
-  const { c, scope, life, lane, year, yearFirst, from, to } = item
+interface Props {
+  item: Placed
+  /** Fora do filtro: a parada some da página e do caminho. */
+  hidden: boolean
+  /** A primeira parada à vista do ano: o ano grande vem antes dela. */
+  yearFirst: boolean
+  /** As tags escolhidas no filtro: acendem no cartão. */
+  chosen: ReadonlySet<string>
+  /** O marco em leitura: o ponto enche e o cartão acende a borda. */
+  current: boolean
+  /** Entrada na rolagem (só com movimento liberado): esperando (false) ou já entrou (true). */
+  reveal: boolean | undefined
+}
+
+export const Checkpoint = memo(function Checkpoint({ item, hidden, yearFirst, chosen, current, reveal }: Props) {
+  const { c, scope, life, lane, year } = item
   const period = periodLabel(c)
   const wide = lane === 'wide'
   return (
     <li
       id={life?.id ?? c.id}
+      hidden={hidden}
       data-checkpoint
       data-scope={scope?.id}
-      data-label={[period, c.title.en].filter(Boolean).join(' · ')}
-      data-year={year}
-      data-from={from}
-      data-to={to}
-      data-tools={joined(c.tags?.tools)}
-      data-concepts={joined(c.tags?.concepts)}
-      data-skills={joined(c.tags?.skills)}
       className={cx(
         scope && `life-${scope.id}`,
         yearFirst && 'year-first',
         'checkpoint relative scroll-mt-20 pb-12 pl-10 sm:pb-14 lg:pl-0',
+        current && 'is-current',
+        reveal !== undefined && 'reveal',
+        reveal && 'is-in',
       )}
     >
       {year && <YearMark year={year} />}
@@ -107,7 +116,7 @@ export function Checkpoint({ item }: { item: Placed }) {
             </p>
             {c.highlights && <Highlights items={c.highlights.en} className="mt-5 hidden sm:block" />}
           </div>
-          <Tags tags={c.tags} wide={wide} />
+          <Tags tags={c.tags} wide={wide} chosen={chosen} />
           <details className="group mt-6 border-t border-white/[0.08] pt-4">
             <summary className="inline-flex min-h-9 cursor-pointer list-none items-center gap-2 text-sm font-medium text-white/70 hover:text-white focus-visible:outline-2 focus-visible:outline-white [&::-webkit-details-marker]:hidden">
               <span className="group-open:hidden">Read the story</span>
@@ -137,7 +146,7 @@ export function Checkpoint({ item }: { item: Placed }) {
       </div>
     </li>
   )
-}
+})
 
 /** A vida do herói que começa neste marco: o nome grande, na cor dela, sem numeração (J66). */
 function Landmark({ life, lane }: { life: NonNullable<Placed['life']>; lane: Lane }) {
@@ -181,7 +190,7 @@ function Highlights({ items, className }: { items: string[]; className: string }
  * Tags separadas em ferramentas, conceitos e habilidades (J26), num peso abaixo do texto: são o índice do que o marco
  * usou, não a história. No marco largo, três colunas lado a lado; nos outros, um grupo embaixo do outro.
  */
-function Tags({ tags, wide }: { tags: Data['tags']; wide: boolean }) {
+function Tags({ tags, wide, chosen }: { tags: Data['tags']; wide: boolean; chosen: ReadonlySet<string> }) {
   const groups = TAG_GROUPS.flatMap((g) => {
     const items = tags?.[g.key]
     return items?.length ? [{ ...g, items }] : []
@@ -202,8 +211,11 @@ function Tags({ tags, wide }: { tags: Data['tags']; wide: boolean }) {
               {g.items.map((t) => (
                 <li
                   key={t}
-                  data-tag={t}
-                  className={cx('tag rounded-full px-2.5 py-0.5 text-[0.72rem]', `tag-${g.key}`)}
+                  className={cx(
+                    'tag rounded-full px-2.5 py-0.5 text-[0.72rem]',
+                    `tag-${g.key}`,
+                    chosen.has(t) && 'is-match',
+                  )}
                 >
                   {t}
                 </li>

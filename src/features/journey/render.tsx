@@ -1,13 +1,19 @@
-import { renderToStaticMarkup } from 'react-dom/server'
+import { StrictMode } from 'react'
+import { renderToString } from 'react-dom/server'
 import { stages } from '../../content/journey'
 import { JourneyPage } from './JourneyPage'
 
 /**
- * Chamadas do build (vite.config.ts, journeyPage), nunca do navegador: o HTML da página e o CSS das cores das vidas
- * (a CSP não aceita estilo inline, então a cor de cada vida vira uma classe).
+ * Chamadas do build (vite.config.ts, journeyPage), nunca do navegador: o HTML da página, que o navegador hidrata
+ * (main.tsx, a mesma árvore), e o CSS das cores das vidas (a CSP não aceita estilo inline, então a cor de cada vida
+ * vira uma classe).
  */
 export function renderJourney(): string {
-  return renderToStaticMarkup(<JourneyPage />)
+  return renderToString(
+    <StrictMode>
+      <JourneyPage />
+    </StrictMode>,
+  )
 }
 
 /**

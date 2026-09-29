@@ -3,8 +3,8 @@ import type { Checkpoint } from '../../content/journey-timeline'
 
 /**
  * Onde cada marco fica no mapa (J52: "cada elemento em um canto [...] contínua mas tortuosa"). No desktop os marcos
- * comuns alternam entre a metade esquerda e a direita, e o de foco ocupa a largura; o caminho sinuoso que main.ts
- * desenha liga um ao outro. Tudo decidido no build: o HTML já sai com as classes certas.
+ * comuns alternam entre a metade esquerda e a direita, e o de foco ocupa a largura; o caminho sinuoso que
+ * useJourneyMotion desenha liga um ao outro. Tudo decidido no build: o HTML já sai com as classes certas.
  */
 export type Lane = 'left' | 'right' | 'wide'
 
@@ -21,10 +21,10 @@ export interface Dated extends Item {
   year?: string
   /**
    * A primeira parada do ano: o ano grande aparece no caminho, antes dela, uma vez só (J61: "2021 [...] alocada entre
-   * uber e estudos", sem "muitos 2025 repetidos"). Com filtro, main.ts refaz a conta sobre as paradas à vista.
+   * uber e estudos", sem "muitos 2025 repetidos"). Com filtro, JourneyPage refaz a conta sobre as paradas à vista.
    */
   yearFirst: boolean
-  /** Os anos que a parada cobre, para o filtro de período (main.ts). */
+  /** Os anos que a parada cobre, para o filtro de período (useFilters). */
   from: number
   to: number
 }
