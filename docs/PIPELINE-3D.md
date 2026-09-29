@@ -1,106 +1,78 @@
-# Pipeline 3D — scan da cabeça e props no Blender
+# Pipeline 3D — do scan ao herói do site
 
-Objetivo: um busto seu (`head.glb`) e um prop por etapa da jornada (`props/<id>.glb`),
-carregados pelo Three.js no hero. Este documento é o contrato entre o que sai do Blender
-e o que o código espera.
-
-## 1. Captura e reconstrução (100% gratuito)
-
-Celular: **Poco X5 (Xiaomi, Android, sem LiDAR)**. Sem app pago. FaceBuilder (KeenTools) foi
-descartado: é pago após 15 dias de teste.
-
-### Duas rotas em paralelo, fica a melhor
-
-| Rota                                | Onde processa              | Custo                        | Observação                                                                 |
-| ----------------------------------- | -------------------------- | ---------------------------- | -------------------------------------------------------------------------- |
-| ~~RealityScan Mobile~~              | —                          | —                            | **Incompatível com o Poco X5** (verificado na Play Store em 2026-09-14).   |
-| KIRI Engine 4.0 (plano Basic)       | nuvem, app Android 7+      | grátis, exportação ilimitada | Até 150 fotos por scan no Basic. Exporta OBJ/FBX/GLTF/STL direto do app.   |
-| Meshroom 2025.1.0 (AliceVision 3.3) | local, CUDA 12 na RTX 3050 | grátis                       | Instalado localmente (2026-09-15). `meshroom_batch -i <fotos> -o <saída>`. |
-
-Ordem: KIRI Engine é a rota principal (60–80 fotos bastam para um busto). Meshroom entra como terceira via quando houver disco.
-Fontes verificadas em 2026-09-14: release do Meshroom no GitHub, realityscan.com, kiriengine.app/pricing.
-
-### Câmera do Poco X5
-
-- Use o app **Open Camera** (grátis, F-Droid/Play) ou o modo **Pro** da câmera nativa.
-- Trave ISO (100–200), velocidade (≥ 1/125 s), foco (manual, no rosto) e balanço de branco. Nada pode mudar entre fotos.
-- Resolução máxima da câmera principal (48 MP), sem HDR, sem filtro de beleza, sem zoom.
-- Formato JPG qualidade máxima. Se o app oferecer RAW, JPG basta.
-
-### Sessão de fotos
-
-1. Outra pessoa fotografa. Você fica sentado, imóvel, expressão neutra, olhos abertos, boca fechada. Piscou ou mexeu, refaz a órbita.
-2. Luz difusa e uniforme: dia nublado perto de janela grande, ou duas luzes brancas iguais dos dois lados. Sem sol direto, sem flash, sem sombra dura.
-3. Fundo fosco sem padrão. Sem óculos. Cabelo ajeitado para trás (o cabelo será refeito no Blender de qualquer forma). Camisa lisa escura.
-4. 100 a 150 fotos em três órbitas completas: altura dos olhos, ~30° acima, ~20° abaixo. Passo de ~8° entre fotos, sobreposição de 70%.
-5. Distância constante de 60–80 cm. Inclua a cabeça inteira, pescoço e topo dos ombros em todas as fotos.
-6. Extra: 10 fotos de detalhe (orelhas, nuca, queixo por baixo) mantendo a mesma exposição.
-7. Cópia das fotos para esta máquina (`3d/captura/2026-xx-xx/`) para a rota Meshroom.
-
-### Referência para expressões e variantes
-
-Fotos adicionais, mesma luz: sorriso, choro (cara de choro), foco/concentração, surpresa; de frente e 3/4. Servem de referência para esculpir as shape keys. Fotos das tatuagens em alta resolução, planas, para virar decal.
-
-## 2. Blender — limpeza do busto
-
-1. Importe o scan. `Ctrl+A` → Apply All Transforms.
-2. Corte o busto: Edit Mode, selecione tudo abaixo da linha do peito e delete; feche o buraco com `F` ou `Alt+F`. Alternativa: modifier Boolean com um cubo.
-3. Remova ilhas soltas: Edit Mode, `Select → Select All by Trait → Loose Geometry` e delete; depois `Mesh → Clean Up → Merge by Distance`.
-4. Sculpt Mode com brush Smooth (força baixa) apenas nas regiões ruidosas (cabelo, orelhas). Não suavize olhos, nariz e boca.
-5. Topologia limpa: `Object → Quick Effects`/modifier **Remesh (QuadriFlow)** com ~20 mil faces, ou Decimate se a malha já estiver boa. Topologia limpa é o que permite shape keys e decal de tatuagem. Cabelo do scan é descartado e refeito (mesh escultural ou cartões).
-6. Textura: se o scan trouxe várias texturas, faça UV unwrap (`Smart UV Project`) e bake da cor (Diffuse, só Color) em uma imagem de 2048×2048. Salve como JPG qualidade 85.
-   6b. Shape keys: Basis + choro, sorriso, foco, surpresa, esculpidas em Sculpt Mode com as fotos de referência.
-7. Material: Principled BSDF, Base Color = textura baked, Roughness ~0.6, Metallic 0. Nada de nós especiais; o exportador glTF só entende Principled.
-8. Origem: `Object → Set Origin → Origin to Geometry`, depois mova para que a base do busto fique em Z=0 e o centro em X=0, Y=0.
-9. Escala: 1 unidade do Blender = 1 metro. A cabeça deve ter ~0,25 m de altura; o busto inteiro ~0,45 m.
-10. Rosto olhando para −Y no Blender (frente padrão). O exportador converte para +Z no glTF.
-
-## 3. Blender — props por etapa
-
-Um arquivo por etapa. Ids e sugestões de objeto (a decisão final é sua):
-
-| id             | Slot                      | Prop sugerido                                         |
-| -------------- | ------------------------- | ----------------------------------------------------- |
-| `financeiro`   | administrador financeiro  | calculadora, gravata ou planilha flutuando            |
-| `empreendedor` | empreendedor              | prancha de SUP, cupcake, chave de hostel              |
-| `vela`         | professor de barco a vela | boné de marinheiro na cabeça, mini veleiro            |
-| `uber`         | Motorista de uber         | volante, lágrimas (duas gotas azuis saindo dos olhos) |
-| `qa`           | QA tester                 | lupa, inseto (bug) pousado na testa                   |
-| `fullstack`    | Fullstack dev             | óculos, chaves `{ }` e `< />` orbitando               |
-| `techlead`     | TechLead                  | apito, headset, ou pequenos cubos-pessoas ao redor    |
-| `cto`          | FDE CTO                   | capacete de obra? mapa/rota? (a confirmar com Fael)   |
-| `ai`           | AI Software developer     | nós e arestas de rede neural orbitando, chip          |
-
-Regras:
-
-- Low-poly estilizado. Alvo de 500 a 3 mil triângulos por prop. Cores chapadas (material sem textura) ou uma textura pequena de 512px.
-- Origem de cada prop no ponto onde ele encosta na cabeça (boné: origem na base do boné). Props "orbitando" ficam com origem no próprio centro; a órbita é feita em código.
-- Todos os props no mesmo arquivo `.blend`, um por Collection, com a cabeça de referência visível para acertar escala e posição. Exportar uma Collection por vez.
-- Nomeie os objetos dentro do arquivo (`Boné`, `Veleiro`). O código encontra por nome se precisar animar peças separadas.
-- Animações simples (gota caindo, bug andando) podem ser feitas em Blender e exportadas como Actions no glTF; nomeie a Action com o mesmo id do prop.
-
-## 4. Exportação glTF
-
-`File → Export → glTF 2.0`:
-
-- Format: glTF Binary (.glb)
-- Include: Selected Objects (ou a Collection ativa)
-- Transform: +Y Up (padrão)
-- Mesh: Apply Modifiers ✔, UVs ✔, Normals ✔, Vertex Colors só se usou
-- Material: Export, Images: JPEG para o busto, Automatic para props
-- Compression: Draco ✔, level 6, quantization padrão
-- Animation: ✔ só se o prop tiver Action
-
-Orçamento de tamanho (com Draco): `head.glb` ≤ 3 MB, cada prop ≤ 300 KB.
-
-## 5. Onde colocar
+O herói mostra o busto do Fael e, a cada vida, um adereço animado. Tudo em 3D sai de **receitas reprodutíveis**: scripts
+Python rodando no Blender 4.5 sem interface (`blender -b --python …`). Nada é modelado à mão e salvo sem receita: apagar
+a saída e rodar de novo dá o mesmo arquivo. Custo zero (Blender, gltf-transform, meshoptimizer, Playwright).
 
 ```
-public/models/head.glb
-public/models/props/financeiro.glb
-public/models/props/empreendedor.glb
-...
+fotos do celular ─▶ scan ─▶ escultura por receita (S07 → S13) ─▶ busto-s13.glb ─┐
+                                                                               ├─▶ otimizar.mjs ─▶ 3d/export/ ─▶ site
+receita do adereço (3d/tools/prop_<vida>*.py) ─▶ <vida>.glb ───────────────────┘   (meshopt)      (import ?url)
+                                                     │
+                                  provas no site real (portões, volta, colisão, CSP)
 ```
 
-Posição, rotação, escala e animação de cada prop no hero ficam em `src/content/journey.ts`.
-Enquanto os `.glb` não existirem, o site usa um placeholder gerado da foto do currículo.
+## 1. Busto
+
+Scan fotogramétrico do rosto, depois uma cadeia de receitas que esculpe sobre ele, medindo contra as fotos (MediaPipe e
+OpenCV) em cada passo. O busto entregue é o S13: cerca de 47 mil vértices no glb, 10 expressões (morphs no padrão
+ARKit, como `mouthSmileLeft`, `browInnerUp`), pele em WebP. Detalhes, fontes e comandos em [3d/README.md](../3d/README.md).
+
+Regras do busto: o arquivo abre no rosto neutro; nenhuma expressão entra sem passar no portão de expressões
+(`3d/tools/r_exprgate.py`); nenhuma entrega sem as folhas de conferência pela câmera das fotos.
+
+## 2. Adereços (um por vida)
+
+| Vida            | Receita (`3d/tools/`)   | Saída (`3d/export/props/`)                 | Componente (`src/features/hero/scene/props/`) |
+| --------------- | ----------------------- | ------------------------------------------ | --------------------------------------------- |
+| Financeiro      | `props/financeiro/`     | `financeiro.glb`, `financeiro_direita.glb` | `ledger/`                                     |
+| Empreendedor    | `prop_empreendedor*.py` | `empreendedor.glb`                         | `empreendedor/`                               |
+| Vela            | `prop_vela*.py`         | `vela.glb`                                 | `vela/`                                       |
+| Uber            | `prop_uber*.py`         | `uber.glb`                                 | `uber/`                                       |
+| Fullstack       | `prop_fullstack*.py`    | `fullstack.glb`                            | `fullstack/`                                  |
+| QA              | `prop_qa*.py`           | `qa.glb`                                   | `qa/`                                         |
+| Solutions Arch. | `prop_devops*.py`       | `devops.glb`                               | `devops/`                                     |
+| Tech Lead       | `prop_techlead*.py`     | `techlead.glb`                             | `techlead/`                                   |
+| AI Product Eng. | `prop_ai*.py`           | `ai.glb`                                   | `ai/`                                         |
+
+Cada receita monta a cena com o **mesmo busto do site** como referência e a **mesma câmera do site** nas três telas
+(`3d/tools/props/camera-site.json`, gerada do próprio site). Assim o que se vê no Blender é o que o visitante vê.
+Utilitários comuns em `3d/tools/props/comum.py` (espaços glTF ↔ Blender, câmera, render de argila e silhueta).
+
+Divisão de trabalho entre arquivo e código: forma, materiais, texturas e animações que não dependem do visitante vão no
+glb; o que reage ao relógio do carrossel, ao ponteiro ou ao arrasto é procedural no componente da vida.
+
+## 3. Exportação para a web
+
+`node 3d/tools/props/otimizar.mjs <entrada.glb> [saída.glb]` é o passo final de todo glb:
+
+- compressão **meshopt** (`EXT_meshopt_compression`) e quantização (`KHR_mesh_quantization`), **sem Draco**: o
+  decodificador do Draco vem de um CDN externo, que a CSP do site bloqueia; o do meshopt já está no bundle;
+- relê a saída e compara o inventário (nós, malhas, skins, clipes, materiais, vértices, imagens, morfos); se algo mudou,
+  não grava;
+- `--webp=<imagem>=<arquivo>` troca a textura por WebP; `--malha-em-filho` preserva o pivô de nós que o site gira (olhos).
+
+Leitura de um glb: `node 3d/tools/props/glb.mjs <arquivo>`. Erro de quantização contra o original:
+`3d/tools/props/erro_quantizacao.mjs`.
+
+Tamanhos de hoje: busto 1,2 MB; adereços de 66 KB a 338 KB. O site importa cada glb com `?url` (o Vite copia com hash
+no nome) e carrega com `useGLTF` do drei, com pré-carga.
+
+## 4. Provas (no site real, não no Blender)
+
+Todas rodam contra o servidor de dev com Playwright e renderização por software, nas telas 1440×900, 1024×768 e 360×740.
+
+| Ferramenta (`3d/tools/props/`) | O que prova                                                                                  |
+| ------------------------------ | -------------------------------------------------------------------------------------------- |
+| `portoes.mjs`                  | silhueta, tamanho em tela, peça contra a cena e orçamento do arquivo                         |
+| `volta_prop.mjs`               | a volta inteira da vida quadro a quadro: nada sobre texto ou borda, olhos e boca livres      |
+| `colisao_orq.mjs`              | folga mínima entre o adereço e o busto (mais o que está vestido) em várias poses do ponteiro |
+| `prova_csp.mjs`                | build de produção com os cabeçalhos reais: zero violação de CSP, zero requisição externa     |
+| `verifica.mjs`                 | toda entrega tem os arquivos que declara, escritos na execução                               |
+
+Uma vida só entra no site depois de passar nessas provas e de ser aprovada pelo Fael.
+
+## 5. O que fica fora do git
+
+Scans brutos, fotos da captura, iterações intermediárias, renders de processo e caches. A lista de permissão está no
+`.gitignore` da raiz.

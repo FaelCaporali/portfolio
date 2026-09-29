@@ -1,4 +1,4 @@
-/** Textos do widget de contato. Idioma do site ainda em aberto: por ora, inglês. */
+/** Textos do widget de contato, em inglês como o resto do site (`lang="en"` no index.html). */
 import { LIMITS, type ContactErrorCode, type Field } from '../../../shared/contact/contract'
 
 export const FIELD_HINT: Record<Field, string> = {

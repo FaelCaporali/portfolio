@@ -9,7 +9,7 @@ Um Worker só (`wrangler.jsonc`, nome `fael-caporali`, domínio `fael.caporali.d
 A API e as páginas HTML acordam o Worker (`run_worker_first`); JS, modelos, PDFs e ícones saem direto dos assets.
 
 ```
-navegador ── POST /api/contact ──▶ Worker ──▶ D1 (grava) ──▶ send_email ──▶ fael@caporali.dev ──▶ Email Routing ──▶ Gmail
+navegador ── POST /api/contact ──▶ Worker ──▶ D1 (grava) ──▶ send_email ──▶ fael@caporali.dev ──▶ Email Routing ──▶ caixa
                                      ▲                                                      (worker@mail.caporali.dev)
                             cron */15 min: reenvia pendentes, apaga > 90 dias
 ```
@@ -32,9 +32,16 @@ navegador ── POST /api/contact ──▶ Worker ──▶ D1 (grava) ──�
 | `public/_headers`                        | cabeçalhos de segurança do site (CSP etc.)                                                       |
 | `worker/page.ts`                         | CSP das páginas com nonce por requisição (scripts injetados pela Cloudflare sem `unsafe-inline`) |
 
-O e-mail vai para `fael@caporali.dev` (destino verificado; o roteamento entrega no Gmail). Assim a mensagem chega
-"para" o endereço profissional e a resposta sai por ele ("Enviar como" + "responder do mesmo endereço", docs/EMAIL.md).
-Reply-To = e-mail do visitante; se ele deixou telefone, o corpo traz o link `wa.me`.
+O e-mail vai para `fael@caporali.dev` (destino verificado). Assim a mensagem chega "para" o endereço profissional e a
+resposta sai por ele. Reply-To = e-mail do visitante; se ele deixou telefone, o corpo traz o link `wa.me`.
+
+### Entregabilidade
+
+- Disparo automático num subdomínio próprio (`mail.caporali.dev`): a reputação do formulário não contamina a do
+  endereço pessoal, e vice-versa.
+- SPF e DKIM alinhados nos dois caminhos (formulário e caixa pessoal); DMARC `p=reject` no domínio principal, que vale
+  também para os subdomínios: e-mail forjado em nome de `caporali.dev` é recusado pelo destino.
+- Só `fael@caporali.dev` recebe (sem catch-all): outros endereços do domínio são recusados.
 
 ## Segurança (cada ameaça, cada defesa — todas com teste em `worker/test/`)
 
@@ -42,7 +49,7 @@ Reply-To = e-mail do visitante; se ele deixou telefone, o corpo traz o link `wa.
 | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Relay: mandar e-mail a terceiros | binding com `destination_address` e `allowed_sender_addresses` fixos (a própria Cloudflare recusa outro destino/remetente)                                                                                                  |
 | Injeção de cabeçalho             | assunto montado no servidor; campos de uma linha sem CR/LF; Reply-To só com e-mail validado                                                                                                                                 |
-| HTML/phishing no Gmail           | corpo só `text`, nunca `html`                                                                                                                                                                                               |
+| HTML/phishing na caixa           | corpo só `text`, nunca `html`                                                                                                                                                                                               |
 | Texto disfarçado                 | removidos caracteres de controle, marcas bidirecionais, separadores Unicode, BOM                                                                                                                                            |
 | CSRF                             | `Origin` precisa estar em `ALLOWED_ORIGINS`; `Sec-Fetch-Site` diferente de `same-origin` recusado; nenhum cabeçalho CORS                                                                                                    |
 | Robôs                            | Turnstile no servidor (ação `contact`, hostname esperado, uso único, falha fechada; chave de teste só vale com `ALLOW_TEST_TURNSTILE=1`), isca `website`, 3 req/min por IP, teto de 50 mensagens por 24 h                   |
@@ -58,16 +65,19 @@ Entrega garantida: a mensagem é gravada antes do envio. Falhou o envio, o visit
 ## Dados (LGPD)
 
 Tabela `messages`: nome, contato, mensagem, país (da Cloudflare), status. Sem IP, sem identificador do visitante.
-Apagadas após 90 dias pelo cron. O aviso de privacidade entra na tarefa de monitoramento e cookies (#41).
+Apagadas após 90 dias pelo cron. O aviso de privacidade no formulário ainda não está no site (entra com o
+monitoramento).
 
 ## Desenvolvimento
 
-- `pnpm dev` (porta 5199): o Worker roda dentro do Vite; D1, limite e e-mail simulados. O e-mail vira arquivo em
+- `pnpm dev`: o site na porta 5199 (Vite + React Router) e o Worker no `wrangler dev` (porta 8787, `pnpm dev:api`),
+  para onde o Vite encaminha `/api`; D1, limite e e-mail simulados. O e-mail vira arquivo em
   `.wrangler/tmp/email/` (não sai de verdade). Chaves de teste do Turnstile em `.env.development` e `.dev.vars`
   (copiar de `.dev.vars.example`). Primeira vez: `pnpm exec wrangler d1 migrations apply fael-caporali --local`.
 - `pnpm test`: testes do Worker no runtime da Cloudflare (vitest + `@cloudflare/vitest-plugin`, `worker/test/`) e do
   widget e do contrato em jsdom (`src/features/contact/*.test.tsx`, `shared/contact/*.test.ts`).
 - `pnpm e2e`: envio de ponta a ponta pelo widget contra o `pnpm dev` (`e2e/contact.spec.ts`).
+- `pnpm preview`: o build (`build/client`) servido pelo Worker no `wrangler dev` (porta 4299), com a CSP de nonce.
 - `pnpm cf-typegen` depois de mudar `wrangler.jsonc`.
 - O build de produção exige `VITE_TURNSTILE_SITEKEY` (no CI, segredo do ambiente `production`); sem ela, falha de
   propósito.

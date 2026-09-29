@@ -19,7 +19,7 @@ export function ContactWidget() {
     >
       <button
         {...triggerProps}
-        className="flex h-12 w-12 cursor-pointer items-center justify-center gap-2 rounded-full border border-white/25 bg-[#16161b]/90 text-sm font-medium text-white shadow-lg backdrop-blur-md transition-colors hover:border-white/60 hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white min-[361px]:h-14 min-[361px]:w-14 lg:h-auto lg:w-auto lg:bg-white/10 lg:px-5 lg:py-3"
+        className="contact-cta flex h-12 w-12 cursor-pointer items-center justify-center gap-2 rounded-full border border-transparent bg-[#16161b]/90 text-sm font-medium text-white shadow-lg backdrop-blur-md transition-colors hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white min-[361px]:h-14 min-[361px]:w-14 lg:h-auto lg:w-auto lg:bg-white/10 lg:px-5 lg:py-3"
       >
         <svg
           aria-hidden

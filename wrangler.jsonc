@@ -8,9 +8,14 @@
   "routes": [{ "pattern": "fael.caporali.dev", "custom_domain": true }],
   "workers_dev": false,
   "preview_urls": false,
+  // O site: as páginas pré-renderizadas e os arquivos do build do React Router (pnpm build). O wrangler empacota o
+  // Worker direto de worker/index.ts. /journey serve journey/index.html sem a barra no fim (drop-trailing-slash);
+  // endereço que não existe cai no Worker como 404 e ganha a página "Page not found" do roteador (worker/index.ts).
   "assets": {
+    "directory": "./build/client",
     "binding": "ASSETS",
-    "not_found_handling": "single-page-application",
+    "html_handling": "drop-trailing-slash",
+    "not_found_handling": "none",
     // A API e as páginas HTML acordam o Worker (a página ganha a CSP com nonce, worker/page.ts). Arquivos estáticos
     // saem direto dos assets, sem consumir requisições do plano.
     "run_worker_first": ["/*", "!/assets/*", "!/cv/*", "!/favicon.svg", "!/favicon.ico", "!/apple-touch-icon.png"]

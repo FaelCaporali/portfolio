@@ -10,7 +10,17 @@ import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
 export default defineConfig([
-  globalIgnores(['dist', '.wrangler', '3d', 'public', '.claude', '.wai', 'worker/worker-configuration.d.ts']),
+  globalIgnores([
+    'dist',
+    'build',
+    '.react-router',
+    '.wrangler',
+    '3d',
+    'public',
+    '.claude',
+    '.wai',
+    'worker/worker-configuration.d.ts',
+  ]),
 
   // Todo TypeScript: regras com informação de tipo e análise de qualidade (as mesmas do SonarQube/SonarLint).
   {

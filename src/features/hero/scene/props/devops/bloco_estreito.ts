@@ -16,10 +16,62 @@ const quando = (f: number) => T.icones[0] + (T.icones[1] - T.icones[0]) * f
 const KS = ESCALA.sobe
 const KP = ESCALA.producao
 
+/** Abaixo desta altura (px) a coluna da esquerda vira a silhueta compacta (J74: 320×568, coluna de 66 px). */
+const COLUNA_MIN = 100
+
+/**
+ * Coluna da esquerda compacta (J74): a borda numa linha (Route 53 → CloudFront → API Gateway) e, embaixo, a decisão
+ * SQS ✓ × RabbitMQ, só ícones (sem altura para os nomes), dentro do grupo AWS.
+ */
+function colunaCompacta(tl: Tela, esq: Quadro) {
+  const k = TAM[tl.f]
+  const W = esq.x1 - esq.x0
+  const ic = Math.min(k.apoio, Math.floor((W - 12) / 3.2), Math.floor((esq.y1 - esq.y0 - 24) / 2.4))
+  grupo(
+    tl,
+    { x0: esq.x0, y0: esq.y0 - 2, x1: esq.x1, y1: esq.y1 },
+    { icone: 'g_nuvem', titulo: 'AWS', cor: COR.nuvem, t: T.grupos },
+  )
+  const ya = esq.y0 + Math.round(k.nome * 1.6) + 4 + ic / 2
+  const xs = [0.2, 0.5, 0.8].map((f) => esq.x0 + f * W)
+  const ids = ['route53', 'cloudfront', 'apigateway'] as const
+  ids.forEach((id, i) => servico(tl, { id, x: xs[i] ?? 0, y: ya, nome: '', lado: ic, t: quando(i * 0.2) }))
+  for (let i = 1; i < xs.length; i++) {
+    const a = (xs[i - 1] ?? 0) + ic / 2 + 2
+    const b = (xs[i] ?? 0) - ic / 2 - 2
+    seta(
+      tl,
+      [
+        [a, ya],
+        [b, ya],
+      ],
+      { t: quando(i * 0.2 - 0.1), dur: 0.1 * KS, fluxo: true },
+    )
+  }
+  const yq = esq.y1 - 4 - ic / 2
+  const [s0, s1] = JANELA.sqs
+  const xq = esq.x0 + W * 0.3
+  const xr = esq.x0 + W * 0.72
+  tl.p.pares.push({
+    exclusivo: true,
+    de: s0,
+    ate: s1,
+    palco: esq,
+    itens: [
+      { id: 'sqs', nome: 'SQS', x: xq, y: yq, lado: ic, vence: true },
+      { id: 'rabbitmq', nome: 'RabbitMQ', x: xr, y: yq, lado: ic, vence: false },
+    ],
+  })
+  servico(tl, { id: 'sqs', x: xq, y: yq, nome: '', lado: ic, t: s1 })
+  check(tl, xq + ic / 2 + 4, yq - ic / 2 + 2, s1, 6)
+  descartada(tl, { id: 'rabbitmq', x: xr, y: yq, nome: '', lado: ic, t: s1 })
+}
+
 export function blocoEstreito(tl: Tela, esq: Quadro | null, dir: Quadro | null) {
   const k = TAM[tl.f]
   const ic = k.icone
-  if (esq) {
+  if (esq && esq.y1 - esq.y0 < COLUNA_MIN) colunaCompacta(tl, esq)
+  else if (esq) {
     const W = esq.x1 - esq.x0
     const H = esq.y1 - esq.y0
     const x = esq.x0 + W / 2

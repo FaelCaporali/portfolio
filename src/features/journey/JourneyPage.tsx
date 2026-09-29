@@ -1,0 +1,149 @@
+import { useEffect, useMemo } from 'react'
+import { checkpoints, periodLabel, type Checkpoint as Data } from '../../content/journey-timeline'
+import type { Stage } from '../../content/journey'
+import { ContactWidget } from '../contact/ContactWidget'
+import { Checkpoint } from './Checkpoint'
+import { Frame } from './Frame'
+import { Intro, PartHead, type Part } from './Intro'
+import { Filters } from './Filters'
+import { date, place } from './layout'
+import { IndexSheet, markId, Minimap, type Row } from './Minimap'
+import { byId } from './parts'
+import { matches, useFilters, type Group } from './useFilters'
+import { useJourneyMotion } from './useJourneyMotion'
+import './journey.css'
+
+/**
+ * A página da trajetória: uma linha do tempo em duas partes, o prólogo (antes da tecnologia e a virada) e a história
+ * (a carreira em tecnologia), como pediu o Fael (J24), desenhada como um mapa: um caminho contínuo e sinuoso de marco
+ * em marco, com minimapa (J52). É a rota /journey (src/routes/journey.tsx): o build a renderiza em HTML e o navegador a
+ * hidrata. O conteúdo vem de journey.json; sem estilo inline (a CSP só aceita CSS do site): a cor de cada marco é a
+ * classe `life-<id>`.
+ */
+
+/** O primeiro e o último ano de uma parte: as datas das partes saem do conteúdo, nunca escritas à mão (J41). */
+function years(part: Data['part']): string {
+  const dates = checkpoints
+    .filter((c) => c.part === part)
+    .flatMap((c) => [c.period?.start, c.period?.end])
+    .filter((d): d is string => !!d)
+  const ys = dates.filter((d) => d !== 'present').map((d) => Number(d.slice(0, 4)))
+  if (!ys.length) throw new Error(`journey.json: a parte ${part} não tem marco datado`)
+  const last = dates.includes('present') ? 'today' : String(Math.max(...ys))
+  return `${String(Math.min(...ys))} – ${last}`
+}
+
+/** Cada parte vai do primeiro ao último ano dos seus marcos; o prólogo e a história se sobrepõem (J46). */
+const PARTS: Record<Data['part'], Part> = {
+  prologue: { id: 'prologue', title: 'Prologue', span: years('prologue') },
+  story: { id: 'story', title: 'The story', span: years('story') },
+}
+
+/** Cada marco pertence à última vida que começou até ele: é a cor dele e a vida acesa nos pontos do cabeçalho. */
+let current: Stage | undefined
+const scoped = date(
+  checkpoints.map((c) => {
+    const life = c.life ? byId.get(c.life) : undefined
+    current = life ?? current
+    return { c, scope: current, life }
+  }),
+)
+const groups = (['prologue', 'story'] as const).map((part) => ({
+  part: PARTS[part],
+  items: place(scoped.filter(({ c }) => c.part === part)),
+}))
+/** As paradas na ordem da página. */
+const placed = groups.flatMap((g) => g.items)
+const rows: Row[] = groups.flatMap((g) => [
+  { kind: 'part' as const, part: g.part },
+  ...g.items.map((item) => ({ kind: 'mark' as const, item })),
+])
+
+/** O que o filtro aceita: os anos da jornada e as tags que existem nela. */
+const BOUNDS = { min: Math.min(...scoped.map((i) => i.from)), max: Math.max(...scoped.map((i) => i.to)) }
+const tagsIn = (g: Group) => new Set(scoped.flatMap((i) => i.c.tags?.[g] ?? []))
+const KNOWN = { tools: tagsIn('tools'), concepts: tagsIn('concepts'), skills: tagsIn('skills') }
+/** O rótulo de cada marco no topo do menu do mapa (celular). */
+const LABELS = new Map(placed.map((i) => [markId(i), [periodLabel(i.c), i.c.title.en].filter(Boolean).join(' · ')]))
+
+export function JourneyPage() {
+  useEffect(() => {
+    // Link direto a um marco (/journey#vela): o navegador rola até ele ao abrir, com a rolagem suave da página, e o
+    // ScrollTrigger (useJourneyMotion) a interrompe quando mede a página. Aqui a ida é num salto.
+    const id = decodeURIComponent(location.hash.slice(1))
+    if (id) document.getElementById(id)?.scrollIntoView({ behavior: 'instant' })
+  }, [])
+  const filters = useFilters(BOUNDS, KNOWN)
+  const { state } = filters
+  /** As paradas fora do filtro. */
+  const out = useMemo(() => new Set(placed.filter((i) => !matches(i, state)).map(markId)), [state])
+  /**
+   * Com filtro, o ano grande passa para a primeira parada à vista de cada ano (na ordem da página); sem filtro, é o
+   * do layout (layout.ts).
+   */
+  const firsts = useMemo(() => {
+    const ids = new Set<string>()
+    let last: string | undefined
+    for (const i of placed) {
+      if (out.has(markId(i)) || !i.year) continue
+      if (i.year !== last) ids.add(markId(i))
+      last = i.year
+    }
+    return ids
+  }, [out])
+  const { timeline, route, bar, life, mark, reveal } = useJourneyMotion(out)
+
+  return (
+    <>
+      <Frame
+        life={life}
+        bar={bar}
+        menu={<IndexSheet rows={rows} out={out} current={mark} label={LABELS.get(mark ?? '')} />}
+      />
+      <main className="text-white">
+        <Intro />
+        <Filters items={scoped} filters={filters} />
+        <div ref={timeline} className="timeline relative mx-auto max-w-7xl px-5 pb-16 sm:px-8 lg:pr-20 xl:pr-60">
+          {/* Sem JavaScript: o eixo reto. Com ele, o caminho sinuoso no SVG (useJourneyMotion), e o eixo some. */}
+          <div
+            aria-hidden
+            className="rail absolute top-3 bottom-16 left-[1.5625rem] w-px bg-white/10 sm:left-[2.3125rem]"
+          />
+          <svg ref={route} aria-hidden className="route pointer-events-none absolute top-0 left-0 overflow-visible" />
+          <p hidden={out.size < placed.length} className="py-24 text-center text-lg text-white/70">
+            Nothing on the map matches these filters.{' '}
+            <button type="button" onClick={filters.clear} className="underline underline-offset-4 hover:text-white">
+              Clear filters
+            </button>
+          </p>
+          {groups.map((g) => (
+            <section
+              key={g.part.id}
+              id={g.part.id}
+              hidden={g.items.every((i) => out.has(markId(i)))}
+              aria-labelledby={`${g.part.id}-title`}
+              className="scroll-mt-32"
+            >
+              <PartHead part={g.part} />
+              <ol>
+                {g.items.map((item) => (
+                  <Checkpoint
+                    key={item.c.id}
+                    item={item}
+                    hidden={out.has(markId(item))}
+                    yearFirst={filters.active ? firsts.has(markId(item)) : item.yearFirst}
+                    chosen={filters.chosen}
+                    current={mark === markId(item)}
+                    reveal={reveal.get(markId(item))}
+                  />
+                ))}
+              </ol>
+            </section>
+          ))}
+        </div>
+      </main>
+      <Minimap rows={rows} out={out} current={mark} />
+      <ContactWidget />
+    </>
+  )
+}

@@ -1,9 +1,9 @@
-/// <reference types="vite/client" />
 /**
- * CSP das páginas HTML com nonce por requisição. A Cloudflare lê o nonce do cabeçalho e o põe nos scripts que ela
- * injeta na borda (JS Detections do Bot Fight Mode e o beacon do Web Analytics), então nada precisa de
- * 'unsafe-inline'. Os demais arquivos saem direto dos assets com a CSP do public/_headers (mesmas diretivas, sem
- * nonce).
+ * CSP das páginas HTML com nonce por requisição. As páginas saem prontas do build (React Router, pré-renderizadas) com
+ * <script> inline do roteador (dados da rota, restauração da rolagem, a partida do app): o Worker põe o nonce da
+ * resposta em cada <script> do HTML (HTMLRewriter). A Cloudflare lê o nonce do cabeçalho e o põe nos scripts que ela
+ * injeta na borda (JS Detections do Bot Fight Mode e o beacon do Web Analytics). Nada precisa de 'unsafe-inline'. Os
+ * demais arquivos saem direto dos assets com a CSP do public/_headers (mesmas diretivas, sem nonce).
  */
 
 /** Script do Web Analytics da Cloudflare e o endereço para onde ele envia as medições. */
@@ -35,13 +35,24 @@ function newNonce(): string {
 }
 
 /**
- * Página HTML ganha a CSP com nonce e sai sem cache (o nonce não pode se repetir). O resto passa como veio.
- * No servidor de dev do Vite não se aplica: o recarregamento do React usa script inline.
+ * Página HTML ganha a CSP com nonce, o mesmo nonce em todos os seus <script>, e sai sem cache (o nonce não pode se
+ * repetir). O resto passa como veio. No servidor de dev do Vite as páginas não passam por aqui.
  */
 export function withPageCsp(response: Response): Response {
-  if (import.meta.env.DEV || !response.headers.get('Content-Type')?.includes('text/html')) return response
-  const page = new Response(response.body, response)
-  page.headers.set('Content-Security-Policy', pageCsp(newNonce()))
+  if (!response.headers.get('Content-Type')?.includes('text/html')) return response
+  const nonce = newNonce()
+  const html = new HTMLRewriter()
+    .on('script', {
+      element(el) {
+        el.setAttribute('nonce', nonce)
+      },
+    })
+    .transform(response)
+  const page = new Response(html.body, response)
+  page.headers.set('Content-Security-Policy', pageCsp(nonce))
   page.headers.set('Cache-Control', 'no-store')
+  // O corpo mudou (nonce): tamanho e ETag do arquivo original não valem mais.
+  page.headers.delete('Content-Length')
+  page.headers.delete('ETag')
   return page
 }

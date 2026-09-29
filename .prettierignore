@@ -2,6 +2,8 @@
 pnpm-lock.yaml
 worker/worker-configuration.d.ts
 dist
+build
+.react-router
 .wrangler
 # pipeline 3D (Python e documentos de processo) e arquivos servidos como estão
 3d

@@ -1,4 +1,6 @@
-import { useCallback, useId, useRef, useState } from 'react'
+import { useCallback, useEffect, useId, useRef, useState } from 'react'
+import { useHydrated } from '../lib/useHydrated'
+import { backToClose } from './backToClose'
 import { useDismiss } from './useDismiss'
 
 /**
@@ -17,9 +19,35 @@ export function usePopover() {
   }, [])
   useDismiss(open, close, root)
 
+  // Botão voltar (J85): com o painel aberto, fecha o teclado, depois o painel, e só então navega.
+  const back = useRef<ReturnType<typeof backToClose>>(null)
+  useEffect(() => {
+    const b = backToClose(close)
+    back.current = b
+    return () => {
+      b.dispose()
+    }
+  }, [close])
+  useEffect(() => {
+    if (open) back.current?.opened()
+    else back.current?.closed()
+  }, [open])
+  /** Fecha indo a `url` na mesma página (escolher um item do índice): a entrada do painel vira a do destino. */
+  const closeTo = useCallback(
+    (url: string) => {
+      back.current?.closedTo(url)
+      close()
+    },
+    [close],
+  )
+
+  // A página sai pronta do build: até a hidratação o botão existe mas não abre nada. Desligado até lá, o clique não se
+  // perde em silêncio.
+  const hydrated = useHydrated()
   const triggerProps = {
     ref: trigger,
     type: 'button' as const,
+    disabled: !hydrated,
     'aria-expanded': open,
     'aria-controls': panelId,
     onClick: () => {
@@ -27,5 +55,5 @@ export function usePopover() {
     },
   }
 
-  return { open, close, root, panelId, triggerProps }
+  return { open, close, closeTo, root, panelId, triggerProps }
 }

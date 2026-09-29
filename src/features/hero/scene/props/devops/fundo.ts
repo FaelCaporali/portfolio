@@ -25,6 +25,26 @@ const Z_FUNDO = -0.22
 const ESCALA_MAX = 2
 const BRILHO = 0.92
 const ACENTO = '#ff6ec7'
+/** Altura mínima da base para o assíncrono e os cartões (a mesma com que zonas.ts valida a base). */
+const RESTO_BASE = 90
+
+/**
+ * O fluxo principal (J74, zonas.ts): na faixa de cima (com o assíncrono na coluna entre o título e a cabeça, se
+ * houver), no alto da base ou, sem as duas, a silhueta do retrato.
+ */
+function pintarFluxo(tl: Tela, z: Zonas) {
+  const fx = z.fluxo
+  if (fx?.onde === 'silhueta') {
+    blocoEstreito({ ...tl, f: 'estreito' }, fx.q, null)
+    return
+  }
+  const noTopo = fx?.onde === 'topo'
+  // A seta do evento desce do fluxo para o assíncrono só quando o fluxo está em cima dele.
+  const xEvento = z.esq && noTopo ? z.esq.x0 + 0.28 * (z.esq.x1 - z.esq.x0) : Number.POSITIVE_INFINITY
+  const s = fx ? blocoFluxo({ ...tl, f: fx.estilo }, fx.q, xEvento) : null
+  if (!z.esq) return
+  blocoAssincrono(tl, z.esq, s && noTopo ? s.y : z.esq.y0)
+}
 
 /** Pinta o diagrama inteiro no pincel (recortado pelo canvas dele). */
 function pintar(tl: Tela, z: Zonas) {
@@ -32,11 +52,8 @@ function pintar(tl: Tela, z: Zonas) {
     blocoEstreito(tl, z.esq, z.dir)
     return
   }
-  const xEvento = z.esq ? z.esq.x0 + 0.28 * (z.esq.x1 - z.esq.x0) : Number.POSITIVE_INFINITY
-  if (z.topo) {
-    const s = blocoFluxo(tl, z.topo, xEvento)
-    if (z.esq) blocoAssincrono(tl, z.esq, s.y)
-  }
+  pintarFluxo(tl, z)
+  const fx = z.fluxo
   if (z.dir) {
     const r = { ...z.dir }
     r.y0 = blocoObservabilidade(tl, r) + 8
@@ -47,6 +64,9 @@ function pintar(tl: Tela, z: Zonas) {
   if (!z.base) return
   // Sem coluna entre o título e a cabeça (1024), o assíncrono vai para cima dos cartões.
   const base = { ...z.base }
+  // Com o fluxo no alto da base, o assíncrono e os cartões ficam com o resto, se ele tiver a altura mínima da base.
+  if (fx?.onde === 'base') base.y0 = fx.q.y1 + 8
+  if (base.y1 - base.y0 < RESTO_BASE) return
   if (!z.esq) base.y0 = blocoAssincronoLinha(tl, base) + 6
   blocoCartoes(tl, base)
 }
@@ -67,6 +87,7 @@ export function criarFundo() {
     marcos: [] as { x: number; y: number; t: number }[],
     alarme: null as { x: number; y: number; t: number } | null,
     zonas: null as Zonas | null,
+    ref: null as Referencias | null,
   }
 
   const raio = new THREE.Raycaster()
@@ -94,6 +115,7 @@ export function criarFundo() {
     const rects = paineisPara(zonas)
     const escala = Math.min(ESCALA_MAX, window.devicePixelRatio || 1)
     estado.zonas = zonas
+    estado.ref = ref
     estado.marcos = []
     let pares: Par[] = []
     for (const p of paineis) {

@@ -1,4 +1,5 @@
 import { useRef, type Ref } from 'react'
+import { Link } from 'react-router'
 import { stages, type Stage } from '../../content/journey'
 import { journeyLink, profile, profileLinks } from '../../content/profile'
 import { pill } from '../../ui/pill'
@@ -39,7 +40,7 @@ export function HeroCopy({ ref, stage, leaving }: HeroCopyProps) {
           style={slotSize ? { fontSize: slotSize } : undefined}
           className="mt-2 block min-h-[2em] text-[2.75rem] leading-none font-semibold tracking-tight min-[360px]:text-[3rem] sm:min-h-[1em] lg:text-[clamp(2.75rem,4.4vw,5.5rem)]"
         >
-          <SlotWord text={stage.slot} color={stage.accent} leaving={leaving} />
+          <SlotWord text={stage.slot} life={stage.id} leaving={leaving} />
         </span>
       </h1>
       {/* Celular: um título por linha. A partir de sm: numa linha só, separados por um ponto apagado. */}
@@ -62,14 +63,15 @@ export function HeroCopy({ ref, stage, leaving }: HeroCopyProps) {
         aria-label="Links"
         className="pointer-events-auto mt-6 flex flex-col items-start gap-3 sm:mt-7 lg:mt-8 lg:gap-4 short:mt-3 short:gap-2"
       >
-        {journeyLink.live && (
-          <a
-            href={journeyLink.href}
-            className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-neutral-950 transition-colors hover:bg-white/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white short:py-2"
-          >
-            {journeyLink.label} <span aria-hidden>→</span>
-          </a>
-        )}
+        {/* Leva ao início da trajetória, sempre (J48, 28/09); o salto direto para a vida fica para depois. Pelo
+            roteador, sem recarregar: a página começa a baixar quando o ponteiro ou o foco chega ao botão. */}
+        <Link
+          to={journeyLink.href}
+          prefetch="intent"
+          className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-neutral-950 transition-colors hover:bg-white/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white short:py-2"
+        >
+          {journeyLink.label} <span aria-hidden>→</span>
+        </Link>
         {/* Três pílulas: cabem numa linha desde 320 px. */}
         <ul className="flex flex-wrap gap-1.5 sm:gap-2">
           <li>

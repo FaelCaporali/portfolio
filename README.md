@@ -8,13 +8,13 @@ pelo mesmo Worker da Cloudflare que entrega o site.
 
 | Pasta     | Conteúdo                                                                                                                   |
 | --------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `src/`    | site: Vite 7, React 19, TypeScript, React Three Fiber + drei, Tailwind 4                                                   |
+| `src/`    | site: Vite 7, React 19, React Router 7 (páginas geradas no build), TypeScript, React Three Fiber + drei, Tailwind 4        |
 | `shared/` | contrato do contato (rota, limites, campos, códigos de erro, validação), usado pelo site e pelo Worker                     |
 | `worker/` | API de contato em Cloudflare Workers: Turnstile, limite por IP, D1 e reenvio por cron ([docs/CONTATO.md](docs/CONTATO.md)) |
 | `e2e/`    | testes de ponta a ponta (Playwright) contra o servidor de dev                                                              |
 | `public/` | assets estáticos e cabeçalhos de segurança (`_headers`)                                                                    |
 | `3d/`     | pipeline do busto e do personagem cartoon: Blender 4.5 headless, MPFB, MediaPipe ([3d/README.md](3d/README.md))            |
-| `docs/`   | pipeline 3D, contato, e-mail e pesquisas de referência                                                                     |
+| `docs/`   | pipeline 3D, contato, deploy e pesquisas de referência                                                                     |
 
 O site é organizado por feature, e cada feature separa camadas:
 
@@ -34,10 +34,11 @@ O site é organizado por feature, e cada feature separa camadas:
 pnpm install
 cp .dev.vars.example .dev.vars                                  # chaves de teste do Turnstile
 pnpm exec wrangler d1 migrations apply fael-caporali --local    # primeira vez
-pnpm dev                                                         # http://localhost:5199
+pnpm dev                                                         # http://localhost:5199 (e o Worker na 8787)
 pnpm check                                                       # tipos, ESLint, knip, Prettier e testes
 pnpm e2e                                                         # Playwright contra o pnpm dev (sobe sozinho)
-pnpm build                                                       # exige VITE_TURNSTILE_SITEKEY no ambiente
+pnpm build                                                       # build/client; exige VITE_TURNSTILE_SITEKEY
+pnpm preview                                                     # o build pelo Worker, http://127.0.0.1:4299
 ```
 
 Deploy pelo GitHub Actions a cada push na `main`: [docs/DEPLOY.md](docs/DEPLOY.md).
