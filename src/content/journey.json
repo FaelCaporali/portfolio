@@ -115,17 +115,17 @@
         "pt": "Empreendedor"
       },
       "headline": {
-        "en": "Three businesses of my own, one after another: brownies on the street, a bakery, and a hostel near Brumadinho.",
-        "pt": "Três negócios meus, um depois do outro: brownies na rua, uma confeitaria e um hostel perto de Brumadinho."
+        "en": "Three businesses, one after another: brownies on the street, a bakery, and a hostel near Brumadinho.",
+        "pt": "Três negócios, um depois do outro: brownies na rua, uma confeitaria e um hostel perto de Brumadinho."
       },
       "body": {
         "en": [
-          "The office wasn’t enough, so I left it. With a friend, I started baking brownies in batches and selling them on the street myself, one customer at a time, and every sale put a real number on cost, price and whether someone would come back.",
+          "The office wasn’t enough, so I left it. With a friend, I started baking brownies in batches and selling them on the street in person, one customer at a time, and every sale put a real number on cost, price and whether someone would come back.",
           "From brownies I moved on to a bakery that made cakes, bonbons and sweets, supplying fairs and the breakfast tables of local guesthouses. Then I returned to finance at Immersus.",
           "Even back behind a desk, I kept looking for the next venture. Living near Brumadinho, I saw the tourist traffic in the region and opened a hostel, run alongside the finance job with a partner in charge of operations. After I closed the hostel, sailing came along, and for a short while I kept both the boats and the finance job."
         ],
         "pt": [
-          "O escritório não bastava, então saí dele. Com um amigo, comecei a fazer brownies em fornadas e a vender eu mesmo na rua, um cliente por vez, e cada venda punha um número de verdade no custo, no preço e na chance de o cliente voltar.",
+          "O escritório não bastava, então saí dele. Com um amigo, comecei a fazer brownies em fornadas e a vender pessoalmente na rua, um cliente por vez, e cada venda punha um número de verdade no custo, no preço e na chance de o cliente voltar.",
           "Dos brownies passei para uma confeitaria que fazia bolos, bombons e doces para feiras e para o café da manhã de pousadas da região. Depois voltei para o financeiro da Immersus.",
           "Mesmo de volta à mesa, continuei procurando o próximo negócio. Morando perto de Brumadinho, vi o movimento turístico da região e abri um hostel, tocado junto com o financeiro, com um sócio cuidando da operação. Depois que fechei o hostel veio a vela, e por um tempo conciliei os barcos com o financeiro."
         ]
@@ -339,35 +339,35 @@
         "pt": "Tester de software, construindo a área de qualidade"
       },
       "headline": {
-        "en": "I joined a construction-tech startup as a manual tester and built its QA function from scratch.",
-        "pt": "Entrei numa startup de construção como tester manual e construí a área de qualidade do zero."
+        "en": "I joined a construction-tech startup as a manual tester and set up the QA function it didn’t have yet.",
+        "pt": "Entrei numa startup de construção como tester manual e estruturei a área de qualidade que ela ainda não tinha."
       },
       "highlights": {
         "en": [
-          "Cut open defects from about 300 to under 100, ending the recurring talk of stopping everything for a bug smash.",
+          "Together with engineering, cut open defects from about 300 to under 100, ending the recurring talk of stopping everything for a bug smash.",
           "Incident and failure management: a defined path from bug report to engineering, error reporting and feedback inside the platform, and proactive alerts on API and interface failures.",
           "Wrote the QA documentation: bug-report standards, the protocol for opening tickets with engineering and the testing process itself.",
-          "Built the end-to-end test project from scratch: Cypress running scenarios written in Gherkin."
+          "Created the end-to-end test project: Cypress running scenarios written in Gherkin."
         ],
         "pt": [
-          "Reduzi os defeitos abertos de cerca de 300 para menos de 100, o que acabou com a conversa recorrente de parar tudo para um bug smash.",
+          "Junto com a engenharia, reduzimos os defeitos abertos de cerca de 300 para menos de 100, o que acabou com a conversa recorrente de parar tudo para um bug smash.",
           "Gestão de incidentes e falhas: um caminho definido do relato do bug até a engenharia, relato de erro e feedback dentro da plataforma e alertas proativos de falha de API e de interface.",
           "Escrevi a documentação de qualidade: padrões de relato de bug, o protocolo de abertura de chamado para a engenharia e o próprio processo de teste.",
-          "Construí do zero o projeto de testes ponta a ponta: Cypress executando cenários escritos em Gherkin."
+          "Criei o projeto de testes ponta a ponta: Cypress executando cenários escritos em Gherkin."
         ]
       },
       "body": {
         "en": [
           "Brickup was my first job in software, in June 2023: a construction-tech startup with a growing platform and no QA function yet. I came in as a manual tester, and the cost of having no QA showed in the backlog, where every couple of weeks someone suggested we stop everything for a bug smash.",
           "Instead of just testing harder, I started with the process. I defined how a bug is reported and how it reaches engineering, wrote the standards and the protocol for opening tickets, documented how we test, and gave customers a way to report errors and send feedback without leaving the platform. With monitoring and proactive alerts on API and interface failures, we started hearing about problems before customers had to report them.",
-          "The techniques followed, applied where they paid off rather than by the book: white-box and black-box testing, static review, and unit, integration, regression, exploratory and load tests, all drawn from the CTFL syllabus and chosen by impact. Feature flags made releases safer, and I built the end-to-end test project from the ground up, with its scenarios written in plain language, BDD style.",
-          "I trained the team in the new practices along the way, and the backlog came down from about 300 open defects to fewer than 100."
+          "The techniques followed, applied where they paid off rather than by the book: white-box and black-box testing, static review, and unit, integration, regression, exploratory and load tests, all drawn from the CTFL syllabus and chosen by impact. Feature flags made releases safer, and I created the end-to-end test project, with its scenarios written in plain language, BDD style.",
+          "Along the way I trained the team in the new practices, and together we brought the backlog down from about 300 open defects to fewer than 100."
         ],
         "pt": [
           "A Brickup foi o meu primeiro emprego em software, em junho de 2023: uma startup de construção com uma plataforma crescendo e ainda sem área de qualidade. Entrei como tester manual, e a falta de qualidade aparecia no backlog, onde a cada duas semanas alguém sugeria parar tudo para um bug smash.",
           "Em vez de só testar mais, comecei pelo processo. Defini como um bug é relatado e como chega à engenharia, escrevi os padrões e o protocolo de abertura de chamado, documentei como a gente testa e dei ao cliente um jeito de relatar erros e mandar feedback sem sair da plataforma. Com monitoramento e alertas proativos de falha de API e de interface, passamos a saber dos problemas antes de o cliente precisar avisar.",
-          "As técnicas vieram em seguida, aplicadas onde davam resultado e não por protocolo: caixa branca e caixa preta, revisão estática e testes unitários, de integração, de regressão, exploratórios e de carga, tudo do conteúdo do CTFL e escolhido pelo impacto. Feature flags deixaram as entregas mais seguras, e construí do zero o projeto de testes ponta a ponta, com os cenários escritos em linguagem natural, no estilo BDD.",
-          "No caminho treinei o time nas novas práticas, e o backlog caiu de uns 300 defeitos abertos para menos de 100."
+          "As técnicas vieram em seguida, aplicadas onde davam resultado e não por protocolo: caixa branca e caixa preta, revisão estática e testes unitários, de integração, de regressão, exploratórios e de carga, tudo do conteúdo do CTFL e escolhido pelo impacto. Feature flags deixaram as entregas mais seguras, e criei o projeto de testes ponta a ponta, com os cenários escritos em linguagem natural, no estilo BDD.",
+          "No caminho treinei o time nas novas práticas, e juntos baixamos o backlog de uns 300 defeitos abertos para menos de 100."
         ]
       },
       "tags": {
@@ -430,8 +430,8 @@
         "pt": "Scrum master, product owner e liderança de time"
       },
       "headline": {
-        "en": "Solving problems nobody owned kept turning into new roles.",
-        "pt": "Resolver problemas que ninguém assumia foi virando novas funções."
+        "en": "Taking on problems that had no owner yet kept turning into new roles.",
+        "pt": "Assumir problemas que ainda não tinham dono foi virando novas funções."
       },
       "highlights": {
         "en": [
@@ -453,13 +453,13 @@
         "en": [
           "Once the QA function was running, new work came before any new title: first I was offered the scrum master’s role. I rebuilt the Jira board and created a process for modeling and designing user stories, so that what reached development was already clear.",
           "From there the work moved upstream, into what a product manager or product owner would normally own: requirements, specs, blueprints and documentation. That is how I came to write the specs for the billing and financial services, with bank reconciliation through Open Finance, invoice issuance and ERP integration, and to take over the public API documentation.",
-          "Brickup was also where I started learning architecture and DevOps for real. My first commit to the main server containerized the local environment, and I went on to design and deploy serverless services of my own, such as the integrations service that connects the platform to its CRM, billing and monitoring. Later I also helped design the API gateway.",
-          "Hiring came to me as well: I went looking for people and built the selection processes myself, and for a while I coordinated a team of five developers."
+          "Brickup was also where I started learning architecture and DevOps for real. My first commit to the main server containerized the local environment, and I went on to design and deploy serverless services, such as the integrations service that connects the platform to its CRM, billing and monitoring. Later I also helped design the API gateway.",
+          "Hiring came to me as well: I went looking for people and designed the selection processes, and for a while I coordinated a team of five developers."
         ],
         "pt": [
           "Com a área de qualidade rodando, o trabalho novo veio antes de qualquer cargo novo: primeiro me ofereceram o papel de scrum master. Refiz o board do Jira e criei um processo de modelagem e design de histórias, para que o que chegasse ao desenvolvimento já estivesse claro.",
           "Dali o trabalho subiu para o que normalmente seria de um PM ou PO: requisitos, especificações, blueprints e documentação. Foi assim que escrevi as especificações dos serviços de cobrança e financeiro, com conciliação bancária por Open Finance, emissão de notas e integração com ERP, e assumi a documentação da API pública.",
-          "A Brickup foi também onde comecei a aprender arquitetura e DevOps de verdade. O meu primeiro commit no servidor principal pôs o ambiente local em contêineres, e depois passei a desenhar e implantar serviços serverless meus, como o de integrações, que liga a plataforma ao CRM, à cobrança e ao monitoramento. Mais tarde ajudei também no design do API gateway.",
+          "A Brickup foi também onde comecei a aprender arquitetura e DevOps de verdade. O meu primeiro commit no servidor principal pôs o ambiente local em contêineres, e depois passei a desenhar e implantar serviços serverless, como o de integrações, que liga a plataforma ao CRM, à cobrança e ao monitoramento. Mais tarde ajudei também no design do API gateway.",
           "A contratação também veio para mim: fui atrás de gente e montei os processos seletivos, e por um tempo coordenei um time de cinco desenvolvedores."
         ]
       },
@@ -671,18 +671,18 @@
         "pt": "Arquitetura de soluções e mobile v2"
       },
       "headline": {
-        "en": "I rewrote most of mobile v2 and moved the platform from Lightsail to a production-grade ECS setup.",
-        "pt": "Reescrevi quase todo o mobile v2 e levei a plataforma do Lightsail para um ECS de produção."
+        "en": "I took on most of the mobile v2 rewrite with the two mobile developers and moved the platform from Lightsail to a production-grade ECS setup.",
+        "pt": "Assumi, com os dois desenvolvedores mobile, a maior parte da reescrita do mobile v2 e levei a plataforma do Lightsail para um ECS de produção."
       },
       "highlights": {
         "en": [
-          "Mobile v2: working in a task force with the two mobile developers, I wrote most of the code.",
+          "Mobile v2: rewritten by a task force with the two mobile developers, in which I took on most of the code.",
           "API: tangled code reorganized into a clean monolith, with media upload, messaging and scheduled jobs split into services of their own.",
           "Infrastructure: ECS behind a load balancer, VPC, RDS and blue-green deployments with CodeDeploy, all defined in CloudFormation, with the scheduled jobs on Lambda.",
           "Led the SEO and generative engine optimization (GEO) audit and its ten-part plan for visibility in search engines and AI assistants."
         ],
         "pt": [
-          "Mobile v2: numa força-tarefa com os dois desenvolvedores mobile, escrevi a maior parte do código.",
+          "Mobile v2: reescrito numa força-tarefa com os dois desenvolvedores mobile, em que assumi a maior parte do código.",
           "API: código macarrônico reorganizado num monólito limpo, com upload de mídia, mensageria e rotinas agendadas separadas em serviços próprios.",
           "Infraestrutura: ECS atrás de um balanceador de carga, VPC, RDS e deploy blue-green com CodeDeploy, tudo definido em CloudFormation, com as rotinas agendadas em Lambda.",
           "Conduzi a auditoria de SEO e GEO e o plano em dez frentes para visibilidade em buscadores e assistentes de IA."
@@ -691,14 +691,14 @@
       "body": {
         "en": [
           "When I took over the technical side, Beamble was carrying a lot: live video shopping calls, a cart and checkout, Stripe payments, maps, and delivery through Uber, DHL and UPS in several countries. Underneath, the app had critical performance problems and outdated libraries, the API had grown tangled, and the platform ran on a single Lightsail server.",
-          "Then Google Play set a deadline: from November 2025, every update targeting Android 15 had to support 16 KB memory pages, which the app’s aging native stack couldn’t guarantee, and without that the app could stop shipping updates. That deadline was one more reason to get my hands into the code. In a task force with the two mobile developers, I rewrote most of mobile v2 in React Native, working on memory leaks, video performance and the maps, and adding real-user monitoring with Datadog.",
+          "Then Google Play set a deadline: from November 2025, every update targeting Android 15 had to support 16 KB memory pages, which the app’s aging native stack couldn’t guarantee, and without that the app could stop shipping updates. That deadline was one more reason to get my hands into the code. In a task force with the two mobile developers, we rewrote mobile v2 in React Native. I wrote most of the code, tackling memory leaks, video performance and the maps, and added real-user monitoring with Datadog.",
           "On the back end, the Laravel API went from tangled code to a clean monolith, with media upload, messaging and scheduled jobs moved into services of their own, on Firebase Functions and on AWS Lambda with the Serverless Framework. The platform left Lightsail for ECS behind a load balancer, inside its own VPC, with RDS, auto scaling, alerts and blue-green deployments through CodeDeploy, all defined in CloudFormation.",
           "One of the pieces I’m proudest of from that year is the SEO and GEO audit: a study of how search engines and AI assistants see Beamble, turned into a ten-part plan, from structured data and server-side rendering to Core Web Vitals, tracking brand mentions in LLMs and a Beamble MCP server.",
           "Every change had the same aim: a platform that scales, fails less, is easier for the team to work on and ships on time. Much of what made that possible I had first learned at Brickup."
         ],
         "pt": [
           "Quando assumi a parte técnica, o Beamble carregava muita coisa: videochamadas de compra ao vivo, carrinho e checkout, pagamentos no Stripe, mapas e entrega por Uber, DHL e UPS em vários países. Por baixo, o app tinha problemas críticos de performance e bibliotecas legadas, a API tinha virado um emaranhado, e a plataforma rodava num único servidor Lightsail.",
-          "Então o Google Play marcou um prazo: a partir de novembro de 2025, toda atualização para Android 15 teria de suportar páginas de memória de 16 KB, o que a base nativa antiga do app não garantia, e sem isso o app podia deixar de publicar atualizações. Esse prazo foi mais um motivo para pôr a mão no código. Numa força-tarefa com os dois desenvolvedores mobile, reescrevi quase todo o mobile v2 em React Native, atacando vazamentos de memória, performance de vídeo e os mapas, e acrescentando monitoramento de usuário real com o Datadog.",
+          "Então o Google Play marcou um prazo: a partir de novembro de 2025, toda atualização para Android 15 teria de suportar páginas de memória de 16 KB, o que a base nativa antiga do app não garantia, e sem isso o app podia deixar de publicar atualizações. Esse prazo foi mais um motivo para pôr a mão no código. Numa força-tarefa com os dois desenvolvedores mobile, reescrevemos o mobile v2 em React Native. Fiquei com a maior parte do código, atacando vazamentos de memória, a performance de vídeo e os mapas, e acrescentei o monitoramento de usuário real com o Datadog.",
           "No back-end, a API em Laravel saiu do código macarrônico para um monólito limpo, com upload de mídia, mensageria e rotinas agendadas em serviços próprios, no Firebase Functions e em AWS Lambda com Serverless Framework. A plataforma saiu do Lightsail para o ECS atrás de um balanceador de carga, numa VPC própria, com RDS, auto scaling, alertas e deploy blue-green pelo CodeDeploy, tudo definido em CloudFormation.",
           "Um dos trabalhos de que mais me orgulho naquele ano é a auditoria de SEO e GEO: um estudo de como buscadores e assistentes de IA enxergam o Beamble, transformado num plano em dez frentes, de dados estruturados e renderização no servidor a Core Web Vitals, monitoramento de menções em LLMs e um servidor MCP do Beamble.",
           "Cada mudança tinha o mesmo objetivo: uma plataforma que escala, falha menos, é mais fácil de o time trabalhar e entrega no prazo. Muito do que tornou isso possível eu tinha aprendido antes, na Brickup."
@@ -787,12 +787,12 @@
       },
       "body": {
         "en": [
-          "Beamble opened the door to La Fabrique’s other projects, and Dalegig came next. The platform connects musicians, artists and cultural producers with venues and needed two things from me: an interface for musicians and an engine to help each profile stand out.",
-          "I started with the proof of concept of the musician interface and, by the third version, was coordinating and designing the interface myself. The engine is Chico, an agent that talks with each newly registered musician, researches them across YouTube, Spotify, Instagram and the wider web to build the profile, weighs reach and relevance, and turns what it finds into goals that appear next to the ones the musician sets.",
+          "Beamble opened the door to La Fabrique’s other projects, and Dalegig came next. The platform connects musicians, artists and cultural producers with venues, and I was brought in for two things: an interface for musicians and an engine to help each profile stand out.",
+          "I started with the proof of concept of the musician interface and, by the third version, was coordinating and designing the interface. The engine is Chico, an agent that talks with each newly registered musician, researches them across YouTube, Spotify, Instagram and the wider web to build the profile, weighs reach and relevance, and turns what it finds into goals that appear next to the ones the musician sets.",
           "Chico runs as agents on Flowise and n8n, with Anthropic and OpenAI models, inside an Nx monorepo with React, Node.js and Supabase."
         ],
         "pt": [
-          "O Beamble abriu a porta para os outros projetos da La Fabrique, e o Dalegig veio em seguida. A plataforma conecta músicos, artistas e produtores culturais às casas de show e precisava de duas coisas de mim: uma interface para o músico e um motor que ajudasse cada perfil a se destacar.",
+          "O Beamble abriu a porta para os outros projetos da La Fabrique, e o Dalegig veio em seguida. A plataforma conecta músicos, artistas e produtores culturais às casas de show, e fui chamado para duas coisas: uma interface para o músico e um motor que ajudasse cada perfil a se destacar.",
           "Comecei pela prova de conceito da interface do músico e, na terceira versão, já coordenava e desenhava a interface. O motor é o Chico, um agente que conversa com cada músico recém-cadastrado, pesquisa o músico no YouTube, no Spotify, no Instagram e no resto da internet para montar o perfil, pesa alcance e relevância e transforma o que acha em metas, ao lado das que o próprio músico define.",
           "O Chico roda em agentes no Flowise e no n8n, com modelos da Anthropic e da OpenAI, num monorepo Nx com React, Node.js e Supabase."
         ]
@@ -842,8 +842,8 @@
         "pt": "Líder do projeto conjunto"
       },
       "headline": {
-        "en": "I took over a joint project with Brickup’s partner and investor and turned it into Prévia, an AI construction-planning platform built for large companies.",
-        "pt": "Assumi um projeto conjunto com a parceira e investidora da Brickup e o transformei no Prévia, uma plataforma de planejamento de obras com IA feita para grandes empresas."
+        "en": "I led Brickup’s side of the joint project that grew into Prévia, an AI construction-planning platform built for large companies.",
+        "pt": "Liderei, do lado da Brickup, o projeto conjunto que virou o Prévia, uma plataforma de planejamento de obras com IA feita para grandes empresas."
       },
       "highlights": {
         "en": [
@@ -945,11 +945,11 @@
       },
       "body": {
         "en": [
-          "In 2025 I returned to Immersus, this time on the technical side. The school had three vendors working on its growth (a sales firm, a content marketing agency and a paid-ads manager), and my role was to coordinate them and hold their work to a technical standard. The agency’s new landing page was the first test, and I reviewed it for search visibility, design, responsiveness, performance and brand consistency.",
+          "In 2025 I returned to Immersus, this time on the technical side. The school had three vendors working on its growth (a sales firm, a content marketing agency and a paid-ads manager), and my role was to coordinate them and bring their work to a shared technical standard. The agency’s new landing page was the first test, and I reviewed it for search visibility, design, responsiveness, performance and brand consistency.",
           "Alongside the consulting, I built the school’s web platform on Laravel and React through Inertia, with server-side rendering for the public site, Filament for content, and role-based access and two-factor authentication for the student, teaching and admin areas, each on its own domain."
         ],
         "pt": [
-          "Em 2025 voltei à Immersus, desta vez do lado técnico. A escola tinha três fornecedores cuidando do crescimento (um comercial, uma agência de marketing de conteúdo e um gestor de tráfego pago), e o meu papel era coordenar os três e cobrar deles um padrão técnico. A nova landing page da agência foi o primeiro teste, e eu a avaliei em visibilidade em busca, design, responsividade, performance e consistência de marca.",
+          "Em 2025 voltei à Immersus, desta vez do lado técnico. A escola tinha três fornecedores cuidando do crescimento (um comercial, uma agência de marketing de conteúdo e um gestor de tráfego pago), e o meu papel era coordenar os três e alinhar o trabalho deles a um padrão técnico comum. A nova landing page da agência foi o primeiro teste, e eu a avaliei em visibilidade em busca, design, responsividade, performance e consistência de marca.",
           "Junto com a consultoria, construí a plataforma web da escola em Laravel e React via Inertia, com renderização no servidor para o site público, Filament para o conteúdo e acesso por papel e autenticação em dois fatores nas áreas de aluno, pedagógica e administrativa, cada uma no seu domínio."
         ]
       },
@@ -1018,12 +1018,12 @@
       "body": {
         "en": [
           "BID came to me through HC in November 2025, looking for help with its product roadmap and with how to take the product to market. BID’s trade-in and asset-management platform was spread across earlier versions and several separate apps, so the first job was to bring them into a single React and TypeScript monorepo, with row-level security for multi-tenancy and Terraform on GCP.",
-          "Over time a pattern emerged. The owner kept building prototypes in Lovable and bringing them to me to rebuild with security and scale in mind. Rather than redo every project, I gave him a harness: rules the AI agent must follow, complexity levels that set how much process each change needs, mission logs that record every decision, and gates the code can’t skip, from tests and coverage to hooks that block a commit and CI that blocks a merge, all explained in plain language. He could keep building with AI, and what he built could reach production.",
+          "Over time a pattern emerged. The owner kept building prototypes in Lovable and bringing them to me to rebuild with security and scale in mind. Rather than redo every project, I set up a harness he could build in: rules the AI agent must follow, complexity levels that set how much process each change needs, mission logs that record every decision, and gates the code can’t skip, from tests and coverage to hooks that block a commit and CI that blocks a merge, all explained in plain language. He could keep building with AI, and what he built could reach production.",
           "The big win was the warehouse system, which went into production. Alongside it, a pricing agent uses Claude’s vision capabilities to identify a device and its parts from photos, checks market prices and proposes an offer."
         ],
         "pt": [
           "A BID chegou até mim pela HC em novembro de 2025, buscando ajuda com a gestão do roadmap e com o go-to-market do produto. A plataforma de trade-in e gestão de ativos estava espalhada em versões anteriores e vários apps separados, então o primeiro trabalho foi reuni-los num único monorepo React e TypeScript, com row-level security para multi-tenancy e Terraform no GCP.",
-          "Com o tempo apareceu um padrão. O dono criava protótipos no Lovable e os trazia para eu refazer pensando em segurança e escala. Em vez de refazer cada projeto, entreguei a ele um harness: regras que o agente de IA tem de seguir, níveis de complexidade que definem quanto processo cada mudança exige, registro de missões com cada decisão e gates que o código não pula, de testes e cobertura a hooks que bloqueiam o commit e CI que bloqueia o merge, tudo explicado em linguagem simples. Ele podia continuar construindo com IA, e o que construía podia chegar à produção.",
+          "Com o tempo apareceu um padrão. O dono criava protótipos no Lovable e os trazia para eu refazer pensando em segurança e escala. Em vez de refazer cada projeto, montei um harness em que ele pudesse construir: regras que o agente de IA tem de seguir, níveis de complexidade que definem quanto processo cada mudança exige, registro de missões com cada decisão e gates que o código não pula, de testes e cobertura a hooks que bloqueiam o commit e CI que bloqueia o merge, tudo explicado em linguagem simples. Ele podia continuar construindo com IA, e o que construía podia chegar à produção.",
           "A grande conquista foi o sistema de armazém, que entrou em produção. Ao lado dele, um agente de precificação usa a visão do Claude para identificar o aparelho e as peças pelas fotos, consulta preços de mercado e propõe uma oferta."
         ]
       },
@@ -1095,31 +1095,31 @@
         "pt": "Tech lead e engenheiro full-stack"
       },
       "headline": {
-        "en": "An AI customer-service agent for Brazilian notary offices on WhatsApp: I did all of the engineering, inside a team I coordinated, from the first commit to the handover.",
-        "pt": "Um agente de atendimento com IA para cartórios brasileiros no WhatsApp: fiz toda a engenharia, dentro de um time que coordenei, do primeiro commit à entrega."
+        "en": "An AI customer-service agent for Brazilian notary offices on WhatsApp, built with a team I coordinated, in which I owned the engineering from the first commit to the handover.",
+        "pt": "Um agente de atendimento com IA para cartórios brasileiros no WhatsApp, construído com um time que coordenei, no qual a engenharia ficou comigo do primeiro commit à entrega."
       },
       "highlights": {
         "en": [
-          "The whole product: the notary office panel, the admin panel and the agent itself, from architecture to production.",
-          "Coordinated a multidisciplinary team, taught a junior developer a great deal and took part in strategic decisions.",
+          "Engineered the notary office panel, the admin panel and the agent itself, from architecture to production.",
+          "Coordinated a multidisciplinary team, mentored a junior developer and took part in strategic decisions.",
           "Built for a regulated market, with every requirement of CNJ Provision 213/2026 mapped to the code and an eye on Brazil’s data protection law (LGPD) throughout.",
           "Handed over in September 2026 with the first two clients live, the system running, the team trained and operating procedures in place."
         ],
         "pt": [
-          "O produto inteiro: o painel do cartório, o painel administrativo e o próprio agente, da arquitetura à produção.",
-          "Coordenei um time multidisciplinar, ensinei muito a uma desenvolvedora júnior e participei das decisões estratégicas.",
+          "Fiz a engenharia do painel do cartório, do painel administrativo e do próprio agente, da arquitetura à produção.",
+          "Coordenei um time multidisciplinar, orientei de perto uma desenvolvedora júnior e participei das decisões estratégicas.",
           "Construído para um mercado regulado, com cada requisito do Provimento 213/2026 do CNJ mapeado no código e atenção à LGPD do começo ao fim.",
           "Entregue em setembro de 2026 com os dois primeiros clientes no ar, o sistema operando, a equipe treinada e o fluxo operacional de pé."
         ]
       },
       "body": {
         "en": [
-          "Marketing para Cartórios wanted AI agents to serve Brazilian notary offices over WhatsApp, and in January 2026 I joined to build them. The product was a team effort: the founder, whom I coached into the product owner role, domain experts from the notary world, and a junior developer I guided. Stack, token-based pricing and roadmap were defined with the founder.",
+          "Marketing para Cartórios wanted AI agents to serve Brazilian notary offices over WhatsApp, and in January 2026 I joined to build them. The product was a team effort: the founder, whom I supported as she stepped into the product owner role, domain experts from the notary world, and a junior developer I guided. Stack, token-based pricing and roadmap were defined with the founder.",
           "Each notary office got a knowledge base built from its reference documents, such as laws, fee tables and opening hours, curated from the admin panel and searched with PostgreSQL and pgvector. Voice messages are transcribed before the agent answers. The agent is orchestrated in n8n, reaches WhatsApp through the Evolution API and writes its replies with OpenAI models. Before any change goes live, an evaluation tool scores the agent against scenarios and personas.",
           "A regulated market asks for more than a chatbot. The platform was built around CNJ Provision 213/2026 and the LGPD, with mandatory two-factor authentication, one active session per user, an append-only audit trail, isolation between offices and an AI disclosure at the start of every conversation. Each requirement of the Provision is mapped to the code and tracked on the roadmap, and the agent evaluation includes personal-data scenarios."
         ],
         "pt": [
-          "A Marketing para Cartórios queria agentes de IA atendendo cartórios brasileiros pelo WhatsApp, e em janeiro de 2026 entrei para construí-los. O produto foi um trabalho de time: a fundadora, que preparei para o papel de product owner, especialistas de domínio do mundo notarial e uma desenvolvedora júnior que orientei. Stack, precificação por tokens e roadmap foram definidos com a fundadora.",
+          "A Marketing para Cartórios queria agentes de IA atendendo cartórios brasileiros pelo WhatsApp, e em janeiro de 2026 entrei para construí-los. O produto foi um trabalho de time: a fundadora, que apoiei enquanto ela assumia o papel de product owner, especialistas de domínio do mundo notarial e uma desenvolvedora júnior que orientei. Stack, precificação por tokens e roadmap foram definidos com a fundadora.",
           "Cada cartório ganhou uma base de conhecimento feita dos seus documentos de referência, como leis, tabelas de valores e horários de funcionamento, curada pelo painel administrativo e com busca em PostgreSQL e pgvector. As mensagens de voz são transcritas antes de o agente responder. O agente é orquestrado no n8n, chega ao WhatsApp pela Evolution API e escreve as respostas com modelos da OpenAI. Antes de cada mudança ir ao ar, uma ferramenta de avaliação pontua o agente em cenários e personas.",
           "Um mercado regulado pede mais que um chatbot. A plataforma foi construída em torno do Provimento 213/2026 do CNJ e da LGPD, com autenticação em dois fatores obrigatória, uma sessão ativa por usuário, trilha de auditoria só de inserção, isolamento entre cartórios e aviso de IA no início de toda conversa. Cada requisito do Provimento está mapeado no código e acompanhado no roadmap, e a avaliação do agente inclui cenários de dados pessoais."
         ]
@@ -1321,12 +1321,12 @@
       "body": {
         "en": [
           "The idea for a portfolio like this had been with me for years, and 3D always made me curious. I had played with Blender, but becoming a 3D modeler was never the goal, so the idea never went live.",
-          "What changed was the tooling. With today’s models and the WAI Framework, I could run the project like a small studio: each life of the hero went through direction, modeling, review and my approval, and everything ships from a single Cloudflare Worker, with tests, performance budgets and a strict content security policy.",
+          "What changed was the tooling. With today’s models and the WAI Framework, I could run the project like a small studio, with AI agents filling its roles: each life of the hero went through direction, modeling and review before my approval. Everything ships from a single Cloudflare Worker, with tests, performance budgets and a strict content security policy.",
           "The hero is the creative side, and this page is the story behind it. The source code is public."
         ],
         "pt": [
           "A ideia de um portfólio assim me acompanhava havia anos, e 3D sempre me deixou curioso. Eu já tinha brincado com o Blender, mas virar modelador 3D nunca foi o objetivo, então a ideia nunca foi ao ar.",
-          "O que mudou foram as ferramentas. Com os modelos de hoje e o WAI Framework, pude tocar o projeto como um pequeno estúdio: cada vida do herói passou por direção, modelagem, revisão e a minha aprovação, e tudo é servido por um único Worker da Cloudflare, com testes, orçamento de performance e uma política de segurança de conteúdo rígida.",
+          "O que mudou foram as ferramentas. Com os modelos de hoje e o WAI Framework, pude tocar o projeto como um pequeno estúdio, com agentes de IA em cada papel: cada vida do herói passou por direção, modelagem e revisão antes da minha aprovação. Tudo é servido por um único Worker da Cloudflare, com testes, orçamento de performance e uma política de segurança de conteúdo rígida.",
           "O herói é o lado criativo, e esta página é a história por trás dele. O código é público."
         ]
       },
