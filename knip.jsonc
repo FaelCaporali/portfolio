@@ -13,7 +13,7 @@
     "3d/tools/props/financeiro/site-v7/**"
   ],
   // Programas do sistema chamados pelas ferramentas de prova (não são pacotes npm).
-  "ignoreBinaries": ["inkscape", "convert"],
+  "ignoreBinaries": ["inkscape", "convert", "montage"],
   // O script `pnpm knip` define VITE_TURNSTILE_SITEKEY: o vite.config.ts recusa carregar em modo de build sem a chave
   // pública, e o knip carrega a config para achar os plugins. O valor não vai para build nenhum.
   "ignoreDependencies": [

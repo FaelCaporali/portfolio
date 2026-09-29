@@ -1,59 +1,58 @@
-import { chapters, type Entry } from '../../content/journey-page'
+import { checkpoints, type Checkpoint as Data } from '../../content/journey-timeline'
 import type { Stage } from '../../content/journey'
-import { Cards, type Scoped } from './Cards'
+import { Checkpoint } from './Checkpoint'
 import { Frame } from './Frame'
-import { ChapterHead, Closing, Opening } from './Opening'
+import { Closing, Intro, PartHead, type Part } from './Intro'
 import { byId } from './parts'
-import { Scene } from './Scene'
 
 /**
- * A página da trajetória inteira, renderizada para HTML estático no build (vite.config.ts, journeyPage). Sem estilo
- * inline: a CSP das páginas só aceita CSS do próprio site. A cor de cada vida vem da classe `life-<id>` (CSS gerado
- * de journey.ts) e a animação, de main.ts. Estrutura em .wai/trajetoria/DESIGN.md: abertura, capítulos, uma cena
- * por vida (o Uber, de passagem, fica entre os cartões), os causos em cartões e o fechamento.
+ * A página da trajetória, renderizada para HTML estático no build (vite.config.ts, journeyPage): uma linha do tempo
+ * institucional em duas partes, o prólogo (antes da tecnologia e a virada) e a história (a carreira em tecnologia),
+ * como pediu o Fael (J24). O conteúdo vem de journey.json; sem estilo inline (a CSP só aceita CSS do site): a cor de
+ * cada marco é a classe `life-<id>` e o movimento, de main.ts.
  */
 
-type Block =
-  { kind: 'scene'; entry: Entry; stage: Stage; flip: boolean } | { kind: 'cards'; key: string; items: Scoped[] }
+const PARTS: Record<Data['part'], Part> = {
+  prologue: { id: 'prologue', title: 'Prologue', span: '2006 – 2022' },
+  story: { id: 'story', title: 'The story', span: '2023 – today' },
+}
 
-/** Cada entrada pertence à última vida que começou antes dela: é a cor do nó e a vida acesa nos pontos. */
+/** Cada marco pertence à última vida que começou até ele: é a cor dele e a vida acesa nos pontos do cabeçalho. */
 let current: Stage | undefined
-let scenes = 0
-const blocked = chapters.map((c) => {
-  const blocks: Block[] = []
-  for (const entry of c.entries) {
-    const stage = entry.life ? byId.get(entry.life) : undefined
-    if (stage) current = stage
-    const last = blocks.at(-1)
-    if (stage && !entry.minor) {
-      blocks.push({ kind: 'scene', entry, stage, flip: scenes++ % 2 === 1 })
-    } else if (last?.kind === 'cards') {
-      last.items.push({ entry, scope: current })
-    } else {
-      blocks.push({ kind: 'cards', key: entry.title, items: [{ entry, scope: current }] })
-    }
-  }
-  return { ...c, blocks }
+const scoped = checkpoints.map((c) => {
+  current = (c.life && byId.get(c.life)) || current
+  return { c, scope: current }
 })
+const groups = (['prologue', 'story'] as const).map((part) => ({
+  part: PARTS[part],
+  items: scoped.filter(({ c }) => c.part === part),
+}))
 
 export function JourneyPage() {
   return (
     <>
       <Frame />
       <main className="text-white">
-        <Opening />
-        {blocked.map((c, i) => (
-          <section key={c.id} id={c.id} aria-labelledby={`${c.id}-title`} className="scroll-mt-14">
-            <ChapterHead id={c.id} title={c.title} span={c.span} index={i} />
-            {c.blocks.map((b) =>
-              b.kind === 'scene' ? (
-                <Scene key={b.stage.id} entry={b.entry} stage={b.stage} flip={b.flip} />
-              ) : (
-                <Cards key={b.key} items={b.items} />
-              ),
-            )}
-          </section>
-        ))}
+        <Intro parts={groups.map((g) => g.part)} />
+        <div className="timeline relative mx-auto max-w-6xl px-5 pb-16 sm:px-8">
+          {/* O eixo: linha apagada e, por cima, a parte já lida, que main.ts estica com a rolagem. */}
+          <div
+            aria-hidden
+            className="rail absolute top-3 bottom-16 left-[1.5625rem] w-px bg-white/10 sm:left-[2.3125rem] lg:left-[14.5rem]"
+          >
+            <div className="rail-fill absolute inset-0 origin-top bg-(--accent)" />
+          </div>
+          {groups.map((g) => (
+            <section key={g.part.id} id={g.part.id} aria-labelledby={`${g.part.id}-title`} className="scroll-mt-20">
+              <PartHead part={g.part} />
+              <ol>
+                {g.items.map(({ c, scope }) => (
+                  <Checkpoint key={c.id} c={c} scope={scope} />
+                ))}
+              </ol>
+            </section>
+          ))}
+        </div>
         <Closing />
       </main>
     </>
