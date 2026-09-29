@@ -1,8 +1,11 @@
 import { expect, test } from '@playwright/test'
 
 // Um envio de ponta a ponta por projeto: o Worker local limita 3 envios por minuto por IP.
+// O ContactWidget é o mesmo em toda página (ContactWidget.tsx); a /journey não carrega o three.js (a /
+// carrega o busto e o renderiza por software o teste inteiro), então testar o contato aqui evita que a
+// verificação do Turnstile dispute a única CPU do runner com o WebGL do herói (playwright.config.ts:7-8).
 test('contato: valida, envia pelo Worker local e confirma', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/journey')
   await page.getByRole('button', { name: 'Contact me' }).click()
   const dialog = page.getByRole('dialog')
   await expect(dialog.getByLabel('Name')).toBeFocused()
