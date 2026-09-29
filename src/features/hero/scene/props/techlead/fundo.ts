@@ -11,7 +11,7 @@
  */
 import * as THREE from 'three'
 import type { Formato } from '../devops/composicao'
-import { Pincel, type Ponto } from './pincel'
+import { Pincel, type Ponto, type Quadro } from './pincel'
 import { criarRevela, type Revela } from '../devops/revela'
 import { chamada, chamadaMini, novoBalao, postits } from './bloco_chamada'
 import { quadroJira, type Jira } from './bloco_jira'
@@ -33,34 +33,58 @@ const PULSO = '#f1e8ff'
 /** Retrato (silhueta): a chamada e os post-its à esquerda da cabeça, o Kanban e o burndown à direita. */
 function pintarRetrato(tl: Tela, z: Zonas, m: Medida): Jira | null {
   if (z.esq) {
-    const ouvido: Ponto = [z.esq.x1 - 2, Math.min(z.esq.y1 - 120, Math.max(z.esq.y0 + 40, m.ouvido[1]))]
-    const y = chamadaMini(tl, z.esq, ouvido)
-    postits(tl, { ...z.esq, y0: y }, true)
+    const r = z.esq
+    // Coluna baixa (J74, 320×568): a onda chega ao ouvido dentro dela.
+    const oy =
+      r.y1 - 120 < r.y0 + 40
+        ? Math.min(r.y1 - 4, Math.max(r.y0 + 24, m.ouvido[1]))
+        : Math.min(r.y1 - 120, Math.max(r.y0 + 40, m.ouvido[1]))
+    const y = chamadaMini(tl, r, [r.x1 - 2, oy])
+    if (z.chamada === 'retrato') postits(tl, { ...r, y0: y }, true)
   }
   return z.dir ? quadroJira(tl, z.dir, true) : null
+}
+
+/** Coluna à direita da cabeça: post-its (sem a coluna da esquerda), o mockup e o fluxo de uso. */
+function pintarDir(tl: Tela, z: Zonas, dir: Quadro, m: Medida) {
+  const k = TAM[tl.f]
+  if (z.chamada === 'dir') {
+    // J74: sem faixa em cima nem coluna ao lado do texto (800×360): a chamada em silhueta no alto da coluna (a onda
+    // chega à concha direita), os post-its só com o rótulo e a solução se sobrar altura.
+    const y = chamadaMini(tl, dir, [dir.x0 + 2, Math.min(dir.y0 + 50, Math.max(dir.y0 + 24, m.ouvido[1]))])
+    const alto = 3 * k.rotulo * 2.4 + 12
+    postits(tl, { ...dir, y0: y, y1: Math.min(dir.y1, y + alto) }, true)
+    if (dir.y1 - (y + alto + k.corpo) >= 120) solucao(tl, { ...dir, y0: y + alto + k.corpo })
+    return
+  }
+  let r = dir
+  if (!z.esq) {
+    const alto = 3 * (k.corpo * 1.1 + k.rotulo * 1.3 + 2 * k.corpo * 1.3) + 20
+    postits(tl, { ...r, y1: r.y0 + alto })
+    r = { ...r, y0: r.y0 + alto + k.corpo * 1.2 }
+  }
+  solucao(tl, r)
 }
 
 /** Pinta o fundo inteiro no pincel (recortado pelo canvas dele); devolve os slots do Kanban e a chegada da voz. */
 function pintar(tl: Tela, z: Zonas, m: Medida): Jira | null {
   const k = TAM[tl.f]
   if (tl.f === 'estreito') return pintarRetrato(tl, z, m)
-  if (z.topo) {
+  if (z.topo && z.chamada === 'topo') {
     // A onda segue na altura do balão e desce ao ouvido junto à cabeça (sem cruzar a legenda).
     const desvio = z.topo.x1 - k.corpo * 3
     const ouvido: Ponto = z.esq ? m.ouvido : [z.topo.x1 - 4, Math.min(z.topo.y1 - 8, m.ouvido[1])]
     const y = chamada(tl, z.topo, ouvido, desvio)
     if (y + k.corpo * 2.6 < z.topo.y1) novoBalao(tl, z.topo.x0, y + k.corpo * 0.3, desvio - z.topo.x0 - 12)
     if (z.esq) postits(tl, { ...z.esq, x1: Math.min(z.esq.x1, desvio - 16) })
+  } else if (z.esq && z.chamada === 'esq') {
+    // J74: faixa de cima baixa demais (notebook 1366×657): a chamada no alto da coluna entre o texto e a cabeça.
+    // Coluna estreita para o balão no corpo do formato (≈ 18 corpos com o avatar): a chamada no corpo do médio.
+    const tc: Tela = z.esq.x1 - z.esq.x0 < 18 * k.corpo + 10 ? { ...tl, f: 'medio' } : tl
+    const y = chamada(tc, z.esq, m.ouvido, z.esq.x1 - TAM[tc.f].corpo * 1.5)
+    postits(tl, { ...z.esq, y0: y + k.corpo })
   }
-  if (z.dir) {
-    let r = z.dir
-    if (!z.esq) {
-      const alto = 3 * (k.corpo * 1.1 + k.rotulo * 1.3 + 2 * k.corpo * 1.3) + 20
-      postits(tl, { ...r, y1: r.y0 + alto })
-      r = { ...r, y0: r.y0 + alto + k.corpo * 1.2 }
-    }
-    solucao(tl, r)
-  }
+  if (z.dir) pintarDir(tl, z, z.dir, m)
   return z.base ? quadroJira(tl, z.base) : null
 }
 
@@ -77,7 +101,11 @@ export function criarFundo() {
   const cartoes = criarCartoes()
   const saida = criarSaida()
   /** Pontos do olhar (px CSS) e as zonas vigentes (lidas pelas ferramentas do estúdio). */
-  const estado = { alvos: {} as Partial<Record<Alvo, { x: number; y: number }>>, zonas: null as Zonas | null }
+  const estado = {
+    alvos: {} as Partial<Record<Alvo, { x: number; y: number }>>,
+    zonas: null as Zonas | null,
+    medida: null as Medida | null,
+  }
 
   const raio = new THREE.Raycaster()
   const plano = new THREE.Plane(new THREE.Vector3(0, 0, 1), -Z_FUNDO)
@@ -104,6 +132,7 @@ export function criarFundo() {
     const zonas = zonasPara(f, m)
     const escala = Math.min(ESCALA_MAX, window.devicePixelRatio || 1)
     estado.zonas = zonas
+    estado.medida = m
     let jira: Jira | null = null
     let feito = false
     for (const p of paineis) {
