@@ -40,8 +40,12 @@ function journeyPage(): Plugin {
       },
     },
     // O navegador não importa o texto (ele vem no HTML): editado o conteúdo ou a página, recarrega a página inteira.
+    // O CSS das cores é virtual e o Vite o guarda: sem invalidar, a mudança só aparecia ao reiniciar o servidor.
     hotUpdate({ file, server }) {
-      if (/src\/(content|features\/journey)\//.test(file)) server.ws.send({ type: 'full-reload', path: '/journey' })
+      if (!/src\/(content|features\/journey)\//.test(file)) return
+      const accents = server.moduleGraph.getModuleById(`\0${ACCENTS_ID}`)
+      if (accents) server.moduleGraph.invalidateModule(accents)
+      server.ws.send({ type: 'full-reload', path: '/journey' })
     },
     // No dev, /journey (o endereço de produção) serve a página; sem isso o Vite devolveria o herói.
     configureServer(server) {

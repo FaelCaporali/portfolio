@@ -3,6 +3,7 @@
 import 'virtual:journey-accents.css'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { initFilters } from './filters'
 
 /**
  * Tudo aqui é acabamento: o texto inteiro, o índice e o minimapa já estão no HTML (journey.html, gerado no build).
@@ -60,6 +61,8 @@ function setMark(el: HTMLElement | undefined) {
 }
 
 const aboveLine = (el: HTMLElement) => el.getBoundingClientRect().top < window.innerHeight * LINE
+/** Fora do filtro (filters.ts), a parada some da página e do caminho. */
+const onMap = (el: HTMLElement) => !el.closest('[hidden]')
 
 /* O caminho: uma curva em S de ponto em ponto ([data-node]), um trecho por marco, na cor da vida de destino. */
 interface Leg {
@@ -73,11 +76,14 @@ let legs: Leg[] = []
 function buildRoute() {
   if (!route || !timeline) return
   const box = timeline.getBoundingClientRect()
-  const pts = [...timeline.querySelectorAll<HTMLElement>('[data-node]')].map((n) => {
+  const pts = [...timeline.querySelectorAll<HTMLElement>('[data-node]')].filter(onMap).map((n) => {
     const r = n.getBoundingClientRect()
     return { x: r.left + r.width / 2 - box.left, y: r.top + r.height / 2 - box.top, scope: n.dataset.node ?? '' }
   })
+  // Tamanho em pixels, igual ao viewBox: o SVG nunca estica sozinho quando a página cresce (J68, o caminho piscava).
   route.setAttribute('viewBox', `0 0 ${box.width.toFixed(1)} ${box.height.toFixed(1)}`)
+  route.style.width = `${box.width.toFixed(1)}px`
+  route.style.height = `${box.height.toFixed(1)}px`
   const base = document.createElementNS(SVG, 'path')
   base.classList.add('route-base')
   const parts: string[] = []
@@ -114,22 +120,26 @@ function drawRoute() {
 
 function onScroll(self: ScrollTrigger) {
   if (bar) bar.style.transform = `scaleX(${self.progress.toFixed(4)})`
-  setLife(scoped.filter(aboveLine).at(-1)?.dataset.scope)
-  setMark(marks.filter(aboveLine).at(-1))
+  setLife(scoped.filter(onMap).filter(aboveLine).at(-1)?.dataset.scope)
+  setMark(marks.filter(onMap).filter(aboveLine).at(-1))
   drawRoute()
 }
 ScrollTrigger.create({ start: 0, end: 'max', onUpdate: onScroll, onRefresh: onScroll })
 
-// A história abre e o mapa cresce (ou a tela muda de tamanho): o caminho e a rolagem são medidos de novo.
+/*
+ * A história abre, o filtro muda ou a tela muda de tamanho: o caminho é refeito já, no próprio aviso do
+ * ResizeObserver, que chega depois do layout e antes da pintura. Refazer só no quadro seguinte deixava um quadro com
+ * o caminho antigo esticado e fora do lugar (J68: "pisca mudando de posição e depois volta"). A rolagem é medida de
+ * novo no quadro seguinte.
+ */
 let pending = 0
 function remeasure() {
+  buildRoute()
   cancelAnimationFrame(pending)
-  pending = requestAnimationFrame(() => {
-    buildRoute()
-    ScrollTrigger.refresh()
-  })
+  pending = requestAnimationFrame(() => ScrollTrigger.refresh())
 }
 if (timeline) new ResizeObserver(remeasure).observe(timeline)
+initFilters(remeasure)
 
 // No celular, escolher um marco no índice fecha a barra.
 sheet?.addEventListener('click', (e) => {

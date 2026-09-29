@@ -26,8 +26,7 @@ function markId(item: Placed) {
 }
 
 function year(item: Placed) {
-  const p = item.c.period
-  return p?.start?.slice(0, 4) ?? p?.end?.slice(0, 4) ?? ''
+  return item.year ?? ''
 }
 
 /** Os trechos do caminho em miniatura, de marco em marco, cada um na cor da vida de destino. */

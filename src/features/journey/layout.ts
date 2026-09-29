@@ -8,27 +8,60 @@ import type { Checkpoint } from '../../content/journey-timeline'
  */
 export type Lane = 'left' | 'right' | 'wide'
 
-export interface Placed {
+interface Item {
   c: Checkpoint
   /** A vida em leitura neste marco (a última que começou até aqui). */
   scope?: Stage
   /** A vida que começa neste marco. */
   life?: Stage
-  lane: Lane
+}
+
+export interface Dated extends Item {
+  /** O ano em que a parada começa. */
+  year?: string
   /**
-   * O marcador grande de cada parada (J58: "marcos precisam de destaque similar"): o nome da vida quando uma vida
-   * começa aqui (Checkpoint.tsx); nos outros marcos, o ano em contorno. Na metade vazia ao lado do cartão, ou na
-   * linha de cima quando o marco é largo.
+   * A primeira parada do ano: o ano grande aparece no caminho, antes dela, uma vez só (J61: "2021 [...] alocada entre
+   * uber e estudos", sem "muitos 2025 repetidos"). Com filtro, main.ts refaz a conta sobre as paradas à vista.
    */
-  yearMark?: string
+  yearFirst: boolean
+  /** Os anos que a parada cobre, para o filtro de período (main.ts). */
+  from: number
+  to: number
 }
 
-function yearOf(c: Checkpoint) {
-  const d = c.period?.start ?? c.period?.end
-  return d && d !== 'present' ? d.slice(0, 4) : undefined
+export interface Placed extends Dated {
+  lane: Lane
 }
 
-export function place(items: { c: Checkpoint; scope?: Stage; life?: Stage }[]): Placed[] {
+const NOW = new Date().getFullYear()
+
+function yearNum(d: string | undefined) {
+  return d && d !== 'present' ? Number(d.slice(0, 4)) : undefined
+}
+
+/**
+ * O ano e o intervalo de cada parada, na ordem da jornada inteira (as duas partes). O ano grande é sempre o do início:
+ * a vela só tem o fim (2020), e marcar 2020 antes dela diria que ela começou ali (J62). Sem início conhecido, a parada
+ * começa onde a anterior começou (os brownies e a vela correram junto com a Immersus), só para o filtro de período.
+ */
+export function date<T extends Item>(items: T[]): (T & Dated)[] {
+  let prev = { from: NOW, to: NOW }
+  let last: string | undefined
+  return items.map((item) => {
+    const p = item.c.period
+    const first = yearNum(p?.start)
+    const from = first ?? prev.from
+    const end = p?.end === 'present' ? NOW : yearNum(p?.end)
+    const to = end ?? (first === undefined ? prev.to : from)
+    const year = first === undefined ? undefined : String(first)
+    const yearFirst = !!year && year !== last
+    if (year) last = year
+    prev = { from, to }
+    return { ...item, year, yearFirst, from, to }
+  })
+}
+
+export function place<T extends Dated>(items: T[]): (T & Placed)[] {
   let side: 'left' | 'right' = 'right'
   return items.map((item) => {
     let lane: Lane = 'wide'
@@ -36,6 +69,6 @@ export function place(items: { c: Checkpoint; scope?: Stage; life?: Stage }[]): 
       side = side === 'left' ? 'right' : 'left'
       lane = side
     }
-    return { ...item, lane, yearMark: item.life ? undefined : yearOf(item.c) }
+    return { ...item, lane }
   })
 }

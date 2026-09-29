@@ -26,7 +26,7 @@ export function Frame() {
           <LifeDots />
           <a
             href={email?.href}
-            className="hidden min-h-8 shrink-0 items-center rounded-full border border-white/15 px-4 text-sm font-medium text-white/85 transition-colors hover:border-(--accent) hover:text-white sm:inline-flex"
+            className="contact-cta hidden min-h-8 shrink-0 items-center rounded-full bg-[#16161b] px-4 text-sm font-medium text-white transition-colors hover:bg-[#1d1d24] sm:inline-flex"
           >
             Contact me
           </a>

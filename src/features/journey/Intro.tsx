@@ -8,37 +8,46 @@ export interface Part {
   span: string
 }
 
-/** Abertura: o título, o lede aprovado (J22) e o índice das duas partes (J24: prólogo e a história). */
+/**
+ * Abertura: à esquerda o título e o lede (J22); à direita, o sumário das duas partes (J24), como o sumário de um livro,
+ * com fios em vez de botões (J63: as pílulas pareciam chamadas para ação). No celular, um embaixo do outro.
+ */
 export function Intro({ parts }: { parts: Part[] }) {
   return (
-    <section aria-labelledby="journey-title" className="relative pt-28 pb-16 sm:pt-36 sm:pb-24">
+    <section aria-labelledby="journey-title" className="relative pt-28 pb-14 sm:pt-36 sm:pb-20">
       <div aria-hidden className="intro-glow pointer-events-none absolute inset-x-0 top-0 -z-10 h-[34rem]" />
-      <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:pr-20 xl:pr-60">
-        <div>
+      <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:grid lg:grid-cols-12 lg:items-end lg:gap-x-8 lg:pr-20 xl:pr-60">
+        <div className="lg:col-span-7">
           <p className={eyebrow}>{profile.name}</p>
           <h1
             id="journey-title"
-            className="mt-5 text-[clamp(3rem,10vw,6.5rem)] leading-[0.92] font-semibold tracking-[-0.045em] text-white"
+            className="mt-5 text-[clamp(3.25rem,9vw,7rem)] leading-[0.9] font-semibold tracking-[-0.05em] text-white"
           >
             The full <span className="journey-spectrum">journey</span>
           </h1>
-          <p className="mt-7 max-w-[40ch] text-lg leading-relaxed text-white/80 sm:text-2xl">{intro.lede.en}</p>
-          <nav aria-label="Parts" className="mt-10">
-            <ol className="flex flex-wrap gap-2 sm:gap-3">
-              {parts.map((p) => (
-                <li key={p.id}>
-                  <a
-                    href={`#${p.id}`}
-                    className="flex min-h-12 flex-col justify-center rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-2 transition-colors hover:border-white/30 hover:bg-white/[0.06]"
-                  >
-                    <span className="text-sm font-semibold text-white sm:text-base">{p.title}</span>
-                    <span className="text-xs text-white/60 sm:text-sm">{p.span}</span>
-                  </a>
-                </li>
-              ))}
-            </ol>
-          </nav>
+          <p className="mt-7 max-w-[36ch] text-lg leading-relaxed text-white/70 sm:text-xl">{intro.lede.en}</p>
         </div>
+        <nav aria-label="Parts" className="mt-12 lg:col-span-5 lg:mt-0 lg:pb-2">
+          <ol className="border-t border-white/10">
+            {parts.map((p) => (
+              <li key={p.id} className="border-b border-white/10">
+                <a
+                  href={`#${p.id}`}
+                  className="group flex min-h-16 items-baseline gap-4 py-4 focus-visible:outline-2 focus-visible:outline-white"
+                >
+                  <span className="text-xl font-semibold tracking-tight text-white sm:text-2xl">{p.title}</span>
+                  <span className="ml-auto text-sm text-white/55 tabular-nums">{p.span}</span>
+                  <span
+                    aria-hidden
+                    className="text-white/40 transition-transform duration-300 group-hover:translate-y-1 group-hover:text-white"
+                  >
+                    ↓
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ol>
+        </nav>
       </div>
     </section>
   )

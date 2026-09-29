@@ -66,3 +66,91 @@ body {
     animation-delay: 0s;
   }
 }
+
+/* "Contact me" (J65), no herói (ContactWidget) e na trajetória (Frame): um anel nas nove cores das vidas girando devagar
+   em volta do botão, um brilho que respira atrás dele e, de tempos em tempos, um leve pulo de escala para puxar o olho.
+   As cores vêm de --spectrum-loop (render.tsx). Com movimento reduzido, fica só o anel, parado. */
+@property --cta-turn {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+.contact-cta {
+  position: relative;
+  isolation: isolate;
+  animation: cta-nudge 8s ease-in-out 2s infinite;
+}
+.contact-cta::before,
+.contact-cta::after {
+  content: '';
+  position: absolute;
+  border-radius: inherit;
+  pointer-events: none;
+  background: conic-gradient(from var(--cta-turn), var(--spectrum-loop, #fff, #fff));
+  animation: cta-turn 6s linear infinite;
+}
+/* O anel: só a borda do gradiente (a máscara recorta o miolo). */
+.contact-cta::before {
+  inset: -1.5px;
+  padding: 1.5px;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+}
+/* O brilho: o mesmo gradiente, desfocado, atrás do botão. */
+.contact-cta::after {
+  inset: -5px;
+  z-index: -1;
+  filter: blur(12px);
+  opacity: 0.35;
+  animation:
+    cta-turn 6s linear infinite,
+    cta-breathe 3.2s ease-in-out infinite;
+  transition: opacity 0.3s ease;
+}
+.contact-cta:hover,
+.contact-cta:focus-visible {
+  animation-play-state: paused;
+}
+.contact-cta:hover::after,
+.contact-cta:focus-visible::after {
+  animation: cta-turn 6s linear infinite;
+  opacity: 0.8;
+}
+@keyframes cta-turn {
+  to {
+    --cta-turn: 360deg;
+  }
+}
+@keyframes cta-breathe {
+  50% {
+    opacity: 0.6;
+  }
+}
+@keyframes cta-nudge {
+  0%,
+  86%,
+  100% {
+    transform: scale(1);
+  }
+  90% {
+    transform: scale(1.07);
+  }
+  94% {
+    transform: scale(0.98);
+  }
+  97% {
+    transform: scale(1.02);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .contact-cta,
+  .contact-cta::before,
+  .contact-cta::after {
+    animation: none;
+  }
+}

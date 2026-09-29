@@ -11,11 +11,14 @@ export function renderJourney(): string {
 }
 
 /**
- * Uma classe por vida, mais o espectro das nove cores em ordem (o "journey" da abertura). O texto só fica
- * transparente junto com o gradiente: sem esta folha, a palavra continua branca.
+ * Uma classe por vida, mais o espectro das nove cores em ordem (o "journey" da abertura e o anel do "Contact me"). O
+ * texto só fica transparente junto com o gradiente: sem esta folha, a palavra continua branca. Vai também para o herói
+ * (src/main.tsx), por causa do botão.
  */
 export function lifeAccentsCss(): string {
   const colors = stages.map((s) => s.accent).join(',')
+  // O espectro também como variável: o anel do "Contact me" (index.css) gira nele, fechando o círculo na primeira cor.
+  const root = `:root{--spectrum:${colors};--spectrum-loop:${colors},${stages[0]?.accent ?? '#fff'}}`
   const spectrum = `.journey-spectrum{background-image:linear-gradient(90deg,${colors});-webkit-background-clip:text;background-clip:text;color:transparent}`
-  return [...stages.map((s) => `.life-${s.id}{--accent:${s.accent}}`), spectrum].join('\n')
+  return [root, ...stages.map((s) => `.life-${s.id}{--accent:${s.accent}}`), spectrum].join('\n')
 }

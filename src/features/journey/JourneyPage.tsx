@@ -3,7 +3,8 @@ import type { Stage } from '../../content/journey'
 import { Checkpoint } from './Checkpoint'
 import { Frame } from './Frame'
 import { Intro, PartHead, type Part } from './Intro'
-import { place } from './layout'
+import { Filters } from './Filters'
+import { date, place } from './layout'
 import { Minimap, type Row } from './Minimap'
 import { byId } from './parts'
 
@@ -35,11 +36,13 @@ const PARTS: Record<Data['part'], Part> = {
 
 /** Cada marco pertence à última vida que começou até ele: é a cor dele e a vida acesa nos pontos do cabeçalho. */
 let current: Stage | undefined
-const scoped = checkpoints.map((c) => {
-  const life = c.life ? byId.get(c.life) : undefined
-  current = life ?? current
-  return { c, scope: current, life }
-})
+const scoped = date(
+  checkpoints.map((c) => {
+    const life = c.life ? byId.get(c.life) : undefined
+    current = life ?? current
+    return { c, scope: current, life }
+  }),
+)
 const groups = (['prologue', 'story'] as const).map((part) => ({
   part: PARTS[part],
   items: place(scoped.filter(({ c }) => c.part === part)),
@@ -55,15 +58,22 @@ export function JourneyPage() {
       <Frame />
       <main className="text-white">
         <Intro parts={groups.map((g) => g.part)} />
+        <Filters items={scoped} />
         <div className="timeline relative mx-auto max-w-7xl px-5 pb-16 sm:px-8 lg:pr-20 xl:pr-60">
           {/* Sem JavaScript: o eixo reto. Com ele, main.ts desenha o caminho sinuoso no SVG e esconde o eixo. */}
           <div
             aria-hidden
             className="rail absolute top-3 bottom-16 left-[1.5625rem] w-px bg-white/10 sm:left-[2.3125rem]"
           />
-          <svg aria-hidden className="route pointer-events-none absolute inset-0 h-full w-full overflow-visible" />
+          <svg aria-hidden className="route pointer-events-none absolute top-0 left-0 overflow-visible" />
+          <p data-filter-empty hidden className="py-24 text-center text-lg text-white/70">
+            Nothing on the map matches these filters.{' '}
+            <button type="button" data-filter-clear className="underline underline-offset-4 hover:text-white">
+              Clear filters
+            </button>
+          </p>
           {groups.map((g) => (
-            <section key={g.part.id} id={g.part.id} aria-labelledby={`${g.part.id}-title`} className="scroll-mt-20">
+            <section key={g.part.id} id={g.part.id} aria-labelledby={`${g.part.id}-title`} className="scroll-mt-32">
               <PartHead part={g.part} />
               <ol>
                 {g.items.map((item) => (
