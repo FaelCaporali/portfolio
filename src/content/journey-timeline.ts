@@ -17,6 +17,8 @@ export interface Checkpoint {
   /** Posição na página (a ordem do JSON não vale; vale esta). */
   order: number
   part: 'prologue' | 'story'
+  /** Marco de peso (J52): ocupa a largura do mapa e vem com mais destaque. */
+  focus?: boolean
   /** Vida do herói que começa aqui: vira a âncora /journey#<vida> e dá a cor ao que vem depois. */
   life?: StageId
   /** Mês ("2023-06") ou ano ("2020"); "present" no fim. `text` quando nenhuma fonte dá a data exata. */

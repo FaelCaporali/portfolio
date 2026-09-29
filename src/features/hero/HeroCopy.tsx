@@ -62,9 +62,9 @@ export function HeroCopy({ ref, stage, leaving }: HeroCopyProps) {
         aria-label="Links"
         className="pointer-events-auto mt-6 flex flex-col items-start gap-3 sm:mt-7 lg:mt-8 lg:gap-4 short:mt-3 short:gap-2"
       >
-        {/* Leva à vida que está na tela, já no ponto dela na linha do tempo. */}
+        {/* Leva ao início da trajetória, sempre (J48, 28/09); o salto direto para a vida fica para depois. */}
         <a
-          href={`${journeyLink.href}#${stage.id}`}
+          href={journeyLink.href}
           className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-neutral-950 transition-colors hover:bg-white/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white short:py-2"
         >
           {journeyLink.label} <span aria-hidden>→</span>

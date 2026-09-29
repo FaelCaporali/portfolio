@@ -10,8 +10,14 @@
       "id": "first-business",
       "order": 1,
       "part": "prologue",
-      "period": { "start": "2006", "end": "2012" },
-      "title": { "en": "SEBRAE and São João del-Rei", "pt": "SEBRAE e São João del-Rei" },
+      "period": {
+        "start": "2006",
+        "end": "2012"
+      },
+      "title": {
+        "en": "SEBRAE and São João del-Rei",
+        "pt": "SEBRAE e São João del-Rei"
+      },
       "subtitle": {
         "en": "Business school, then my first company",
         "pt": "Escola de negócios, depois a primeira empresa"
@@ -41,9 +47,16 @@
       "id": "immersus-finance",
       "order": 2,
       "part": "prologue",
+      "focus": true,
       "life": "financeiro",
-      "period": { "start": "2013", "end": "2017" },
-      "title": { "en": "Immersus Language School", "pt": "Immersus Escola de Idiomas" },
+      "period": {
+        "start": "2013",
+        "end": "2017"
+      },
+      "title": {
+        "en": "Immersus Language School",
+        "pt": "Immersus Escola de Idiomas"
+      },
       "subtitle": {
         "en": "Financial Assistant → Financial Coordinator",
         "pt": "Assistente financeiro → Coordenador financeiro"
@@ -87,8 +100,14 @@
       "order": 3,
       "part": "prologue",
       "life": "empreendedor",
-      "title": { "en": "Brownies, a confectionery, a hostel", "pt": "Brownies, uma confeitaria, um hostel" },
-      "subtitle": { "en": "Entrepreneur", "pt": "Empreendedor" },
+      "title": {
+        "en": "Brownies, a confectionery, a hostel",
+        "pt": "Brownies, uma confeitaria, um hostel"
+      },
+      "subtitle": {
+        "en": "Entrepreneur",
+        "pt": "Empreendedor"
+      },
       "headline": {
         "en": "Selling face to face taught me cost, price and customer.",
         "pt": "Vender cara a cara me ensinou custo, preço e cliente."
@@ -113,8 +132,17 @@
       "order": 4,
       "part": "prologue",
       "life": "vela",
-      "period": { "end": "2020", "text": { "en": "Until 2020", "pt": "Até 2020" } },
-      "title": { "en": "Sailing: from translator to school owner", "pt": "Vela: de tradutor a dono de escola" },
+      "period": {
+        "end": "2020",
+        "text": {
+          "en": "Until 2020",
+          "pt": "Até 2020"
+        }
+      },
+      "title": {
+        "en": "Sailing: from translator to school owner",
+        "pt": "Vela: de tradutor a dono de escola"
+      },
       "subtitle": {
         "en": "Sailing Instructor, partner, school owner",
         "pt": "Instrutor de vela, sócio, dono de escola"
@@ -146,9 +174,18 @@
       "order": 5,
       "part": "prologue",
       "life": "uber",
-      "period": { "start": "2020", "end": "2023" },
-      "title": { "en": "Uber, Belo Horizonte", "pt": "Uber, Belo Horizonte" },
-      "subtitle": { "en": "The switch", "pt": "A virada" },
+      "period": {
+        "start": "2020",
+        "end": "2023"
+      },
+      "title": {
+        "en": "Uber, Belo Horizonte",
+        "pt": "Uber, Belo Horizonte"
+      },
+      "subtitle": {
+        "en": "The switch",
+        "pt": "A virada"
+      },
       "headline": {
         "en": "I drove for Uber to pay the bills while I studied to become a developer.",
         "pt": "Rodei de Uber para pagar as contas enquanto estudava para virar desenvolvedor."
@@ -169,10 +206,20 @@
       "id": "study",
       "order": 6,
       "part": "story",
+      "focus": true,
       "life": "fullstack",
-      "period": { "start": "2021", "end": "2023" },
-      "title": { "en": "Trybe, CS50 and CTFL", "pt": "Trybe, CS50 e CTFL" },
-      "subtitle": { "en": "Full-Stack Web Development", "pt": "Desenvolvimento web full-stack" },
+      "period": {
+        "start": "2021",
+        "end": "2023"
+      },
+      "title": {
+        "en": "Trybe, CS50 and CTFL",
+        "pt": "Trybe, CS50 e CTFL"
+      },
+      "subtitle": {
+        "en": "Full-Stack Web Development",
+        "pt": "Desenvolvimento web full-stack"
+      },
       "headline": {
         "en": "The story starts with study: software testing, computer science and 1,500 hours of full-stack projects.",
         "pt": "A história começa com estudo: teste de software, ciência da computação e 1.500 horas de projetos full-stack."
@@ -209,9 +256,15 @@
       "id": "brickup-quality",
       "order": 7,
       "part": "story",
+      "focus": true,
       "life": "qa",
-      "period": { "start": "2023-06" },
-      "title": { "en": "Brickup", "pt": "Brickup" },
+      "period": {
+        "start": "2023-06"
+      },
+      "title": {
+        "en": "Brickup",
+        "pt": "Brickup"
+      },
       "subtitle": {
         "en": "Software Tester, building the quality area",
         "pt": "Testador de software, construindo a área de qualidade"
@@ -256,8 +309,16 @@
       "id": "brickup-lead",
       "order": 8,
       "part": "story",
-      "period": { "text": { "en": "Within my first year", "pt": "Antes de completar um ano" } },
-      "title": { "en": "Brickup", "pt": "Brickup" },
+      "period": {
+        "text": {
+          "en": "Within my first year",
+          "pt": "Antes de completar um ano"
+        }
+      },
+      "title": {
+        "en": "Brickup",
+        "pt": "Brickup"
+      },
       "subtitle": {
         "en": "Scrum Master → Product Owner and team lead",
         "pt": "Scrum master → product owner e líder de time"
@@ -302,8 +363,14 @@
       "id": "brickup-ai",
       "order": 9,
       "part": "story",
-      "period": { "start": "2024" },
-      "title": { "en": "Brickup", "pt": "Brickup" },
+      "focus": true,
+      "period": {
+        "start": "2024"
+      },
+      "title": {
+        "en": "Brickup",
+        "pt": "Brickup"
+      },
       "subtitle": {
         "en": "The AI era: planner and daily-report insights",
         "pt": "A era da IA: planejador e insights de diário de obra"
@@ -351,52 +418,22 @@
       }
     },
     {
-      "id": "previa",
+      "id": "beamble-lead",
       "order": 10,
       "part": "story",
-      "period": { "start": "2025", "end": "2026" },
-      "title": { "en": "Prévia · Brickup and PHD Engenharia", "pt": "Prévia · Brickup e PHD Engenharia" },
-      "subtitle": { "en": "Joint project lead", "pt": "Líder do projeto conjunto" },
-      "headline": {
-        "en": "I took over a joint project with Brickup's partner and investor: today it is Prévia, a full construction-planning platform with an AI assistant.",
-        "pt": "Assumi um projeto conjunto com a parceira e investidora da Brickup: hoje é o Prévia, uma plataforma completa de planejamento de obras com um assistente de IA."
-      },
-      "highlights": {
-        "en": [
-          "A planning assistant built on Lean Construction and Advanced Work Packaging.",
-          "A conversational agent that runs and follows the planning pipeline from chat: quantity takeoff, unit-price compositions, work breakdown and distribution.",
-          "React and TypeScript monorepo, Expo app, n8n and LangChain agents, CI/CD with quality gates on AWS."
-        ],
-        "pt": [
-          "Um assistente de planejamento baseado em Lean Construction e Advanced Work Packaging.",
-          "Um agente conversacional que dispara e acompanha o pipeline de planejamento pelo chat: levantamento de quantitativos, composições de preço unitário, EAP e distribuição.",
-          "Monorepo React e TypeScript, app em Expo, agentes em n8n e LangChain, CI/CD com quality gates na AWS."
-        ]
-      },
-      "body": {
-        "en": [
-          "Then I took over a joint project of Brickup and PHD Engenharia, Brickup's partner and investor, with two engineers from their side.",
-          "Today it is Prévia: a complete platform with a construction-planning assistant based on Lean Construction and AWP. Its agent works from the project's parameters and runs the planning pipeline from a conversation."
-        ],
-        "pt": [
-          "Depois assumi um projeto conjunto da Brickup com a PHD Engenharia, parceira e investidora da Brickup, com dois engenheiros do lado deles.",
-          "Hoje é o Prévia: uma plataforma completa com um assistente de planejamento de obras baseado em Lean Construction e AWP. O agente trabalha a partir dos parâmetros do projeto e roda o pipeline de planejamento a partir de uma conversa."
-        ]
-      },
-      "tags": {
-        "tools": ["React", "TypeScript", "Expo", "n8n", "LangChain", "AWS"],
-        "concepts": ["Lean Construction", "Advanced Work Packaging", "AI agents", "CI/CD", "Quality gates"],
-        "skills": ["Technical leadership", "Domain modeling", "Stakeholder management"]
-      }
-    },
-    {
-      "id": "beamble-lead",
-      "order": 11,
-      "part": "story",
       "life": "techlead",
-      "period": { "start": "2025-01", "end": "2025-12" },
-      "title": { "en": "La Fabrique Flottante · Beamble", "pt": "La Fabrique Flottante · Beamble" },
-      "subtitle": { "en": "QA → Tech Lead", "pt": "QA → tech lead" },
+      "period": {
+        "start": "2025-01",
+        "end": "2025-12"
+      },
+      "title": {
+        "en": "La Fabrique Flottante · Beamble",
+        "pt": "La Fabrique Flottante · Beamble"
+      },
+      "subtitle": {
+        "en": "QA → Tech Lead",
+        "pt": "QA → tech lead"
+      },
       "headline": {
         "en": "In parallel with Brickup, I joined a software house as QA on a live-shopping platform and quickly took over as its tech lead.",
         "pt": "Em paralelo com a Brickup, entrei numa software house como QA de uma plataforma de live shopping e rapidamente assumi como tech lead."
@@ -432,13 +469,56 @@
       }
     },
     {
+      "id": "hc-consultorias",
+      "order": 11,
+      "part": "story",
+      "period": {
+        "start": "2025-03"
+      },
+      "title": {
+        "en": "HC Consultorias e Desenvolvimento de Software",
+        "pt": "HC Consultorias e Desenvolvimento de Software"
+      },
+      "subtitle": {
+        "en": "Managing partner",
+        "pt": "Sócio-administrador"
+      },
+      "headline": {
+        "en": "The company I opened in 2012 became a software company: contract engineering, technical consulting and products of my own.",
+        "pt": "A empresa que abri em 2012 virou uma empresa de software: engenharia sob encomenda, consultoria técnica e produtos próprios."
+      },
+      "body": {
+        "en": [
+          "Software development cannot run under Brazil's sole-microentrepreneur regime, so in March 2025 my company became a limited company registered for software development, with me as managing partner.",
+          "Since then my contracts run through it: custom software engineering, technical consulting and products of my own, for clients such as BID Tecnologia, La Fabrique Flottante and Marketing para Cartórios – AI."
+        ],
+        "pt": [
+          "Desenvolvimento de software não pode ser MEI, então em março de 2025 a minha empresa virou uma limitada com atividade de desenvolvimento de software, comigo como sócio-administrador.",
+          "Desde então os meus contratos passam por ela: engenharia de software sob encomenda, consultoria técnica e produtos próprios, para clientes como BID Tecnologia, La Fabrique Flottante e Marketing para Cartórios – AI."
+        ]
+      },
+      "tags": {
+        "concepts": ["Contract engineering", "Technical consulting"],
+        "skills": ["Business management", "Entrepreneurship"]
+      }
+    },
+    {
       "id": "beamble-architecture",
       "order": 12,
       "part": "story",
+      "focus": true,
       "life": "devops",
-      "period": { "start": "2025" },
-      "title": { "en": "Beamble", "pt": "Beamble" },
-      "subtitle": { "en": "Solutions architecture and mobile v2", "pt": "Arquitetura de soluções e mobile v2" },
+      "period": {
+        "start": "2025"
+      },
+      "title": {
+        "en": "Beamble",
+        "pt": "Beamble"
+      },
+      "subtitle": {
+        "en": "Solutions architecture and mobile v2",
+        "pt": "Arquitetura de soluções e mobile v2"
+      },
       "headline": {
         "en": "An app that did not scale, cost too much to work on and missed deadlines: I rewrote the mobile app with the team and moved the platform to production-grade AWS.",
         "pt": "Um app que não escalava, custava caro para trabalhar e perdia prazos: reescrevi o app mobile com o time e levei a plataforma para uma AWS de produção de verdade."
@@ -485,9 +565,17 @@
       "id": "dalegig",
       "order": 13,
       "part": "story",
-      "period": { "start": "2025" },
-      "title": { "en": "La Fabrique Flottante · Dalegig", "pt": "La Fabrique Flottante · Dalegig" },
-      "subtitle": { "en": "AI engine and interface lead", "pt": "Motor de IA e liderança da interface" },
+      "period": {
+        "start": "2025"
+      },
+      "title": {
+        "en": "La Fabrique Flottante · Dalegig",
+        "pt": "La Fabrique Flottante · Dalegig"
+      },
+      "subtitle": {
+        "en": "AI engine and interface lead",
+        "pt": "Motor de IA e liderança da interface"
+      },
       "headline": {
         "en": "Invited to the software house's other projects: a matchmaking platform for musicians, with an AI I built at its core.",
         "pt": "Convidado para os outros projetos da software house: uma plataforma de matches para músicos, com uma IA feita por mim no centro."
@@ -519,41 +607,69 @@
       }
     },
     {
-      "id": "hc-consultorias",
+      "id": "previa",
       "order": 14,
       "part": "story",
-      "period": { "start": "2025-03" },
-      "title": {
-        "en": "HC Consultorias e Desenvolvimento de Software",
-        "pt": "HC Consultorias e Desenvolvimento de Software"
+      "period": {
+        "start": "2025",
+        "end": "2026"
       },
-      "subtitle": { "en": "Managing partner", "pt": "Sócio-administrador" },
+      "title": {
+        "en": "Prévia · Brickup and PHD Engenharia",
+        "pt": "Prévia · Brickup e PHD Engenharia"
+      },
+      "subtitle": {
+        "en": "Joint project lead",
+        "pt": "Líder do projeto conjunto"
+      },
       "headline": {
-        "en": "The company I opened in 2012 became a software company: contract engineering, technical consulting and products of my own.",
-        "pt": "A empresa que abri em 2012 virou uma empresa de software: engenharia sob encomenda, consultoria técnica e produtos próprios."
+        "en": "I took over a joint project with Brickup's partner and investor: today it is Prévia, a full construction-planning platform with an AI assistant.",
+        "pt": "Assumi um projeto conjunto com a parceira e investidora da Brickup: hoje é o Prévia, uma plataforma completa de planejamento de obras com um assistente de IA."
+      },
+      "highlights": {
+        "en": [
+          "A planning assistant built on Lean Construction and Advanced Work Packaging.",
+          "A conversational agent that runs and follows the planning pipeline from chat: quantity takeoff, unit-price compositions, work breakdown and distribution.",
+          "React and TypeScript monorepo, Expo app, n8n and LangChain agents, CI/CD with quality gates on AWS."
+        ],
+        "pt": [
+          "Um assistente de planejamento baseado em Lean Construction e Advanced Work Packaging.",
+          "Um agente conversacional que dispara e acompanha o pipeline de planejamento pelo chat: levantamento de quantitativos, composições de preço unitário, EAP e distribuição.",
+          "Monorepo React e TypeScript, app em Expo, agentes em n8n e LangChain, CI/CD com quality gates na AWS."
+        ]
       },
       "body": {
         "en": [
-          "Software development cannot run under Brazil's sole-microentrepreneur regime, so in March 2025 my company became a limited company registered for software development, with me as managing partner.",
-          "Since then my contracts run through it: custom software engineering, technical consulting and products of my own, for clients such as BID Tecnologia, La Fabrique Flottante and Marketing para Cartórios – AI."
+          "Then I took over a joint project of Brickup and PHD Engenharia, Brickup's partner and investor, with two engineers from their side.",
+          "Today it is Prévia: a complete platform with a construction-planning assistant based on Lean Construction and AWP. Its agent works from the project's parameters and runs the planning pipeline from a conversation."
         ],
         "pt": [
-          "Desenvolvimento de software não pode ser MEI, então em março de 2025 a minha empresa virou uma limitada com atividade de desenvolvimento de software, comigo como sócio-administrador.",
-          "Desde então os meus contratos passam por ela: engenharia de software sob encomenda, consultoria técnica e produtos próprios, para clientes como BID Tecnologia, La Fabrique Flottante e Marketing para Cartórios – AI."
+          "Depois assumi um projeto conjunto da Brickup com a PHD Engenharia, parceira e investidora da Brickup, com dois engenheiros do lado deles.",
+          "Hoje é o Prévia: uma plataforma completa com um assistente de planejamento de obras baseado em Lean Construction e AWP. O agente trabalha a partir dos parâmetros do projeto e roda o pipeline de planejamento a partir de uma conversa."
         ]
       },
       "tags": {
-        "concepts": ["Contract engineering", "Technical consulting"],
-        "skills": ["Business management", "Entrepreneurship"]
+        "tools": ["React", "TypeScript", "Expo", "n8n", "LangChain", "AWS"],
+        "concepts": ["Lean Construction", "Advanced Work Packaging", "AI agents", "CI/CD", "Quality gates"],
+        "skills": ["Technical leadership", "Domain modeling", "Stakeholder management"]
       }
     },
     {
       "id": "immersus-consulting",
       "order": 15,
       "part": "story",
-      "period": { "start": "2025", "end": "present" },
-      "title": { "en": "Immersus Language School", "pt": "Immersus Escola de Idiomas" },
-      "subtitle": { "en": "Technical Consultant", "pt": "Consultor técnico" },
+      "period": {
+        "start": "2025",
+        "end": "present"
+      },
+      "title": {
+        "en": "Immersus Language School",
+        "pt": "Immersus Escola de Idiomas"
+      },
+      "subtitle": {
+        "en": "Technical Consultant",
+        "pt": "Consultor técnico"
+      },
       "headline": {
         "en": "Back where my career began, now as the school's technical consultant.",
         "pt": "De volta onde a minha carreira começou, agora como consultor técnico da escola."
@@ -585,12 +701,80 @@
       }
     },
     {
-      "id": "bid",
+      "id": "own-products",
       "order": 16,
       "part": "story",
-      "period": { "start": "2025-11", "end": "2026-07" },
-      "title": { "en": "BID Tecnologia", "pt": "BID Tecnologia" },
-      "subtitle": { "en": "Technical Consultant", "pt": "Consultor técnico" },
+      "period": {
+        "start": "2025",
+        "end": "present"
+      },
+      "title": {
+        "en": "Own products · HC Consultorias",
+        "pt": "Produtos próprios · HC Consultorias"
+      },
+      "subtitle": {
+        "en": "AI Product Engineer",
+        "pt": "AI Product Engineer"
+      },
+      "headline": {
+        "en": "Still an entrepreneur: products of my own, from the idea to the code, with AI as the engine and a person as the decision-maker.",
+        "pt": "Ainda empreendedor: produtos meus, da ideia ao código, com a IA como motor e uma pessoa como quem decide."
+      },
+      "highlights": {
+        "en": [
+          "Triadora: AI customer service within reach of any business, where the conversation path is an explicit, auditable decision tree and the model only writes the reply.",
+          "A cloud backup for CCTV recorders, a shared base for mini-games and mini-apps, and management software for a grocery that sells from a truck in rural France.",
+          "WAI Framework: a method for building software with AI agents."
+        ],
+        "pt": [
+          "Triadora: atendimento com IA ao alcance de qualquer negócio, em que o caminho da conversa é uma árvore de decisão explícita e auditável e o modelo só escreve a resposta.",
+          "Um backup em nuvem para gravadores de CFTV, uma base comum para mini-games e mini-apps e um sistema de gestão para uma mercearia que vende de um caminhão no interior da França.",
+          "WAI Framework: um método para construir software com agentes de IA."
+        ]
+      },
+      "body": {
+        "en": [
+          "I build products of my own because I am still an entrepreneur. The main one is Triadora, born from the idea of making AI customer service accessible: agents whose conversation path is an explicit, auditable decision tree, while the model only writes the reply. It runs on the WhatsApp Cloud API, with a visual flow editor, a simulator and a spending cap per customer.",
+          "With AI I write real code, not vibe coding. My work is applications and features with AI as the engine: harnesses, context management, guardrails, retrieval and prompt engineering. The person stays the decision-maker, and the AI is a well-orchestrated tool inside human-in-the-loop flows. The WAI Framework writes this down as a method."
+        ],
+        "pt": [
+          "Construo produtos meus porque ainda sou empreendedor. O principal é a Triadora, nascida da ideia de tornar o atendimento com IA acessível: agentes em que o caminho da conversa é uma árvore de decisão explícita e auditável, enquanto o modelo só escreve a resposta. Roda na WhatsApp Cloud API, com editor visual de fluxo, simulador e teto de gasto por cliente.",
+          "Com IA eu escrevo código de verdade, não vibe coding. O meu trabalho são aplicações e funcionalidades com a IA como motor: harness, gestão de contexto, guardrails, busca e engenharia de prompt. A pessoa continua sendo quem decide, e a IA é uma ferramenta bem orquestrada dentro de fluxos com humano no loop. O WAI Framework registra isso como método."
+        ]
+      },
+      "tags": {
+        "tools": [
+          "TypeScript",
+          "Node.js",
+          "Express",
+          "tRPC",
+          "Prisma",
+          "PostgreSQL",
+          "React",
+          "AWS CDK",
+          "WhatsApp Cloud API"
+        ],
+        "concepts": ["Decision trees", "Guardrails", "Context management", "Human in the loop", "Prompt engineering"],
+        "skills": ["Product engineering", "Entrepreneurship", "AI engineering"]
+      }
+    },
+    {
+      "id": "bid",
+      "order": 17,
+      "part": "story",
+      "focus": true,
+      "period": {
+        "start": "2025-11",
+        "end": "2026-07"
+      },
+      "title": {
+        "en": "BID Tecnologia",
+        "pt": "BID Tecnologia"
+      },
+      "subtitle": {
+        "en": "Technical Consultant",
+        "pt": "Consultor técnico"
+      },
       "headline": {
         "en": "Technical consulting for a device trade-in company, including a harness that let its owner build software with AI, with tests, gates and rules.",
         "pt": "Consultoria técnica para uma empresa de trade-in de eletrônicos, incluindo um harness para o dono construir software com IA, com testes, gates e regras."
@@ -631,10 +815,14 @@
     },
     {
       "id": "mpc",
-      "order": 17,
+      "order": 18,
       "part": "story",
+      "focus": true,
       "life": "ai",
-      "period": { "start": "2026-01", "end": "2026-09" },
+      "period": {
+        "start": "2026-01",
+        "end": "2026-09"
+      },
       "title": {
         "en": "Marketing para Cartórios – AI · D-Rocket group",
         "pt": "Marketing para Cartórios – AI · grupo D-Rocket"
@@ -700,61 +888,21 @@
       }
     },
     {
-      "id": "own-products",
-      "order": 18,
-      "part": "story",
-      "period": { "start": "2025", "end": "present" },
-      "title": { "en": "Own products · HC Consultorias", "pt": "Produtos próprios · HC Consultorias" },
-      "subtitle": { "en": "AI Product Engineer", "pt": "AI Product Engineer" },
-      "headline": {
-        "en": "Still an entrepreneur: products of my own, from the idea to the code, with AI as the engine and a person as the decision-maker.",
-        "pt": "Ainda empreendedor: produtos meus, da ideia ao código, com a IA como motor e uma pessoa como quem decide."
-      },
-      "highlights": {
-        "en": [
-          "Triadora: AI customer service within reach of any business, where the conversation path is an explicit, auditable decision tree and the model only writes the reply.",
-          "A cloud backup for CCTV recorders, a shared base for mini-games and mini-apps, and management software for a grocery that sells from a truck in rural France.",
-          "WAI Framework: a method for building software with AI agents."
-        ],
-        "pt": [
-          "Triadora: atendimento com IA ao alcance de qualquer negócio, em que o caminho da conversa é uma árvore de decisão explícita e auditável e o modelo só escreve a resposta.",
-          "Um backup em nuvem para gravadores de CFTV, uma base comum para mini-games e mini-apps e um sistema de gestão para uma mercearia que vende de um caminhão no interior da França.",
-          "WAI Framework: um método para construir software com agentes de IA."
-        ]
-      },
-      "body": {
-        "en": [
-          "I build products of my own because I am still an entrepreneur. The main one is Triadora, born from the idea of making AI customer service accessible: agents whose conversation path is an explicit, auditable decision tree, while the model only writes the reply. It runs on the WhatsApp Cloud API, with a visual flow editor, a simulator and a spending cap per customer.",
-          "With AI I write real code, not vibe coding. My work is applications and features with AI as the engine: harnesses, context management, guardrails, retrieval and prompt engineering. The person stays the decision-maker, and the AI is a well-orchestrated tool inside human-in-the-loop flows. The WAI Framework writes this down as a method."
-        ],
-        "pt": [
-          "Construo produtos meus porque ainda sou empreendedor. O principal é a Triadora, nascida da ideia de tornar o atendimento com IA acessível: agentes em que o caminho da conversa é uma árvore de decisão explícita e auditável, enquanto o modelo só escreve a resposta. Roda na WhatsApp Cloud API, com editor visual de fluxo, simulador e teto de gasto por cliente.",
-          "Com IA eu escrevo código de verdade, não vibe coding. O meu trabalho são aplicações e funcionalidades com a IA como motor: harness, gestão de contexto, guardrails, busca e engenharia de prompt. A pessoa continua sendo quem decide, e a IA é uma ferramenta bem orquestrada dentro de fluxos com humano no loop. O WAI Framework registra isso como método."
-        ]
-      },
-      "tags": {
-        "tools": [
-          "TypeScript",
-          "Node.js",
-          "Express",
-          "tRPC",
-          "Prisma",
-          "PostgreSQL",
-          "React",
-          "AWS CDK",
-          "WhatsApp Cloud API"
-        ],
-        "concepts": ["Decision trees", "Guardrails", "Context management", "Human in the loop", "Prompt engineering"],
-        "skills": ["Product engineering", "Entrepreneurship", "AI engineering"]
-      }
-    },
-    {
       "id": "brickup-today",
       "order": 19,
       "part": "story",
-      "period": { "start": "2026", "end": "present" },
-      "title": { "en": "Brickup, today", "pt": "Brickup, hoje" },
-      "subtitle": { "en": "Building BIA", "pt": "Construindo a BIA" },
+      "period": {
+        "start": "2026",
+        "end": "present"
+      },
+      "title": {
+        "en": "Brickup, today",
+        "pt": "Brickup, hoje"
+      },
+      "subtitle": {
+        "en": "Building BIA",
+        "pt": "Construindo a BIA"
+      },
       "headline": {
         "en": "Still at Brickup: the QA I trained runs quality, and I am building BIA, a conversational financial assistant on WhatsApp.",
         "pt": "Ainda na Brickup: o QA que formei cuida da qualidade, e eu estou construindo a BIA, uma assistente financeira conversacional no WhatsApp."
@@ -779,9 +927,17 @@
       "id": "portfolio",
       "order": 20,
       "part": "story",
-      "period": { "start": "2026" },
-      "title": { "en": "This portfolio", "pt": "Este portfólio" },
-      "subtitle": { "en": "Design, 3D and engineering", "pt": "Design, 3D e engenharia" },
+      "period": {
+        "start": "2026"
+      },
+      "title": {
+        "en": "This portfolio",
+        "pt": "Este portfólio"
+      },
+      "subtitle": {
+        "en": "Design, 3D and engineering",
+        "pt": "Design, 3D e engenharia"
+      },
       "headline": {
         "en": "A 3D bust built from code-driven Blender recipes, nine lives in one hero, served by a single Cloudflare Worker.",
         "pt": "Um busto 3D feito a partir de receitas de Blender em código, nove vidas num só herói, servido por um único Worker da Cloudflare."
@@ -800,7 +956,10 @@
         "skills": ["Creative development"]
       },
       "link": {
-        "label": { "en": "View source on GitHub", "pt": "Ver o código no GitHub" },
+        "label": {
+          "en": "View source on GitHub",
+          "pt": "Ver o código no GitHub"
+        },
         "href": "https://github.com/FaelCaporali/portfolio"
       }
     }
