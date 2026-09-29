@@ -30,8 +30,14 @@ const NODE: Record<Lane, string> = {
   right: '-left-[1.125rem] top-9 lg:top-0 lg:right-12 lg:left-auto lg:translate-x-1/2',
   wide: '-left-[1.875rem] top-9 lg:top-0 lg:left-1/2',
 }
-/* O mesmo tamanho e peso para os dois rótulos grandes do mapa, o nome da vida e o ano (J61: "mesmo estilo"). */
-const BIG = 'text-[clamp(2.75rem,5.6vw,5.25rem)] leading-[0.95] font-semibold tracking-[-0.045em]'
+/*
+ * O mesmo tamanho e peso para os dois rótulos grandes do mapa, o nome da vida e o ano (J61: "mesmo estilo"). O tamanho
+ * sai da palavra mais longa, "Entrepreneur" (≈7em neste peso): ela tem de caber inteira na coluna, sem quebrar no meio
+ * (J70). No celular a coluna é a tela menos 5rem de margens; do lg para cima, meia grade (416px em 1024, 464px no
+ * máximo), daí o teto de 3.875rem.
+ */
+const BIG =
+  'text-[min(2.75rem,calc((100vw_-_5rem)/7.4))] lg:text-[min(5.6vw,3.875rem)] leading-[0.95] font-semibold tracking-[-0.045em]'
 
 /** As tags de um grupo num atributo, para o filtro (main.ts); "|" não aparece em nenhuma tag. */
 const joined = (items: string[] | undefined) => items?.join('|')
@@ -137,7 +143,7 @@ export function Checkpoint({ item }: { item: Placed }) {
 function Landmark({ life, lane }: { life: NonNullable<Placed['life']>; lane: Lane }) {
   return (
     <div className={cx('landmark relative mb-5 lg:mb-0', LANDMARK[lane])}>
-      <p className={cx(BIG, '[overflow-wrap:anywhere] text-(--accent)')}>{life.slot}</p>
+      <p className={cx(BIG, 'text-(--accent)')}>{life.slot}</p>
     </div>
   )
 }
