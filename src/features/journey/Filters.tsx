@@ -25,7 +25,7 @@ export function Filters({ items }: { items: Dated[] }) {
       hidden
       className="filters sticky top-14 z-20 border-y border-white/[0.06] bg-[#0b0b0e]/85 backdrop-blur-md"
     >
-      <div className="relative mx-auto flex max-w-7xl flex-wrap items-center gap-2 px-5 py-2.5 sm:px-8 lg:pr-20 xl:pr-60">
+      <div className="relative mx-auto flex max-w-7xl flex-wrap items-center gap-1.5 px-4 py-2 sm:gap-2 sm:px-8 sm:py-2.5 lg:pr-20 xl:pr-60">
         <p className={cx(eyebrow, 'mr-1 hidden text-[0.65rem] md:block')}>Filter the map</p>
         <Menu label="Years">
           <div className="grid grid-cols-2 gap-3">
@@ -85,7 +85,7 @@ function tagsOf(items: Dated[], key: (typeof GROUPS)[number]['key']): string[] {
 function Menu({ label, children }: { label: string; children: ReactNode }) {
   return (
     <details data-filter-menu className="group sm:relative">
-      <summary className="flex min-h-9 cursor-pointer list-none items-center gap-1.5 rounded-full border border-white/15 px-3.5 text-sm text-white/85 transition-colors group-open:border-white/40 hover:border-white/35 hover:text-white focus-visible:outline-2 focus-visible:outline-white [&::-webkit-details-marker]:hidden">
+      <summary className="flex min-h-9 cursor-pointer list-none items-center gap-1 rounded-full border border-white/15 px-3 text-[0.8rem] text-white/85 transition-colors group-open:border-white/40 hover:border-white/35 hover:text-white focus-visible:outline-2 focus-visible:outline-white sm:gap-1.5 sm:px-3.5 sm:text-sm [&::-webkit-details-marker]:hidden">
         {label}
         <span aria-hidden data-filter-on hidden className="h-1.5 w-1.5 rounded-full bg-white" />
         <span aria-hidden className="text-[0.65rem] text-white/50 transition-transform group-open:rotate-180">
