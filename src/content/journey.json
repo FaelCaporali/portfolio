@@ -1,8 +1,8 @@
 {
   "intro": {
     "lede": {
-      "en": "Finance, my own ventures and a sailing school; then the switch to software, which started with study. Every stop below left something I still use.",
-      "pt": "Financeiro, negócios próprios e uma escola de vela; depois a virada para o software, que começou pelo estudo. Cada parada abaixo deixou algo que ainda uso."
+      "en": "A finance job, businesses of my own and a sailing school, then the move into software, which began with studying. Each stop below left me something I still use.",
+      "pt": "Um emprego no financeiro, negócios próprios e uma escola de vela; depois a virada para o software, que começou pelo estudo. Cada parada abaixo me deixou algo que ainda uso."
     }
   },
   "checkpoints": [
@@ -19,22 +19,22 @@
         "pt": "SEBRAE e São João del-Rei"
       },
       "subtitle": {
-        "en": "A business technical course, then a first company",
+        "en": "A vocational business course, then my first company",
         "pt": "Curso técnico em administração, depois a primeira empresa"
       },
       "headline": {
-        "en": "A technical course in business administration at SEBRAE, then São João del-Rei, where I opened my first company.",
-        "pt": "Curso técnico em administração no SEBRAE, depois São João del-Rei, onde abri a minha primeira empresa."
+        "en": "My first business plan in 2007, and my first company in 2012.",
+        "pt": "O primeiro plano de negócios em 2007 e a primeira empresa em 2012."
       },
       "body": {
         "en": [
-          "Business administration at SEBRAE-MG's technical school in Belo Horizonte, alongside high school. My first business plan came out of there, in 2007.",
-          "Then came São João del-Rei and four and a half years of psychology. It was there, in 2012, that I opened my first company: a music production venture with a friend. He produced; I ran the business.",
-          "That registration followed me from one venture to the next, and today it is HC Consultorias, my software company."
+          "Business administration at SEBRAE-MG's technical school in Belo Horizonte, alongside high school. That is where I wrote my first business plan.",
+          "Then came São João del-Rei and four and a half years of psychology. There I started my first company, a music production business with a friend: he produced the music, I ran the company.",
+          "I kept that company registration through every venture that followed, and today it is HC Consultorias, my software company."
         ],
         "pt": [
-          "Administração na escola técnica do SEBRAE-MG, em Belo Horizonte, junto com o ensino médio. De lá saiu o meu primeiro plano de negócios, em 2007.",
-          "Depois vieram São João del-Rei e quatro anos e meio de psicologia. Foi lá, em 2012, que abri a minha primeira empresa: uma produtora musical com um amigo. Ele produzia; eu cuidava do negócio.",
+          "Administração na escola técnica do SEBRAE-MG, em Belo Horizonte, junto com o ensino médio. Foi lá que escrevi o meu primeiro plano de negócios.",
+          "Depois vieram São João del-Rei e quatro anos e meio de psicologia. Foi lá que abri a minha primeira empresa, uma produtora musical com um amigo: ele produzia, eu cuidava do negócio.",
           "Esse CNPJ me acompanhou de um negócio a outro e hoje é a HC Consultorias, a minha empresa de software."
         ]
       },
@@ -62,31 +62,31 @@
         "pt": "Assistente financeiro → Coordenador financeiro"
       },
       "headline": {
-        "en": "From financial assistant to coordinator, and my first multidisciplinary team.",
-        "pt": "De assistente a coordenador financeiro, e o meu primeiro time multidisciplinar."
+        "en": "Finance at a language school, and my first multidisciplinary team.",
+        "pt": "O financeiro de uma escola de idiomas e o meu primeiro time multidisciplinar."
       },
       "highlights": {
         "en": [
-          "With the school's director, a financial consultant and a marketing consultant, more than doubled the school's revenue.",
-          "Planned alongside the school's management as financial coordinator.",
-          "Automated the management (BI) reports in VBA."
+          "Together with the school's director, a financial consultant and a marketing consultant, we more than doubled the school's revenue.",
+          "As financial coordinator, ran the financial planning with the school's management.",
+          "Automated management (BI) reporting with Excel VBA."
         ],
         "pt": [
           "Com a diretora da escola, um consultor financeiro e uma consultora de marketing, mais que duplicamos o faturamento da escola.",
-          "Planejei junto com a direção da escola como coordenador financeiro.",
-          "Automatizei os relatórios gerenciais (BI) em VBA."
+          "Como coordenador financeiro, conduzi o planejamento financeiro com a direção da escola.",
+          "Automatizei os relatórios gerenciais (BI) com VBA no Excel."
         ]
       },
       "body": {
         "en": [
-          "Back from São João del-Rei, I joined the Immersus language school as a financial assistant and worked my way up to financial coordinator. The office taught me logic, analysis and how to set strategic goals.",
-          "It was also the first time I put a multidisciplinary team together and worked inside one: finance, marketing and the school's leadership around the same table.",
-          "I left for a while, first for brownies and then for a confectionery, and later came back."
+          "Back from São João del-Rei, I joined the Immersus language school as a financial assistant and worked my way up to financial coordinator. The job taught me analytical thinking and how to set strategic targets.",
+          "It was also the first time I put together a multidisciplinary team and worked as part of it.",
+          "I stepped away for a while and later came back."
         ],
         "pt": [
-          "De volta de São João del-Rei, entrei na Immersus Escola de Idiomas como assistente financeiro e cheguei a coordenador financeiro. O escritório me ensinou lógica, análise e a traçar metas estratégicas.",
-          "Foi também a primeira vez que montei um time multidisciplinar e trabalhei dentro dele: finanças, marketing e a direção da escola na mesma mesa.",
-          "Saí por um tempo, primeiro para os brownies e depois para uma confeitaria, e mais tarde voltei."
+          "De volta de São João del-Rei, entrei na Immersus Escola de Idiomas como assistente financeiro e cheguei a coordenador financeiro. O trabalho me ensinou raciocínio analítico e a traçar metas estratégicas.",
+          "Foi também a primeira vez que montei um time multidisciplinar e trabalhei dentro dele.",
+          "Saí por um tempo e depois voltei."
         ]
       },
       "tags": {
@@ -101,7 +101,7 @@
       "part": "prologue",
       "life": "empreendedor",
       "title": {
-        "en": "Brownies, a confectionery, a hostel",
+        "en": "Brownies, a bakery, a hostel",
         "pt": "Brownies, uma confeitaria, um hostel"
       },
       "subtitle": {
@@ -109,17 +109,17 @@
         "pt": "Empreendedor"
       },
       "headline": {
-        "en": "Selling face to face taught me costs, pricing and customers.",
+        "en": "Selling face to face taught me about costs, pricing and customers.",
         "pt": "Vender cara a cara me ensinou custo, preço e cliente."
       },
       "body": {
         "en": [
-          "During the break from Immersus I baked brownies and sold them on the street, then ran a confectionery that supplied cakes and sweets to fairs and guesthouse breakfasts.",
-          "Back at Immersus, I stepped away from the confectionery and opened a hostel near Brumadinho, alongside the finance job. When the hostel closed, I moved on to the water."
+          "During the break from Immersus I baked brownies and sold them on the street, then ran a bakery that supplied cakes and sweets to fairs and to guesthouses for their breakfasts.",
+          "After returning to Immersus, I left the bakery and opened a hostel near Brumadinho. When the hostel closed, I turned to sailing."
         ],
         "pt": [
           "Na pausa da Immersus, fiz brownies e vendi na rua; depois veio uma confeitaria que fornecia bolos e doces para feiras e cafés da manhã de pousadas.",
-          "De volta à Immersus, me afastei da confeitaria e abri um hostel perto de Brumadinho, junto com o financeiro. Quando o hostel fechou, fui para a água."
+          "De volta à Immersus, me afastei da confeitaria e abri um hostel perto de Brumadinho. Quando o hostel fechou, fui para a vela."
         ]
       },
       "tags": {
@@ -140,8 +140,8 @@
         }
       },
       "title": {
-        "en": "Sailing: from translator to school owner",
-        "pt": "Vela: de tradutor a dono de escola"
+        "en": "Sailing, from Lagoa dos Ingleses to Lagoa Santa",
+        "pt": "Vela, da Lagoa dos Ingleses a Lagoa Santa"
       },
       "subtitle": {
         "en": "Sailing Instructor",
@@ -153,14 +153,14 @@
       },
       "body": {
         "en": [
-          "I've read and written English since childhood, and that is how sailing found me. A friend who grew up on boats had sold a beginner course to two British children without speaking English, and called me to translate. By the end, I was hooked.",
-          "For a short while I split my days between the water and Immersus; then sailing took over. I started teaching at his school, then became his partner at Lagoa dos Ingleses, running operations and teaching Laser. I also taught at Nauttec, Uaiwind and Clube de Regatas Afonso Ligório, took the courses of the Brazilian Sailing Confederation (CBVela) and taught all ages.",
-          "When the club closed, I opened my own school in Lagoa Santa, until the pandemic stopped everything on the water. What sailing left me: teaching, and knowing how to build a school."
+          "I've read and written English since childhood, and that is how sailing found me. A friend who grew up on boats had sold a beginner's course to two British children, though he spoke no English, so he called me in to translate. By the end, I was hooked.",
+          "For a short while I split my days between the water and Immersus; then sailing took over. I started teaching at his school, then became his partner at Lagoa dos Ingleses, running operations and teaching the Laser class. I also taught at Nauttec, Uaiwind and the Clube de Regatas Afonso Ligório, with students of all ages, and took the Brazilian Sailing Confederation (CBVela) courses.",
+          "When the club at Lagoa dos Ingleses closed, I started my own school in Lagoa Santa, which ran until the pandemic stopped everything on the water. What I took from sailing: how to teach, and how to build a school."
         ],
         "pt": [
-          "Leio e escrevo em inglês desde criança, e foi assim que a vela me encontrou. Um amigo que cresceu em barcos tinha vendido um curso de iniciação para duas crianças inglesas sem falar inglês, e me chamou para traduzir. No fim, eu estava apaixonado pela vela.",
-          "Por um tempo, dividi os dias entre a água e a Immersus; depois, a vela tomou conta. Virei instrutor na escola dele, depois sócio na Lagoa dos Ingleses, cuidando da operação e das aulas de Laser. Também dei aulas na Nauttec, na Uaiwind e no Clube de Regatas Afonso Ligório, fiz os cursos da CBVela e ensinei todas as idades.",
-          "Quando o clube fechou, abri a minha própria escola em Lagoa Santa, até a pandemia parar tudo na água. Da vela ficaram ensinar e saber construir uma escola."
+          "Leio e escrevo em inglês desde criança, e foi assim que a vela me encontrou. Um amigo que cresceu em barcos, e que não falava inglês, tinha vendido um curso de iniciação para duas crianças inglesas e me chamou para traduzir. No fim, eu estava apaixonado pela vela.",
+          "Por um tempo, dividi os dias entre a água e a Immersus; depois, a vela tomou conta. Virei instrutor na escola dele, depois sócio na Lagoa dos Ingleses, cuidando da operação e das aulas de Laser. Também dei aulas na Nauttec, na Uaiwind e no Clube de Regatas Afonso Ligório, para todas as idades, e fiz os cursos da CBVela.",
+          "Quando o clube da Lagoa dos Ingleses fechou, abri a minha própria escola em Lagoa Santa, que funcionou até a pandemia parar tudo na água. O que levei da vela: ensinar e saber construir uma escola."
         ]
       },
       "tags": {
@@ -192,10 +192,10 @@
       },
       "body": {
         "en": [
-          "The driving came first, then the studying alongside it, and I finished Trybe with the car behind me. Good ratings, and one review that became a nickname: \"the legend of the wheel\". What it left: resilience, tenacity and the habit of doing things right."
+          "I started driving first, then began studying alongside it, and had stopped driving by the time I finished Trybe. Passengers rated me highly, and one review became a nickname: \"the legend of the wheel\". Driving taught me resilience, persistence and the habit of doing things properly."
         ],
         "pt": [
-          "Primeiro veio o volante, depois o estudo junto com ele, e terminei a Trybe já sem rodar. Boas avaliações, e um comentário que virou apelido: \"a lenda dos volantes\". O que ficou: resiliência, tenacidade e o hábito de fazer as coisas bem feitas."
+          "Primeiro veio o volante, depois o estudo junto com ele, e terminei a Trybe já sem rodar. Boas avaliações, e um comentário que virou apelido: \"a lenda dos volantes\". O volante me ensinou resiliência, tenacidade e o hábito de fazer as coisas bem feitas."
         ]
       },
       "tags": {
@@ -221,35 +221,35 @@
         "pt": "Desenvolvimento web full-stack"
       },
       "headline": {
-        "en": "Software testing first, then computer science, then 1,500 hours of full-stack projects.",
-        "pt": "Primeiro teste de software, depois ciência da computação, depois 1.500 horas de projetos full-stack."
+        "en": "Software testing first, then computer science, then full-stack development.",
+        "pt": "Primeiro teste de software, depois ciência da computação, depois desenvolvimento full-stack."
       },
       "highlights": {
         "en": [
-          "CTFL preparation (ISTQB/BSTQB v4): the foundations of software testing.",
+          "Preparation for the ISTQB Certified Tester Foundation Level (CTFL v4): the foundations of software testing.",
           "CS50, Harvard's Introduction to Computer Science.",
           "Trybe's Full-Stack Web Development program: 1,500 hours, all of it through projects.",
-          "Real bugs in real products for Brazilian and international clients, as a crowdtester on uTest and Crowdtest."
+          "As a crowdtester on uTest and Crowdtest, found bugs in live products for Brazilian and international clients."
         ],
         "pt": [
           "Preparação para o CTFL (ISTQB/BSTQB v4): os fundamentos de teste de software.",
           "CS50, a Introdução à Ciência da Computação de Harvard.",
           "Desenvolvimento Web Full-Stack na Trybe: 1.500 horas, tudo por projetos.",
-          "Bugs de verdade em produtos reais de clientes brasileiros e internacionais, como crowdtester no uTest e na Crowdtest."
+          "Como crowdtester no uTest e na Crowdtest, achei bugs em produtos reais de clientes brasileiros e internacionais."
         ]
       },
       "body": {
         "en": [
-          "The switch began with testing. The CTFL gave me a method for finding what breaks, CS50 the fundamentals underneath the code, and Trybe turned both into practice: web fundamentals, front-end, back-end and computer science.",
-          "Along the way came the stack I still use most: Node.js, Express and React in TypeScript, with Laravel, Python and SQL around it."
+          "Preparing for the CTFL gave me a method for finding what breaks, CS50 gave me the fundamentals beneath the code, and Trybe put both into practice across web fundamentals, front-end, back-end and computer science.",
+          "Along the way came the stack I still use most: Node.js, Express and React in TypeScript, alongside Laravel, Python and SQL."
         ],
         "pt": [
-          "A virada começou pelo teste. O CTFL me deu método para achar o que quebra, o CS50 os fundamentos por baixo do código, e a Trybe transformou os dois em prática: fundamentos da web, front-end, back-end e ciência da computação.",
-          "No caminho veio a stack que mais uso até hoje: Node.js, Express e React em TypeScript, com Laravel, Python e SQL em volta."
+          "A preparação para o CTFL me deu método para achar o que quebra, o CS50 me deu os fundamentos por baixo do código, e a Trybe transformou os dois em prática: fundamentos da web, front-end, back-end e ciência da computação.",
+          "No caminho veio a stack que mais uso até hoje: Node.js, Express e React em TypeScript, ao lado de Laravel, Python e SQL."
         ]
       },
       "tags": {
-        "tools": ["JavaScript", "TypeScript", "Node.js", "Express", "React", "PHP", "Python", "SQL"],
+        "tools": ["JavaScript", "TypeScript", "Node.js", "Express", "React", "Python", "SQL", "React Native"],
         "concepts": ["Computer science", "Software testing", "ISTQB", "Crowdtesting", "Exploratory testing"],
         "skills": ["Full-stack development", "Bug hunting"]
       }
@@ -269,33 +269,33 @@
         "pt": "Brickup"
       },
       "subtitle": {
-        "en": "Software Tester, building the quality area",
-        "pt": "Testador de software, construindo a área de qualidade"
+        "en": "Software Tester, building the QA function",
+        "pt": "Tester de software, construindo a área de qualidade"
       },
       "headline": {
-        "en": "Joined a construction-tech startup as a software tester and built its quality area from scratch.",
-        "pt": "Entrei numa startup de construção como testador de software e construí a área de qualidade do zero."
+        "en": "Joined a construction-tech startup as a software tester and built its QA function from scratch.",
+        "pt": "Entrei numa startup de construção como tester de software e construí a área de qualidade do zero."
       },
       "highlights": {
         "en": [
-          "Open defects down from about 300 to under 100, and the biweekly talk of stopping everything for a bug smash was over.",
+          "Open defects cut from about 300 to under 100, which ended the recurring talk of stopping everything for a bug smash.",
           "Incident and failure management: a defined path from bug report to engineering, error reporting inside the platform, and proactive alerts on API and interface failures.",
           "Built the end-to-end test suite, written as BDD scenarios."
         ],
         "pt": [
-          "Defeitos abertos de cerca de 300 para menos de 100, e acabou a conversa quinzenal de parar tudo para um bug smash.",
+          "Defeitos abertos de cerca de 300 para menos de 100, o que acabou com a conversa recorrente de parar tudo para um bug smash.",
           "Gestão de incidentes e falhas: um caminho definido do relato do bug até a engenharia, relato de erro dentro da plataforma e alertas proativos de falha de API e de interface.",
           "Construí a suíte de testes ponta a ponta, escrita como cenários BDD."
         ]
       },
       "body": {
         "en": [
-          "My first job in software, in June 2023. There was no quality area, and every two weeks someone suggested stopping everything for a bug smash.",
-          "The area was built from the process up: rules for how a bug travels, documentation, a way for customers to report errors, monitoring, feature flags and automated end-to-end tests. The CTFL came in without the bureaucracy: first find what brings the most result, then pick the technique, whether white-box, black-box, static review, regression, integration or load testing."
+          "My first job in software, in June 2023, at a startup with no QA function yet.",
+          "I built it from the process up, with documentation and feature flags alongside the incident flow and the test suite. I applied the CTFL syllabus without the red tape: start with what has the most impact, then pick the technique, whether white-box, black-box, static review, regression, integration or load testing."
         ],
         "pt": [
-          "O meu primeiro emprego em software, em junho de 2023. Não existia área de qualidade, e a cada duas semanas alguém sugeria parar tudo para um bug smash.",
-          "A área nasceu do processo: regras de como um bug caminha, documentação, um jeito de o cliente relatar erros, monitoramento, feature flags e testes ponta a ponta automatizados. O CTFL entrou sem burocracia: primeiro achar o que traz mais resultado, depois escolher a técnica, fosse caixa branca, caixa preta, revisão estática, regressão, integração ou carga."
+          "O meu primeiro emprego em software, em junho de 2023, numa startup ainda sem área de qualidade.",
+          "Construí a área a partir do processo, com documentação e feature flags ao lado do fluxo de incidentes e da suíte de testes. O conteúdo do CTFL entrou sem burocracia: primeiro o que tem mais impacto, depois a técnica, fosse caixa branca, caixa preta, revisão estática, regressão, integração ou carga."
         ]
       },
       "tags": {
@@ -310,7 +310,10 @@
           "Black-box testing",
           "White-box testing",
           "Load testing",
-          "Static review"
+          "Static review",
+          "Integration testing",
+          "Unit testing",
+          "Exploratory testing"
         ],
         "skills": ["Quality strategy", "Process design", "Test automation"]
       }
@@ -334,35 +337,33 @@
         "pt": "Scrum master, depois produto e liderança de time"
       },
       "headline": {
-        "en": "Solving problems nobody owned turned into a role: scrum master first, then product.",
-        "pt": "Resolver problemas que ninguém assumia virou função: primeiro scrum master, depois produto."
+        "en": "Solving problems nobody owned kept turning into new roles.",
+        "pt": "Resolver problemas que ninguém assumia foi virando novas funções."
       },
       "highlights": {
         "en": [
           "Rebuilt the Jira board and created the process for modeling and designing user stories.",
           "Modeled features and wrote the specs and blueprints for the billing and financial services.",
           "Took over the public API documentation.",
-          "Ran the hiring processes that brought in real talent, and coordinated a team of five developers for a period.",
-          "Designed and deployed microservices, among them the integrations service."
+          "Designed and ran the hiring process that brought in strong developers, and for a time coordinated a team of five.",
+          "Designed and deployed microservices, among them the integrations service that connects the platform to its CRM, billing and monitoring."
         ],
         "pt": [
           "Refiz o board do Jira e criei o processo de modelagem e design de histórias.",
           "Modelei features e escrevi as especificações e os blueprints dos serviços de cobrança e financeiro.",
           "Assumi a documentação da API pública.",
-          "Conduzi os processos seletivos que trouxeram talentos de verdade e, por um período, coordenei um time de cinco desenvolvedores.",
-          "Idealizei e implantei microsserviços, entre eles o de integrações."
+          "Desenhei e conduzi o processo seletivo que trouxe bons desenvolvedores e, por um período, coordenei um time de cinco.",
+          "Idealizei e implantei microsserviços, entre eles o de integrações, que liga a plataforma ao CRM, à cobrança e ao monitoramento."
         ]
       },
       "body": {
         "en": [
-          "Once the quality area was running, the next role came before any new title: first I was offered the scrum master's work.",
-          "With incident management in place, the work moved upstream, into what a PM or PO would normally own: requirements, specs and documentation.",
-          "Among the microservices I designed and deployed is the integrations service, which connects the platform to its CRM, billing and monitoring."
+          "Once the QA function was running, new work came before any new title: first I was offered the scrum master's role.",
+          "Then the work moved upstream, into what a product manager or product owner would normally own."
         ],
         "pt": [
           "Com a área de qualidade rodando, a função seguinte veio antes de qualquer cargo novo: primeiro me ofereceram o trabalho de scrum master.",
-          "Com a gestão de incidentes de pé, o trabalho subiu para o que normalmente seria de um PM ou PO: requisitos, especificações e documentação.",
-          "Entre os microsserviços que idealizei e implantei está o de integrações, que liga a plataforma ao CRM, à cobrança e ao monitoramento."
+          "Depois o trabalho subiu para o que normalmente seria de um PM ou PO."
         ]
       },
       "tags": {
@@ -374,7 +375,11 @@
           "Requirements engineering",
           "API documentation",
           "Microservices",
-          "Serverless"
+          "Serverless",
+          "Billing",
+          "Bank reconciliation (Open Finance)",
+          "Invoice issuance (NFS-e)",
+          "ERP integration"
         ],
         "skills": ["Leadership", "Product management", "Hiring", "Team coordination"]
       }
@@ -396,31 +401,31 @@
         "pt": "A era da IA: o Constructo e os insights do diário de obra"
       },
       "headline": {
-        "en": "When AI arrived, programming became my most valuable skill: Constructo, a construction planner that went from proof of concept to product.",
-        "pt": "Quando a IA chegou, programar virou a minha habilidade mais valiosa: o Constructo, um planejador de obras que foi de prova de conceito a produto."
+        "en": "When AI arrived, programming became my most valuable skill, starting with Constructo, a construction planner.",
+        "pt": "Quando a IA chegou, programar virou a minha habilidade mais valiosa, a começar pelo Constructo, um planejador de obras."
       },
       "highlights": {
         "en": [
-          "Saved two Black Friday campaigns and put the startup back on a path of innovation.",
+          "Constructo saved two Black Friday campaigns and put innovation back on the startup's agenda.",
           "After the refactor, the proof of concept became an MVP, and then a product.",
           "Designed the AI that reads the history of daily construction reports, and worked closely with the developer who built it."
         ],
         "pt": [
-          "Salvou duas campanhas de Black Friday e recolocou a startup num rumo de inovação.",
+          "O Constructo salvou duas campanhas de Black Friday e trouxe a inovação de volta para a startup.",
           "Depois da refatoração, a prova de conceito virou MVP e, depois, produto.",
           "Desenhei a IA que lê o histórico dos relatórios diários de obra e trabalhei de perto com o desenvolvedor que a construiu."
         ]
       },
       "body": {
         "en": [
-          "The first piece was an automation in n8n: a form goes in, a one-shot call to the model returns structured JSON, and a ready construction schedule comes out.",
-          "It spent a year in beta without much pull. Then I refactored it: construction-planning techniques applied, and usage analytics behind every product decision.",
-          "The second AI I did not implement, but I designed it: it reads the history of daily construction reports to surface insights, spot patterns that hurt the operation and suggest improvements. It also builds lock-in, encouraging customers to keep feeding the platform with data."
+          "The first piece was an automation in n8n: a form goes in, a one-shot call to the model returns structured JSON, and a finished construction schedule comes out.",
+          "It spent a year in beta without much traction. Then I refactored it, applying construction-planning techniques and basing every product decision on usage analytics.",
+          "The daily-report AI surfaces insights from the history of construction reports, spots patterns that hurt site operations and suggests improvements. It also builds lock-in, since it gives customers a reason to keep feeding the platform data."
         ],
         "pt": [
           "A primeira peça foi uma automação em n8n: entra um formulário, uma chamada one-shot ao modelo devolve um JSON estruturado, e sai o cronograma da obra pronto.",
-          "Passou um ano em beta, sem muito apelo. Então eu o refatorei: técnicas de planejamento de obra aplicadas e análise de uso por trás de cada decisão de produto.",
-          "A segunda IA eu não implementei, mas fiz o design: ela lê o histórico dos relatórios diários de obra para trazer insights, identificar padrões nocivos à operação e sugerir melhorias. Também gera lock-in, estimulando o cliente a continuar alimentando a plataforma com dados."
+          "Passou um ano em beta, sem muito apelo. Então eu o refatorei, aplicando técnicas de planejamento de obra e baseando cada decisão de produto em análise de uso.",
+          "A IA do diário de obra traz insights do histórico dos relatórios, identifica padrões nocivos à operação e sugere melhorias. Também gera lock-in, porque dá ao cliente motivo para continuar alimentando a plataforma com dados."
         ]
       },
       "tags": {
@@ -454,33 +459,33 @@
         "pt": "QA → tech lead"
       },
       "headline": {
-        "en": "Alongside Brickup, I joined a software house as QA on a live-shopping platform and was its tech lead by April.",
+        "en": "Alongside Brickup, I joined a software house in a QA role on a live-shopping platform, and by April I was its tech lead.",
         "pt": "Em paralelo à Brickup, entrei numa software house como QA de uma plataforma de live shopping e, em abril, já era o tech lead."
       },
       "highlights": {
         "en": [
-          "Beamble: live video shopping for high-end fashion, for a French client, with iOS and Android apps.",
-          "Direct line to the client, and the bridge between the international team and the Brazilian developers.",
+          "Beamble: a live video shopping platform for high-end fashion, with iOS and Android apps, built for a French client.",
+          "Worked directly with the client and bridged the international team and the Brazilian developers.",
           "Modeled the scaling path from the monolith to microservices, and designed the features.",
-          "Led the SEO and GEO audit: a ten-part plan for visibility in search engines and AI assistants, from structured data and server-side rendering to Core Web Vitals, LLM mention tracking and a Beamble MCP server."
+          "Led the SEO and generative engine optimization (GEO) audit: a ten-part plan for visibility in search engines and AI assistants, from structured data and server-side rendering to Core Web Vitals, tracking of brand mentions in LLMs and a Beamble MCP server."
         ],
         "pt": [
           "Beamble: live video shopping de moda de alto padrão, para um cliente francês, com apps iOS e Android.",
-          "Interlocução direta com o cliente e a ponte entre o time internacional e os desenvolvedores brasileiros.",
+          "Tratei direto com o cliente e fiz a ponte entre o time internacional e os desenvolvedores brasileiros.",
           "Modelei o caminho de escala do monólito para microsserviços e desenhei as features.",
           "Conduzi a auditoria de SEO e GEO: um plano em dez frentes para visibilidade em buscadores e assistentes de IA, de dados estruturados e renderização no servidor a Core Web Vitals, monitoramento de menções em LLMs e um servidor MCP da Beamble."
         ]
       },
       "body": {
         "en": [
-          "In January 2025, still at Brickup, I joined La Fabrique Flottante, a software house, as QA on Beamble. A complex platform: live video, a shopping cart, Stripe payments, maps and delivery through Uber, DHL and UPS.",
-          "Once again it started in QA, and by April the tech lead role was mine. Leading there meant listening to the client, finding the problem behind each request, choosing techniques and tools, designing the solution, then setting deadlines and development cadence and following every delivery.",
-          "The audit looked at how search engines and AI assistants see the product, and became an executive proposal with requirements and acceptance criteria for every part."
+          "Beamble is a complex platform: live video, a shopping cart, Stripe payments, maps and delivery through Uber, DHL and UPS.",
+          "Leading there meant listening to the client, finding the problem behind each request, choosing techniques and tools, designing the solution, then setting deadlines and the development cadence, and seeing every delivery through.",
+          "The result was an executive proposal, with requirements and acceptance criteria for each of the ten parts."
         ],
         "pt": [
-          "Em janeiro de 2025, ainda na Brickup, entrei na La Fabrique Flottante, uma software house, como QA do Beamble. Uma plataforma complexa: vídeo ao vivo, carrinho de compras, pagamentos no Stripe, mapas e entrega por Uber, DHL e UPS.",
-          "De novo começou pelo QA, e em abril a liderança técnica já era minha. Liderar ali era ouvir o cliente, achar o problema por trás de cada pedido, escolher técnicas e ferramentas, desenhar a solução, depois definir prazos e cadência de desenvolvimento e acompanhar cada entrega.",
-          "A auditoria olhou como buscadores e assistentes de IA enxergam o produto e virou uma proposta executiva, com requisitos e critérios de aceite para cada frente."
+          "O Beamble é uma plataforma complexa: vídeo ao vivo, carrinho de compras, pagamentos no Stripe, mapas e entrega por Uber, DHL e UPS.",
+          "Liderar ali era ouvir o cliente, achar o problema por trás de cada pedido, escolher técnicas e ferramentas, desenhar a solução, depois definir prazos e cadência de desenvolvimento e acompanhar cada entrega.",
+          "O resultado foi uma proposta executiva, com requisitos e critérios de aceite para cada uma das dez frentes."
         ]
       },
       "tags": {
@@ -521,17 +526,17 @@
         "pt": "Sócio-administrador"
       },
       "headline": {
-        "en": "The company opened in 2012 became a software company, and every contract since runs through it.",
-        "pt": "A empresa aberta em 2012 virou uma empresa de software, e todos os contratos desde então passam por ela."
+        "en": "The company I started in 2012 is now a software company, and my consulting and development contracts run through it.",
+        "pt": "A empresa que abri em 2012 hoje é uma empresa de software, e os meus contratos de consultoria e desenvolvimento passam por ela."
       },
       "body": {
         "en": [
-          "Software development can't be done under Brazil's individual microentrepreneur (MEI) regime, so in March 2025 the company became a limited liability company registered for software development, with me as managing partner.",
-          "Clients have included BID Tecnologia, La Fabrique Flottante and Marketing para Cartórios – AI, for custom software and technical consulting, and the company's own products are built there too."
+          "Brazil's individual microentrepreneur (MEI) scheme doesn't allow software development, so in March 2025 I turned the business into a limited liability company, with myself as managing partner.",
+          "Its clients have included BID Tecnologia, La Fabrique Flottante and Marketing para Cartórios – AI, for custom software and technical consulting, and it is also where I build my own products."
         ],
         "pt": [
-          "Desenvolvimento de software não pode ser MEI, então em março de 2025 a empresa virou uma sociedade limitada com atividade de desenvolvimento de software, comigo como sócio-administrador.",
-          "Entre os clientes estão a BID Tecnologia, a La Fabrique Flottante e a Marketing para Cartórios – AI, com software sob encomenda e consultoria técnica, e os produtos próprios também nascem ali."
+          "O MEI não permite a atividade de desenvolvimento de software, então em março de 2025 transformei a empresa numa sociedade limitada, comigo como sócio-administrador.",
+          "Entre os clientes estão a BID Tecnologia, a La Fabrique Flottante e a Marketing para Cartórios – AI, com software sob encomenda e consultoria técnica, e é nela também que construo os meus produtos."
         ]
       },
       "tags": {
@@ -557,29 +562,29 @@
         "pt": "Arquitetura de soluções e mobile v2"
       },
       "headline": {
-        "en": "An app that didn't scale, was hard to work on and kept missing deadlines: mobile v2 rebuilt with the team, and the platform moved from Lightsail to a production-grade ECS setup.",
-        "pt": "Um app que não escalava, era difícil de manter e perdia prazos: o mobile v2 reconstruído com o time e a plataforma levada do Lightsail para um ECS de produção."
+        "en": "I rewrote most of mobile v2 and moved the platform from Lightsail to a production-grade ECS setup.",
+        "pt": "Reescrevi quase todo o mobile v2 e levei a plataforma do Lightsail para um ECS de produção."
       },
       "highlights": {
         "en": [
-          "Mobile v2: in a task force with the two mobile developers, most of the code was mine.",
-          "API: tangled code reorganized into a clean monolith, with media upload, messaging and scheduled routines split into services of their own.",
-          "Infrastructure: ECS behind a load balancer, VPC, RDS and blue-green deployments with CodeDeploy, all described in CloudFormation, plus scheduled jobs on Lambda."
+          "Mobile v2: working in a task force with the two mobile developers, I wrote most of the code.",
+          "API: tangled code reorganized into a clean monolith, with media upload, messaging and scheduled jobs split into services of their own.",
+          "Infrastructure: ECS behind a load balancer, VPC, RDS and blue-green deployments with CodeDeploy, all defined in CloudFormation, with the scheduled jobs on Lambda."
         ],
         "pt": [
-          "Mobile v2: numa força-tarefa com os dois desenvolvedores mobile, a maior parte do código foi minha.",
+          "Mobile v2: numa força-tarefa com os dois desenvolvedores mobile, escrevi a maior parte do código.",
           "API: código macarrônico reorganizado num monólito limpo, com upload de mídia, mensageria e rotinas agendadas separadas em serviços próprios.",
-          "Infraestrutura: ECS atrás de um balanceador de carga, VPC, RDS e deploy blue-green com CodeDeploy, tudo descrito em CloudFormation, além de rotinas agendadas em Lambda."
+          "Infraestrutura: ECS atrás de um balanceador de carga, VPC, RDS e deploy blue-green com CodeDeploy, tudo definido em CloudFormation, com as rotinas agendadas em Lambda."
         ]
       },
       "body": {
         "en": [
-          "On arrival, the app had critical performance problems and outdated libraries, on top of a demanding feature set: live video, cart and checkout, Stripe payments and shipping through several carriers.",
-          "Every change had the same aim: a platform that scales, that the team can work on without fighting the code, and that stops missing deadlines. Brickup is where I learned what I applied here."
+          "When I arrived, the app had critical performance problems and outdated libraries, on top of everything the platform had to carry.",
+          "Every change had the same aim: a platform that scales, fails less, is easier for the team to work on and ships on time. Brickup is where I learned what I applied here."
         ],
         "pt": [
-          "Na chegada, o app tinha problemas críticos de performance e bibliotecas legadas, e um conjunto exigente de funcionalidades: vídeo ao vivo, carrinho e checkout, pagamentos no Stripe e frete com várias transportadoras.",
-          "Cada mudança tinha o mesmo objetivo: uma plataforma que escala, em que o time trabalha sem brigar com o código e que para de perder prazos. Foi na Brickup que aprendi o que apliquei aqui."
+          "Na chegada, o app tinha problemas críticos de performance e bibliotecas legadas, além de tudo o que a plataforma precisava carregar.",
+          "Cada mudança tinha o mesmo objetivo: uma plataforma que escala, falha menos, é mais fácil de o time trabalhar e entrega no prazo. Foi na Brickup que aprendi o que apliquei aqui."
         ]
       },
       "tags": {
@@ -588,7 +593,6 @@
           "Redux Toolkit",
           "VideoSDK",
           "Laravel",
-          "PHP",
           "Stripe",
           "AWS ECS",
           "Elastic Load Balancing",
@@ -629,12 +633,12 @@
         "pt": "Motor de IA e liderança da interface"
       },
       "headline": {
-        "en": "Invited to the software house's other projects: a matchmaking platform for live music, with an AI of my own at its core.",
-        "pt": "Convidado para os outros projetos da software house: uma plataforma de matches para a música ao vivo, com uma IA minha no centro."
+        "en": "Then came an invitation to the software house's other projects: a matchmaking platform for live music, with an AI agent I built at its core.",
+        "pt": "Convidado para os outros projetos da software house: uma plataforma que conecta a música ao vivo às casas de show, com uma IA feita por mim no centro."
       },
       "highlights": {
         "en": [
-          "Built the proof of concept of the musician interface, then coordinated and designed its third version.",
+          "Built the proof of concept for the musician interface, then coordinated and designed its third version.",
           "Built Chico, the AI agent that researches each musician on YouTube, Spotify, Instagram and the web and suggests goals to strengthen the profile."
         ],
         "pt": [
@@ -645,11 +649,11 @@
       "body": {
         "en": [
           "Dalegig matches musicians, artists and cultural producers with venues.",
-          "Chico is the engine: it enriches each profile with data on reach and relevance from the musician's channels and turns it into goals, shown next to the ones the musician sets. It runs on Flowise and n8n agents, with Anthropic and OpenAI models."
+          "Chico is the engine: the goals it suggests appear next to the ones the musician sets. It runs as agents on Flowise and n8n, using Anthropic and OpenAI models."
         ],
         "pt": [
           "O Dalegig conecta músicos, artistas e produtores culturais às casas de show.",
-          "O Chico é o motor: enriquece cada perfil com dados de alcance e relevância dos canais do músico e transforma isso em metas, ao lado das que o próprio músico define. Roda em agentes no Flowise e no n8n, com modelos da Anthropic e da OpenAI."
+          "O Chico é o motor: as metas que ele sugere aparecem ao lado das que o próprio músico define. Roda em agentes no Flowise e no n8n, com modelos da Anthropic e da OpenAI."
         ]
       },
       "tags": {
@@ -699,7 +703,7 @@
       "highlights": {
         "en": [
           "A planning assistant grounded in Lean Construction, Advanced Work Packaging and PMBOK.",
-          "A conversational agent that runs and follows the planning pipeline from chat: quantity takeoff, unit-price compositions, work breakdown and distribution.",
+          "A conversational agent that triggers and tracks the planning pipeline from chat: quantity takeoff, unit-price breakdowns, the work breakdown structure (WBS) and distribution.",
           "Custom n8n nodes that package LangChain's deep-agents SDK, so agents with subagents can be built visually."
         ],
         "pt": [
@@ -710,14 +714,14 @@
       },
       "body": {
         "en": [
-          "A joint project of Brickup and PHD Engenharia, Brickup's partner and investor, with two engineers from their side.",
-          "The agent works from the project's parameters: a root agent with a methodology specialist as a subagent, built on LangGraph and Gemini, with human review where the numbers matter, such as extracting unit-price compositions.",
-          "Around it: a React and TypeScript monorepo, an Expo app, and CI/CD with quality gates on AWS."
+          "Two engineers from PHD Engenharia worked on it with me.",
+          "The agent runs in n8n and works from the project's parameters: a root agent with a methodology specialist as a subagent, partly on LangChain's LangGraph, with Gemini models and human review where the numbers matter, such as extracting unit-price breakdowns.",
+          "The platform around it is a React and TypeScript monorepo with an Expo mobile app, and CI/CD with quality gates on AWS."
         ],
         "pt": [
-          "Um projeto conjunto da Brickup com a PHD Engenharia, parceira e investidora da Brickup, com dois engenheiros do lado deles.",
-          "O agente trabalha a partir dos parâmetros do projeto: um agente principal com um especialista em metodologia como subagente, sobre LangGraph e Gemini, com revisão humana onde os números importam, como na extração de composições de preço unitário.",
-          "Em volta dele: um monorepo React e TypeScript, um app em Expo e CI/CD com quality gates na AWS."
+          "Dois engenheiros da PHD Engenharia trabalharam comigo.",
+          "O agente roda no n8n e trabalha a partir dos parâmetros do projeto: um agente principal com um especialista em metodologia como subagente, em parte sobre o LangGraph da LangChain, com modelos Gemini e revisão humana onde os números importam, como na extração de composições de preço unitário.",
+          "A plataforma em volta dele é um monorepo React e TypeScript com um app mobile em Expo, e CI/CD com quality gates na AWS."
         ]
       },
       "tags": {
@@ -764,35 +768,34 @@
         "pt": "Consultor técnico"
       },
       "headline": {
-        "en": "Back where my career began, now as the school's technical consultant.",
-        "pt": "De volta onde a minha carreira começou, agora como consultor técnico da escola."
+        "en": "Back at Immersus, now as the school's technical consultant.",
+        "pt": "De volta à Immersus, agora como consultor técnico da escola."
       },
       "highlights": {
         "en": [
-          "Coordinated the school's three vendors on the technical side: sales, the content agency and paid traffic.",
-          "Reviewed the agency's landing page against every criterion: search visibility, design, responsiveness, performance and brand.",
+          "Coordinated the school's three vendors on the technical side: the sales firm, the content marketing agency and the paid-ads manager.",
+          "Reviewed the agency's landing page for search visibility, design, responsiveness, performance and brand consistency.",
           "Built the school's web platform: student, teaching and admin areas on their own domains, a content manager and two-factor authentication."
         ],
         "pt": [
-          "Coordenei os três fornecedores da escola do lado técnico: comercial, a agência de conteúdo e o tráfego pago.",
-          "Avaliei a landing page da agência em todos os critérios: visibilidade em busca, design, responsividade, performance e marca.",
+          "Coordenei os três fornecedores da escola do lado técnico: o comercial, a agência de marketing de conteúdo e o gestor de tráfego pago.",
+          "Avaliei a landing page da agência em visibilidade em busca, design, responsividade, performance e consistência de marca.",
           "Construí a plataforma web da escola: áreas de aluno, pedagógica e administrativa em domínios próprios, gerenciador de conteúdo e autenticação em dois fatores."
         ]
       },
       "body": {
         "en": [
-          "In 2025 I returned to Immersus, this time on the technical side, and have been the school's technical consultant since.",
-          "The platform runs on Laravel and React through Inertia, with server-side rendering for the public site, Filament as the content manager and role-based access for each area."
+          "In 2025 I returned to Immersus, this time on the technical side.",
+          "The platform is built on Laravel and React through Inertia, with server-side rendering for the public site and role-based access for each area."
         ],
         "pt": [
-          "Em 2025 voltei à Immersus, desta vez do lado técnico, e desde então sou o consultor técnico da escola.",
-          "A plataforma roda em Laravel e React via Inertia, com renderização no servidor para o site público, Filament como gerenciador de conteúdo e acesso por papel em cada área."
+          "Em 2025 voltei à Immersus, desta vez do lado técnico.",
+          "A plataforma é construída em Laravel e React via Inertia, com renderização no servidor para o site público e acesso por papel em cada área."
         ]
       },
       "tags": {
         "tools": [
           "Laravel",
-          "PHP",
           "React",
           "TypeScript",
           "Inertia.js",
@@ -839,22 +842,22 @@
         "en": [
           "An AI development harness for a non-technical owner: rules, a mandatory flow from classifying the request to verifying the result, tests, coverage gates, hooks that block a commit and CI that blocks a merge.",
           "The warehouse system, the big win: inventory, triage, validation, disassembly, shipping, CRM and admin, in production.",
-          "A legacy spread across several apps consolidated into one monorepo, plus a pricing agent that reads photos of a device and returns an offer."
+          "Consolidated a legacy spread across several apps into one monorepo."
         ],
         "pt": [
           "Um harness de desenvolvimento com IA para um dono não técnico: regras, um fluxo obrigatório da classificação do pedido à verificação do resultado, testes, gates de cobertura, hooks que bloqueiam o commit e CI que bloqueia o merge.",
           "O sistema de armazém, a grande conquista: inventário, triagem, validação, desmontagem, expedição, CRM e administração, em produção.",
-          "Um legado espalhado em vários apps consolidado num único monorepo, e um agente de precificação que lê fotos de um aparelho e devolve uma oferta."
+          "Consolidei num único monorepo um legado espalhado em vários apps."
         ]
       },
       "body": {
         "en": [
-          "BID came through HC in November 2025, with a trade-in and asset-management platform spread across earlier versions and several AI-generated apps. The owner wanted to build with AI himself, so instead of a prompt-to-app builder he got a harness: rules the agent must follow, complexity levels that set how much process each change needs, mission records with their decisions, and gates the code can't skip, all explained in plain language.",
-          "The rebuild brought the platform into a single React and TypeScript monorepo, with row-level security for multi-tenancy and Terraform on GCP. The pricing agent uses Claude's vision to identify the model and its parts, checks market prices and proposes an offer."
+          "BID came through HC in November 2025, with a trade-in and asset-management platform spread across earlier versions and several separate apps. The owner wanted to build with AI himself, so instead of a prompt-to-app builder he got a harness: rules the agent must follow, complexity levels that set how much process each change needs, mission logs that record every decision, and gates the code can't skip, all explained in plain language.",
+          "The monorepo runs on React and TypeScript, with row-level security for multi-tenancy and Terraform on GCP. A pricing agent uses Claude's vision capabilities to identify the device and its parts from photos, checks market prices and proposes an offer."
         ],
         "pt": [
-          "A BID chegou pela HC em novembro de 2025, com uma plataforma de trade-in e gestão de ativos espalhada em versões anteriores e vários apps gerados por IA. O dono queria construir com IA ele mesmo, então, em vez de um gerador de apps por prompt, recebeu um harness: regras que o agente tem de seguir, níveis de complexidade que definem quanto processo cada mudança exige, registro de missões com as suas decisões e gates que o código não pula, tudo explicado em linguagem simples.",
-          "A reconstrução levou a plataforma para um único monorepo React e TypeScript, com row-level security para multi-tenancy e Terraform no GCP. O agente de precificação usa a visão do Claude para identificar o modelo e as peças, consulta preços de mercado e propõe uma oferta."
+          "A BID chegou pela HC em novembro de 2025, com uma plataforma de trade-in e gestão de ativos espalhada em versões anteriores e vários apps separados. O dono queria construir com IA ele mesmo, então, em vez de um gerador de apps por prompt, recebeu um harness: regras que o agente tem de seguir, níveis de complexidade que definem quanto processo cada mudança exige, registro de missões com cada decisão e gates que o código não pula, tudo explicado em linguagem simples.",
+          "O monorepo roda em React e TypeScript, com row-level security para multi-tenancy e Terraform no GCP. Um agente de precificação usa a visão do Claude para identificar o aparelho e as peças pelas fotos, consulta preços de mercado e propõe uma oferta."
         ]
       },
       "tags": {
@@ -873,7 +876,9 @@
           "Vitest",
           "ESLint",
           "GitHub Actions",
-          "n8n"
+          "n8n",
+          "SearXNG",
+          "Firecrawl"
         ],
         "concepts": [
           "AI development harness",
@@ -884,7 +889,7 @@
           "Multi-tenancy",
           "Vision language models"
         ],
-        "skills": ["Technical consulting", "Developer experience", "Legacy rescue"]
+        "skills": ["Technical consulting", "Developer experience", "Legacy modernization"]
       }
     },
     {
@@ -902,37 +907,37 @@
         "pt": "Marketing para Cartórios – AI · grupo D-Rocket"
       },
       "subtitle": {
-        "en": "Tech Lead and Full-Stack Engineer, end to end",
-        "pt": "Tech lead e engenheiro full-stack, de ponta a ponta"
+        "en": "Tech Lead and Full-Stack Engineer",
+        "pt": "Tech lead e engenheiro full-stack"
       },
       "headline": {
-        "en": "An AI attendant for Brazilian notary offices on WhatsApp: all of the engineering was mine, inside a team I coordinated, from the first commit to the handover.",
-        "pt": "Um atendente de IA para cartórios brasileiros no WhatsApp: toda a engenharia foi minha, dentro de um time que coordenei, do primeiro commit à entrega."
+        "en": "An AI customer-service agent for Brazilian notary offices on WhatsApp: I did all of the engineering, inside a team I coordinated, from the first commit to the handover.",
+        "pt": "Um agente de atendimento com IA para cartórios brasileiros no WhatsApp: fiz toda a engenharia, dentro de um time que coordenei, do primeiro commit à entrega."
       },
       "highlights": {
         "en": [
           "The whole product: the notary office panel, the admin panel and the agent itself, from architecture to production.",
-          "Coordinated the team: coached the founder into the product owner role, worked with domain experts, mentored a junior developer and took part in strategic decisions.",
-          "Built around CNJ Provision 213/2026 and the LGPD: mandatory two-factor authentication, single sessions, an append-only audit trail, isolation between offices and an AI disclosure on every first message.",
-          "Handover in September 2026 with the first two clients live, the system operating, the team trained and the operating flow in place."
+          "Coordinated the team: coached the founder into the product owner role, worked with domain experts, guided and taught a junior developer, and took part in strategic decisions.",
+          "Built around CNJ Provision 213/2026 and Brazil's data protection law (LGPD): mandatory two-factor authentication, one active session per user, an append-only audit trail, isolation between offices and an AI disclosure at the start of every conversation.",
+          "Handed over in September 2026 with the first two clients live, the system running, the team trained and operating procedures in place."
         ],
         "pt": [
           "O produto inteiro: o painel do cartório, o painel administrativo e o próprio agente, da arquitetura à produção.",
-          "Coordenei o time: preparei a fundadora para o papel de product owner, trabalhei com especialistas de domínio, orientei uma desenvolvedora júnior e participei das decisões estratégicas.",
-          "Construído em torno do Provimento 213/2026 do CNJ e da LGPD: autenticação em dois fatores obrigatória, sessão única, trilha de auditoria só de inserção, isolamento entre cartórios e aviso de IA em toda primeira mensagem.",
-          "Entrega em setembro de 2026 com os dois primeiros clientes no ar, o sistema operando, a equipe treinada e o fluxo operacional de pé."
+          "Coordenei o time: preparei a fundadora para o papel de product owner, trabalhei com especialistas de domínio, orientei uma desenvolvedora júnior, a quem ensinei muito, e participei das decisões estratégicas.",
+          "Construído em torno do Provimento 213/2026 do CNJ e da LGPD: autenticação em dois fatores obrigatória, uma sessão ativa por usuário, trilha de auditoria só de inserção, isolamento entre cartórios e aviso de IA no início de toda conversa.",
+          "Entregue em setembro de 2026 com os dois primeiros clientes no ar, o sistema operando, a equipe treinada e o fluxo operacional de pé."
         ]
       },
       "body": {
         "en": [
-          "AI agents that serve Brazilian notary offices over WhatsApp. The code was mine end to end; the product was a team effort, with the founder, domain experts and a junior developer I guided, assigned work to and taught. Stack, pricing and roadmap were defined with the founder.",
-          "Each notary office got a knowledge base built from its reference documents, such as laws, fee tables and opening hours, with retrieval on PostgreSQL and pgvector and audio transcription, curated from the admin panel. The agent is orchestrated in n8n, reaches WhatsApp through the Evolution API and writes its replies with OpenAI models; an evaluation tool tests it against scenarios, personas and scoring before changes go live.",
-          "A regulated market asks for more than a chatbot: every requirement of CNJ Provision 213/2026 is mapped to the code and tracked on the roadmap, and the agent evaluation includes scenarios on personal data under the LGPD."
+          "Stack, pricing and roadmap were defined with the founder.",
+          "Each notary office got a knowledge base built from its reference documents, such as laws, fee tables and opening hours, curated from the admin panel and searched with PostgreSQL and pgvector; voice messages are transcribed. The agent is orchestrated in n8n, reaches WhatsApp through the Evolution API and writes its replies with OpenAI models, and an evaluation tool scores it against scenarios and personas before any change goes live.",
+          "A regulated market asks for more than a chatbot: each requirement of the Provision is mapped to the code and tracked on the roadmap, and the agent evaluation includes personal-data scenarios."
         ],
         "pt": [
-          "Agentes de IA que atendem cartórios brasileiros pelo WhatsApp. O código foi meu de ponta a ponta; o produto foi um trabalho de time, com a fundadora, especialistas de domínio e uma desenvolvedora júnior que orientei, a quem atribuí tarefas e ensinei muito. Stack, precificação e roadmap foram definidos com a fundadora.",
-          "Cada cartório ganhou uma base de conhecimento feita dos seus documentos de referência, como leis, tabelas de valores e horários de funcionamento, com busca em PostgreSQL e pgvector e transcrição de áudio, curada pelo painel administrativo. O agente é orquestrado no n8n, chega ao WhatsApp pela Evolution API e escreve as respostas com modelos da OpenAI; uma ferramenta de avaliação testa o agente contra cenários, personas e pontuação antes de cada mudança ir ao ar.",
-          "Um mercado regulado pede mais que um chatbot: cada requisito do Provimento 213/2026 do CNJ está mapeado no código e acompanhado no roadmap, e a avaliação do agente inclui cenários de dados pessoais sob a LGPD."
+          "Stack, precificação e roadmap foram definidos com a fundadora.",
+          "Cada cartório ganhou uma base de conhecimento feita dos seus documentos de referência, como leis, tabelas de valores e horários de funcionamento, curada pelo painel administrativo e com busca em PostgreSQL e pgvector; as mensagens de voz são transcritas. O agente é orquestrado no n8n, chega ao WhatsApp pela Evolution API e escreve as respostas com modelos da OpenAI, e uma ferramenta de avaliação pontua o agente em cenários e personas antes de cada mudança ir ao ar.",
+          "Um mercado regulado pede mais que um chatbot: cada requisito do Provimento está mapeado no código e acompanhado no roadmap, e a avaliação do agente inclui cenários de dados pessoais."
         ]
       },
       "tags": {
@@ -985,17 +990,17 @@
         "pt": "Construindo a BIA"
       },
       "headline": {
-        "en": "Still at Brickup: the QA I trained now runs quality, and I'm building BIA, a conversational financial assistant on WhatsApp.",
-        "pt": "Ainda na Brickup: o QA que formei cuida da qualidade, e eu estou construindo a BIA, uma assistente financeira conversacional no WhatsApp."
+        "en": "Still at Brickup, now building BIA, a conversational financial assistant on WhatsApp.",
+        "pt": "Ainda na Brickup, agora construindo a BIA, uma assistente financeira conversacional no WhatsApp."
       },
       "body": {
         "en": [
-          "Today I support the QA I trained to take my place, and much of the credit is his: he is very good.",
-          "BIA is an agent routed through n8n, with tools to look up records, read the media people send and create draft financial entries."
+          "Today I support the QA engineer I trained to take my place; much of the credit is his, and he's very good.",
+          "BIA is an n8n agent with a router and tools to look up records, read the media people send and create draft financial entries."
         ],
         "pt": [
-          "Hoje eu apoio o QA que formei para me substituir, e muito do mérito é dele: ele é muito bom.",
-          "A BIA é um agente roteado no n8n, com ferramentas para buscar cadastros, ler as mídias que as pessoas mandam e criar pré-lançamentos financeiros."
+          "Hoje eu apoio o QA que formei para me substituir; muito do mérito é dele, e ele é muito bom.",
+          "A BIA é um agente no n8n, com um roteador e ferramentas para buscar cadastros, ler as mídias que as pessoas mandam e criar pré-lançamentos financeiros."
         ]
       },
       "tags": {
@@ -1013,7 +1018,7 @@
         "end": "present"
       },
       "title": {
-        "en": "Own products · HC Consultorias",
+        "en": "My own products · HC Consultorias",
         "pt": "Produtos próprios · HC Consultorias"
       },
       "subtitle": {
@@ -1021,8 +1026,8 @@
         "pt": "AI Product Engineer"
       },
       "headline": {
-        "en": "Still an entrepreneur: products of my own, from idea to code, with AI as the engine and a person as the decision-maker.",
-        "pt": "Ainda empreendedor: produtos meus, da ideia ao código, com a IA como motor e uma pessoa como quem decide."
+        "en": "Still an entrepreneur: products of my own, from idea to code.",
+        "pt": "Ainda empreendedor: produtos meus, da ideia ao código."
       },
       "highlights": {
         "en": [
@@ -1038,12 +1043,12 @@
       },
       "body": {
         "en": [
-          "With AI I still design, write and review the code. My work is applications and features with AI as the engine: harnesses, context management, guardrails, retrieval and prompt engineering, with a person as the decision-maker and the AI as a well-orchestrated tool inside human-in-the-loop flows. The WAI Framework writes that down as a method.",
-          "Triadora follows the same idea: the conversation path is an explicit, auditable decision tree, and the model only writes the reply. The provider is a detail: one model can replace another, or none at all, without touching the flows."
+          "With AI I still design, write and review the code. My focus is applications and features powered by AI: harnesses, context management, guardrails, retrieval and prompt engineering, with people making the decisions and the AI as a well-orchestrated tool in human-in-the-loop flows.",
+          "Triadora follows the same idea: the conversation path is an explicit, auditable decision tree, and the model only interprets what the customer says. The provider is a detail: one model can replace another, or none at all, without touching the flows."
         ],
         "pt": [
-          "Com IA eu continuo desenhando, escrevendo e revisando o código. O meu trabalho são aplicações e funcionalidades com a IA como motor: harness, gestão de contexto, guardrails, busca e engenharia de prompt, com uma pessoa como quem decide e a IA como ferramenta bem orquestrada dentro de fluxos com humano no loop. O WAI Framework registra isso como método.",
-          "A Triadora segue a mesma ideia: o caminho da conversa é uma árvore de decisão explícita e auditável, e o modelo só escreve a resposta. O provedor é um detalhe: um modelo troca por outro, ou por nenhum, sem mexer nos fluxos."
+          "Com IA eu continuo desenhando, escrevendo e revisando o código. Construo aplicações e funcionalidades movidas a IA: harness, gestão de contexto, guardrails, busca e engenharia de prompt, com pessoas tomando as decisões e a IA como ferramenta bem orquestrada dentro de fluxos com humano no loop.",
+          "A Triadora segue a mesma ideia: o caminho da conversa é uma árvore de decisão explícita e auditável, e o modelo só interpreta o que o cliente diz. O provedor é um detalhe: um modelo troca por outro, ou por nenhum, sem mexer nos fluxos."
         ]
       },
       "tags": {
@@ -1059,7 +1064,8 @@
           "Docker",
           "AWS CDK",
           "AWS S3",
-          "ffmpeg"
+          "ffmpeg",
+          "Claude Code"
         ],
         "concepts": [
           "Decision trees",
@@ -1068,8 +1074,7 @@
           "Human in the loop",
           "Prompt engineering",
           "Provider-agnostic AI",
-          "Hexagonal architecture",
-          "Multi-tenancy"
+          "Hexagonal architecture"
         ],
         "skills": ["Product engineering", "Entrepreneurship", "AI engineering"]
       }
@@ -1090,15 +1095,15 @@
         "pt": "Design, 3D e engenharia"
       },
       "headline": {
-        "en": "A 3D bust built from code-driven Blender recipes, nine lives in one hero, served by a single Cloudflare Worker.",
-        "pt": "Um busto 3D feito a partir de receitas de Blender em código, nove vidas num só herói, servido por um único Worker da Cloudflare."
+        "en": "A 3D bust built from Blender recipes written in code, with nine lives in a single hero.",
+        "pt": "Um busto 3D feito de receitas de Blender em código, com nove vidas num só herói."
       },
       "body": {
         "en": [
-          "The latest piece: the hero is the creative side, and this page is the story behind it. The source is public."
+          "The most recent project: the hero is the creative side, and this page is the story behind it. The source code is public."
         ],
         "pt": [
-          "A peça mais recente: o herói é o lado criativo, e esta página é a história por trás dele. O código é público."
+          "O projeto mais recente: o herói é o lado criativo, e esta página é a história por trás dele. O código é público."
         ]
       },
       "tags": {
@@ -1116,7 +1121,8 @@
           "Cloudflare D1",
           "Cloudflare Turnstile",
           "Playwright",
-          "Vitest"
+          "Vitest",
+          "Claude Code"
         ],
         "concepts": [
           "3D on the web",
