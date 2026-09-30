@@ -1,4 +1,4 @@
-import { Suspense, lazy, useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { Suspense, lazy, useCallback, useRef, useState, useSyncExternalStore } from 'react'
 import { flushSync } from 'react-dom'
 import { useNavigation } from 'react-router'
 import { OPENING, stages, type PropId } from '../../content/journey'
@@ -51,14 +51,6 @@ const noSubscribe = () => () => undefined
 const serverOptions = () => null
 const OPENING_START = readHeroOptions('', IDS, OPENING, false).start
 /**
- * Prazo do "loading" (U2), o mesmo das vidas (TEMPO_LIMITE_MS em scene/carga.ts, repetido aqui para o herói não puxar
- * o three): sem o 1º quadro da cena em 20 s desde a montagem no navegador (glb do busto que não chega, preparo que não
- * termina, erro que a fronteira não vê), o texto sai do "loading" para a vida de abertura; a cena que chegar depois
- * segue normal. Limite aceito: em rede muito lenta (mais de 20 s), a vida aparece antes do busto.
- */
-const PRAZO_CENA_MS = 20_000
-
-/**
  * Herói: "Today I am a [vida]" com o busto 3D que desintegra em furacão e volta com o adereço da próxima vida.
  * Até o 1º quadro da cena, "Today I am loading" (U2, D-143a), também no HTML do build.
  * Com ?slot o carrossel começa em outra vida: o herói recomeça nela assim que o navegador lê o endereço.
@@ -93,20 +85,10 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
   const failed = useRef<ReadonlySet<number>>(new Set())
   // A cena caiu (SceneBoundary): quem troca a vida é o clique no indicador, direto, sem desintegração.
   const [sceneFailed, setSceneFailed] = useState(false)
-  // "Today I am loading" até o 1º quadro com o busto (U2): no HTML, na hidratação e a cada montagem (a volta da
-  // trajetória também). Cena que cai sai do "loading" na hora, para a vida de abertura; cena que não chega, no prazo.
+  // "Today I am loading" até o 1º quadro com o busto (U2), sem prazo (D-U2a: "loading sem limites faz sentido contanto
+  // que quando busto carregado, troque o texto"): no HTML, na hidratação e a cada montagem (a volta da trajetória
+  // também). Cena que cai sai do "loading" na hora, para a vida de abertura.
   const [sceneReady, setSceneReady] = useState(false)
-  const [sceneLate, setSceneLate] = useState(false)
-  const hasScene = options !== null
-  useEffect(() => {
-    if (!hasScene) return
-    const timer = setTimeout(() => {
-      setSceneLate(true)
-    }, PRAZO_CENA_MS)
-    return () => {
-      clearTimeout(timer)
-    }
-  }, [hasScene])
   const onSceneReady = useCallback(() => {
     // Vem do commit do R3F (Bust.tsx, junto da marca 'cena'), outro renderizador: o flushSync troca o texto nesse
     // mesmo instante, e o texto e o busto pintam no mesmo quadro.
@@ -115,14 +97,14 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
       setSceneReady(true)
     })
   }, [])
-  const loading = !sceneReady && !sceneFailed && !sceneLate
+  const loading = !sceneReady && !sceneFailed
   const next = useCallback((prop: PropId) => {
     // A vida para onde a cena troca (a escolhida no indicador ou a 1ª pronta da volta).
     const i = stages.findIndex((s) => s.prop === prop)
     const target = i < 0 ? requested.current : i
     requested.current = null
     setPending(null)
-    lineup.current = advance(lineup.current, stages.length, target, Math.random, failed.current)
+    lineup.current = advance(lineup.current, stages.length, target, failed.current)
     setIndex(lineup.current.current)
     setCarga(loadProps(lineup.current, null, failed.current))
     setOpening(false)

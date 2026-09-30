@@ -140,7 +140,7 @@ describe('herói: "Today I am loading" até a cena 3D (U2)', () => {
     expect(atuais().map((b) => b.getAttribute('aria-label'))).toEqual([outra.slot])
   })
 
-  it('cena que não chega em 20 s: sai do "loading" para a vida de abertura; a cena que chega depois segue', async () => {
+  it('sem prazo (D-U2a): a cena que demora deixa o "loading" até o busto chegar, e aí troca', async () => {
     vi.useFakeTimers()
     render(<RouterProvider router={createMemoryRouter(rotas())} />)
     await act(async () => {
@@ -148,16 +148,12 @@ describe('herói: "Today I am loading" até a cena 3D (U2)', () => {
     })
     expect(screen.getByRole('button', { name: 'cena pronta' })).toBeInTheDocument()
     await act(async () => {
-      await vi.advanceTimersByTimeAsync(19_999)
+      await vi.advanceTimersByTimeAsync(120_000)
     })
     expect(titulo()).toHaveAccessibleName(LOADING)
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(1)
-    })
-    expect(titulo()).toHaveAccessibleName(VIDA)
-    expect(atuais().map((b) => b.getAttribute('aria-label'))).toEqual([abertura.slot])
     fireEvent.click(screen.getByRole('button', { name: 'cena pronta' }))
     expect(titulo()).toHaveAccessibleName(VIDA)
+    expect(atuais().map((b) => b.getAttribute('aria-label'))).toEqual([abertura.slot])
   })
 
   it('a volta da trajetória para o herói mostra "loading" de novo até a cena', async () => {
