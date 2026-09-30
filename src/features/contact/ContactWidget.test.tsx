@@ -1,19 +1,25 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ContactWidget } from './ContactWidget'
 import { FALLBACK, STILL_VERIFYING, errorText } from './texts'
 
-// Turnstile de mentira: por padrão entrega um token assim que o widget é criado.
+// Turnstile de mentira: por padrão entrega um token assim que o widget é criado. Guarda os callbacks do widget para o
+// teste entregar o token (ou a falha) depois, como o desafio de verdade na 1ª abertura.
+interface WidgetCallbacks {
+  callback: (token: string) => void
+  'error-callback': () => void
+}
 const turnstile = vi.hoisted(() => {
-  const state: { token: string | null } = { token: 'tok-1' }
+  const state: { token: string | null; widget: WidgetCallbacks | null } = { token: 'tok-1', widget: null }
   return state
 })
 vi.mock('./turnstile', () => ({
   SITEKEY: 'sitekey-de-teste',
   loadTurnstile: () =>
     Promise.resolve({
-      render: (_el: HTMLElement, options: { callback: (token: string) => void }) => {
+      render: (_el: HTMLElement, options: WidgetCallbacks) => {
+        turnstile.widget = options
         if (turnstile.token) options.callback(turnstile.token)
         return 'widget-1'
       },
@@ -26,6 +32,7 @@ const fetchMock = vi.fn<typeof fetch>()
 
 beforeEach(() => {
   turnstile.token = 'tok-1'
+  turnstile.widget = null
   fetchMock.mockReset()
   vi.stubGlobal('fetch', fetchMock)
 })
@@ -129,11 +136,45 @@ describe('widget de contato', () => {
     expect(screen.getByLabelText('Name')).toHaveValue('')
   })
 
-  it('sem token ainda: pede um instante e não envia', async () => {
+  it('sem token ainda: o botão mostra "Verifying…", ocupado, e não envia; com o token vira "Send" (U2)', async () => {
     turnstile.token = null
     const user = await openAndFill()
-    await user.click(screen.getByRole('button', { name: 'Send' }))
+    const button = screen.getByRole('button', { name: 'Verifying…' })
+    expect(button).toHaveAttribute('aria-busy', 'true')
+    expect(button).toHaveAttribute('aria-disabled', 'true')
+    await user.click(button)
     expect(screen.getByText(STILL_VERIFYING)).toBeVisible()
     expect(fetchMock).not.toHaveBeenCalled()
+    act(() => {
+      turnstile.widget?.callback('tok-2')
+    })
+    expect(screen.getByRole('button', { name: 'Send' })).not.toHaveAttribute('aria-busy')
+    // O aviso de "ainda verificando" sai com o token: não fica ao lado de um "Send" pronto.
+    expect(screen.queryByText(STILL_VERIFYING)).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Verifying…' })).not.toBeInTheDocument()
+  })
+
+  it('verificação que falha: sai do "Verifying…" para "Send", com o texto de falha que já existe', async () => {
+    turnstile.token = null
+    const user = await openAndFill()
+    expect(screen.getByRole('button', { name: 'Verifying…' })).toBeVisible()
+    act(() => {
+      turnstile.widget?.['error-callback']()
+    })
+    await user.click(screen.getByRole('button', { name: 'Send' }))
+    expect(screen.getByText(FALLBACK)).toBeVisible()
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it('da 2ª abertura em diante, com o token já no widget, o botão é "Send" direto', async () => {
+    const user = userEvent.setup()
+    render(<ContactWidget />)
+    const trigger = screen.getByRole('button', { name: 'Contact me' })
+    await user.click(trigger)
+    expect(await screen.findByRole('button', { name: 'Send' })).toBeVisible()
+    await user.keyboard('{Escape}')
+    await user.click(trigger)
+    expect(screen.getByRole('button', { name: 'Send' })).toBeVisible()
+    expect(screen.queryByRole('button', { name: 'Verifying…' })).not.toBeInTheDocument()
   })
 })

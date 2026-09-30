@@ -25,6 +25,10 @@ export function ContactForm({ active }: { active: boolean }) {
 
   const wasActive = useRef(false)
   const sent = status.kind === 'sent'
+  // A verificação humana ainda não terminou (U2, D-143: a demora da 1ª abertura): nem token nem falha. O botão avisa
+  // e não envia (o envio sem token já para em useContactForm). Com o token, "Send"; falha, o texto que já existe.
+  const verifying = token === null && !failed && status.kind !== 'sending'
+  const sendLabel = status.kind === 'sending' ? 'Sending…' : 'Send'
   const nameInput = () => form.current?.querySelector<HTMLInputElement>('input[name="name"]')
 
   useEffect(() => {
@@ -130,12 +134,22 @@ export function ContactForm({ active }: { active: boolean }) {
           </label>
         </div>
         <div ref={captcha} />
+        {/* Verificando: aria-disabled e não disabled, para o foco e a validação dos campos seguirem no botão. */}
         <button
           type="submit"
           disabled={status.kind === 'sending'}
-          className="flex w-full cursor-pointer items-center justify-center rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-neutral-950 transition-colors hover:bg-white/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-wait disabled:opacity-60"
+          aria-disabled={verifying || undefined}
+          aria-busy={verifying || undefined}
+          className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-neutral-950 transition-colors hover:bg-white/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-wait disabled:opacity-60 aria-busy:cursor-wait aria-busy:opacity-60"
         >
-          {status.kind === 'sending' ? 'Sending…' : 'Send'}
+          {verifying && (
+            // Anel girando: só transform (animate-spin); parado com movimento reduzido.
+            <span
+              aria-hidden
+              className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent motion-reduce:animate-none"
+            />
+          )}
+          {verifying ? 'Verifying…' : sendLabel}
         </button>
         <p role="status" className="min-h-[1lh] text-xs text-rose-300">
           {status.kind === 'error' ? status.text : ''}

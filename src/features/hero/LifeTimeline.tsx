@@ -3,8 +3,8 @@ import { cx } from '../../lib/cx'
 import { useHydrated } from '../../lib/useHydrated'
 
 interface LifeTimelineProps {
-  /** Vida em destaque: a atual, ou a escolhida enquanto a troca acontece. */
-  currentId: string
+  /** Vida em destaque: a atual, ou a escolhida enquanto a troca acontece; null = nenhuma (o "loading" do herói). */
+  currentId: string | null
   onSelect: (id: string) => void
 }
 

@@ -1,4 +1,5 @@
-import { Suspense, lazy, useCallback, useRef, useState, useSyncExternalStore } from 'react'
+import { Suspense, lazy, useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { flushSync } from 'react-dom'
 import { useNavigation } from 'react-router'
 import { OPENING, stages, type PropId } from '../../content/journey'
 import { profile } from '../../content/profile'
@@ -49,9 +50,17 @@ function clientOptions(): HeroOptions {
 const noSubscribe = () => () => undefined
 const serverOptions = () => null
 const OPENING_START = readHeroOptions('', IDS, OPENING, false).start
+/**
+ * Prazo do "loading" (U2), o mesmo das vidas (TEMPO_LIMITE_MS em scene/carga.ts, repetido aqui para o herói não puxar
+ * o three): sem o 1º quadro da cena em 20 s desde a montagem no navegador (glb do busto que não chega, preparo que não
+ * termina, erro que a fronteira não vê), o texto sai do "loading" para a vida de abertura; a cena que chegar depois
+ * segue normal. Limite aceito: em rede muito lenta (mais de 20 s), a vida aparece antes do busto.
+ */
+const PRAZO_CENA_MS = 20_000
 
 /**
  * Herói: "Today I am a [vida]" com o busto 3D que desintegra em furacão e volta com o adereço da próxima vida.
+ * Até o 1º quadro da cena, "Today I am loading" (U2, D-143a), também no HTML do build.
  * Com ?slot o carrossel começa em outra vida: o herói recomeça nela assim que o navegador lê o endereço.
  */
 export function Hero() {
@@ -84,10 +93,29 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
   const failed = useRef<ReadonlySet<number>>(new Set())
   // A cena caiu (SceneBoundary): quem troca a vida é o clique no indicador, direto, sem desintegração.
   const [sceneFailed, setSceneFailed] = useState(false)
-  const onSceneFail = useCallback(() => {
-    setSceneFailed(true)
-    setPhase('hold')
+  // "Today I am loading" até o 1º quadro com o busto (U2): no HTML, na hidratação e a cada montagem (a volta da
+  // trajetória também). Cena que cai sai do "loading" na hora, para a vida de abertura; cena que não chega, no prazo.
+  const [sceneReady, setSceneReady] = useState(false)
+  const [sceneLate, setSceneLate] = useState(false)
+  const hasScene = options !== null
+  useEffect(() => {
+    if (!hasScene) return
+    const timer = setTimeout(() => {
+      setSceneLate(true)
+    }, PRAZO_CENA_MS)
+    return () => {
+      clearTimeout(timer)
+    }
+  }, [hasScene])
+  const onSceneReady = useCallback(() => {
+    // Vem do commit do R3F (Bust.tsx, junto da marca 'cena'), outro renderizador: o flushSync troca o texto nesse
+    // mesmo instante, e o texto e o busto pintam no mesmo quadro.
+    // eslint-disable-next-line @eslint-react/dom-no-flush-sync -- uma vez por montagem: a troca não vai a outra tarefa
+    flushSync(() => {
+      setSceneReady(true)
+    })
   }, [])
+  const loading = !sceneReady && !sceneFailed && !sceneLate
   const next = useCallback((prop: PropId) => {
     // A vida para onde a cena troca (a escolhida no indicador ou a 1ª pronta da volta).
     const i = stages.findIndex((s) => s.prop === prop)
@@ -99,6 +127,14 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
     setCarga(loadProps(lineup.current, null, failed.current))
     setOpening(false)
   }, [])
+  const onSceneFail = useCallback(() => {
+    setSceneFailed(true)
+    setPhase('hold')
+    // A escolha no indicador que esperava a cena (feita no "loading" ou no meio da volta) vale agora, direto: o ponto e
+    // o texto ficam juntos.
+    if (requested.current === null) setPending(null)
+    else next(cyclicAt(stages, requested.current).prop)
+  }, [next])
   const onFailures = useCallback((props: ReadonlySet<PropId>) => {
     failed.current = new Set(stages.flatMap((s, i) => (props.has(s.prop) ? [i] : [])))
     // A escolha no indicador numa vida que falhou é descartada: o carrossel segue.
@@ -148,6 +184,7 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
               dragHandlers={handlers}
               onPhase={setPhase}
               onNext={next}
+              onScene={onSceneReady}
             />
           </Suspense>
         </SceneBoundary>
@@ -165,7 +202,11 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
           </a>
         </div>
         <div className="mt-2 flex justify-center">
-          <LifeTimeline currentId={cyclicAt(stages, pending ?? index).id} onSelect={select} />
+          {/* No "loading" nenhuma vida está na tela: nenhum ponto atual, só a escolha feita nele (vale na chegada). */}
+          <LifeTimeline
+            currentId={loading && pending === null ? null : cyclicAt(stages, pending ?? index).id}
+            onSelect={select}
+          />
         </div>
       </header>
 
@@ -176,7 +217,7 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
         iconClassName="h-5 w-5"
       />
 
-      <HeroCopy ref={text} stage={stage} leaving={phase === 'out'} />
+      <HeroCopy ref={text} stage={stage} leaving={phase === 'out'} loading={loading} />
     </section>
   )
 }

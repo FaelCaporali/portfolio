@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { isRouteErrorResponse, Link, Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router'
 import { useHydrated } from './lib/useHydrated'
+import { NavigationProgress } from './ui/NavigationProgress'
 import './index.css'
 // As cores das vidas como classes e variáveis (a trajetória e o anel do "Contact me"), geradas de journey.ts
 // (vite.config.ts): a CSP não aceita estilo inline.
@@ -34,8 +35,14 @@ export function Layout({ children }: { children: ReactNode }) {
   )
 }
 
+/** Todas as páginas, com a barra de carregamento da troca de página pelo roteador (U2). */
 export default function Root() {
-  return <Outlet />
+  return (
+    <>
+      <NavigationProgress />
+      <Outlet />
+    </>
+  )
 }
 
 /**

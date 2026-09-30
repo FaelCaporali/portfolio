@@ -44,6 +44,8 @@ interface HeroCanvasProps {
   dragHandlers: Record<'onPointerDown' | 'onPointerMove' | 'onPointerUp' | 'onPointerCancel', PointerEventHandler>
   onPhase: (p: Phase) => void
   onNext: (prop: PropId) => void
+  /** O 1º quadro com o busto (a marca 'cena', Bust.tsx): o herói troca o "loading" pela vida (U2). Estável. */
+  onScene: () => void
 }
 
 /** A cena 3D do herói, atrás do texto: câmera, luz, busto e o relógio do carrossel. */
@@ -63,6 +65,7 @@ export function HeroCanvas({
   dragHandlers,
   onPhase,
   onNext,
+  onScene,
 }: HeroCanvasProps) {
   // A fila dos glb (carga.ts) segue o carrossel: a cada troca ou escolha no indicador, a próxima vida vai à frente.
   useEffect(() => {
@@ -124,6 +127,7 @@ export function HeroCanvas({
           particles={quality.particles}
           proxima={next}
           palco={palco}
+          onCena={onScene}
         />
         <Director
           first={first}

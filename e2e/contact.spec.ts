@@ -10,6 +10,8 @@ test('contato: valida, envia pelo Worker local e confirma', async ({ page }) => 
   const dialog = page.getByRole('dialog')
   await expect(dialog.getByLabel('Name')).toBeFocused()
 
+  // Na 1ª abertura o botão mostra "Verifying…" (aria-disabled) até o Turnstile entregar o token (U2): o Playwright
+  // espera o "Send" habilitar para clicar; a validação dos campos vazios segue igual.
   await dialog.getByRole('button', { name: 'Send' }).click()
   await expect(dialog.getByLabel('Name')).toHaveAttribute('aria-invalid', 'true')
 

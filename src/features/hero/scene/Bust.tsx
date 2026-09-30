@@ -30,6 +30,8 @@ interface BustProps {
   proxima: PropId
   /** Estado da cena por quadro: aqui se marca o 1º quadro com o busto (o relógio do carrossel só anda depois dele). */
   palco: Palco
+  /** O 1º quadro com o busto, no mesmo commit da marca 'cena': o herói sai do "loading" (U2). Referência estável. */
+  onCena: () => void
 }
 
 interface MovimentoProps {
@@ -72,7 +74,7 @@ function Movimento({ expr, pointer, drag, rig, head, frame }: MovimentoProps) {
 }
 
 /** O busto do S13 com expressão da vida, piscar, olhar que segue o ponteiro, arrasto, adereço e furacão. */
-export function Bust({ expr, prop, proxima, pointer, drag, particles, palco }: BustProps) {
+export function Bust({ expr, prop, proxima, pointer, drag, particles, palco, onCena }: BustProps) {
   const { scene } = useGlb(bustUrl)
   const gl = useThree((s) => s.gl)
   const camera = useThree((s) => s.camera)
@@ -92,7 +94,8 @@ export function Bust({ expr, prop, proxima, pointer, drag, particles, palco }: B
     palco.emCena = true
     // Lida pela sonda da #138: o 1º quadro com o busto.
     performance.mark('cena')
-  }, [emCena, palco])
+    onCena()
+  }, [emCena, palco, onCena])
   const vortexPronto = useRef(false)
   const onVortex = useCallback(() => {
     vortexPronto.current = true

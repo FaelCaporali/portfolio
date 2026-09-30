@@ -33,6 +33,9 @@ const focusField = (form: HTMLFormElement, field: Field | undefined) => {
 export function useContactForm(verification: Verification) {
   const [status, setStatus] = useState<Status>({ kind: 'idle' })
   const [invalid, setInvalid] = useState<Field[]>([])
+  // O aviso "ainda verificando" sai quando o token chega (U2): o botão já diz "Send". Ajuste no render (padrão do
+  // React para estado que segue uma prop), sem efeito e sem um quadro com o aviso velho.
+  if (verification.token && status.kind === 'error' && status.text === STILL_VERIFYING) setStatus({ kind: 'idle' })
 
   async function submit(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault()

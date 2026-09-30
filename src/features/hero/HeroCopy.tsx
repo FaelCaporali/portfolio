@@ -15,14 +15,34 @@ interface HeroCopyProps {
   stage: Stage
   /** A vida está saindo (furacão): as letras saem girando. */
   leaving: boolean
+  /** A cena 3D ainda não está na tela: "Today I am loading" no lugar da vida (U2, D-143a). */
+  loading: boolean
 }
 
 const SLOTS = stages.map((s) => s.slot)
 /** "Today I am a(n)" / "Yesterday I was a(n)". */
 const abertura = (s: Stage) => `${s.past ? 'Yesterday I was' : 'Today I am'} a${/^[aeiou]/i.test(s.slot) ? 'n' : ''}`
 
+/**
+ * "loading" no lugar da vida enquanto a cena 3D não chega (index.css: .loading-word): a palavra respira e três pontos
+ * sobem em onda. Uma palavra só, sem letras soltas: o HTML e o leitor de tela leem "Today I am loading". Fora de
+ * .slot-word de propósito: as sondas do estúdio 3D e o e2e leem a vida em .slot-word.
+ */
+function LoadingWord() {
+  return (
+    <span className="loading-word">
+      loading
+      <span aria-hidden className="loading-dots">
+        <span className="loading-dot" />
+        <span className="loading-dot" />
+        <span className="loading-dot" />
+      </span>
+    </span>
+  )
+}
+
 /** Coluna de texto do herói: a vida atual, os títulos, os links e o contato direto. */
-export function HeroCopy({ ref, stage, leaving }: HeroCopyProps) {
+export function HeroCopy({ ref, stage, leaving, loading }: HeroCopyProps) {
   const slotRef = useRef<HTMLSpanElement>(null)
   // Largo (lg): a vida mais longa sempre numa linha, com a fonte do visitante. Abaixo, reserva de duas linhas.
   const slotSize = useFitFontSize(slotRef, SLOTS, WIDE_QUERY)
@@ -36,7 +56,7 @@ export function HeroCopy({ ref, stage, leaving }: HeroCopyProps) {
     >
       <h1>
         <span className="relative block text-lg text-white/65 lg:text-2xl">
-          <span data-vida-texto>{abertura(stage)}</span>
+          <span data-vida-texto>{loading ? 'Today I am' : abertura(stage)}</span>
           {/* Amostras paradas e escondidas de cada vida (#138): a cena 3D pinta o fundo de uma vida antes de ela
               entrar, medindo o texto dela aqui, na mesma coluna e na mesma fonte (devops/referencias.ts). */}
           {amostras &&
@@ -55,7 +75,8 @@ export function HeroCopy({ ref, stage, leaving }: HeroCopyProps) {
           className="relative mt-2 block min-h-[2em] text-[2.75rem] leading-none font-semibold tracking-tight min-[360px]:text-[3rem] sm:min-h-[1em] lg:text-[clamp(2.75rem,4.4vw,5.5rem)]"
         >
           <span data-vida-texto>
-            <SlotWord text={stage.slot} life={stage.id} leaving={leaving} />
+            {/* Com a cena, a vida entra com a entrada que o SlotWord já tem (monta de novo). */}
+            {loading ? <LoadingWord /> : <SlotWord text={stage.slot} life={stage.id} leaving={leaving} />}
           </span>
           {amostras &&
             stages.map((s) => (
@@ -86,11 +107,13 @@ export function HeroCopy({ ref, stage, leaving }: HeroCopyProps) {
         className="pointer-events-auto mt-6 flex flex-col items-start gap-3 sm:mt-7 lg:mt-8 lg:gap-4 short:mt-3 short:gap-2"
       >
         {/* Leva ao início da trajetória, sempre (J48, 28/09); o salto direto para a vida fica para depois. Pelo
-            roteador, sem recarregar: a página começa a baixar quando o ponteiro ou o foco chega ao botão. */}
+            roteador, sem recarregar: a página começa a baixar quando o ponteiro ou o foco chega ao botão. O toque
+            afunda o botão no mesmo quadro (:active), e a barra do roteador (NavigationProgress) segue até a
+            trajetória pintar (U2). */}
         <Link
           to={journeyLink.href}
           prefetch="intent"
-          className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-neutral-950 transition-colors hover:bg-white/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white short:py-2"
+          className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-neutral-950 transition-[color,background-color,transform] duration-150 hover:bg-white/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:scale-[0.96] active:bg-white/70 motion-reduce:active:scale-100 short:py-2"
         >
           {journeyLink.label} <span aria-hidden>→</span>
         </Link>
