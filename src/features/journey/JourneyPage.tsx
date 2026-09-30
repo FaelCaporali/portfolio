@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { memo, useDeferredValue, useEffect, useMemo } from 'react'
 import { checkpoints, periodLabel, type Checkpoint as Data } from '../../content/journey-timeline'
 import type { Stage } from '../../content/journey'
 import { ContactWidget } from '../contact/ContactWidget'
@@ -9,7 +9,8 @@ import { Filters } from './Filters'
 import { date, place } from './layout'
 import { IndexSheet, markId, Minimap, type Row } from './Minimap'
 import { byId } from './parts'
-import { matches, useFilters, type Group } from './useFilters'
+import { useReading, type Reading } from './reading'
+import { matches, summary, useFilters, type Group } from './useFilters'
 import { useJourneyMotion } from './useJourneyMotion'
 import './journey.css'
 
@@ -66,6 +67,24 @@ const KNOWN = { tools: tagsIn('tools'), concepts: tagsIn('concepts'), skills: ta
 /** O rótulo de cada marco no topo do menu do mapa (celular). */
 const LABELS = new Map(placed.map((i) => [markId(i), [periodLabel(i.c), i.c.title.en].filter(Boolean).join(' · ')]))
 
+/** As tags do marco que o filtro escolheu, numa chave de texto: o cartão só redesenha quando ela muda. */
+const matchedIn = (item: (typeof placed)[number], chosen: ReadonlySet<string>) =>
+  chosen.size
+    ? Object.values(item.c.tags ?? {})
+        .flatMap((ts) => ts.filter((t) => chosen.has(t)))
+        .join('\n')
+    : ''
+
+/* O mapa e o índice leem o marco em leitura sozinhos: a troca de marco não refaz a página (142). */
+const LiveMinimap = memo(function LiveMinimap({ reading, out }: { reading: Reading; out: ReadonlySet<string> }) {
+  const mark = useReading(reading, (s) => s.mark)
+  return <Minimap rows={rows} out={out} current={mark} />
+})
+const LiveIndex = memo(function LiveIndex({ reading, out }: { reading: Reading; out: ReadonlySet<string> }) {
+  const mark = useReading(reading, (s) => s.mark)
+  return <IndexSheet rows={rows} out={out} current={mark} label={LABELS.get(mark ?? '')} />
+})
+
 export function JourneyPage() {
   useEffect(() => {
     // Link direto a um marco (/journey#vela): o navegador rola até ele ao abrir, com a rolagem suave da página, e o
@@ -74,7 +93,12 @@ export function JourneyPage() {
     if (id) document.getElementById(id)?.scrollIntoView({ behavior: 'instant' })
   }, [])
   const filters = useFilters(BOUNDS, KNOWN)
-  const { state } = filters
+  /*
+   * O toque numa tag responde já na barra (Filters lê o estado novo); o mapa filtrado vem no render adiado logo depois
+   * (142). O caminho continua refeito no mesmo commit em que as paradas somem ou voltam, antes da pintura (J68).
+   */
+  const state = useDeferredValue(filters.state)
+  const { active, chosen } = useMemo(() => summary(state, BOUNDS), [state])
   /** As paradas fora do filtro. */
   const out = useMemo(() => new Set(placed.filter((i) => !matches(i, state)).map(markId)), [state])
   /**
@@ -91,15 +115,11 @@ export function JourneyPage() {
     }
     return ids
   }, [out])
-  const { timeline, route, bar, life, mark, reveal } = useJourneyMotion(out)
+  const { timeline, route, bar, reading } = useJourneyMotion(out)
 
   return (
     <>
-      <Frame
-        life={life}
-        bar={bar}
-        menu={<IndexSheet rows={rows} out={out} current={mark} label={LABELS.get(mark ?? '')} />}
-      />
+      <Frame reading={reading} bar={bar} menu={<LiveIndex reading={reading} out={out} />} />
       <main className="text-white">
         <Intro />
         <Filters items={scoped} filters={filters} />
@@ -131,10 +151,9 @@ export function JourneyPage() {
                     key={item.c.id}
                     item={item}
                     hidden={out.has(markId(item))}
-                    yearFirst={filters.active ? firsts.has(markId(item)) : item.yearFirst}
-                    chosen={filters.chosen}
-                    current={mark === markId(item)}
-                    reveal={reveal.get(markId(item))}
+                    yearFirst={active ? firsts.has(markId(item)) : item.yearFirst}
+                    matched={matchedIn(item, chosen)}
+                    reading={reading}
                   />
                 ))}
               </ol>
@@ -142,7 +161,7 @@ export function JourneyPage() {
           ))}
         </div>
       </main>
-      <Minimap rows={rows} out={out} current={mark} />
+      <LiveMinimap reading={reading} out={out} />
       <ContactWidget />
     </>
   )

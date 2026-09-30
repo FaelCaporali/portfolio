@@ -185,7 +185,7 @@ export function IndexSheet({ rows, out, current, label }: { rows: Row[]; label: 
         className="absolute top-full right-0 mt-3 w-[min(22rem,calc(100vw-2rem))] rounded-2xl border border-white/10 bg-[#0b0b0e]/95 shadow-2xl backdrop-blur-md"
       >
         <p className="flex items-center gap-3 border-b border-white/10 px-4 py-3 text-sm text-white/85">
-          <span aria-hidden className="h-2 w-2 shrink-0 rounded-full bg-(--accent)" />
+          <span aria-hidden className="accent-fade h-2 w-2 shrink-0 rounded-full bg-(--accent)" />
           <span className="min-w-0 truncate">{label ?? 'Journey map'}</span>
         </p>
         <ol className="max-h-[70vh] overflow-y-auto px-2 py-2">

@@ -28,6 +28,13 @@ export function matches(item: Dated, state: FilterState): boolean {
   })
 }
 
+/** O que o estado liga: período fora do inteiro, algum filtro, e as tags escolhidas (que acendem nos cartões). */
+export function summary(state: FilterState, bounds: Bounds) {
+  const yearsOn = state.from !== bounds.min || state.to !== bounds.max
+  const chosen: ReadonlySet<string> = new Set(GROUPS.flatMap((g) => [...state.tags[g]]))
+  return { yearsOn, active: yearsOn || chosen.size > 0, chosen }
+}
+
 /** O estado que o endereço pede, só com o que existe na página. */
 function fromSearch(search: string, bounds: Bounds, known: Record<Group, ReadonlySet<string>>): FilterState {
   const params = new URLSearchParams(search)
@@ -100,11 +107,9 @@ export function useFilters(bounds: Bounds, known: Record<Group, ReadonlySet<stri
     )
   }, [bounds])
 
-  const yearsOn = state.from !== bounds.min || state.to !== bounds.max
-  const active = yearsOn || GROUPS.some((g) => state.tags[g].size > 0)
-  const chosen = useMemo(() => new Set(GROUPS.flatMap((g) => [...state.tags[g]])), [state])
+  const { yearsOn, active } = useMemo(() => summary(state, bounds), [state, bounds])
 
-  return { state, toggle, setYears, clearYears, clear, yearsOn, active, chosen }
+  return { state, toggle, setYears, clearYears, clear, yearsOn, active }
 }
 
 export type Filters = ReturnType<typeof useFilters>

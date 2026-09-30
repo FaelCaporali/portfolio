@@ -1,6 +1,7 @@
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useCallback, useLayoutEffect, useRef, useState } from 'react'
+import { createReading } from './reading'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -21,6 +22,9 @@ const aboveLine = (el: Element) => el.getBoundingClientRect().top < window.inner
 const onMap = (el: Element) => !el.closest('[hidden]')
 const visibleMarks = (timeline: HTMLElement | null) =>
   timeline ? [...timeline.querySelectorAll<HTMLElement>('[data-checkpoint]')].filter(onMap) : []
+
+/** O tamanho da linha do tempo em que o caminho foi desenhado. */
+const sizeOf = (r: DOMRect) => `${r.width.toFixed(1)}x${r.height.toFixed(1)}`
 
 /**
  * O caminho: uma curva em S de ponto em ponto ([data-node], no cartão de cada marco à vista), um trecho por marco, na
@@ -74,9 +78,8 @@ export function useJourneyMotion(visible: unknown) {
   const bar = useRef<HTMLDivElement>(null)
   const legs = useRef<Leg[]>([])
   const animate = useRef(false)
-  const [life, setLife] = useState<string>()
-  const [mark, setMark] = useState<string>()
-  const [reveal, setReveal] = useState<ReadonlyMap<string, boolean>>(() => new Map())
+  // A vida, o marco e a entrada de cada marco, fora do estado da página: quem mostra lê o seu pedaço (reading.ts).
+  const [reading] = useState(createReading)
 
   const draw = useCallback(() => {
     const t = timeline.current
@@ -88,27 +91,43 @@ export function useJourneyMotion(visible: unknown) {
     }
   }, [])
 
-  /** Refaz o caminho já e mede a rolagem de novo no quadro seguinte. */
-  const pending = useRef(0)
+  /**
+   * Refaz o caminho já e mede a rolagem de novo depois da pintura seguinte: o refresh do ScrollTrigger (e o que ele
+   * troca na leitura) fica fora do quadro que responde ao toque (142). O caminho já está certo antes da pintura; o
+   * refresh só acerta a barra, a vida e o marco em leitura um quadro depois.
+   */
+  const frame = useRef(0)
+  const task = useRef(0)
+  const built = useRef('')
+  const cancelRefresh = useCallback(() => {
+    cancelAnimationFrame(frame.current)
+    clearTimeout(task.current)
+  }, [])
   const remeasure = useCallback(() => {
     if (!timeline.current || !route.current) return
     legs.current = buildRoute(timeline.current, route.current)
+    built.current = sizeOf(timeline.current.getBoundingClientRect())
     draw()
-    cancelAnimationFrame(pending.current)
-    pending.current = requestAnimationFrame(() => ScrollTrigger.refresh())
-  }, [draw])
+    cancelRefresh()
+    frame.current = requestAnimationFrame(() => {
+      task.current = window.setTimeout(() => ScrollTrigger.refresh())
+    })
+  }, [draw, cancelRefresh])
 
-  // A história abre ou a tela muda de tamanho: o caminho é refeito no próprio aviso do ResizeObserver (J68).
+  // A história abre ou a tela muda de tamanho: o caminho é refeito no próprio aviso do ResizeObserver (J68). Se o
+  // tamanho é o do caminho já desenhado (o filtro acabou de refazê-lo antes da pintura), não refaz de novo.
   useLayoutEffect(() => {
     const t = timeline.current
     if (!t) return
-    const ro = new ResizeObserver(remeasure)
+    const ro = new ResizeObserver(() => {
+      if (sizeOf(t.getBoundingClientRect()) !== built.current) remeasure()
+    })
     ro.observe(t)
     return () => {
       ro.disconnect()
-      cancelAnimationFrame(pending.current)
+      cancelRefresh()
     }
-  }, [remeasure])
+  }, [remeasure, cancelRefresh])
 
   // O filtro mudou: o caminho sobre as paradas à vista, antes da pintura.
   useLayoutEffect(remeasure, [visible, remeasure])
@@ -118,15 +137,14 @@ export function useJourneyMotion(visible: unknown) {
     const update = (self: ScrollTrigger) => {
       if (bar.current) bar.current.style.transform = `scaleX(${self.progress.toFixed(4)})`
       const read = visibleMarks(timeline.current).filter(aboveLine)
-      setLife(read.filter((el) => el.dataset.scope).at(-1)?.dataset.scope)
-      setMark(read.at(-1)?.id)
+      reading.set({ life: read.filter((el) => el.dataset.scope).at(-1)?.dataset.scope, mark: read.at(-1)?.id })
       draw()
     }
     const st = ScrollTrigger.create({ start: 0, end: 'max', onUpdate: update, onRefresh: update })
     return () => {
       st.kill()
     }
-  }, [draw])
+  }, [draw, reading])
 
   // Com movimento liberado: o caminho se desenha na rolagem e os marcos abaixo da tela ao abrir entram quando chegam.
   useLayoutEffect(() => {
@@ -135,36 +153,46 @@ export function useJourneyMotion(visible: unknown) {
       animate.current = true
       draw()
       const below = visibleMarks(timeline.current).filter((el) => el.getBoundingClientRect().top > window.innerHeight)
-      setReveal(new Map(below.map((el) => [el.id, false])))
+      reading.set({ reveal: new Map(below.map((el) => [el.id, false])) })
       for (const el of below) {
         ScrollTrigger.create({
           trigger: el,
           start: 'top 88%',
           once: true,
           onEnter: () => {
-            setReveal((m) => new Map(m).set(el.id, true))
+            reading.set({ reveal: new Map(reading.get().reveal).set(el.id, true) })
           },
         })
       }
       return () => {
         animate.current = false
         draw()
-        setReveal(new Map())
+        reading.set({ reveal: new Map() })
       }
     })
     return () => {
       mm.revert()
     }
-  }, [draw])
+  }, [draw, reading])
 
-  // A vida em leitura dá a cor dela ao <body> (brilho, barra, cabeçalho e índice).
+  // A vida em leitura dá a cor dela ao <body> (brilho, barra, cabeçalho e índice), sem passar pelo React. A troca é
+  // num salto no <body>; a transição de 0,8 s é só de quem pinta com essa cor (journey.css).
   useLayoutEffect(() => {
-    if (!life) return
-    document.body.classList.add(`life-${life}`)
-    return () => {
-      document.body.classList.remove(`life-${life}`)
+    let shown: string | undefined
+    const sync = () => {
+      const { life } = reading.get()
+      if (life === shown) return
+      if (shown) document.body.classList.remove(`life-${shown}`)
+      if (life) document.body.classList.add(`life-${life}`)
+      shown = life
     }
-  }, [life])
+    sync()
+    const off = reading.subscribe(sync)
+    return () => {
+      off()
+      if (shown) document.body.classList.remove(`life-${shown}`)
+    }
+  }, [reading])
 
-  return { timeline, route, bar, life, mark, reveal }
+  return { timeline, route, bar, reading }
 }

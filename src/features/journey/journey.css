@@ -1,13 +1,22 @@
 /* Só o que é da trajetória: a base (Tailwind, fundo, fonte e as variantes) é o index.css, que o root.tsx põe antes. */
 
 /* A cor da vida (cada .life-<id> troca; CSS gerado de journey.ts, vite.config.ts). Registrada como cor para a troca
-   do <body> (vida em leitura, useJourneyMotion) ser uma transição, não um salto. */
+   da vida em leitura (a classe do <body>, useJourneyMotion) ser uma transição, não um salto. */
 @property --accent {
   syntax: '<color>';
   inherits: true;
   initial-value: #fff;
 }
-body {
+/* O <body> troca a cor num salto; transita (0,8 s) só quem pinta com a cor dele: o brilho do fundo e o da abertura, a
+   barra, o ponto do índice e as partes sem vida própria (o 1º marco, o ponto dele no mapa e no índice, as tags do
+   filtro; mais abaixo, com as outras transições deles). Transição no <body> recalculava o estilo do documento inteiro
+   a cada quadro por quase 1 s (142). Um destes nunca fica dentro de outro: a cor herdada transitaria duas vezes. Nos
+   que têm vida própria a cor não muda, e a transição não dispara. */
+.page-glow,
+.intro-glow,
+.progress,
+.accent-fade,
+.checkpoint {
   transition: --accent 0.8s ease;
 }
 html {
@@ -113,7 +122,8 @@ body:not([class*='life-']) .page-glow {
 .mini-dot {
   transition:
     transform 0.3s ease,
-    box-shadow 0.3s ease;
+    box-shadow 0.3s ease,
+    --accent 0.8s ease;
 }
 .mini-link[aria-current] .mini-dot {
   transform: translate(-50%, -50%) scale(1.8);
@@ -171,7 +181,9 @@ body:not([class*='life-']) .page-glow {
   /* Só opacidade: deslocar o marco tiraria o caminho do lugar (useJourneyMotion mede os pontos). */
   .reveal {
     opacity: 0;
-    transition: opacity 0.7s ease;
+    transition:
+      opacity 0.7s ease,
+      --accent 0.8s ease;
   }
   .reveal.is-in {
     opacity: 1;
@@ -219,7 +231,8 @@ body:not([class*='life-']) .page-glow {
   cursor: pointer;
   transition:
     background-color 0.2s ease,
-    color 0.2s ease;
+    color 0.2s ease,
+    --accent 0.8s ease;
 }
 .filter-tag[aria-pressed='true'] {
   background: #fff;

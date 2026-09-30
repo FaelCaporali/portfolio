@@ -2,19 +2,20 @@ import type { ReactNode, RefObject } from 'react'
 import { Link } from 'react-router'
 import { stages } from '../../content/journey'
 import { profile } from '../../content/profile'
+import { useReading, type Reading } from './reading'
 
 /**
  * O que fica sempre à vista: brilho de fundo, barra de progresso e cabeçalho. Os três leem `--accent` do <body>, que
  * useJourneyMotion troca para a cor da vida em leitura (a transição da cor é do CSS, journey.css). `bar`: a barra, que
- * a rolagem estica.
+ * a rolagem estica. `reading`: a vida em leitura, que acende o ponto dela.
  */
 export function Frame({
   menu,
-  life,
+  reading,
   bar,
 }: {
   menu: ReactNode
-  life: string | undefined
+  reading: Reading
   bar: RefObject<HTMLDivElement | null>
 }) {
   return (
@@ -38,7 +39,7 @@ export function Frame({
             {/* Abaixo de 400 px só a seta: os nove pontos precisam da largura. */}
             <span className="sr-only min-[400px]:not-sr-only min-[400px]:ml-2">{profile.name}</span>
           </Link>
-          <LifeDots life={life} />
+          <LifeDots reading={reading} />
           {menu}
         </div>
       </header>
@@ -47,7 +48,8 @@ export function Frame({
 }
 
 /** Os pontos das vidas, como no herói: cada um leva à vida na página; o da vida em leitura acende. */
-function LifeDots({ life }: { life: string | undefined }) {
+function LifeDots({ reading }: { reading: Reading }) {
+  const life = useReading(reading, (s) => s.life)
   return (
     <nav aria-label="Lives" className="relative">
       <span aria-hidden className="absolute inset-x-3 top-1/2 h-px -translate-y-1/2 bg-white/15" />
