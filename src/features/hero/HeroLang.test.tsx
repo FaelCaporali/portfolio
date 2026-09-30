@@ -64,7 +64,7 @@ describe('herói em português (/pt)', () => {
     box.innerHTML = html
     expect(box.querySelector('h1')?.textContent).toBe('Hoje estou carregando')
     expect(within(box).getByRole('list', { name: 'Títulos' })).toHaveTextContent('Analista de QA')
-    expect(within(box).getByRole('link', { name: /Veja a trajetória completa/ })).toHaveAttribute('href', '/pt/journey')
+    expect(within(box).getByRole('link', { name: /Ver a trajetória completa/ })).toHaveAttribute('href', '/pt/journey')
     const en = within(box).getByRole('link', { name: 'Read in English' })
     expect(en).toHaveAttribute('href', '/')
     expect(en).toHaveAttribute('hreflang', 'en')

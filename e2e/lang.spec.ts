@@ -15,7 +15,7 @@ test.describe('navegador em português, sem escolha salva', () => {
     await expect(page.locator('html')).toHaveAttribute('lang', 'pt-BR')
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://fael.caporali.dev/pt')
     await expect(page.getByRole('heading', { level: 1 })).toHaveAccessibleName(/^Hoje (estou|sou|fui) \S/)
-    await expect(page.getByRole('link', { name: /Veja a trajetória completa/ })).toHaveAttribute('href', '/pt/journey')
+    await expect(page.getByRole('link', { name: /Ver a trajetória completa/ })).toHaveAttribute('href', '/pt/journey')
   })
 
   test('a escolha EN fica: a volta a / não leva de novo ao português', async ({ page }) => {

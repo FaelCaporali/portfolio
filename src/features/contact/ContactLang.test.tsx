@@ -33,11 +33,11 @@ describe('contato em português', () => {
     expect(screen.getByLabelText('Nome')).toHaveFocus()
     await user.click(await screen.findByRole('button', { name: 'Enviar' }))
     expect(screen.getByLabelText('Nome')).toHaveAccessibleDescription('Informe seu nome.')
-    expect(screen.getByLabelText('E-mail ou WhatsApp, para eu responder')).toHaveAccessibleDescription(
+    expect(screen.getByLabelText('E-mail ou WhatsApp para eu responder')).toHaveAccessibleDescription(
       'Informe um e-mail ou um telefone.',
     )
     expect(screen.getByLabelText('Mensagem')).toHaveAccessibleDescription('Escreva pelo menos 10 caracteres.')
-    expect(screen.getByText('Ou fale comigo direto')).toBeInTheDocument()
+    expect(screen.getByText('Ou fale comigo diretamente')).toBeInTheDocument()
     expect(turnstile.language).toBe('pt-br')
   })
 })
