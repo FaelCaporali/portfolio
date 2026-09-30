@@ -63,13 +63,13 @@ export function ErrorBoundary({ error }: { error: unknown }) {
   if (!hydrated) return null
   const missing = isRouteErrorResponse(error) && error.status === 404
   return (
-    <main className="mx-auto flex min-h-svh max-w-xl flex-col justify-center gap-4 px-5 text-white">
+    <main className="mx-auto flex min-h-svh max-w-xl flex-col justify-center gap-4 px-5 text-fg">
       <title>{missing ? 'Page not found · Fael Caporali' : 'Something went wrong · Fael Caporali'}</title>
       <h1 className="text-3xl font-semibold tracking-tight">{missing ? 'Page not found' : 'Something went wrong'}</h1>
-      <p className="text-white/70">
+      <p className="text-fg/70">
         {missing ? 'There is nothing at this address.' : 'The page could not be shown. Please try again.'}
       </p>
-      <Link to="/" className="text-white underline underline-offset-4 hover:text-white/80">
+      <Link to="/" className="text-fg underline underline-offset-4 hover:text-fg/80">
         Back to the home page
       </Link>
     </main>

@@ -1,5 +1,74 @@
 @import 'tailwindcss';
 
+/* Design tokens (U3): a fonte única das decisões de design do site, com nome de papel, não de valor. Viram utilitários do
+   Tailwind (bg-page, text-eyebrow-sm, phone:, z-float...) e variáveis no :root para o CSS (var(--color-page)). `static`:
+   todas saem no :root, também as que só o journey.css usa (ele não passa pelo Tailwind). Mudar um valor aqui muda o
+   site inteiro; os valores são os de a9068d8, sem mudar um pixel. Fora daqui: as cores das vidas (dado, journey.ts →
+   accents.ts) e a geometria de um componente só (fica nele). */
+@theme static {
+  /* Cor. O primeiro plano em valor literal: com ele o build resolve fg/15 numa cor fixa (#ffffff26) para navegador sem
+     color-mix; com var() dentro, a regra base virava color-mix e esses navegadores perdiam a cor. Também em canais,
+     para os brancos com opacidade do CSS: rgb(var(--fg-rgb) / 0.14) dá o mesmo valor computado de antes; --alpha() não
+     (mistura em oklab: outro valor computado). Os dois andam juntos. */
+  --color-fg: #fff; /* texto e primeiro plano */
+  --fg-rgb: 255 255 255; /* --color-fg em canais */
+
+  /* Fonte. O <html> fica na pilha do preflight, como antes (initial tira --default-font-family); a página, no <body>. */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --default-font-family: initial;
+
+  /* Tipo: títulos grandes. Tamanho sem --line-height de propósito: só troca o font-size, como o valor solto trocava. */
+  --text-display: clamp(2.75rem, 6.2vw, 5.5rem); /* título da trajetória */
+  --leading-display: 0.92;
+  --tracking-display: -0.05em;
+  --text-heading: clamp(1.75rem, 3.2vw, 2.5rem); /* cabeçalho de parte da trajetória */
+  --tracking-heading: -0.02em;
+  --text-life-narrow: 2.75rem; /* a vida no herói, abaixo de 360 px */
+  --text-life: 3rem; /* a vida no herói, de 360 px até o lg */
+  --text-life-wide: clamp(2.75rem, 4.4vw, 5.5rem); /* a vida no herói, do lg (useFitFontSize ajusta por cima) */
+  --leading-landmark: 0.95; /* rótulos grandes do mapa: o nome da vida e o ano */
+  --tracking-landmark: -0.045em;
+
+  /* Tipo: texto e rótulos. */
+  --text-hero-titles: 15px; /* os títulos do herói, do sm */
+  --text-hero-link: 13px; /* pílulas e contatos diretos do herói */
+  --text-story: 0.98rem; /* a história aberta do marco */
+  --text-highlight: 0.95rem; /* as conquistas do marco */
+  --text-tag: 0.72rem; /* tags do cartão */
+  --text-filter: 0.8rem; /* botões e chips da barra de filtro */
+  --text-filter-sm: 0.65rem; /* rótulo da barra de filtro e seta dos menus dela */
+  --text-minimap: 0.7rem; /* rótulos do minimapa */
+  --tracking-eyebrow: 0.18em; /* rótulo pequeno em caixa alta (parts.tsx: eyebrow) */
+  --text-eyebrow-sm: 0.62rem; /* eyebrow dos grupos de tags e das partes no índice */
+  --text-eyebrow-xs: 0.6rem; /* eyebrow das partes no minimapa */
+
+  /* Larguras de tela, em px como antes (min-[360px], min-[400px]): 360 é o celular comum, 400 o grande. */
+  --breakpoint-phone: 360px;
+  --breakpoint-phone-lg: 400px;
+
+  /* Respiro do herói no layout largo: texto e nome a 7vw da borda. */
+  --spacing-hero: 7vw;
+
+  /* Camadas (z-index). */
+  --z-index-backdrop: 20; /* -z-backdrop: o brilho de fundo da trajetória */
+  --z-index-glow: 10; /* -z-glow: o brilho da abertura, atrás do título */
+  --z-index-popover: 10; /* painel sobre os vizinhos, abaixo dos flutuantes: currículo, menu do filtro */
+  --z-index-float: 20; /* flutuantes: contato, barra de filtro, minimapa */
+  --z-index-header: 30; /* cabeçalho fixo da trajetória */
+  --z-index-progress: 60; /* barra de troca de página, acima de tudo */
+}
+/* Fundos e papéis sobre a paleta do Tailwind. `inline`: o utilitário leva o valor, não a variável, como o bg-[#…] e o
+   text-neutral-950 de antes; com opacidade (bg-page/85) o build resolve a mistura numa cor só, e o valor computado fica
+   o mesmo (com a variável, ficaria uma mistura em oklab). `static`: as variáveis também saem, para o CSS. */
+@theme static inline {
+  --color-page: #0b0b0e; /* fundo da página, halos dos rótulos, miolo dos pontos, barras translúcidas */
+  --color-surface: #111116; /* superfície: cartão do marco, menu do filtro */
+  --color-raised: #16161b; /* superfície elevada: menus e popovers, botão do contato, select */
+  --color-on-fg: var(--color-neutral-950); /* texto sobre o primeiro plano (botões claros, aviso de copiado) */
+  --color-error: var(--color-rose-300); /* texto de erro */
+  --color-error-edge: var(--color-rose-400); /* borda do campo inválido */
+}
+
 /* Layout largo (texto à esquerda, busto à direita): desktop ou celular deitado. Mesma condição de isWide e
    WIDE_QUERY em src/features/hero/model/layout.ts. */
 @custom-variant wide {
@@ -18,14 +87,8 @@ html {
 }
 body {
   margin: 0;
-  background: #0b0b0e;
-  font-family:
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    'Segoe UI',
-    Roboto,
-    sans-serif;
+  background: var(--color-page);
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -85,7 +148,7 @@ body {
    sobem em onda. Só opacity e transform, que o compositor anima: nada de filter/blur por cima do canvas (a GPU refaz o
    desfoque a cada quadro e o 3D atrasa, ver .contact-cta). Com movimento reduzido, tudo parado. */
 .loading-word {
-  color: rgb(255 255 255 / 0.85);
+  color: rgb(var(--fg-rgb) / 0.85);
   animation: loading-breathe 1.6s ease-in-out infinite;
 }
 .loading-dots {
@@ -130,7 +193,7 @@ body {
   position: fixed;
   inset-inline: 0;
   top: 0;
-  z-index: 60;
+  z-index: var(--z-index-progress);
   height: 3px;
   overflow: hidden;
   pointer-events: none;
@@ -147,7 +210,7 @@ body {
   inset-block: 0;
   left: 0;
   width: 40%;
-  background: linear-gradient(90deg, transparent, #fff 50%, transparent);
+  background: linear-gradient(90deg, transparent, var(--color-fg) 50%, transparent);
   transform: translateX(-100%);
 }
 .nav-progress.is-busy::before {
@@ -171,7 +234,7 @@ body {
   /* Parada: a barra inteira acesa, sem o trecho que corre. */
   .nav-progress::before {
     width: 100%;
-    background: rgb(255 255 255 / 0.7);
+    background: rgb(var(--fg-rgb) / 0.7);
     transform: none;
   }
 }
@@ -197,9 +260,9 @@ body {
   position: absolute;
   border-radius: inherit;
   pointer-events: none;
-  background: conic-gradient(from var(--cta-turn), var(--spectrum-loop, #fff, #fff));
+  background: conic-gradient(from var(--cta-turn), var(--spectrum-loop, var(--color-fg), var(--color-fg)));
 }
-/* O anel: só a borda do gradiente (a máscara recorta o miolo). */
+/* O anel: só a borda do gradiente (a máscara recorta o miolo; o #000 é só o canal da máscara, não uma cor). */
 .contact-cta::before {
   inset: -1.5px;
   padding: 1.5px;

@@ -20,8 +20,8 @@ export function Frame({
 }) {
   return (
     <>
-      <div aria-hidden className="page-glow pointer-events-none fixed inset-0 -z-20" />
-      <header className="fixed inset-x-0 top-0 z-30 border-b border-white/[0.06] bg-[#0b0b0e]/70 backdrop-blur-md">
+      <div aria-hidden className="page-glow pointer-events-none fixed inset-0 -z-backdrop" />
+      <header className="fixed inset-x-0 top-0 z-header border-b border-fg/6 bg-page/70 backdrop-blur-md">
         <div
           ref={bar}
           aria-hidden
@@ -33,11 +33,11 @@ export function Frame({
           <Link
             to="/"
             prefetch="intent"
-            className="inline-flex min-h-6 shrink-0 items-center justify-self-start text-sm font-semibold text-white/85 hover:text-white"
+            className="inline-flex min-h-6 shrink-0 items-center justify-self-start text-sm font-semibold text-fg/85 hover:text-fg"
           >
             <span aria-hidden>←</span>
             {/* Abaixo de 400 px só a seta: os nove pontos precisam da largura. */}
-            <span className="sr-only min-[400px]:not-sr-only min-[400px]:ml-2">{profile.name}</span>
+            <span className="sr-only phone-lg:not-sr-only phone-lg:ml-2">{profile.name}</span>
           </Link>
           <LifeDots reading={reading} />
           {menu}
@@ -52,8 +52,8 @@ function LifeDots({ reading }: { reading: Reading }) {
   const life = useReading(reading, (s) => s.life)
   return (
     <nav aria-label="Lives" className="relative">
-      <span aria-hidden className="absolute inset-x-3 top-1/2 h-px -translate-y-1/2 bg-white/15" />
-      <ol className="relative flex items-center min-[360px]:gap-0.5 sm:gap-2">
+      <span aria-hidden className="absolute inset-x-3 top-1/2 h-px -translate-y-1/2 bg-fg/15" />
+      <ol className="relative flex items-center phone:gap-0.5 sm:gap-2">
         {stages.map((s) => (
           <li key={s.id} className={`life-${s.id}`}>
             <a
@@ -62,9 +62,9 @@ function LifeDots({ reading }: { reading: Reading }) {
               aria-current={s.id === life ? 'step' : undefined}
               aria-label={s.slot}
               title={s.slot}
-              className="group grid h-6 w-6 place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-white"
+              className="group grid h-6 w-6 place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-fg"
             >
-              <span className="dot block h-2.5 w-2.5 rounded-full border-[1.5px] border-(--accent) bg-[#0b0b0e] opacity-55 transition-all duration-300 group-hover:scale-110 group-hover:opacity-100" />
+              <span className="dot block h-2.5 w-2.5 rounded-full border-[1.5px] border-(--accent) bg-page opacity-55 transition-all duration-300 group-hover:scale-110 group-hover:opacity-100" />
             </a>
           </li>
         ))}

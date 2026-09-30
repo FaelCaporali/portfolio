@@ -16,7 +16,7 @@ export function ResumeMenu({ className }: { className: string }) {
         <svg
           aria-hidden
           viewBox="0 0 10 6"
-          className={cx('h-1.5 w-2.5 text-white/45 transition-transform', !open && 'rotate-180')}
+          className={cx('h-1.5 w-2.5 text-fg/45 transition-transform', !open && 'rotate-180')}
         >
           <path
             d="M1 5l4-4 4 4"
@@ -31,7 +31,7 @@ export function ResumeMenu({ className }: { className: string }) {
       <ul
         id={panelId}
         hidden={!open}
-        className="absolute bottom-full left-0 z-10 mb-2 min-w-full overflow-hidden rounded-2xl border border-white/15 bg-[#16161b]/95 py-1 shadow-xl backdrop-blur"
+        className="absolute bottom-full left-0 z-popover mb-2 min-w-full overflow-hidden rounded-2xl border border-fg/15 bg-raised/95 py-1 shadow-xl backdrop-blur"
       >
         {resumes.map((r) => (
           <li key={r.href}>
@@ -39,10 +39,10 @@ export function ResumeMenu({ className }: { className: string }) {
               href={r.href}
               download
               onClick={close}
-              className="flex items-center justify-between gap-3 px-4 py-2 text-sm whitespace-nowrap text-white/80 hover:bg-white/10 hover:text-white focus-visible:bg-white/10 focus-visible:outline-none"
+              className="flex items-center justify-between gap-3 px-4 py-2 text-sm whitespace-nowrap text-fg/80 hover:bg-fg/10 hover:text-fg focus-visible:bg-fg/10 focus-visible:outline-none"
             >
               {r.label}
-              <span aria-hidden className="text-xs text-white/40">
+              <span aria-hidden className="text-xs text-fg/40">
                 PDF ↓
               </span>
             </a>

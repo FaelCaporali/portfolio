@@ -5,4 +5,4 @@ import { stages } from '../../content/journey'
 export const byId = new Map(stages.map((s) => [s.id, s]))
 
 /** Rótulo pequeno em caixa alta (datas, partes, grupos de tags). */
-export const eyebrow = 'text-xs font-medium tracking-[0.18em] text-white/60 uppercase'
+export const eyebrow = 'text-xs font-medium tracking-eyebrow text-fg/60 uppercase'

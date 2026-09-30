@@ -15,11 +15,11 @@ export function ContactWidget() {
   return (
     <div
       ref={root}
-      className="fixed right-4 bottom-[calc(1rem+env(safe-area-inset-bottom))] z-20 sm:right-8 lg:right-8 lg:bottom-8"
+      className="fixed right-4 bottom-[calc(1rem+env(safe-area-inset-bottom))] z-float sm:right-8 lg:right-8 lg:bottom-8"
     >
       <button
         {...triggerProps}
-        className="contact-cta flex h-12 w-12 cursor-pointer items-center justify-center gap-2 rounded-full border border-transparent bg-[#16161b]/90 text-sm font-medium text-white shadow-lg backdrop-blur-md transition-colors hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white min-[361px]:h-14 min-[361px]:w-14 lg:h-auto lg:w-auto lg:bg-white/10 lg:px-5 lg:py-3"
+        className="contact-cta flex h-12 w-12 cursor-pointer items-center justify-center gap-2 rounded-full border border-transparent bg-raised/90 text-sm font-medium text-fg shadow-lg backdrop-blur-md transition-colors hover:bg-fg/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fg min-[361px]:h-14 min-[361px]:w-14 lg:h-auto lg:w-auto lg:bg-fg/10 lg:px-5 lg:py-3"
       >
         <svg
           aria-hidden
@@ -41,7 +41,7 @@ export function ContactWidget() {
         role="dialog"
         aria-labelledby={titleId}
         hidden={!open}
-        className="absolute right-0 bottom-full mb-2 max-h-[calc(100dvh-6rem)] w-[calc(100vw-2rem)] max-w-sm overflow-y-auto rounded-2xl border border-white/15 bg-[#16161b]/95 p-5 text-white shadow-2xl backdrop-blur lg:max-h-[calc(100dvh-7rem)] lg:w-[22rem]"
+        className="absolute right-0 bottom-full mb-2 max-h-[calc(100dvh-6rem)] w-[calc(100vw-2rem)] max-w-sm overflow-y-auto rounded-2xl border border-fg/15 bg-raised/95 p-5 text-fg shadow-2xl backdrop-blur lg:max-h-[calc(100dvh-7rem)] lg:w-[22rem]"
       >
         <h2 id={titleId} className="text-base font-semibold">
           Send me a message

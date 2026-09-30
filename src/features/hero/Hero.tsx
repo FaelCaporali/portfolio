@@ -175,10 +175,10 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
       {/* Cabeçalho na largura toda: o nome à esquerda e, abaixo dele, o indicador centralizado na página. A base do
           cabeçalho é o topo do espaço livre do busto no celular (useFreeArea). */}
       <header ref={header} className="pointer-events-none absolute inset-x-0 top-0 pt-5 pb-1">
-        <div className="px-5 sm:px-10 wide:pl-[7vw]">
+        <div className="px-5 sm:px-10 wide:pl-hero">
           <a
             href="/"
-            className="pointer-events-auto text-sm font-medium tracking-wide text-white/90 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white lg:text-base"
+            className="pointer-events-auto text-sm font-medium tracking-wide text-fg/90 transition-colors hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-fg lg:text-base"
           >
             {profile.name}
           </a>
@@ -195,7 +195,7 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
       {/* Canto superior direito em todos os tamanhos (o contato fica embaixo). Alinhado ao nome; discreto: só o ícone
           apagado, sem contorno nem fundo, com área de toque de 44 px. */}
       <SourceLink
-        className="absolute top-2.5 right-3 flex h-11 w-11 items-center justify-center rounded-full text-white/50 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:right-8"
+        className="absolute top-2.5 right-3 flex h-11 w-11 items-center justify-center rounded-full text-fg/50 transition-colors hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fg sm:right-8"
         iconClassName="h-5 w-5"
       />
 

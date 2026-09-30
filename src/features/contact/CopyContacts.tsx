@@ -55,7 +55,7 @@ export function CopyContacts({ className = '' }: { className?: string }) {
   }
 
   return (
-    <ul aria-label="Contact" className={`flex flex-wrap gap-x-1 gap-y-1 min-[360px]:gap-x-2 ${className}`}>
+    <ul aria-label="Contact" className={`flex flex-wrap gap-x-1 gap-y-1 phone:gap-x-2 ${className}`}>
       {directContacts.map((c) => {
         const shown = copied?.label === c.label
         return (
@@ -65,14 +65,14 @@ export function CopyContacts({ className = '' }: { className?: string }) {
               disabled={!hydrated}
               onClick={() => void copy(c)}
               title={`Copy ${c.kind === 'email' ? 'e-mail' : 'phone number'}`}
-              className="group -mx-1.5 inline-flex cursor-copy items-center gap-1.5 rounded-md px-1.5 py-1 text-xs text-white/65 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-white min-[360px]:text-[13px] lg:text-sm"
+              className="group -mx-1.5 inline-flex cursor-copy items-center gap-1.5 rounded-md px-1.5 py-1 text-xs text-fg/65 transition-colors hover:bg-fg/10 hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-fg phone:text-hero-link lg:text-sm"
             >
               <KindIcon kind={shown && copied.ok ? 'copied' : c.kind} />
               <span className="tabular-nums">{c.value}</span>
             </button>
             <span
               role="status"
-              className={`pointer-events-none absolute bottom-full left-0 mb-1 rounded-md bg-white px-2 py-0.5 text-xs font-medium whitespace-nowrap text-neutral-950 shadow transition-all duration-150 ${shown ? 'translate-y-0 opacity-100' : 'translate-y-1 opacity-0'}`}
+              className={`pointer-events-none absolute bottom-full left-0 mb-1 rounded-md bg-fg px-2 py-0.5 text-xs font-medium whitespace-nowrap text-on-fg shadow transition-all duration-150 ${shown ? 'translate-y-0 opacity-100' : 'translate-y-1 opacity-0'}`}
             >
               {shown ? copiedText(c, copied.ok) : ''}
             </span>

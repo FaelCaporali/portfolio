@@ -10,7 +10,7 @@ import { stages } from '../../content/journey'
 export function lifeAccentsCss(): string {
   const colors = stages.map((s) => s.accent).join(',')
   // O espectro também como variável: o anel do "Contact me" (index.css) gira nele, fechando o círculo na primeira cor.
-  const root = `:root{--spectrum:${colors};--spectrum-loop:${colors},${stages[0]?.accent ?? '#fff'}}`
+  const root = `:root{--spectrum:${colors};--spectrum-loop:${colors},${stages[0]?.accent ?? 'var(--color-fg)'}}`
   const spectrum = `.journey-spectrum{background-image:linear-gradient(90deg,${colors});-webkit-background-clip:text;background-clip:text;color:transparent}`
   // A posição de cada letra da vida no herói (SlotWord: ch-<n> dá --i, que escalona a animação).
   const letters = Math.max(...stages.map((s) => s.slot.replaceAll(' ', '').length))

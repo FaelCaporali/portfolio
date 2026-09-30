@@ -39,7 +39,7 @@ const NODE: Record<Lane, string> = {
  * máximo), daí o teto de 3.875rem.
  */
 const BIG =
-  'text-[min(2.75rem,calc((100vw_-_5rem)/7.4))] lg:text-[min(5.6vw,3.875rem)] leading-[0.95] font-semibold tracking-[-0.045em]'
+  'text-[min(2.75rem,calc((100vw_-_5rem)/7.4))] lg:text-[min(5.6vw,3.875rem)] leading-landmark font-semibold tracking-landmark'
 
 /**
  * Um marco do mapa, em duas camadas (J27): o que se lê de relance (data, título, papel, a frase, as conquistas e as
@@ -103,7 +103,7 @@ const Card = memo(function Card({ item, matched }: { item: Placed; matched: stri
   return (
     <article
       className={cx(
-        'card relative rounded-3xl border border-white/[0.08] p-5 sm:p-7',
+        'card relative rounded-3xl border border-fg/8 p-5 sm:p-7',
         CARD[lane],
         wide && 'lg:p-10',
         wide && life && 'lg:row-start-2',
@@ -113,7 +113,7 @@ const Card = memo(function Card({ item, matched }: { item: Placed; matched: stri
         aria-hidden
         data-node={scope?.id ?? ''}
         className={cx(
-          'dot absolute h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-(--accent) bg-[#0b0b0e]',
+          'dot absolute h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-(--accent) bg-page',
           NODE[lane],
         )}
       />
@@ -121,21 +121,21 @@ const Card = memo(function Card({ item, matched }: { item: Placed; matched: stri
         {period && <p className="ink text-2xl font-semibold tracking-tight tabular-nums sm:text-3xl">{period}</p>}
         <h3
           className={cx(
-            'mt-2 leading-tight font-semibold tracking-tight text-white',
+            'mt-2 leading-tight font-semibold tracking-tight text-fg',
             wide ? 'text-2xl sm:text-3xl lg:text-4xl' : 'text-xl sm:text-2xl',
           )}
         >
           {c.title.en}
         </h3>
         {c.subtitle && <p className="ink mt-1.5 text-base font-medium sm:text-lg">{c.subtitle.en}</p>}
-        <p className={cx('mt-4 leading-relaxed text-white/85', wide ? 'text-lg lg:text-xl' : 'text-base sm:text-lg')}>
+        <p className={cx('mt-4 leading-relaxed text-fg/85', wide ? 'text-lg lg:text-xl' : 'text-base sm:text-lg')}>
           {c.headline.en}
         </p>
         {c.highlights && <Highlights items={c.highlights.en} className="mt-5 hidden sm:block" />}
       </div>
       <Tags tags={c.tags} wide={wide} chosen={chosen} />
-      <details className="group mt-6 border-t border-white/[0.08] pt-4">
-        <summary className="inline-flex min-h-9 cursor-pointer list-none items-center gap-2 text-sm font-medium text-white/70 hover:text-white focus-visible:outline-2 focus-visible:outline-white [&::-webkit-details-marker]:hidden">
+      <details className="group mt-6 border-t border-fg/8 pt-4">
+        <summary className="inline-flex min-h-9 cursor-pointer list-none items-center gap-2 text-sm font-medium text-fg/70 hover:text-fg focus-visible:outline-2 focus-visible:outline-fg [&::-webkit-details-marker]:hidden">
           <span className="group-open:hidden">Read the story</span>
           <span className="hidden group-open:inline">Close the story</span>
           <span aria-hidden className="text-(--accent) transition-transform duration-300 group-open:rotate-45">
@@ -143,7 +143,7 @@ const Card = memo(function Card({ item, matched }: { item: Placed; matched: stri
           </span>
         </summary>
         {c.highlights && <Highlights items={c.highlights.en} className="mt-4 sm:hidden" />}
-        <div className="mt-3 max-w-[68ch] space-y-4 text-[0.98rem] leading-relaxed text-white/80">
+        <div className="mt-3 max-w-[68ch] space-y-4 text-story leading-relaxed text-fg/80">
           {c.body.en.map((p) => (
             <p key={p}>{p}</p>
           ))}
@@ -154,7 +154,7 @@ const Card = memo(function Card({ item, matched }: { item: Placed; matched: stri
           href={c.link.href}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-4 inline-flex min-h-6 items-center gap-1.5 justify-self-start text-sm font-medium text-white/85 underline decoration-(--accent) underline-offset-4 hover:text-white"
+          className="mt-4 inline-flex min-h-6 items-center gap-1.5 justify-self-start text-sm font-medium text-fg/85 underline decoration-(--accent) underline-offset-4 hover:text-fg"
         >
           {c.link.label.en} <span aria-hidden>↗</span>
         </a>
@@ -190,7 +190,7 @@ function YearMark({ year }: { year: string }) {
  */
 function Highlights({ items, className }: { items: string[]; className: string }) {
   return (
-    <ul className={cx('space-y-2.5 text-[0.95rem] leading-relaxed text-white/75', className)}>
+    <ul className={cx('space-y-2.5 text-highlight leading-relaxed text-fg/75', className)}>
       {items.map((h) => (
         <li key={h} className="relative pl-5">
           <span aria-hidden className="absolute top-[0.6em] left-0 h-1.5 w-1.5 rounded-full bg-(--accent)" />
@@ -220,17 +220,13 @@ function Tags({ tags, wide, chosen }: { tags: Data['tags']; wide: boolean; chose
     >
       {groups.map((g) => (
         <div key={g.key} className="contents">
-          <dt className={cx(eyebrow, 'pt-1 text-[0.62rem] text-white/45')}>{g.label}</dt>
+          <dt className={cx(eyebrow, 'pt-1 text-eyebrow-sm text-fg/45')}>{g.label}</dt>
           <dd className={cx('-mt-1 sm:mt-0', wide && 'lg:-mt-1')}>
             <ul aria-label={g.label} className="flex flex-wrap gap-1.5">
               {g.items.map((t) => (
                 <li
                   key={t}
-                  className={cx(
-                    'tag rounded-full px-2.5 py-0.5 text-[0.72rem]',
-                    `tag-${g.key}`,
-                    chosen.has(t) && 'is-match',
-                  )}
+                  className={cx('tag rounded-full px-2.5 py-0.5 text-tag', `tag-${g.key}`, chosen.has(t) && 'is-match')}
                 >
                   {t}
                 </li>

@@ -120,19 +120,19 @@ export function JourneyPage() {
   return (
     <>
       <Frame reading={reading} bar={bar} menu={<LiveIndex reading={reading} out={out} />} />
-      <main className="text-white">
+      <main className="text-fg">
         <Intro />
         <Filters items={scoped} filters={filters} />
         <div ref={timeline} className="timeline relative mx-auto max-w-7xl px-5 pb-16 sm:px-8 lg:pr-20 xl:pr-60">
           {/* Sem JavaScript: o eixo reto. Com ele, o caminho sinuoso no SVG (useJourneyMotion), e o eixo some. */}
           <div
             aria-hidden
-            className="rail absolute top-3 bottom-16 left-[1.5625rem] w-px bg-white/10 sm:left-[2.3125rem]"
+            className="rail absolute top-3 bottom-16 left-[1.5625rem] w-px bg-fg/10 sm:left-[2.3125rem]"
           />
           <svg ref={route} aria-hidden className="route pointer-events-none absolute top-0 left-0 overflow-visible" />
-          <p hidden={out.size < placed.length} className="py-24 text-center text-lg text-white/70">
+          <p hidden={out.size < placed.length} className="py-24 text-center text-lg text-fg/70">
             Nothing on the map matches these filters.{' '}
-            <button type="button" onClick={filters.clear} className="underline underline-offset-4 hover:text-white">
+            <button type="button" onClick={filters.clear} className="underline underline-offset-4 hover:text-fg">
               Clear filters
             </button>
           </p>

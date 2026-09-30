@@ -52,10 +52,10 @@ export function HeroCopy({ ref, stage, leaving, loading }: HeroCopyProps) {
   return (
     <div
       ref={ref}
-      className="pointer-events-none absolute inset-x-0 bottom-0 px-5 pb-6 text-white sm:px-10 wide:inset-y-0 wide:right-auto wide:flex wide:w-[56%] wide:flex-col wide:justify-center wide:pr-6 wide:pb-0 wide:pl-[7vw] wide:short:pt-20 wide:short:pb-3"
+      className="pointer-events-none absolute inset-x-0 bottom-0 px-5 pb-6 text-fg sm:px-10 wide:inset-y-0 wide:right-auto wide:flex wide:w-[56%] wide:flex-col wide:justify-center wide:pr-6 wide:pb-0 wide:pl-hero wide:short:pt-20 wide:short:pb-3"
     >
       <h1>
-        <span className="relative block text-lg text-white/65 lg:text-2xl">
+        <span className="relative block text-lg text-fg/65 lg:text-2xl">
           <span data-vida-texto>{loading ? 'Today I am' : abertura(stage)}</span>
           {/* Amostras paradas e escondidas de cada vida (#138): a cena 3D pinta o fundo de uma vida antes de ela
               entrar, medindo o texto dela aqui, na mesma coluna e na mesma fonte (devops/referencias.ts). */}
@@ -72,7 +72,7 @@ export function HeroCopy({ ref, stage, leaving, loading }: HeroCopyProps) {
         <span
           ref={slotRef}
           style={slotSize ? { fontSize: slotSize } : undefined}
-          className="relative mt-2 block min-h-[2em] text-[2.75rem] leading-none font-semibold tracking-tight min-[360px]:text-[3rem] sm:min-h-[1em] lg:text-[clamp(2.75rem,4.4vw,5.5rem)]"
+          className="relative mt-2 block min-h-[2em] text-life-narrow leading-none font-semibold tracking-tight phone:text-life sm:min-h-[1em] lg:text-life-wide"
         >
           <span data-vida-texto>
             {/* Com a cena, a vida entra com a entrada que o SlotWord já tem (monta de novo). */}
@@ -89,12 +89,12 @@ export function HeroCopy({ ref, stage, leaving, loading }: HeroCopyProps) {
       {/* Celular: um título por linha. A partir de sm: numa linha só, separados por um ponto apagado. */}
       <ul
         aria-label="Títulos"
-        className="mt-4 flex flex-col gap-0.5 text-sm leading-snug font-medium text-white/75 sm:mt-5 sm:flex-row sm:flex-wrap sm:items-baseline sm:gap-y-1 sm:text-[15px] lg:mt-6 lg:text-lg short:mt-2"
+        className="mt-4 flex flex-col gap-0.5 text-sm leading-snug font-medium text-fg/75 sm:mt-5 sm:flex-row sm:flex-wrap sm:items-baseline sm:gap-y-1 sm:text-hero-titles lg:mt-6 lg:text-lg short:mt-2"
       >
         {profile.titles.map((t, i) => (
           <li key={t} className="flex items-baseline">
             {i > 0 && (
-              <span aria-hidden className="mx-2 hidden text-white/25 sm:inline lg:mx-3">
+              <span aria-hidden className="mx-2 hidden text-fg/25 sm:inline lg:mx-3">
                 •
               </span>
             )}
@@ -113,7 +113,7 @@ export function HeroCopy({ ref, stage, leaving, loading }: HeroCopyProps) {
         <Link
           to={journeyLink.href}
           prefetch="intent"
-          className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-neutral-950 transition-[color,background-color,transform] duration-150 hover:bg-white/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:scale-[0.96] active:bg-white/70 motion-reduce:active:scale-100 short:py-2"
+          className="inline-flex items-center gap-2 rounded-full bg-fg px-5 py-3 text-sm font-semibold text-on-fg transition-[color,background-color,transform] duration-150 hover:bg-fg/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fg active:scale-[0.96] active:bg-fg/70 motion-reduce:active:scale-100 short:py-2"
         >
           {journeyLink.label} <span aria-hidden>→</span>
         </Link>
@@ -126,7 +126,7 @@ export function HeroCopy({ ref, stage, leaving, loading }: HeroCopyProps) {
             <li key={l.label}>
               <a href={l.href} target="_blank" rel="noopener noreferrer" className={pill}>
                 {l.label}{' '}
-                <span aria-hidden className="hidden text-white/45 xl:inline">
+                <span aria-hidden className="hidden text-fg/45 xl:inline">
                   ↗
                 </span>
               </a>

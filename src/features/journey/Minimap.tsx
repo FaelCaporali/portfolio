@@ -59,7 +59,7 @@ export function Minimap({ rows, out, current }: { rows: Row[] } & MapState) {
     <>
       <nav
         aria-label="Journey map"
-        className="minimap fixed top-20 right-3 bottom-28 z-20 hidden max-h-[44rem] lg:flex xl:right-6"
+        className="minimap fixed top-20 right-3 bottom-28 z-float hidden max-h-[44rem] lg:flex xl:right-6"
       >
         <div className="relative flex min-h-0 flex-1">
           <svg
@@ -81,7 +81,7 @@ export function Minimap({ rows, out, current }: { rows: Row[] } & MapState) {
             {rows.map((r) =>
               r.kind === 'part' ? (
                 <li key={r.part.id} className="flex min-h-0 flex-1 items-center pl-14">
-                  <a href={`#${r.part.id}`} className={cx(eyebrow, 'hidden text-[0.6rem] hover:text-white xl:inline')}>
+                  <a href={`#${r.part.id}`} className={cx(eyebrow, 'hidden text-eyebrow-xs hover:text-fg xl:inline')}>
                     {r.part.title}
                   </a>
                 </li>
@@ -95,7 +95,7 @@ export function Minimap({ rows, out, current }: { rows: Row[] } & MapState) {
                     aria-current={markId(r.item) === current ? 'location' : undefined}
                     title={[periodLabel(r.item.c), r.item.c.title.en].filter(Boolean).join(' · ')}
                     className={cx(
-                      'mini-link group flex h-full min-h-0 w-full items-center pl-14 focus-visible:outline-2 focus-visible:outline-white',
+                      'mini-link group flex h-full min-h-0 w-full items-center pl-14 focus-visible:outline-2 focus-visible:outline-fg',
                       out.has(markId(r.item)) && 'is-out',
                     )}
                   >
@@ -107,7 +107,7 @@ export function Minimap({ rows, out, current }: { rows: Row[] } & MapState) {
                         r.item.c.focus ? 'h-2.5 w-2.5' : 'h-1.5 w-1.5',
                       )}
                     />
-                    <span className="mini-label hidden max-w-[10rem] truncate text-[0.7rem] text-white/50 group-hover:text-white xl:inline">
+                    <span className="mini-label hidden max-w-[10rem] truncate text-minimap text-fg/50 group-hover:text-fg xl:inline">
                       <span className="inline-block w-8 tabular-nums">{year(r.item)}</span>
                       {r.item.c.title.en}
                     </span>
@@ -163,8 +163,8 @@ export function IndexSheet({ rows, out, current, label }: { rows: Row[]; label: 
         {...triggerProps}
         aria-label="Journey map"
         className={cx(
-          'grid h-9 w-9 cursor-pointer place-items-center rounded-full border text-white/85 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-white',
-          open ? 'border-white/40' : 'border-white/15',
+          'grid h-9 w-9 cursor-pointer place-items-center rounded-full border text-fg/85 transition-colors hover:text-fg focus-visible:outline-2 focus-visible:outline-fg',
+          open ? 'border-fg/40' : 'border-fg/15',
         )}
       >
         <svg
@@ -182,16 +182,16 @@ export function IndexSheet({ rows, out, current, label }: { rows: Row[]; label: 
       <div
         id={panelId}
         hidden={!open}
-        className="absolute top-full right-0 mt-3 w-[min(22rem,calc(100vw-2rem))] rounded-2xl border border-white/10 bg-[#0b0b0e]/95 shadow-2xl backdrop-blur-md"
+        className="absolute top-full right-0 mt-3 w-[min(22rem,calc(100vw-2rem))] rounded-2xl border border-fg/10 bg-page/95 shadow-2xl backdrop-blur-md"
       >
-        <p className="flex items-center gap-3 border-b border-white/10 px-4 py-3 text-sm text-white/85">
+        <p className="flex items-center gap-3 border-b border-fg/10 px-4 py-3 text-sm text-fg/85">
           <span aria-hidden className="accent-fade h-2 w-2 shrink-0 rounded-full bg-(--accent)" />
           <span className="min-w-0 truncate">{label ?? 'Journey map'}</span>
         </p>
         <ol className="max-h-[70vh] overflow-y-auto px-2 py-2">
           {rows.map((r) =>
             r.kind === 'part' ? (
-              <li key={r.part.id} className={cx(eyebrow, 'px-3 pt-3 pb-1 text-[0.62rem]')}>
+              <li key={r.part.id} className={cx(eyebrow, 'px-3 pt-3 pb-1 text-eyebrow-sm')}>
                 {r.part.title}
               </li>
             ) : (
@@ -208,12 +208,12 @@ export function IndexSheet({ rows, out, current, label }: { rows: Row[]; label: 
                     mark.scrollIntoView()
                   }}
                   className={cx(
-                    'mini-link flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm text-white/75 hover:bg-white/5',
+                    'mini-link flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm text-fg/75 hover:bg-fg/5',
                     out.has(markId(r.item)) && 'is-out',
                   )}
                 >
                   <span aria-hidden className="mini-dot h-2 w-2 shrink-0 rounded-full bg-(--accent)" />
-                  <span className="w-10 shrink-0 text-xs text-white/50 tabular-nums">{year(r.item)}</span>
+                  <span className="w-10 shrink-0 text-xs text-fg/50 tabular-nums">{year(r.item)}</span>
                   <span className="min-w-0 truncate">{r.item.c.title.en}</span>
                 </a>
               </li>

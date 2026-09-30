@@ -47,10 +47,10 @@ export function Filters({ items, filters }: { items: Dated[]; filters: FilterApi
       ref={root}
       data-filters
       aria-busy={hydrated ? undefined : true}
-      className="filters sticky top-14 z-20 border-y border-white/[0.06] bg-[#0b0b0e]/85 backdrop-blur-md"
+      className="filters sticky top-14 z-float border-y border-fg/6 bg-page/85 backdrop-blur-md"
     >
       <div className="relative mx-auto flex max-w-7xl flex-wrap items-center gap-1.5 px-4 py-2 sm:gap-2 sm:px-8 sm:py-2.5 lg:pr-20 xl:pr-60">
-        <p className={cx(eyebrow, 'mr-1 hidden text-[0.65rem] md:block')}>Filter the map</p>
+        <p className={cx(eyebrow, 'mr-1 hidden text-filter-sm md:block')}>Filter the map</p>
         <Menu label="Years" on={filters.yearsOn} {...menu('years')}>
           <div className="grid grid-cols-2 gap-3">
             <YearSelect
@@ -96,7 +96,7 @@ export function Filters({ items, filters }: { items: Dated[]; filters: FilterApi
           type="button"
           hidden={!filters.active}
           onClick={filters.clear}
-          className="ml-auto min-h-9 text-sm text-white/70 underline underline-offset-4 hover:text-white"
+          className="ml-auto min-h-9 text-sm text-fg/70 underline underline-offset-4 hover:text-fg"
         >
           Clear
         </button>
@@ -126,7 +126,7 @@ function TagPicker({ group, tags, filters }: { group: (typeof GROUPS)[number]; t
         onChange={(e) => {
           setQuery(e.target.value)
         }}
-        className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/40 focus-visible:border-white/40 focus-visible:outline-none"
+        className="w-full rounded-xl border border-fg/10 bg-fg/5 px-3 py-2 text-sm text-fg placeholder:text-fg/40 focus-visible:border-fg/40 focus-visible:outline-none"
       />
       <div role="group" aria-label={group.label} className="mt-3 flex flex-wrap gap-1.5">
         {tags.map((t) => (
@@ -180,15 +180,15 @@ function Menu({
           e.preventDefault()
           onToggle()
         }}
-        className="flex min-h-9 cursor-pointer list-none items-center gap-1 rounded-full border border-white/15 px-3 text-[0.8rem] text-white/85 transition-colors group-open:border-white/40 hover:border-white/35 hover:text-white focus-visible:outline-2 focus-visible:outline-white sm:gap-1.5 sm:px-3.5 sm:text-sm [&::-webkit-details-marker]:hidden"
+        className="flex min-h-9 cursor-pointer list-none items-center gap-1 rounded-full border border-fg/15 px-3 text-filter text-fg/85 transition-colors group-open:border-fg/40 hover:border-fg/35 hover:text-fg focus-visible:outline-2 focus-visible:outline-fg sm:gap-1.5 sm:px-3.5 sm:text-sm [&::-webkit-details-marker]:hidden"
       >
         {label}
-        <span aria-hidden hidden={!on} className="h-1.5 w-1.5 rounded-full bg-white" />
-        <span aria-hidden className="text-[0.65rem] text-white/50 transition-transform group-open:rotate-180">
+        <span aria-hidden hidden={!on} className="h-1.5 w-1.5 rounded-full bg-fg" />
+        <span aria-hidden className="text-filter-sm text-fg/50 transition-transform group-open:rotate-180">
           ▼
         </span>
       </summary>
-      <div className="absolute inset-x-3 top-full z-10 mt-2 max-h-[60vh] overflow-y-auto rounded-2xl border border-white/10 bg-[#111116] p-3 shadow-2xl sm:inset-x-auto sm:left-0 sm:w-80">
+      <div className="absolute inset-x-3 top-full z-popover mt-2 max-h-[60vh] overflow-y-auto rounded-2xl border border-fg/10 bg-surface p-3 shadow-2xl sm:inset-x-auto sm:left-0 sm:w-80">
         {children}
       </div>
     </details>
@@ -207,14 +207,14 @@ function YearSelect({
   onChange: (year: number) => void
 }) {
   return (
-    <label className="text-xs text-white/60">
+    <label className="text-xs text-fg/60">
       {label}
       <select
         value={value}
         onChange={(e) => {
           onChange(Number(e.target.value))
         }}
-        className="mt-1 block w-full rounded-xl border border-white/10 bg-[#16161b] px-3 py-2 text-sm text-white"
+        className="mt-1 block w-full rounded-xl border border-fg/10 bg-raised px-3 py-2 text-sm text-fg"
       >
         {years.map((y) => (
           <option key={y} value={y}>

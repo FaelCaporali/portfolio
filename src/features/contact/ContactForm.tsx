@@ -5,8 +5,8 @@ import { useContactForm } from './useContactForm'
 import { useTurnstile } from './useTurnstile'
 
 const INPUT =
-  'w-full rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/35 transition-colors focus:border-white/60 focus:outline-none aria-[invalid=true]:border-rose-400/80'
-const LABEL = 'mb-1 block text-xs text-white/60'
+  'w-full rounded-lg border border-fg/15 bg-fg/5 px-3 py-2 text-sm text-fg placeholder:text-fg/35 transition-colors focus:border-fg/60 focus:outline-none aria-[invalid=true]:border-error-edge/80'
+const LABEL = 'mb-1 block text-xs text-fg/60'
 
 /**
  * Formulário de contato. Continua montado com o painel fechado e depois do envio: o texto digitado não se perde e o
@@ -57,7 +57,7 @@ export function ContactForm({ active }: { active: boolean }) {
   })
   const hint = (name: Field) =>
     invalid.includes(name) && (
-      <p id={hintId(name)} className="mt-1 text-xs text-rose-300">
+      <p id={hintId(name)} className="mt-1 text-xs text-error">
         {FIELD_HINT[name]}
       </p>
     )
@@ -65,13 +65,13 @@ export function ContactForm({ active }: { active: boolean }) {
   return (
     <>
       {status.kind === 'sent' && (
-        <div role="status" className="mt-4 space-y-3 text-sm text-white/80">
+        <div role="status" className="mt-4 space-y-3 text-sm text-fg/80">
           <p>Thanks! Message received. I&apos;ll get back to you soon.</p>
           <button
             type="button"
             ref={again}
             onClick={restart}
-            className="cursor-pointer text-white underline underline-offset-4 hover:text-white/80"
+            className="cursor-pointer text-fg underline underline-offset-4 hover:text-fg/80"
           >
             Send another message
           </button>
@@ -140,7 +140,7 @@ export function ContactForm({ active }: { active: boolean }) {
           disabled={status.kind === 'sending'}
           aria-disabled={verifying || undefined}
           aria-busy={verifying || undefined}
-          className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-neutral-950 transition-colors hover:bg-white/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-wait disabled:opacity-60 aria-busy:cursor-wait aria-busy:opacity-60"
+          className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-fg px-5 py-2.5 text-sm font-semibold text-on-fg transition-colors hover:bg-fg/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fg disabled:cursor-wait disabled:opacity-60 aria-busy:cursor-wait aria-busy:opacity-60"
         >
           {verifying && (
             // Anel girando: só transform (animate-spin); parado com movimento reduzido.
@@ -151,7 +151,7 @@ export function ContactForm({ active }: { active: boolean }) {
           )}
           {verifying ? 'Verifying…' : sendLabel}
         </button>
-        <p role="status" className="min-h-[1lh] text-xs text-rose-300">
+        <p role="status" className="min-h-[1lh] text-xs text-error">
           {status.kind === 'error' ? status.text : ''}
         </p>
       </form>
