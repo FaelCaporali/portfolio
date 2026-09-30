@@ -32,11 +32,9 @@ interface HeroCanvasProps {
   requested: RefObject<number | null>
   /** Ordem de carga das vidas: a escolhida no indicador, a atual e as seguintes do carrossel. */
   order: readonly PropId[]
-  /** A vida que vem depois da atual (a escolhida no indicador ou a seguinte): preparada já. */
-  next: PropId
   /**
    * Para onde a troca pode ir, em ordem: a escolhida no indicador (só ela) ou as seguintes do carrossel. A troca vai
-   * para a primeira pronta; nenhuma pronta, a vida atual fica.
+   * para a primeira pronta; nenhuma pronta, a vida atual fica. Dela sai a única próxima preparada (D-138d).
    */
   candidates: readonly PropId[]
   /** As vidas cujo glb falhou (ou demorou demais), a cada mudança: o herói as tira da volta. */
@@ -57,7 +55,6 @@ export function HeroCanvas({
   drag,
   requested,
   order,
-  next,
   candidates,
   onFailures,
   dragHandlers,
@@ -122,7 +119,7 @@ export function HeroCanvas({
           pointer={pointer}
           drag={drag}
           particles={quality.particles}
-          proxima={next}
+          candidatas={candidates}
           palco={palco}
         />
         <Director

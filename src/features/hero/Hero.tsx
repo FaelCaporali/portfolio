@@ -10,16 +10,15 @@ import { useDragRotation } from './hooks/useDragRotation'
 import { useFreeArea } from './hooks/useFreeArea'
 import { usePointerGaze } from './hooks/usePointerGaze'
 import type { Phase } from './model/carousel'
-import { advance, candidates, createLineup, loadOrder, peek, skipFailed, type Lineup } from './model/lineup'
+import { advance, candidates, createLineup, loadOrder, skipFailed, type Lineup } from './model/lineup'
 import { readHeroOptions, type HeroOptions } from './model/options'
 
 const IDS = stages.map((s) => s.id)
-/** Os adereços na ordem em que a cena deve carregá-los (a fila dos glb, scene/carga.ts) e o da próxima vida. */
+/** Os adereços na ordem em que a cena deve carregá-los (a fila dos glb, scene/carga.ts) e para onde a troca pode ir. */
 const loadProps = (l: Lineup, chosen: number | null, failed?: ReadonlySet<number>) => ({
   order: loadOrder(l, chosen).map((i) => cyclicAt(stages, i).prop),
-  next: cyclicAt(stages, peek(l, chosen)).prop,
   // Para onde a troca pode ir: só a escolhida no indicador ou, sem escolha, as seguintes da volta em ordem (nunca a
-  // atual, nunca uma vida cujo glb falhou).
+  // atual, nunca uma vida cujo glb falhou). A 1ª delas já baixada é a única próxima preparada (model/bastidores.ts).
   candidates: candidates(l, chosen, failed).map((i) => cyclicAt(stages, i).prop),
 })
 
@@ -129,7 +128,6 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
             drag={drag}
             requested={requested}
             order={carga.order}
-            next={carga.next}
             candidates={carga.candidates}
             onFailures={onFailures}
             dragHandlers={handlers}
