@@ -5,6 +5,7 @@ import { profile } from '../../content/profile'
 import { cyclicAt } from '../../lib/array'
 import { HeroCopy } from './HeroCopy'
 import { LifeTimeline } from './LifeTimeline'
+import { SceneBoundary } from './SceneBoundary'
 import { SourceLink } from './SourceLink'
 import { useDragRotation } from './hooks/useDragRotation'
 import { useFreeArea } from './hooks/useFreeArea'
@@ -117,26 +118,29 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
 
   return (
     <section className="relative h-svh overflow-hidden" aria-label="Apresentação">
+      {/* Se a cena falha (import, render, WebGL), sai só ela: SceneBoundary. */}
       {options && (
-        <Suspense fallback={null}>
-          <HeroCanvas
-            paused={leavingPage}
-            stage={stage}
-            first={opening}
-            options={options}
-            free={free}
-            pointer={pointer}
-            drag={drag}
-            requested={requested}
-            order={carga.order}
-            next={carga.next}
-            candidates={carga.candidates}
-            onFailures={onFailures}
-            dragHandlers={handlers}
-            onPhase={setPhase}
-            onNext={next}
-          />
-        </Suspense>
+        <SceneBoundary>
+          <Suspense fallback={null}>
+            <HeroCanvas
+              paused={leavingPage}
+              stage={stage}
+              first={opening}
+              options={options}
+              free={free}
+              pointer={pointer}
+              drag={drag}
+              requested={requested}
+              order={carga.order}
+              next={carga.next}
+              candidates={carga.candidates}
+              onFailures={onFailures}
+              dragHandlers={handlers}
+              onPhase={setPhase}
+              onNext={next}
+            />
+          </Suspense>
+        </SceneBoundary>
       )}
 
       {/* Cabeçalho na largura toda: o nome à esquerda e, abaixo dele, o indicador centralizado na página. A base do
