@@ -26,8 +26,8 @@ interface BustProps {
   drag: RefObject<DragState>
   /** Fração das partículas do furacão (qualidade adaptativa). */
   particles: number
-  /** Para onde a troca pode ir, em ordem: dela sai a próxima vida preparada nos bastidores (Props). */
-  candidatas: readonly PropId[]
+  /** A próxima vida (preparada já, se ainda não estiver). */
+  proxima: PropId
   /** Estado da cena por quadro: aqui se marca o 1º quadro com o busto (o relógio do carrossel só anda depois dele). */
   palco: Palco
 }
@@ -72,7 +72,7 @@ function Movimento({ expr, pointer, drag, rig, head, frame }: MovimentoProps) {
 }
 
 /** O busto do S13 com expressão da vida, piscar, olhar que segue o ponteiro, arrasto, adereço e furacão. */
-export function Bust({ expr, prop, candidatas, pointer, drag, particles, palco }: BustProps) {
+export function Bust({ expr, prop, proxima, pointer, drag, particles, palco }: BustProps) {
   const { scene } = useGlb(bustUrl)
   const gl = useThree((s) => s.gl)
   const camera = useThree((s) => s.camera)
@@ -126,7 +126,7 @@ export function Bust({ expr, prop, candidatas, pointer, drag, particles, palco }
           <group name="bust">
             <primitive object={scene} />
           </group>
-          <Props id={prop} candidatas={candidatas} palco={palco} emCena={emCena} />
+          <Props id={prop} proxima={proxima} palco={palco} emCena={emCena} />
           <Vortex skin={rig.skin} toGlb={rig.skinToGlb} fraction={particles} onPronto={onVortex} />
           {emCena && <Movimento expr={expr} pointer={pointer} drag={drag} rig={rig} head={head} frame={frame} />}
         </group>

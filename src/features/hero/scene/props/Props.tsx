@@ -4,7 +4,6 @@ import type * as THREE from 'three'
 import type { PropId } from '../../../../content/journey'
 import { VIDAS, posicaoNaOrdem, useCarga } from '../carga'
 import type { Palco } from '../palco'
-import { proximaNosBastidores } from '../../model/bastidores'
 import { BASTIDOR, fixarProgramas, prepararVida } from '../preparo'
 import { Ai } from './ai/Ai'
 import { Empreendedor } from './empreendedor/Empreendedor'
@@ -52,7 +51,7 @@ function Vida({ id }: { id: PropId }) {
   }
 }
 
-/** A próxima preparada depois de uma troca espera a entrada da vida nova terminar (1 s): nada é montado na troca. */
+/** A instância nova da vida que acabou de sair espera a entrada da seguinte terminar (1 s): nada é montado na troca. */
 const RENOVAR_MS = 1500
 /** Depois de uma preparação que falhou, a próxima tentativa (ms). */
 const NOVA_TENTATIVA_MS = 2000
@@ -102,11 +101,10 @@ interface BastidorProps {
   id: PropId
   /** A vida do carrossel agora: aparece (ela está pronta: o relógio só troca para uma vida pronta). */
   atual: boolean
-  /**
-   * Uma troca acabou de acontecer: a vida espera a entrada da atual terminar (RENOVAR_MS) para montar — nada é montado
-   * na troca. Uma vez montada, fica.
-   */
-  aguardar: boolean
+  /** A próxima do carrossel: a instância renovada monta já, sem esperar RENOVAR_MS. */
+  proxima: boolean
+  /** Instância nova de uma vida que já esteve em cena (monta depois de RENOVAR_MS, ou já, se for a vez dela). */
+  renovada: boolean
   palco: Palco
   /** A cena já apareceu (o busto): antes dela, nenhuma vida sai dos bastidores. */
   emCena: boolean
@@ -118,16 +116,24 @@ interface BastidorProps {
  * naquele instante (efeitos e relógio começam ali). O grupo da vida atual se chama `prop` (gancho de depuração).
  * Desmontada sem nunca ter aparecido, descarta o que a vida criou (os efeitos dela nunca rodaram).
  */
-function Bastidor({ id, atual, aguardar, palco, emCena }: BastidorProps) {
+function Bastidor({ id, atual, proxima, renovada, palco, emCena }: BastidorProps) {
   const grupo = useRef<THREE.Group>(null)
   const preparando = useRef(false)
   const apareceu = useRef(false)
   const montado = useRef(true)
   const [pronta, setPronta] = useState(false)
-  const [liberada, setLiberada] = useState(!aguardar)
-  if (!liberada && (atual || !aguardar)) setLiberada(true)
+  const [montada, setMontada] = useState(!renovada)
   const [descartes] = useState(() => new Set<Descartavel>())
   const visivel = atual && pronta && emCena
+  useEffect(() => {
+    if (montada) return
+    const t = setTimeout(() => {
+      setMontada(true)
+    }, RENOVAR_MS)
+    return () => {
+      clearTimeout(t)
+    }
+  }, [montada])
   useEffect(() => {
     if (visivel) apareceu.current = true
   }, [visivel])
@@ -167,7 +173,7 @@ function Bastidor({ id, atual, aguardar, palco, emCena }: BastidorProps) {
   return (
     <group ref={grupo} name={visivel ? 'prop' : `bastidor-${id}`} userData={BASTIDOR}>
       <Activity mode={visivel ? 'visible' : 'hidden'}>
-        <BastidorContext value={descartes}>{(liberada || atual) && <Vida id={id} />}</BastidorContext>
+        <BastidorContext value={descartes}>{(montada || atual || proxima) && <Vida id={id} />}</BastidorContext>
       </Activity>
     </group>
   )
@@ -176,55 +182,35 @@ function Bastidor({ id, atual, aguardar, palco, emCena }: BastidorProps) {
 interface PropsProps {
   /** A vida atual. */
   id: PropId
-  /**
-   * Para onde a troca pode ir, em ordem: a escolhida no indicador (só ela) ou as seguintes do carrossel, sem a atual e
-   * sem as que falharam. Dela sai a próxima preparada (model/bastidores.ts).
-   */
-  candidatas: readonly PropId[]
+  /** A próxima (a escolhida no indicador ou a seguinte do carrossel). */
+  proxima: PropId
   palco: Palco
   /** A cena já apareceu (Bust): a vida sai dos bastidores no mesmo commit do busto. */
   emCena: boolean
 }
 
 /**
- * Nos bastidores só a vida atual e a próxima (D-138d): no primeiro acesso, a inicial e a seguinte; a cada troca, entra
- * só a nova próxima (depois de RENOVAR_MS). As outras seguem baixando (carga.ts) e montam quando chegar a vez delas de
- * serem a próxima; os programas de shader ficam presos (fixarProgramas), e remontar não recompila. A que sai de cena
- * desmonta (o adereço descarta o que criou, como antes); voltando a ser a próxima, monta uma instância nova.
+ * Todas as vidas baixadas ficam montadas e prontas nos bastidores; a atual aparece. A que sai de cena desmonta (o
+ * adereço descarta o que criou, como antes) e dá lugar a uma instância nova, escondida, para a próxima visita.
  */
-export function Props({ id, candidatas, palco, emCena }: PropsProps) {
+export function Props({ id, proxima, palco, emCena }: PropsProps) {
   const { baixadas } = useCarga()
   const [anterior, setAnterior] = useState(id)
   const [visitas, setVisitas] = useState<Partial<Record<PropId, number>>>({})
-  // Trocas de vida: quantas houve e até qual a entrada já terminou (RENOVAR_MS depois); diferentes = entrada em curso.
-  const [trocas, setTrocas] = useState(0)
-  const [assentadas, setAssentadas] = useState(0)
-  const [reservada, setReservada] = useState<PropId | null>(null)
   if (anterior !== id) {
     setAnterior(id)
     setVisitas((v) => ({ ...v, [anterior]: (v[anterior] ?? 0) + 1 }))
-    setTrocas((n) => n + 1)
   }
-  const proxima = proximaNosBastidores(candidatas, baixadas, reservada) ?? null
-  if (proxima !== reservada) setReservada(proxima)
-  useEffect(() => {
-    if (trocas === 0) return
-    const t = setTimeout(() => {
-      setAssentadas(trocas)
-    }, RENOVAR_MS)
-    return () => {
-      clearTimeout(t)
-    }
-  }, [trocas])
   useFrame(({ gl }) => {
     fixarProgramas(gl)
   })
-  return VIDAS.filter((v) => baixadas.has(v) && (v === id || v === proxima)).map((v) => (
+  return VIDAS.filter((v) => baixadas.has(v)).map((v) => (
     <Bastidor
       key={`${v}-${String(visitas[v] ?? 0)}`}
       id={v}
       atual={v === id}
-      aguardar={trocas !== assentadas}
+      proxima={v === proxima}
+      renovada={visitas[v] !== undefined}
       palco={palco}
       emCena={emCena}
     />
