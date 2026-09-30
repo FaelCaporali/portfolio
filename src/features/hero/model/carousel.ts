@@ -32,6 +32,11 @@ export interface TickInput {
   jump: boolean
   /** Pausa própria da vida (s), no lugar da padrão (Stage.hold; a vida qa, decisão do Fael Q17). */
   hold?: number
+  /**
+   * Há vida pronta para entrar (#138; padrão: sim). Sem nenhuma, a atual segura a pausa (a escolha no indicador espera
+   * também) e, se a saída já tinha começado, a atual volta do furacão: nunca o furacão parado sem busto.
+   */
+  nextReady?: boolean
 }
 
 export interface Tick {
@@ -43,27 +48,33 @@ export interface Tick {
   phase: Phase | null
 }
 
+const PARADO: Tick = { dissolve: 0, next: false, phase: null }
+
+/** Fim da pausa: sai (ou, sem furacão, troca direto) se o tempo acabou ou há escolha, e a próxima está pronta. */
+function hold(c: CarouselClock, input: TickInput): Tick {
+  const pausa = input.hold ?? (input.first ? TIMING.holdFirst : TIMING.hold)
+  if ((!input.jump && c.time < pausa) || input.nextReady === false) return PARADO
+  c.time = 0
+  if (input.reducedMotion) return { dissolve: 0, next: true, phase: null }
+  c.phase = 'out'
+  return { dissolve: 0, next: false, phase: 'out' }
+}
+
 /** Avança o relógio (mutável, vive num ref) e diz o que o quadro aplica. */
 export function tick(c: CarouselClock, dt: number, input: TickInput): Tick {
-  if (c.phase === 'hold' && input.held && !input.jump) return { dissolve: 0, next: false, phase: null }
+  if (c.phase === 'hold' && input.held && !input.jump) return PARADO
   c.time += Math.min(dt, MAX_DT)
 
-  if (c.phase === 'hold') {
-    if (!input.jump && c.time < (input.hold ?? (input.first ? TIMING.holdFirst : TIMING.hold))) {
-      return { dissolve: 0, next: false, phase: null }
-    }
-    c.time = 0
-    if (input.reducedMotion) return { dissolve: 0, next: true, phase: null }
-    c.phase = 'out'
-    return { dissolve: 0, next: false, phase: 'out' }
-  }
+  if (c.phase === 'hold') return hold(c, input)
 
   if (c.phase === 'out') {
     const dissolve = DISSOLVE_MAX * smooth(Math.min(c.time / TIMING.out, 1))
     if (c.time < TIMING.out) return { dissolve, next: false, phase: null }
     c.time = 0
     c.phase = 'in'
-    return { dissolve, next: true, phase: 'in' }
+    // Sem vida pronta para entrar (a escolhida no indicador depois da saída começar, ainda baixando): a atual volta
+    // do furacão e a troca espera na pausa — nunca o furacão parado sem busto.
+    return { dissolve, next: input.nextReady !== false, phase: 'in' }
   }
 
   const dissolve = DISSOLVE_MAX * (1 - smooth(Math.min(c.time / TIMING.in, 1)))

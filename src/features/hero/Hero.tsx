@@ -1,6 +1,6 @@
 import { Suspense, lazy, useCallback, useRef, useState, useSyncExternalStore } from 'react'
 import { useNavigation } from 'react-router'
-import { OPENING, stages } from '../../content/journey'
+import { OPENING, stages, type PropId } from '../../content/journey'
 import { profile } from '../../content/profile'
 import { cyclicAt } from '../../lib/array'
 import { HeroCopy } from './HeroCopy'
@@ -10,10 +10,18 @@ import { useDragRotation } from './hooks/useDragRotation'
 import { useFreeArea } from './hooks/useFreeArea'
 import { usePointerGaze } from './hooks/usePointerGaze'
 import type { Phase } from './model/carousel'
-import { advance, createLineup } from './model/lineup'
+import { advance, candidates, createLineup, loadOrder, peek, skipFailed, type Lineup } from './model/lineup'
 import { readHeroOptions, type HeroOptions } from './model/options'
 
 const IDS = stages.map((s) => s.id)
+/** Os adereços na ordem em que a cena deve carregá-los (a fila dos glb, scene/carga.ts) e o da próxima vida. */
+const loadProps = (l: Lineup, chosen: number | null, failed?: ReadonlySet<number>) => ({
+  order: loadOrder(l, chosen).map((i) => cyclicAt(stages, i).prop),
+  next: cyclicAt(stages, peek(l, chosen)).prop,
+  // Para onde a troca pode ir: só a escolhida no indicador ou, sem escolha, as seguintes da volta em ordem (nunca a
+  // atual, nunca uma vida cujo glb falhou).
+  candidates: candidates(l, chosen, failed).map((i) => cyclicAt(stages, i).prop),
+})
 
 /*
  * A cena 3D (three.js) só no navegador: o build pré-renderiza o texto do herói (react-router.config.ts) sem carregar
@@ -61,6 +69,7 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
   const [opening, setOpening] = useState(true)
   const [initialLineup] = useState(() => createLineup(stages.length, start))
   const lineup = useRef(initialLineup)
+  const [carga, setCarga] = useState(() => loadProps(initialLineup, null))
   const [phase, setPhase] = useState<Phase>('hold')
   const { drag, handlers } = useDragRotation()
   const pointer = usePointerGaze()
@@ -70,22 +79,40 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
   // Vida escolhida no indicador: o ref é lido pelo relógio a cada quadro; o estado destaca o ponto na hora.
   const requested = useRef<number | null>(null)
   const [pending, setPending] = useState<number | null>(null)
-  const next = useCallback(() => {
-    const target = requested.current
+  // Vidas cujo glb falhou (#138, a cena avisa): saem da volta e do indicador até o glb chegar.
+  const failed = useRef<ReadonlySet<number>>(new Set())
+  const next = useCallback((prop: PropId) => {
+    // A vida para onde a cena troca (a escolhida no indicador ou a 1ª pronta da volta).
+    const i = stages.findIndex((s) => s.prop === prop)
+    const target = i < 0 ? requested.current : i
     requested.current = null
     setPending(null)
-    lineup.current = advance(lineup.current, stages.length, target)
+    lineup.current = advance(lineup.current, stages.length, target, Math.random, failed.current)
     setIndex(lineup.current.current)
+    setCarga(loadProps(lineup.current, null, failed.current))
     setOpening(false)
+  }, [])
+  const onFailures = useCallback((props: ReadonlySet<PropId>) => {
+    failed.current = new Set(stages.flatMap((s, i) => (props.has(s.prop) ? [i] : [])))
+    // A escolha no indicador numa vida que falhou é descartada: o carrossel segue.
+    if (requested.current !== null && failed.current.has(requested.current)) {
+      requested.current = null
+      setPending(null)
+    }
+    lineup.current = skipFailed(lineup.current, stages.length, failed.current)
+    setCarga(loadProps(lineup.current, requested.current, failed.current))
   }, [])
   const stage = cyclicAt(stages, index)
   // Indo para outra página (o botão da trajetória): a cena para, e o quadro 3D não disputa o processador com ela.
   const leavingPage = useNavigation().state !== 'idle'
   const select = (id: string) => {
     const i = stages.findIndex((s) => s.id === id)
+    // Vida cujo glb falhou: o clique é descartado e o carrossel segue (o aviso visual é da tarefa 143).
+    if (failed.current.has(i)) return
     const target = i === index ? null : i
     requested.current = target
     setPending(target)
+    setCarga(loadProps(lineup.current, target, failed.current))
   }
 
   return (
@@ -101,6 +128,10 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
             pointer={pointer}
             drag={drag}
             requested={requested}
+            order={carga.order}
+            next={carga.next}
+            candidates={carga.candidates}
+            onFailures={onFailures}
             dragHandlers={handlers}
             onPhase={setPhase}
             onNext={next}

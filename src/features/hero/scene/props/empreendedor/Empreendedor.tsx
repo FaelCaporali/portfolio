@@ -9,7 +9,7 @@
  * sozinho. A vida remonta o componente a cada volta do carrossel, então o relógio recomeça do 0. Movimento reduzido:
  * estado final parado. Sem o clip: estática.
  */
-import { useGLTF } from '@react-three/drei'
+import { useGlb } from '../../carga'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useLayoutEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
@@ -33,7 +33,7 @@ const isMesh = (o: THREE.Object3D): o is THREE.Mesh => (o as Partial<THREE.Mesh>
 
 /** Clona a cena (geometrias e texturas seguem do cache do useGLTF) e troca cada material por um com a desintegração. */
 function useEmpreendedorScene() {
-  const { scene, animations } = useGLTF(empreendedorUrl, false)
+  const { scene, animations } = useGlb(empreendedorUrl)
   const cena = useMemo(() => {
     const root = scene.getObjectByName('emp_todos')
     if (!root) throw new Error('empreendedor.glb sem a raiz emp_todos')
@@ -110,5 +110,3 @@ export function Empreendedor() {
 
   return <primitive object={root} />
 }
-
-useGLTF.preload(empreendedorUrl, false)

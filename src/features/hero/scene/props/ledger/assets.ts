@@ -2,7 +2,7 @@
  * Peças do adereço: geometria e materiais PBR do glb (3d/tools/prop_financeiro.py), clonados por montagem com a
  * desintegração; texturas geradas no site; geometrias do cursor e da linha de tendência.
  */
-import { useGLTF } from '@react-three/drei'
+import { useGlb } from '../../carga'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useMemo } from 'react'
 import * as THREE from 'three'
@@ -84,7 +84,7 @@ function useSceneEnv(pairs: readonly (readonly [THREE.MeshStandardMaterial, numb
 const basic = (color: string) => withDissolve(new THREE.MeshBasicMaterial({ color }))
 
 export function useLedgerAssets(points: readonly THREE.Vector3[]) {
-  const { nodes } = useGLTF(ledgerUrl, false) as unknown as { nodes: Nodes }
+  const { nodes } = useGlb(ledgerUrl) as unknown as { nodes: Nodes }
   const glb = useMemo(
     () => ({
       frame: part(nodes, 'Frame'),
@@ -166,5 +166,3 @@ export function useLedgerAssets(points: readonly THREE.Vector3[]) {
 
   return { glb, mats, sheet, cursor, trend, dot }
 }
-
-useGLTF.preload(ledgerUrl, false)

@@ -80,8 +80,10 @@ export function medirTela(
   repouso: THREE.Matrix4,
   cabeca: Float32Array,
   robo: { cantos: Float32Array; base: Float32Array; mundo: THREE.Matrix4 } | null,
+  /** A vida cujo texto conta (a amostra dela); sem ela, o texto em cena. */
+  vida?: string,
 ): Medida | null {
-  const ref = medirReferencias(canvas, camera, w, h, repouso, null)
+  const ref = medirReferencias(canvas, camera, w, h, repouso, null, vida)
   if (!ref || cabeca.length < 30) return null
   const cab = caixaPx(cabeca, repouso, camera, w, h)
   const r = robo ? caixaPx(robo.cantos, robo.mundo, camera, w, h) : null

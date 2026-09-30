@@ -63,8 +63,10 @@ export function medirTela(
   h: number,
   repouso: THREE.Matrix4,
   headset: readonly (readonly [number, number, number])[],
+  /** A vida cujo texto conta (a amostra dela); sem ela, o texto em cena. */
+  vida?: string,
 ): Medida | null {
-  const ref = medirReferencias(canvas, camera, w, h, repouso, null)
+  const ref = medirReferencias(canvas, camera, w, h, repouso, null, vida)
   if (!ref) return null
   const c = { ...ref.cabeca }
   const px = (p: readonly [number, number, number]) => {

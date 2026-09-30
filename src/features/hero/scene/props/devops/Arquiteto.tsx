@@ -10,7 +10,7 @@
  * desintegração. Relógio: o ciclo 0 conta desde a montagem no auge do furacão (montada já parada, começa em
  * TIMING.in); com a pausa segurada o ciclo recomeça com o fundo limpo. Movimento reduzido: estado final parado.
  */
-import { useGLTF } from '@react-three/drei'
+import { useGlb } from '../../carga'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
@@ -18,6 +18,7 @@ import devopsUrl from '../../../../../../3d/export/props/devops.glb?url'
 import { TIMING } from '../../../model/carousel'
 import { alvoDoAdereco } from '../../../model/gaze'
 import { dissolveUniforms, withDissolve } from '../../dissolve'
+import { criarPintor } from '../pintor'
 import { criarAncora, type Grupo } from '../ancora'
 import { useDisposal } from '../materials'
 import { GRUPO_MESA, formato, type Formato } from './composicao'
@@ -27,6 +28,7 @@ import { carregarAtlas } from './icones'
 import { medirReferencias } from './referencias'
 import { T, criarQuadro, quadroEm, quadroFinal } from './roteiro'
 import { criarTracos, parear } from './tracos'
+import type { Referencias } from './zonas'
 
 const PRANCHETA = 'arq_prancheta'
 const FOLHA = 'arq_folha'
@@ -34,6 +36,8 @@ const FOLHA = 'arq_folha'
 const FUNDO: Grupo = { escala: 1, desloc: [0, 0, 0] }
 /** Com a pausa segurada, o ciclo recomeça este tanto depois do fim (s), se a saída não começou. */
 const RECOMECA = 0.3
+/** A vida no carrossel (a amostra do texto dela no herói, HeroCopy). */
+const VIDA = 'architect'
 
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -54,7 +58,7 @@ function marcoAtual(marcos: readonly Marco[], t: number) {
 
 /** Clona a cena (geometrias e texturas seguem do cache do useGLTF) e troca cada material por um com a desintegração. */
 function useArquitetoScene() {
-  const { scene } = useGLTF(devopsUrl, false)
+  const { scene } = useGlb(devopsUrl)
   const cena = useMemo(() => {
     const raiz = scene.getObjectByName('devops')
     if (!raiz) throw new Error('devops.glb sem a raiz devops')
@@ -96,20 +100,30 @@ function useArquitetoScene() {
     const q = criarQuadro()
     const v = new THREE.Vector3()
     const w = new THREE.Vector3()
-    /** Diagrama para a tela (no resize, nunca por quadro); precisa do atlas carregado. */
-    const ajustarFundo = (
-      canvas: HTMLCanvasElement,
+    /**
+     * Planta (uma vez) e diagrama em passos (#138), e no fim tudo de uma vez: diagrama, planta e traços, como antes.
+     * Cancelado no meio, a planta pintada e não mostrada descarta as texturas.
+     */
+    function* ajuste(
       camera: THREE.Camera,
       f: Formato,
+      ref: Referencias,
       larg: number,
       alt: number,
       img: HTMLImageElement,
-    ) => {
-      const ref = medirReferencias(canvas, camera, larg, alt, grupoFundo.matrixWorld, mesa)
-      if (!ref) return
-      fundo.ajustar(camera, f, ref, img)
-      if (!planta) return
-      planta.pintar(img)
+      subir: (t: THREE.Texture) => void,
+    ): Generator<unknown, void> {
+      let daPlanta: { aplicar: () => void; descartar: () => void } | null = null
+      let trocar: (() => void) | null = null
+      try {
+        if (planta) daPlanta = yield* planta.pintar(img, subir)
+        trocar = yield* fundo.ajustar(camera, f, ref, img, subir)
+      } finally {
+        if (!trocar) daPlanta?.descartar()
+      }
+      trocar()
+      if (!planta || !daPlanta) return
+      daPlanta.aplicar()
       // Cada traço: de uma caixa da decomposição na planta até um ícone do diagrama (no resize, não por quadro).
       const voos = parear(ORIGENS_UV, fundo.estado.marcos).map(({ origem, destino }) => ({
         de: planta.local(origem[0], origem[1], new THREE.Vector3()),
@@ -117,6 +131,42 @@ function useArquitetoScene() {
         chega: destino.t,
       }))
       tracos.definir(voos)
+    }
+    /** Pintura do diagrama em curso (em fatias): um ajuste novo cancela o anterior. */
+    const pintor = criarPintor()
+    /**
+     * Diagrama para a tela (no resize, nunca por quadro); precisa do atlas carregado. O texto que conta é a amostra
+     * parada desta vida (HeroCopy): o mesmo nos bastidores e em cena.
+     */
+    const ajustarFundo = (
+      gl: THREE.WebGLRenderer,
+      camera: THREE.Camera,
+      f: Formato,
+      larg: number,
+      alt: number,
+      img: HTMLImageElement,
+    ) =>
+      pintor.pedir(`${String(larg)}x${String(alt)}`, () => {
+        const ref = medirReferencias(gl.domElement, camera, larg, alt, grupoFundo.matrixWorld, mesa, VIDA)
+        if (!ref) return null
+        const subir = (t: THREE.Texture) => {
+          gl.initTexture(t)
+        }
+        return ajuste(camera, f, ref, larg, alt, img, subir)
+      })
+    const precisaFundo = (larg: number, alt: number) => pintor.precisa(`${String(larg)}x${String(alt)}`)
+    /**
+     * Nos bastidores (Props.tsx, #138): o diagrama, a planta e os traços prontos antes de a vida entrar, como estarão
+     * no 1º quadro dela (a mesa já no formato da tela, que em cena o componente ajusta).
+     */
+    copy.userData.prepararFundo = async (gl: THREE.WebGLRenderer, camera: THREE.Camera, w: number, h: number) => {
+      const img = await carregarAtlas()
+      await document.fonts.ready
+      const f = formato(w, h)
+      Object.assign(grupo, GRUPO_MESA[f])
+      copy.updateMatrixWorld(true)
+      ajustarFundo(gl, camera, f, w, h, img)
+      await pintor.pronta()
     }
     const planos = (tempo: number, parar = false) => {
       fundo.atualizar(q, tempo, parar)
@@ -152,30 +202,30 @@ function useArquitetoScene() {
       alvoDoAdereco.peso = 0
     }
     const dispose = () => {
+      pintor.cancelar()
       materials.forEach((m) => m.dispose())
       fundo.dispose()
       planta?.revela.dispose()
       tracos.dispose()
     }
-    return { root: copy, grupo, ajustarFundo, pose, parado, dispose }
+    return { root: copy, grupo, ajustarFundo, precisaFundo, pose, parado, dispose }
   }, [scene])
   useDisposal(cena)
   return cena
 }
 
 export function Arquiteto() {
-  const { root, grupo, ajustarFundo, pose, parado } = useArquitetoScene()
+  const { root, grupo, ajustarFundo, precisaFundo, pose, parado } = useArquitetoScene()
   const forma = useThree((s) => formato(s.size.width, s.size.height))
   const [reduced] = useState(prefersReducedMotion)
   const relogio = useRef({ c: 0, t: 0, iniciado: false })
-  // Atlas dos ícones (carregado uma vez) e a tela para a qual o diagrama foi pintado.
+  // Atlas dos ícones (carregado uma vez).
   const atlas = useRef<HTMLImageElement | null>(null)
-  const ajustado = useRef({ w: 0, h: 0, quadros: 0, img: false })
+  const quadros = useRef(0)
 
   useLayoutEffect(() => {
+    // A prancheta no formato da tela (outra tela, outro formato: o diagrama repinta pela tela nova).
     Object.assign(grupo, GRUPO_MESA[forma])
-    // A prancheta mudou de tamanho: as zonas do fundo são refeitas no próximo quadro.
-    ajustado.current.w = 0
   }, [grupo, forma])
 
   useEffect(() => {
@@ -195,15 +245,12 @@ export function Arquiteto() {
   }, [])
 
   useFrame(({ camera, size, gl }, delta) => {
-    const a = ajustado.current
-    a.quadros += 1
+    quadros.current += 1
     const img = atlas.current
-    // O primeiro quadro desenha a âncora; o 30º repinta com o texto da UI já na fonte final.
-    if (img && a.quadros > 1 && (a.w !== size.width || a.h !== size.height || !a.img || a.quadros === 30)) {
-      ajustarFundo(gl.domElement, camera, formato(size.width, size.height), size.width, size.height, img)
-      a.w = size.width
-      a.h = size.height
-      a.img = true
+    // Pintado nos bastidores, não repinta; aqui só no resize ou com as fontes chegando depois (o 1º quadro desenha
+    // a âncora, se a vida não passou pelos bastidores).
+    if (img && quadros.current > 1 && precisaFundo(size.width, size.height)) {
+      ajustarFundo(gl, camera, formato(size.width, size.height), size.width, size.height, img)
     }
     if (reduced) {
       parado()
@@ -224,5 +271,3 @@ export function Arquiteto() {
 
   return <primitive object={root} />
 }
-
-useGLTF.preload(devopsUrl, false)

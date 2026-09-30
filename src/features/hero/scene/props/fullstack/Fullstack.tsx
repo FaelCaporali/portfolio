@@ -11,7 +11,7 @@
  * desintegração e pulsa muito de leve (troca de janela). Atrás do busto, a chuva de código (chuva.ts, F10), presa ao
  * mundo como o notebook. Movimento reduzido: luz constante e chuva parada. O notebook não se move.
  */
-import { useGLTF } from '@react-three/drei'
+import { useGlb } from '../../carga'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useLayoutEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
@@ -55,7 +55,7 @@ const isMesh = (o: THREE.Object3D): o is THREE.Mesh => (o as Partial<THREE.Mesh>
 
 /** Clona a cena (geometrias e texturas seguem do cache do useGLTF) e troca cada material por um com a desintegração. */
 function useFullstackScene() {
-  const { scene } = useGLTF(fullstackUrl, false)
+  const { scene } = useGlb(fullstackUrl)
   const cena = useMemo(() => {
     const root = scene.getObjectByName('fullstack')
     if (!root) throw new Error('fullstack.glb sem a raiz fullstack')
@@ -134,5 +134,3 @@ export function Fullstack() {
 
   return <primitive object={root} />
 }
-
-useGLTF.preload(fullstackUrl, false)

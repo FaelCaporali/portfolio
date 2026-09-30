@@ -6,6 +6,7 @@
  * grupo do fundo (preso ao mundo). Por quadro: só uniformes. Brilho contido (o rosto domina); apaga com uD.
  */
 import * as THREE from 'three'
+import { desenhado } from '../../pausa'
 import { blocoCartoes } from './cartoes'
 import { blocoEstreito } from './bloco_estreito'
 import { blocoFluxo } from './bloco_fluxo'
@@ -32,7 +33,7 @@ const RESTO_BASE = 90
  * O fluxo principal (J74, zonas.ts): na faixa de cima (com o assíncrono na coluna entre o título e a cabeça, se
  * houver), no alto da base ou, sem as duas, a silhueta do retrato.
  */
-function pintarFluxo(tl: Tela, z: Zonas) {
+function* pintarFluxo(tl: Tela, z: Zonas): Generator<void, void> {
   const fx = z.fluxo
   if (fx?.onde === 'silhueta') {
     blocoEstreito({ ...tl, f: 'estreito' }, fx.q, null)
@@ -43,31 +44,42 @@ function pintarFluxo(tl: Tela, z: Zonas) {
   const xEvento = z.esq && noTopo ? z.esq.x0 + 0.28 * (z.esq.x1 - z.esq.x0) : Number.POSITIVE_INFINITY
   const s = fx ? blocoFluxo({ ...tl, f: fx.estilo }, fx.q, xEvento) : null
   if (!z.esq) return
+  yield
   blocoAssincrono(tl, z.esq, s && noTopo ? s.y : z.esq.y0)
 }
 
 /** Pinta o diagrama inteiro no pincel (recortado pelo canvas dele). */
-function pintar(tl: Tela, z: Zonas) {
+function* pintar(tl: Tela, z: Zonas): Generator<void, void> {
   if (tl.f === 'estreito') {
     blocoEstreito(tl, z.esq, z.dir)
     return
   }
-  pintarFluxo(tl, z)
+  yield* pintarFluxo(tl, z)
+  yield
   const fx = z.fluxo
   if (z.dir) {
     const r = { ...z.dir }
     r.y0 = blocoObservabilidade(tl, r) + 8
+    yield
     r.y0 = blocoIntegracoes(tl, r) + 8
+    yield
     if (r.y1 - r.y0 > 50) blocoRuntime(tl, r)
+    yield
   }
-  if (z.dirBase) blocoEntrega(tl, z.dirBase)
+  if (z.dirBase) {
+    blocoEntrega(tl, z.dirBase)
+    yield
+  }
   if (!z.base) return
   // Sem coluna entre o título e a cabeça (1024), o assíncrono vai para cima dos cartões.
   const base = { ...z.base }
   // Com o fluxo no alto da base, o assíncrono e os cartões ficam com o resto, se ele tiver a altura mínima da base.
   if (fx?.onde === 'base') base.y0 = fx.q.y1 + 8
   if (base.y1 - base.y0 < RESTO_BASE) return
-  if (!z.esq) base.y0 = blocoAssincronoLinha(tl, base) + 6
+  if (!z.esq) {
+    base.y0 = blocoAssincronoLinha(tl, base) + 6
+    yield
+  }
   blocoCartoes(tl, base)
 }
 
@@ -104,43 +116,77 @@ export function criarFundo() {
     return raio.ray.intersectPlane(plano, out) ?? out.set(0, 0, Z_FUNDO)
   }
 
-  /** Pinta e encaixa os painéis para as referências `ref` (no resize). */
-  const ajustar = (camera: THREE.Camera, f: Formato, ref: Referencias, img: HTMLImageElement) => {
+  /**
+   * Pinta e encaixa os painéis para as referências `ref` (no resize), em passos (#138: quem roda fatia, e.g.
+   * emFatias): o pincel grava, a pintura toca aos poucos e as texturas sobem à GPU (`subir`) uma por passo; painéis,
+   * marcos e decisões só mudam no último passo, com tudo pronto. Cancelado no meio, descarta as texturas novas.
+   */
+  function* ajustar(
+    camera: THREE.Camera,
+    f: Formato,
+    ref: Referencias,
+    img: HTMLImageElement,
+    subir: (t: THREE.Texture) => void,
+  ): Generator<unknown, () => void> {
     const pai = paineis[0]?.mesh.parent
-    if (!pai) return
+    if (!pai) return () => undefined
     // A matriz do grupo é a da âncora no último quadro (a cabeça em repouso); recalcular aqui misturaria o giro atual.
     camera.updateMatrixWorld()
-    inv.copy(pai.matrixWorld).invert()
+    const invInicio = pai.matrixWorld.clone().invert()
     const zonas = zonasPara(f, ref)
     const rects = paineisPara(zonas)
     const escala = Math.min(ESCALA_MAX, window.devicePixelRatio || 1)
-    estado.zonas = zonas
-    estado.ref = ref
-    estado.marcos = []
+    let marcos: typeof estado.marcos = []
+    let alarme: typeof estado.alarme = estado.alarme
     let pares: Par[] = []
-    for (const p of paineis) {
-      const q: Quadro | null = rects[p.nome]
-      if (!q) {
-        p.mesh.visible = false
-        continue
+    const pintados: { p: (typeof paineis)[number]; q: Quadro; troca: ReturnType<Revela['preparar']> }[] = []
+    let pronto = false
+    try {
+      for (const p of paineis) {
+        const q: Quadro | null = rects[p.nome]
+        if (!q) continue
+        const pincel = new Pincel(q, escala, true)
+        yield* pintar({ p: pincel, img, f }, zonas)
+        if (!marcos.length) {
+          marcos = pincel.marcos
+          alarme = pincel.alvos.alarme ?? null
+          pares = pincel.pares
+        }
+        yield
+        yield* pincel.pintura()
+        const troca = p.r.preparar(pincel.cor, pincel.dados)
+        pintados.push({ p, q, troca })
+        for (const t of troca.novas) {
+          // O desenho do canvas termina na GPU antes, fora da thread: a subida é só a cópia.
+          yield desenhado(t.image as HTMLCanvasElement)
+          subir(t)
+          yield
+        }
       }
-      const pincel = new Pincel(q, escala)
-      pintar({ p: pincel, img, f }, zonas)
-      if (!estado.marcos.length) {
-        estado.marcos = pincel.marcos
-        estado.alarme = pincel.alvos.alarme ?? null
-        pares = pincel.pares
-      }
-      p.r.texturas(pincel.cor, pincel.dados)
-      noPlano(q.x0, q.y0, camera, ref.w, ref.h, a)
-      noPlano(q.x1, q.y1, camera, ref.w, ref.h, b)
-      p.mesh.position.set((a.x + b.x) / 2, (a.y + b.y) / 2, Z_FUNDO)
-      p.mesh.scale.set(Math.abs(b.x - a.x), Math.abs(a.y - b.y), 1)
-      p.mesh.userData.rect = { ...q }
-      p.mesh.visible = true
+      pronto = true
+    } finally {
+      if (!pronto) for (const { troca } of pintados) for (const t of troca.novas) t.dispose()
     }
-    // Tradeoffs (D18): o tamanho de destaque é 1,7× o ícone do fluxo principal, limitado pelo palco de cada par.
-    decisoes.definir(pares, img, TAM[f].icone * 1.7, (x, y, out) => noPlano(x, y, camera, ref.w, ref.h, out))
+    // A troca, de uma vez (quem roda chama quando tudo o que aparece junto estiver pronto).
+    return () => {
+      inv.copy(invInicio)
+      estado.zonas = zonas
+      estado.ref = ref
+      estado.marcos = marcos
+      estado.alarme = alarme
+      for (const p of paineis) p.mesh.visible = false
+      for (const { p, q, troca } of pintados) {
+        troca.usar()
+        noPlano(q.x0, q.y0, camera, ref.w, ref.h, a)
+        noPlano(q.x1, q.y1, camera, ref.w, ref.h, b)
+        p.mesh.position.set((a.x + b.x) / 2, (a.y + b.y) / 2, Z_FUNDO)
+        p.mesh.scale.set(Math.abs(b.x - a.x), Math.abs(a.y - b.y), 1)
+        p.mesh.userData.rect = { ...q }
+        p.mesh.visible = true
+      }
+      // Tradeoffs (D18): o tamanho de destaque é 1,7× o ícone do fluxo principal, limitado pelo palco de cada par.
+      decisoes.definir(pares, img, TAM[f].icone * 1.7, (x, y, out) => noPlano(x, y, camera, ref.w, ref.h, out))
+    }
   }
 
   /** Ponto da tela (px CSS) no plano do fundo, em coordenadas do grupo do fundo (para os traços e o olhar). */

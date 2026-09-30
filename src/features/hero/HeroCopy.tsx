@@ -3,6 +3,7 @@ import { Link } from 'react-router'
 import { stages, type Stage } from '../../content/journey'
 import { journeyLink, profile, profileLinks } from '../../content/profile'
 import { pill } from '../../ui/pill'
+import { useHydrated } from '../../lib/useHydrated'
 import { CopyContacts } from '../contact/CopyContacts'
 import { useFitFontSize } from './hooks/useFitFontSize'
 import { WIDE_QUERY } from './model/layout'
@@ -17,20 +18,33 @@ interface HeroCopyProps {
 }
 
 const SLOTS = stages.map((s) => s.slot)
+/** "Today I am a(n)" / "Yesterday I was a(n)". */
+const abertura = (s: Stage) => `${s.past ? 'Yesterday I was' : 'Today I am'} a${/^[aeiou]/i.test(s.slot) ? 'n' : ''}`
 
 /** Coluna de texto do herói: a vida atual, os títulos, os links e o contato direto. */
 export function HeroCopy({ ref, stage, leaving }: HeroCopyProps) {
   const slotRef = useRef<HTMLSpanElement>(null)
   // Largo (lg): a vida mais longa sempre numa linha, com a fonte do visitante. Abaixo, reserva de duas linhas.
   const slotSize = useFitFontSize(slotRef, SLOTS, WIDE_QUERY)
+  // As amostras só existem no navegador, depois da hidratação: fora do HTML (buscadores e IAs leriam as vidas como
+  // texto escondido) e do caminho do LCP; absolutas e invisíveis, não mexem no layout.
+  const amostras = useHydrated()
   return (
     <div
       ref={ref}
       className="pointer-events-none absolute inset-x-0 bottom-0 px-5 pb-6 text-white sm:px-10 wide:inset-y-0 wide:right-auto wide:flex wide:w-[56%] wide:flex-col wide:justify-center wide:pr-6 wide:pb-0 wide:pl-[7vw] wide:short:pt-20 wide:short:pb-3"
     >
       <h1>
-        <span className="block text-lg text-white/65 lg:text-2xl">
-          {stage.past ? 'Yesterday I was' : 'Today I am'} a{/^[aeiou]/i.test(stage.slot) ? 'n' : ''}
+        <span className="relative block text-lg text-white/65 lg:text-2xl">
+          <span data-vida-texto>{abertura(stage)}</span>
+          {/* Amostras paradas e escondidas de cada vida (#138): a cena 3D pinta o fundo de uma vida antes de ela
+              entrar, medindo o texto dela aqui, na mesma coluna e na mesma fonte (devops/referencias.ts). */}
+          {amostras &&
+            stages.map((s) => (
+              <span key={s.id} data-medida={s.prop} aria-hidden className="invisible absolute inset-x-0 top-0">
+                {abertura(s)}
+              </span>
+            ))}
         </span>{' '}
         {/* Altura reservada para a troca não empurrar o resto: duas linhas no celular (a vida mais longa quebra),
             uma a partir de sm. No largo, useFitFontSize escolhe a maior fonte (até 4,4vw) em que todas cabem numa
@@ -38,9 +52,17 @@ export function HeroCopy({ ref, stage, leaving }: HeroCopyProps) {
         <span
           ref={slotRef}
           style={slotSize ? { fontSize: slotSize } : undefined}
-          className="mt-2 block min-h-[2em] text-[2.75rem] leading-none font-semibold tracking-tight min-[360px]:text-[3rem] sm:min-h-[1em] lg:text-[clamp(2.75rem,4.4vw,5.5rem)]"
+          className="relative mt-2 block min-h-[2em] text-[2.75rem] leading-none font-semibold tracking-tight min-[360px]:text-[3rem] sm:min-h-[1em] lg:text-[clamp(2.75rem,4.4vw,5.5rem)]"
         >
-          <SlotWord text={stage.slot} life={stage.id} leaving={leaving} />
+          <span data-vida-texto>
+            <SlotWord text={stage.slot} life={stage.id} leaving={leaving} />
+          </span>
+          {amostras &&
+            stages.map((s) => (
+              <span key={s.id} data-medida={s.prop} aria-hidden className="invisible absolute inset-x-0 top-0">
+                <SlotWord text={s.slot} life={s.id} leaving={false} medida />
+              </span>
+            ))}
         </span>
       </h1>
       {/* Celular: um título por linha. A partir de sm: numa linha só, separados por um ponto apagado. */}

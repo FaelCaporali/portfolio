@@ -7,6 +7,8 @@
  * Chamado só no resize (nunca por quadro).
  */
 import { PASSO_T } from '../devops/revela'
+import { desenhado } from '../../pausa'
+import { Gravacao } from '../gravacao'
 import type { Marca, Pinta, Quadro } from '../techlead/pincel'
 
 export type { Marca, Ponto, Quadro } from '../techlead/pincel'
@@ -26,9 +28,18 @@ export class Pincel {
   private readonly h: number
   readonly q: Quadro
   readonly escala: number
+  private readonly gravacao: Gravacao | null
+  /** Os contextos de verdade dos dados e do instante do fundo (o `fechar` lê pixels: só depois de tocar). */
+  private readonly dReal: Ctx
+  private readonly ftReal: Ctx
+  private fecharPendente = false
+  private copiaDados: HTMLCanvasElement | null = null
 
-  /** `escala`: px do canvas por unidade do desenho (dpr no fundo). */
-  constructor(q: Quadro, escala: number) {
+  /**
+   * `escala`: px do canvas por unidade do desenho (dpr no fundo). Com `adiado` (fundo, #138), o pincel só grava
+   * enquanto os blocos pintam, e a pintura e o `fechar` tocam depois, em fatias (`pintura`).
+   */
+  constructor(q: Quadro, escala: number, adiado = false) {
     this.q = q
     this.escala = escala
     const w = Math.max(1, Math.ceil((q.x1 - q.x0) * escala))
@@ -41,10 +52,52 @@ export class Pincel {
       if (!ctx) throw new Error('pincel: canvas 2D indisponível')
       return [cv, ctx] as const
     }
-    ;[this.cor, this.c] = novo(2 * this.h)
-    ;[this.dados, this.d] = novo(this.h)
-    ;[this.fundoCor, this.fc] = novo(this.h)
-    this.ft = novo(this.h)[1]
+    const [cor, c] = novo(2 * this.h)
+    const [dados, d] = novo(this.h)
+    const [fundoCor, fc] = novo(this.h)
+    const ft = novo(this.h)[1]
+    this.cor = cor
+    this.dados = dados
+    this.fundoCor = fundoCor
+    this.dReal = d
+    this.ftReal = ft
+    this.gravacao = adiado ? new Gravacao() : null
+    const g = this.gravacao
+    this.c = g ? g.contexto(c) : c
+    this.d = g ? g.contexto(d) : d
+    this.fc = g ? g.contexto(fc) : fc
+    this.ft = g ? g.contexto(ft) : ft
+  }
+
+  /** Toca a pintura gravada (pincel `adiado`) e o `fechar`, um passo por vez; quem roda decide as fatias. */
+  *pintura(): Generator<unknown, void> {
+    if (this.gravacao) yield* this.gravacao.tocar()
+    if (!this.fecharPendente) return
+    this.fecharPendente = false
+    // Em faixas de linhas: cada pixel só depende dele mesmo, e a soma das faixas é o `fechar` inteiro.
+    const w = this.dados.width
+    const h = this.dados.height
+    // A 1ª leitura esperaria a GPU terminar o desenho gravado: ele termina antes, fora da thread.
+    yield desenhado(this.dados)
+    yield desenhado(this.ftReal.canvas)
+    const faixa = Math.max(1, Math.floor(32768 / w))
+    for (let y = 0; y < h; y += faixa) {
+      this.fecharFaixa(y, Math.min(faixa, h - y), w)
+      yield
+    }
+    // O canvas lido pixel a pixel passa a viver na memória da CPU, e subir dele para a GPU é lento (~100 ms): a
+    // textura sobe de uma cópia desenhada (os mesmos texels, conferidos byte a byte na subida).
+    const copia = document.createElement('canvas')
+    copia.width = w
+    copia.height = h
+    copia.getContext('2d')?.drawImage(this.dados, 0, 0)
+    this.copiaDados = copia
+    yield
+  }
+
+  /** O canvas de onde sobe a textura de dados (a cópia, depois do `fechar` em faixas; sem ela, o próprio). */
+  get dadosParaSubir() {
+    return this.copiaDados ?? this.dados
   }
 
   private transformar(ctx: Ctx, k = 0) {
@@ -86,15 +139,21 @@ export class Pincel {
 
   /** Fim da pintura: o instante do fundo vai para o canal B dos dados (o material usa quando o de cima não surgiu). */
   fechar() {
-    const w = this.dados.width
-    const h = this.dados.height
-    const dd = this.d.getImageData(0, 0, w, h)
-    const tt = this.ft.getImageData(0, 0, w, h).data
+    if (this.gravacao) {
+      this.fecharPendente = true
+      return
+    }
+    this.fecharFaixa(0, this.dados.height, this.dados.width)
+  }
+
+  private fecharFaixa(y: number, h: number, w: number) {
+    const dd = this.dReal.getImageData(0, y, w, h)
+    const tt = this.ftReal.getImageData(0, y, w, h).data
     for (let i = 0; i < dd.data.length; i += 4) {
       const a = tt[i + 3] ?? 0
       dd.data[i + 2] = a > 127 ? (tt[i] ?? 0) : 0
     }
-    this.d.putImageData(dd, 0, 0)
+    this.dReal.putImageData(dd, 0, y)
   }
 
   /** Imagem (logo do atlas), surgindo inteira em m.t. */

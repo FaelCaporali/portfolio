@@ -19,8 +19,19 @@ function relativo(r: DOMRect, c: DOMRect): Quadro {
   return { x0: r.left - c.left, y0: r.top - c.top, x1: r.right - c.left, y1: r.bottom - c.top }
 }
 
+/**
+ * Se o texto conta na medida: sem `vida`, o texto do herói em cena (sem as amostras); com `vida`, o texto dela, lido
+ * na amostra parada que o herói mantém escondida para cada vida (HeroCopy, data-medida; #138: o fundo pinta antes de a
+ * vida entrar, e a medida não depende do quadro em que a animação das letras está) no lugar do texto em cena.
+ */
+function conta(el: Element | null, vida: string | undefined) {
+  const amostra = el?.closest('[data-medida]')
+  if (amostra) return vida !== undefined && amostra.getAttribute('data-medida') === vida
+  return vida === undefined || !el?.closest('[data-vida-texto]')
+}
+
 /** Caixa (px CSS do canvas) do texto do herói, do fim do indicador e do balão; null sem o DOM do herói. */
-function lerUi(canvas: HTMLCanvasElement) {
+function lerUi(canvas: HTMLCanvasElement, vida?: string) {
   const sec = canvas.closest('section')
   const c = canvas.getBoundingClientRect()
   const copia = sec?.querySelector('h1')?.parentElement
@@ -38,7 +49,7 @@ function lerUi(canvas: HTMLCanvasElement) {
   const walk = document.createTreeWalker(copia, NodeFilter.SHOW_TEXT)
   const range = document.createRange()
   for (let n = walk.nextNode(); n; n = walk.nextNode()) {
-    if (!n.textContent?.trim() || n.parentElement?.closest('.sr-only')) continue
+    if (!n.textContent?.trim() || n.parentElement?.closest('.sr-only') || !conta(n.parentElement, vida)) continue
     range.selectNodeContents(n)
     for (const r of range.getClientRects()) somar(r)
   }
@@ -65,8 +76,10 @@ export function medirReferencias(
   h: number,
   repouso: THREE.Matrix4,
   mesa: THREE.Object3D | null,
+  /** A vida cujo texto conta (a amostra dela, HeroCopy); sem ela, o texto em cena. */
+  vida?: string,
 ): Referencias | null {
-  const dom = lerUi(canvas)
+  const dom = lerUi(canvas, vida)
   if (!dom) return null
   const px = (p: THREE.Vector3) => {
     p.project(camera)

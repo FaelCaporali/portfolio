@@ -5,7 +5,7 @@
  * `financeiro_direita` já posicionada no espaço do frame; meshopt com posição float, porque as malhas são
  * usadas fora dos nós delas: `otimizar.mjs --posicao-float`). Texto da fita e do boleto: canvas (fita.ts, boleto.ts).
  */
-import { useGLTF } from '@react-three/drei'
+import { useGlb } from '../../carga'
 import { useFrame } from '@react-three/fiber'
 import { useMemo, useRef } from 'react'
 import * as THREE from 'three'
@@ -35,7 +35,7 @@ const prefersReducedMotion = () =>
   typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 function useCalculadoraAssets() {
-  const { nodes } = useGLTF(calculadoraUrl, false) as unknown as { nodes: Nodes }
+  const { nodes } = useGlb(calculadoraUrl) as unknown as { nodes: Nodes }
   const glb = useMemo(() => {
     const root = nodes.financeiro_direita
     if (!root) throw new Error('financeiro_direita.glb sem a raiz financeiro_direita')
@@ -96,5 +96,3 @@ export function Calculadora() {
     </group>
   )
 }
-
-useGLTF.preload(calculadoraUrl, false)

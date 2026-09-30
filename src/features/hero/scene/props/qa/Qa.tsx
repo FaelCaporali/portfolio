@@ -11,7 +11,7 @@
  * não sai), o ciclo recomeça e o bug escapa da vaga. Todo material passa pela desintegração. Movimento reduzido: o
  * estado final parado. Nó que o glb não tiver fica de fora.
  */
-import { useGLTF } from '@react-three/drei'
+import { useGlb } from '../../carga'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
@@ -57,7 +57,7 @@ const ARO = 0.0414
 
 /** Clona a cena (geometrias e texturas seguem do cache do useGLTF) e troca cada material por um com a desintegração. */
 function useQaScene() {
-  const { scene } = useGLTF(qaUrl, false)
+  const { scene } = useGlb(qaUrl)
   const cena = useMemo(() => {
     const raiz = scene.getObjectByName('qa')
     if (!raiz) throw new Error('qa.glb sem a raiz qa')
@@ -291,5 +291,3 @@ export function Qa() {
 
   return <primitive object={root} />
 }
-
-useGLTF.preload(qaUrl, false)

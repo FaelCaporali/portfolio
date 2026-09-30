@@ -11,7 +11,7 @@
  * únicos transparentes: desenhados depois da sombra do olho (renderOrder).
  * Movimento reduzido: volante reto, gota a meio caminho, mapa parado. Nó que o glb não tiver fica de fora.
  */
-import { useGLTF } from '@react-three/drei'
+import { useGlb } from '../../carga'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useLayoutEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
@@ -110,7 +110,7 @@ function agua(c: THREE.Material, reflexo: number) {
 
 /** Clona a cena (geometrias e texturas seguem do cache do useGLTF) e troca cada material por um com a desintegração. */
 function useUberScene() {
-  const { scene } = useGLTF(uberUrl, false)
+  const { scene } = useGlb(uberUrl)
   const cena = useMemo(() => {
     const root = scene.getObjectByName('uber')
     if (!root) throw new Error('uber.glb sem a raiz uber')
@@ -202,5 +202,3 @@ export function Uber() {
 
   return <primitive object={root} />
 }
-
-useGLTF.preload(uberUrl, false)

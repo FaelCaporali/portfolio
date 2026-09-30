@@ -7,6 +7,7 @@
  * decomposição esmaece no papel (grupo `monolito`, estado B). A faixa v 0–0,20 fica livre (sob a régua paralela).
  */
 import * as THREE from 'three'
+import { desenhado } from '../../pausa'
 import { desenharIcone } from './icones'
 import { MONO } from './estilo'
 import { Pincel, type Ponto } from './pincel'
@@ -115,6 +116,11 @@ function pintarPlanta(p: Pincel, img: HTMLImageElement) {
 /** Centros das caixas da decomposição em UV da folha (u → direita na tela, v = 1 em cima): de onde os traços sobem. */
 export const ORIGENS_UV: readonly Ponto[] = SERVICOS.map((s) => [s.x / LARG, 1 - s.y / ALT])
 
+interface Troca {
+  aplicar: () => void
+  descartar: () => void
+}
+
 export function criarPlanta(folha: THREE.Mesh) {
   const r = criarRevela('arq_planta', { campo: true, brilho: 1, corFluxo: '#ffffff' })
   const m = r.material
@@ -127,13 +133,42 @@ export function criarPlanta(folha: THREE.Mesh) {
   mesh.visible = false
   folha.add(mesh)
   let pintada = false
-  const pintar = (img: HTMLImageElement) => {
-    if (pintada) return
-    const p = new Pincel({ x0: 0, y0: 0, x1: LARG, y1: ALT }, 1)
+  /**
+   * A planta (uma vez só; não depende da tela), em passos (#138: o pincel grava, a pintura toca aos poucos e as
+   * texturas sobem à GPU com `subir`); devolve a troca que a mostra e o descarte (se a troca não vier). Cancelada no
+   * meio, descarta as texturas novas.
+   */
+  function* pintar(img: HTMLImageElement, subir: (t: THREE.Texture) => void): Generator<unknown, Troca> {
+    if (pintada) return { aplicar: () => undefined, descartar: () => undefined }
+    const p = new Pincel({ x0: 0, y0: 0, x1: LARG, y1: ALT }, 1, true)
     pintarPlanta(p, img)
-    r.texturas(p.cor, p.dados)
-    mesh.visible = true
-    pintada = true
+    yield
+    yield* p.pintura()
+    const troca = r.preparar(p.cor, p.dados)
+    let pronto = false
+    try {
+      for (const t of troca.novas) {
+        yield desenhado(t.image as HTMLCanvasElement)
+        subir(t)
+        yield
+      }
+      pronto = true
+    } finally {
+      if (!pronto) for (const t of troca.novas) t.dispose()
+    }
+    const descartar = () => {
+      for (const t of troca.novas) t.dispose()
+    }
+    const aplicar = () => {
+      if (pintada) {
+        descartar()
+        return
+      }
+      troca.usar()
+      mesh.visible = true
+      pintada = true
+    }
+    return { aplicar, descartar }
   }
   /** Ponto da folha (u, v) no espaço da malha da folha (a geometria é plana no XY local). */
   folha.geometry.computeBoundingBox()
