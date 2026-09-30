@@ -9,10 +9,10 @@ function Thrower(): never {
 }
 
 /** A página do herói em miniatura: a cena dentro da fronteira e o texto fora dela. */
-function Page({ scene }: { scene: React.ReactNode }) {
+function Page({ scene, onFail }: { scene: React.ReactNode; onFail?: () => void }) {
   return (
     <section>
-      <SceneBoundary>{scene}</SceneBoundary>
+      <SceneBoundary onFail={onFail}>{scene}</SceneBoundary>
       <h1>Today I am a</h1>
     </section>
   )
@@ -33,7 +33,9 @@ describe('fronteira de erro da cena 3D', () => {
 
   it('o filho que lança some sozinho; o resto da página fica e o erro vai para o console', () => {
     const error = vi.spyOn(console, 'error').mockImplementation(() => undefined)
-    const { container } = render(<Page scene={<Thrower />} />)
+    const onFail = vi.fn()
+    const { container } = render(<Page scene={<Thrower />} onFail={onFail} />)
+    expect(onFail).toHaveBeenCalledOnce()
     expect(screen.getByRole('heading', { name: 'Today I am a' })).toBeInTheDocument()
     expect(container.querySelector('section')?.childElementCount).toBe(1)
     expect(error).toHaveBeenCalledWith(expect.stringContaining('cena 3D falhou'), boom, expect.any(String))
@@ -60,7 +62,8 @@ describe('fronteira de erro da cena 3D', () => {
 
   it('o WebGL que não nasce (rejeição solta) derruba só a cena', () => {
     const error = vi.spyOn(console, 'error').mockImplementation(() => undefined)
-    render(<Page scene={<canvas data-testid="cena" />} />)
+    const onFail = vi.fn()
+    render(<Page scene={<canvas data-testid="cena" />} onFail={onFail} />)
     const webgl = new Error('Error creating WebGL context.')
     const event = Object.assign(new Event('unhandledrejection', { cancelable: true }), { reason: webgl })
     act(() => {
@@ -69,6 +72,7 @@ describe('fronteira de erro da cena 3D', () => {
     expect(screen.queryByTestId('cena')).not.toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Today I am a' })).toBeInTheDocument()
     expect(event.defaultPrevented).toBe(true)
+    expect(onFail).toHaveBeenCalledOnce()
     expect(error).toHaveBeenCalledWith(expect.stringContaining('WebGL'), webgl)
   })
 

@@ -5,7 +5,7 @@ const isWebGLFailure = (reason: unknown) => reason instanceof Error && reason.me
 
 /**
  * A fronteira de erro da cena 3D do herói (C1): se o pedaço do canvas falha, some só ele, e o texto, o indicador, o
- * link do código e o contato ficam; sem erro, nada muda.
+ * link do código e o contato ficam; sem erro, nada muda. `onFail` avisa o herói (sem cena, o indicador troca o texto).
  *
  * Cobre: o import da cena que falha (o `lazy` lança no render) e erro de render ou de commit dentro do <Canvas> (o R3F
  * 9 pega o erro na fronteira dele, guarda no estado do <Canvas> e o relança no render do <Canvas>, na árvore do React
@@ -13,7 +13,7 @@ const isWebGLFailure = (reason: unknown) => reason instanceof Error && reason.me
  * assíncrona que ninguém espera (a promessa rejeita solta); por isso, enquanto a cena está montada, a rejeição solta
  * que fala de WebGL também derruba a cena.
  */
-export class SceneBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+export class SceneBoundary extends Component<{ children: ReactNode; onFail?: () => void }, { failed: boolean }> {
   override state = { failed: false }
 
   static getDerivedStateFromError() {
@@ -22,6 +22,7 @@ export class SceneBoundary extends Component<{ children: ReactNode }, { failed: 
 
   override componentDidCatch(error: unknown, info: ErrorInfo) {
     console.error('Hero: a cena 3D falhou e saiu da página; o resto segue.', error, info.componentStack)
+    this.props.onFail?.()
   }
 
   override componentDidMount() {
@@ -38,6 +39,7 @@ export class SceneBoundary extends Component<{ children: ReactNode }, { failed: 
     event.preventDefault()
     console.error('Hero: o WebGL não nasceu; a cena 3D saiu da página e o resto segue.', event.reason)
     this.setState({ failed: true })
+    this.props.onFail?.()
   }
 
   override render() {

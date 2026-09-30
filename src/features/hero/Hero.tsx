@@ -82,6 +82,12 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
   const [pending, setPending] = useState<number | null>(null)
   // Vidas cujo glb falhou (#138, a cena avisa): saem da volta e do indicador até o glb chegar.
   const failed = useRef<ReadonlySet<number>>(new Set())
+  // A cena caiu (SceneBoundary): quem troca a vida é o clique no indicador, direto, sem desintegração.
+  const [sceneFailed, setSceneFailed] = useState(false)
+  const onSceneFail = useCallback(() => {
+    setSceneFailed(true)
+    setPhase('hold')
+  }, [])
   const next = useCallback((prop: PropId) => {
     // A vida para onde a cena troca (a escolhida no indicador ou a 1ª pronta da volta).
     const i = stages.findIndex((s) => s.prop === prop)
@@ -110,6 +116,10 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
     const i = stages.findIndex((s) => s.id === id)
     // Vida cujo glb falhou: o clique é descartado e o carrossel segue (o aviso visual é da tarefa 143).
     if (failed.current.has(i)) return
+    if (sceneFailed) {
+      if (i >= 0 && i !== index) next(cyclicAt(stages, i).prop)
+      return
+    }
     const target = i === index ? null : i
     requested.current = target
     setPending(target)
@@ -120,7 +130,7 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
     <section className="relative h-svh overflow-hidden" aria-label="Apresentação">
       {/* Se a cena falha (import, render, WebGL), sai só ela: SceneBoundary. */}
       {options && (
-        <SceneBoundary>
+        <SceneBoundary onFail={onSceneFail}>
           <Suspense fallback={null}>
             <HeroCanvas
               paused={leavingPage}
