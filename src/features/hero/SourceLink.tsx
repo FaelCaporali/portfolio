@@ -1,4 +1,5 @@
-import { sourceLink } from '../../content/profile'
+import { sourceHref } from '../../content/profile'
+import { useMessages } from '../../i18n/lang'
 import { GitHubMark } from '../../ui/GitHubMark'
 
 /**
@@ -7,13 +8,14 @@ import { GitHubMark } from '../../ui/GitHubMark'
  * tamanhos de tela.
  */
 export function SourceLink({ className, iconClassName }: { className: string; iconClassName: string }) {
+  const { source, sourceTitle } = useMessages().hero
   return (
     <a
-      href={sourceLink.href}
+      href={sourceHref}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={sourceLink.label}
-      title="View source"
+      aria-label={source}
+      title={sourceTitle}
       className={className}
     >
       <GitHubMark className={iconClassName} />

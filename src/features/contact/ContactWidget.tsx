@@ -1,3 +1,4 @@
+import { useMessages } from '../../i18n/lang'
 import { usePopover } from '../../ui/usePopover'
 import { ContactForm } from './ContactForm'
 import { DirectContacts } from './DirectContacts'
@@ -11,6 +12,7 @@ import { DirectContacts } from './DirectContacts'
 export function ContactWidget() {
   const { open, root, panelId, triggerProps } = usePopover()
   const titleId = `${panelId}-title`
+  const t = useMessages().contact
 
   return (
     <div
@@ -33,7 +35,7 @@ export function ContactWidget() {
         >
           <path d="M21 12a8.5 8.5 0 0 1-12.6 7.4L3 21l1.6-5.2A8.5 8.5 0 1 1 21 12z" />
         </svg>
-        <span className="sr-only lg:not-sr-only">Contact me</span>
+        <span className="sr-only lg:not-sr-only">{t.open}</span>
       </button>
 
       <section
@@ -44,7 +46,7 @@ export function ContactWidget() {
         className="absolute right-0 bottom-full mb-2 max-h-[calc(100dvh-6rem)] w-[calc(100vw-2rem)] max-w-sm overflow-y-auto rounded-2xl border border-fg/15 bg-raised/95 p-5 text-fg shadow-2xl backdrop-blur lg:max-h-[calc(100dvh-7rem)] lg:w-[22rem]"
       >
         <h2 id={titleId} className="text-base font-semibold">
-          Send me a message
+          {t.title}
         </h2>
         <ContactForm active={open} />
         <DirectContacts />

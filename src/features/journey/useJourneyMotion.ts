@@ -70,9 +70,10 @@ function buildRoute(timeline: HTMLElement, route: SVGSVGElement): Leg[] {
  * O movimento da trajetória, acabamento sobre a página que o build já entrega: o caminho sinuoso (cada trecho se
  * desenha quando a linha de leitura passa por ele; com movimento reduzido, inteiro), a barra de progresso, a vida e o
  * marco em leitura, e a entrada dos marcos que estavam abaixo da tela ao abrir. `visible` muda com o filtro: o caminho
- * é refeito sobre as paradas à vista.
+ * é refeito sobre as paradas à vista; `lang` muda com a troca de idioma: os textos mudam de tamanho e o caminho
+ * também é refeito, antes da pintura.
  */
-export function useJourneyMotion(visible: unknown) {
+export function useJourneyMotion(visible: unknown, lang: string) {
   const timeline = useRef<HTMLDivElement>(null)
   const route = useRef<SVGSVGElement>(null)
   const bar = useRef<HTMLDivElement>(null)
@@ -129,8 +130,8 @@ export function useJourneyMotion(visible: unknown) {
     }
   }, [remeasure, cancelRefresh])
 
-  // O filtro mudou: o caminho sobre as paradas à vista, antes da pintura.
-  useLayoutEffect(remeasure, [visible, remeasure])
+  // O filtro ou o idioma mudou: o caminho sobre as paradas à vista, antes da pintura.
+  useLayoutEffect(remeasure, [visible, lang, remeasure])
 
   // A rolagem: a barra, a vida e o marco em leitura (o último à vista que já passou da linha) e o caminho.
   useLayoutEffect(() => {

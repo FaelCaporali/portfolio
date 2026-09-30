@@ -1,4 +1,5 @@
 import type { Config } from '@react-router/dev/config'
+import { LANGS, localePath, SITE_PAGES } from './shared/i18n'
 
 /**
  * Um app React só (J87), com o React Router em modo framework e as páginas geradas no build (J89): o HTML de cada
@@ -9,7 +10,9 @@ import type { Config } from '@react-router/dev/config'
 export default {
   appDirectory: 'src',
   ssr: false,
-  prerender: ['/', '/journey'],
+  // Cada página em cada idioma (/, /journey, /pt, /pt/journey: o HTML com o texto e as metas do idioma), o sitemap e o
+  // robots.txt (rotas de recurso, src/routes.ts).
+  prerender: [...SITE_PAGES.flatMap((p) => LANGS.map((l) => localePath(l, p))), '/sitemap.xml', '/robots.txt'],
   // O comportamento do React Router v8 já agora (a v8 pede Node 22.22+; a máquina de dev tem 22.21): build por
   // ambientes do Vite e os padrões novos, que aqui não mudam nada (sem loader, action nem middleware).
   future: {

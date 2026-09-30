@@ -1,10 +1,12 @@
 import { directContacts } from '../../content/profile'
+import { useMessages } from '../../i18n/lang'
 
 /** E-mail e WhatsApp como links, abaixo do formulário: o caminho que sempre funciona. */
 export function DirectContacts() {
+  const { direct } = useMessages().contact
   return (
     <div className="mt-4 border-t border-fg/10 pt-4">
-      <p className="text-xs text-fg/50">Or reach me directly</p>
+      <p className="text-xs text-fg/50">{direct}</p>
       <ul className="mt-2 space-y-1 text-sm">
         {directContacts.map((c) => (
           <li key={c.label}>

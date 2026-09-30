@@ -1,4 +1,5 @@
 import { resumes } from '../../content/profile'
+import { useMessages } from '../../i18n/lang'
 import { cx } from '../../lib/cx'
 import { usePopover } from '../../ui/usePopover'
 
@@ -8,11 +9,12 @@ import { usePopover } from '../../ui/usePopover'
  */
 export function ResumeMenu({ className }: { className: string }) {
   const { open, close, root, panelId, triggerProps } = usePopover()
+  const { resume } = useMessages().hero
 
   return (
     <div ref={root} className="relative">
       <button {...triggerProps} className={cx('w-full', className)}>
-        Résumé
+        {resume}
         <svg
           aria-hidden
           viewBox="0 0 10 6"

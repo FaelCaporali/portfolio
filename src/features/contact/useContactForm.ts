@@ -2,9 +2,9 @@ import { useState, type SubmitEvent } from 'react'
 import type { ContactRequest, Field } from '../../../shared/contact/contract'
 import { parseContact } from '../../../shared/contact/validation'
 import { sendContact } from './api'
-import { FALLBACK, STILL_VERIFYING, errorText } from './texts'
+import type { ErrorKey } from './texts'
 
-export type Status = { kind: 'idle' } | { kind: 'sending' } | { kind: 'sent' } | { kind: 'error'; text: string }
+export type Status = { kind: 'idle' } | { kind: 'sending' } | { kind: 'sent' } | { kind: 'error'; key: ErrorKey }
 
 interface Verification {
   token: string | null
@@ -35,7 +35,7 @@ export function useContactForm(verification: Verification) {
   const [invalid, setInvalid] = useState<Field[]>([])
   // O aviso "ainda verificando" sai quando o token chega (U2): o botão já diz "Send". Ajuste no render (padrão do
   // React para estado que segue uma prop), sem efeito e sem um quadro com o aviso velho.
-  if (verification.token && status.kind === 'error' && status.text === STILL_VERIFYING) setStatus({ kind: 'idle' })
+  if (verification.token && status.kind === 'error' && status.key === 'still_verifying') setStatus({ kind: 'idle' })
 
   async function submit(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -53,7 +53,7 @@ export function useContactForm(verification: Verification) {
     }
     const { token } = verification
     if (!token) {
-      setStatus({ kind: 'error', text: verification.failed ? FALLBACK : STILL_VERIFYING })
+      setStatus({ kind: 'error', key: verification.failed ? 'fallback' : 'still_verifying' })
       return
     }
 
@@ -68,7 +68,7 @@ export function useContactForm(verification: Verification) {
       setStatus({ kind: 'idle' })
       focusField(form, result.fields[0])
     } else {
-      setStatus({ kind: 'error', text: errorText(result.code) })
+      setStatus({ kind: 'error', key: result.code ?? 'fallback' })
     }
   }
 

@@ -1,6 +1,7 @@
-import type { ReactNode } from 'react'
-import { isRouteErrorResponse, Link, Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router'
-import { useHydrated } from './lib/useHydrated'
+import { useEffect, type ReactNode } from 'react'
+import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration, useLocation } from 'react-router'
+import { langFromPath, LOCALES } from './i18n/lang'
+import { ErrorPage } from './ui/ErrorPage'
 import { NavigationProgress } from './ui/NavigationProgress'
 import './index.css'
 // As cores das vidas como classes e variáveis (a trajetória e o anel do "Contact me"), geradas de journey.ts
@@ -8,12 +9,19 @@ import './index.css'
 import 'virtual:journey-accents.css'
 
 /**
- * O documento de todas as páginas. Título e descrição vêm de cada rota (meta, em src/routes/); os <script> que o
- * roteador escreve no HTML recebem o nonce da CSP no Worker (worker/page.ts).
+ * O documento de todas as páginas. As metas vêm de cada rota (meta, em src/routes/, calculadas do idioma em
+ * src/i18n/meta.ts); o <html lang> é o do endereço (/pt… = pt-BR), e a troca de idioma pelo roteador o refaz. Os
+ * <script> que o roteador escreve no HTML recebem o nonce da CSP no Worker (worker/page.ts).
  */
 export function Layout({ children }: { children: ReactNode }) {
+  const tag = LOCALES[langFromPath(useLocation().pathname)].tag
+  // A página vazia do build (__spa-fallback.html) sai com lang="en" e a hidratação não corrige atributo: /pt/… que
+  // não existe ganha o lang certo aqui.
+  useEffect(() => {
+    if (document.documentElement.lang !== tag) document.documentElement.lang = tag
+  }, [tag])
   return (
-    <html lang="en">
+    <html lang={tag}>
       <head>
         <meta charSet="UTF-8" />
         <meta
@@ -54,24 +62,10 @@ export function HydrateFallback() {
 }
 
 /**
- * Endereço que não existe (o Worker responde 404 com a página vazia do roteador) ou erro inesperado. A página vazia
- * sai do build sem nada no corpo (HydrateFallback): o aviso só aparece depois da hidratação, para as duas árvores
- * serem iguais.
+ * Endereço que não existe (o Worker responde 404 com a página vazia do roteador) ou erro inesperado, no idioma do
+ * endereço (ErrorPage).
  */
 export function ErrorBoundary({ error }: { error: unknown }) {
-  const hydrated = useHydrated()
-  if (!hydrated) return null
-  const missing = isRouteErrorResponse(error) && error.status === 404
-  return (
-    <main className="mx-auto flex min-h-svh max-w-xl flex-col justify-center gap-4 px-5 text-fg">
-      <title>{missing ? 'Page not found · Fael Caporali' : 'Something went wrong · Fael Caporali'}</title>
-      <h1 className="text-3xl font-semibold tracking-tight">{missing ? 'Page not found' : 'Something went wrong'}</h1>
-      <p className="text-fg/70">
-        {missing ? 'There is nothing at this address.' : 'The page could not be shown. Please try again.'}
-      </p>
-      <Link to="/" className="text-fg underline underline-offset-4 hover:text-fg/80">
-        Back to the home page
-      </Link>
-    </main>
-  )
+  const lang = langFromPath(useLocation().pathname)
+  return <ErrorPage lang={lang} missing={isRouteErrorResponse(error) && error.status === 404} />
 }

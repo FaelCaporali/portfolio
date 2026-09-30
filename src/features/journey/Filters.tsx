@@ -1,4 +1,6 @@
 import { useCallback, useRef, useState, type ReactNode } from 'react'
+import { LOCALES, MESSAGES, useLang, type Lang } from '../../i18n/lang'
+import { tagLabel } from '../../i18n/tags'
 import { cx } from '../../lib/cx'
 import { useHydrated } from '../../lib/useHydrated'
 import { useDismiss } from '../../ui/useDismiss'
@@ -6,11 +8,7 @@ import type { Dated } from './layout'
 import { eyebrow } from './parts'
 import type { Filters as FilterApi, Group } from './useFilters'
 
-const GROUPS = [
-  { key: 'tools', label: 'Tools' },
-  { key: 'concepts', label: 'Concepts' },
-  { key: 'skills', label: 'Skills' },
-] as const satisfies readonly { key: Group; label: string }[]
+const GROUPS = ['tools', 'concepts', 'skills'] as const satisfies readonly Group[]
 
 type MenuId = 'years' | Group
 
@@ -26,6 +24,8 @@ export function Filters({ items, filters }: { items: Dated[]; filters: FilterApi
   const hydrated = useHydrated()
   const root = useRef<HTMLDivElement>(null)
   const [open, setOpen] = useState<MenuId | null>(null)
+  const lang = useLang()
+  const m = MESSAGES[lang].journey
 
   // Um menu aberto por vez; fecha com clique fora ou Esc, e o foco volta ao botão dele.
   const close = useCallback(() => {
@@ -50,11 +50,11 @@ export function Filters({ items, filters }: { items: Dated[]; filters: FilterApi
       className="filters sticky top-14 z-float border-y border-fg/6 bg-page/85 backdrop-blur-md"
     >
       <div className="relative mx-auto flex max-w-7xl flex-wrap items-center gap-1.5 px-4 py-2 sm:gap-2 sm:px-8 sm:py-2.5 lg:pr-20 xl:pr-60">
-        <p className={cx(eyebrow, 'mr-1 hidden text-filter-sm md:block')}>Filter the map</p>
-        <Menu label="Years" on={filters.yearsOn} {...menu('years')}>
+        <p className={cx(eyebrow, 'mr-1 hidden text-filter-sm md:block')}>{m.filter}</p>
+        <Menu label={m.years} on={filters.yearsOn} {...menu('years')}>
           <div className="grid grid-cols-2 gap-3">
             <YearSelect
-              label="From"
+              label={m.from}
               years={years}
               value={state.from}
               onChange={(y) => {
@@ -62,7 +62,7 @@ export function Filters({ items, filters }: { items: Dated[]; filters: FilterApi
               }}
             />
             <YearSelect
-              label="To"
+              label={m.to}
               years={years}
               value={state.to}
               onChange={(y) => {
@@ -72,21 +72,26 @@ export function Filters({ items, filters }: { items: Dated[]; filters: FilterApi
           </div>
         </Menu>
         {GROUPS.map((g) => (
-          <Menu key={g.key} label={g.label} on={state.tags[g.key].size > 0} {...menu(g.key)}>
-            <TagPicker group={g} tags={tagsOf(items, g.key)} filters={filters} />
+          <Menu key={g} label={m.groups[g]} on={state.tags[g].size > 0} {...menu(g)}>
+            <TagPicker group={g} tags={tagsOf(items, g, lang)} filters={filters} lang={lang} />
           </Menu>
         ))}
         <div className="flex flex-wrap gap-1.5">
           {filters.yearsOn && (
-            <Chip label={`${String(state.from)} – ${String(state.to)}`} onClick={filters.clearYears} />
+            <Chip
+              label={`${String(state.from)} – ${String(state.to)}`}
+              remove={m.removeFilter}
+              onClick={filters.clearYears}
+            />
           )}
           {GROUPS.flatMap((g) =>
-            [...state.tags[g.key]].map((t) => (
+            [...state.tags[g]].map((t) => (
               <Chip
-                key={`${g.key}:${t}`}
-                label={t}
+                key={`${g}:${t}`}
+                label={tagLabel(lang, g, t)}
+                remove={m.removeFilter}
                 onClick={() => {
-                  filters.toggle(g.key, t)
+                  filters.toggle(g, t)
                 }}
               />
             )),
@@ -98,49 +103,65 @@ export function Filters({ items, filters }: { items: Dated[]; filters: FilterApi
           onClick={filters.clear}
           className="ml-auto min-h-9 text-sm text-fg/70 underline underline-offset-4 hover:text-fg"
         >
-          Clear
+          {m.clear}
         </button>
       </div>
     </div>
   )
 }
 
-/** Todas as tags de um grupo na jornada, sem repetir, em ordem alfabética. */
-function tagsOf(items: Dated[], key: Group): string[] {
+/**
+ * Todas as tags de um grupo na jornada, sem repetir, em ordem alfabética do rótulo no idioma, com o rótulo (a tag em
+ * si, em inglês, é a do filtro e do endereço).
+ */
+function tagsOf(items: Dated[], key: Group, lang: Lang): { tag: string; label: string }[] {
   const all = new Set(items.flatMap((i) => i.c.tags?.[key] ?? []))
-  return [...all].sort((a, b) => a.localeCompare(b, 'en', { sensitivity: 'base' }))
+  return [...all]
+    .map((tag) => ({ tag, label: tagLabel(lang, key, tag) }))
+    .sort((a, b) => a.label.localeCompare(b.label, LOCALES[lang].tag, { sensitivity: 'base' }))
 }
 
 /** Busca e tags de um grupo; a tag escolhida fica pressionada. */
-function TagPicker({ group, tags, filters }: { group: (typeof GROUPS)[number]; tags: string[]; filters: FilterApi }) {
+function TagPicker({
+  group,
+  tags,
+  filters,
+  lang,
+}: {
+  group: Group
+  tags: { tag: string; label: string }[]
+  filters: FilterApi
+  lang: Lang
+}) {
   const [query, setQuery] = useState('')
   const q = query.trim().toLowerCase()
-  const name = group.label.toLowerCase()
+  const m = MESSAGES[lang].journey
+  const search = m.search(m.groups[group])
   return (
     <>
       <input
         type="search"
-        aria-label={`Search ${name}`}
-        placeholder={`Search ${name}`}
+        aria-label={search}
+        placeholder={search}
         value={query}
         onChange={(e) => {
           setQuery(e.target.value)
         }}
         className="w-full rounded-xl border border-fg/10 bg-fg/5 px-3 py-2 text-sm text-fg placeholder:text-fg/40 focus-visible:border-fg/40 focus-visible:outline-none"
       />
-      <div role="group" aria-label={group.label} className="mt-3 flex flex-wrap gap-1.5">
-        {tags.map((t) => (
+      <div role="group" aria-label={m.groups[group]} className="mt-3 flex flex-wrap gap-1.5">
+        {tags.map(({ tag, label }) => (
           <button
-            key={t}
+            key={tag}
             type="button"
-            hidden={!!q && !t.toLowerCase().includes(q)}
-            aria-pressed={filters.state.tags[group.key].has(t)}
+            hidden={!!q && !label.toLowerCase().includes(q)}
+            aria-pressed={filters.state.tags[group].has(tag)}
             onClick={() => {
-              filters.toggle(group.key, t)
+              filters.toggle(group, tag)
             }}
-            className={cx('tag filter-tag rounded-full px-2.5 py-1 text-xs', `tag-${group.key}`)}
+            className={cx('tag filter-tag rounded-full px-2.5 py-1 text-xs', `tag-${group}`)}
           >
-            {t}
+            {label}
           </button>
         ))}
       </div>
@@ -148,9 +169,9 @@ function TagPicker({ group, tags, filters }: { group: (typeof GROUPS)[number]; t
   )
 }
 
-function Chip({ label, onClick }: { label: string; onClick: () => void }) {
+function Chip({ label, remove, onClick }: { label: string; remove: (tag: string) => string; onClick: () => void }) {
   return (
-    <button type="button" className="filter-chip" aria-label={`Remove filter: ${label}`} onClick={onClick}>
+    <button type="button" className="filter-chip" aria-label={remove(label)} onClick={onClick}>
       {`${label} ×`}
     </button>
   )

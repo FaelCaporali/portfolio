@@ -1,11 +1,9 @@
 import type { MetaFunction } from 'react-router'
 import { ContactWidget } from '../features/contact/ContactWidget'
 import { Hero } from '../features/hero/Hero'
+import { pageMeta } from '../i18n/meta'
 
-export const meta: MetaFunction = () => [
-  { title: 'Fael Caporali' },
-  { name: 'description', content: 'Rafael Caporali — senior full-stack developer, Belo Horizonte.' },
-]
+export const meta: MetaFunction = ({ params }) => pageMeta(params.lang, 'home')
 
 /** A página inicial: o herói e o contato. O texto sai no HTML do build; a cena 3D monta no navegador (Hero). */
 export default function Home() {

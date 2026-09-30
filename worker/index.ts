@@ -1,11 +1,13 @@
 /**
- * Roteamento do Worker único do site: a API do contato, 404 JSON no resto de /api/ e as páginas HTML (com a CSP de
- * nonce). Arquivos estáticos não passam por aqui (run_worker_first no wrangler.jsonc).
+ * Roteamento do Worker único do site: a API do contato, 404 JSON no resto de /api/, a detecção de idioma na primeira
+ * visita (worker/lang.ts) e as páginas HTML (com a CSP de nonce). Arquivos estáticos não passam por aqui
+ * (run_worker_first no wrangler.jsonc).
  */
 import { CONTACT_PATH } from '../shared/contact/contract'
 import { handleContact } from './contact'
 import { retryAndPurge } from './cron'
 import { json } from './http'
+import { langRedirect, withLangVary } from './lang'
 import { withPageCsp } from './page'
 
 /**
@@ -23,12 +25,15 @@ export default {
     if (pathname === '/trajetoria' || pathname === '/trajetoria/') {
       return Response.redirect(new URL('/journey', request.url).href, 301)
     }
+    // Primeira visita de quem prefere português: a página em /pt (worker/lang.ts).
+    const redirect = langRedirect(request)
+    if (redirect) return redirect
     const asset = await env.ASSETS.fetch(request)
     if (asset.status === 404 && request.headers.get('Accept')?.includes('text/html')) {
       const page = await env.ASSETS.fetch(new URL(NOT_FOUND_PAGE, request.url))
       return withPageCsp(new Response(page.body, { status: 404, headers: page.headers }))
     }
-    return withPageCsp(asset)
+    return withLangVary(request, withPageCsp(asset))
   },
 
   scheduled(controller, env, ctx) {

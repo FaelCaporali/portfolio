@@ -2,6 +2,8 @@ import type { ReactNode, RefObject } from 'react'
 import { Link } from 'react-router'
 import { stages } from '../../content/journey'
 import { profile } from '../../content/profile'
+import { LangSwitch } from '../../i18n/LangSwitch'
+import { localePath, useLang, useMessages } from '../../i18n/lang'
 import { useReading, type Reading } from './reading'
 
 /**
@@ -18,6 +20,7 @@ export function Frame({
   reading: Reading
   bar: RefObject<HTMLDivElement | null>
 }) {
+  const lang = useLang()
   return (
     <>
       <div aria-hidden className="page-glow pointer-events-none fixed inset-0 -z-backdrop" />
@@ -31,7 +34,7 @@ export function Frame({
             celular, o menu do mapa. */}
         <div className="mx-auto grid h-14 max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-2 px-4 sm:gap-3 sm:px-8">
           <Link
-            to="/"
+            to={localePath(lang, '/')}
             prefetch="intent"
             className="inline-flex min-h-6 shrink-0 items-center justify-self-start text-sm font-semibold text-fg/85 hover:text-fg"
           >
@@ -42,6 +45,10 @@ export function Frame({
           <LifeDots reading={reading} />
           {menu}
         </div>
+        {/* PT/EN do sm para cima, na coluna direita: último do cabeçalho e absoluto, sem entrar na grade (que segue com
+            três filhos). A borda direita é a da grade (max-w-7xl centrada, com o recuo dela); entre sm e lg, à esquerda
+            do botão do menu do mapa (36 px e o vão de 12 px da grade). Abaixo de sm, dentro do menu (Minimap.tsx). */}
+        <LangSwitch className="absolute top-1.5 right-[calc(max(0px,(100%-80rem)/2)+5rem)] hidden h-11 min-w-11 items-center justify-center rounded-full text-sm font-semibold tracking-wide text-fg/60 transition-colors hover:text-fg focus-visible:outline-2 focus-visible:outline-fg sm:flex lg:right-[calc(max(0px,(100%-80rem)/2)+2rem)]" />
       </header>
     </>
   )
@@ -50,8 +57,9 @@ export function Frame({
 /** Os pontos das vidas, como no herói: cada um leva à vida na página; o da vida em leitura acende. */
 function LifeDots({ reading }: { reading: Reading }) {
   const life = useReading(reading, (s) => s.life)
+  const { journey, hero } = useMessages()
   return (
-    <nav aria-label="Lives" className="relative">
+    <nav aria-label={journey.lives} className="relative">
       <span aria-hidden className="absolute inset-x-3 top-1/2 h-px -translate-y-1/2 bg-fg/15" />
       <ol className="relative flex items-center phone:gap-0.5 sm:gap-2">
         {stages.map((s) => (
@@ -60,8 +68,8 @@ function LifeDots({ reading }: { reading: Reading }) {
               href={`#${s.id}`}
               data-dot
               aria-current={s.id === life ? 'step' : undefined}
-              aria-label={s.slot}
-              title={s.slot}
+              aria-label={hero.slots[s.id]}
+              title={hero.slots[s.id]}
               className="group grid h-6 w-6 place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-fg"
             >
               <span className="dot block h-2.5 w-2.5 rounded-full border-[1.5px] border-(--accent) bg-page opacity-55 transition-all duration-300 group-hover:scale-110 group-hover:opacity-100" />

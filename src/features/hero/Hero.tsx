@@ -3,6 +3,8 @@ import { flushSync } from 'react-dom'
 import { useNavigation } from 'react-router'
 import { OPENING, stages, type PropId } from '../../content/journey'
 import { profile } from '../../content/profile'
+import { LangSwitch } from '../../i18n/LangSwitch'
+import { localePath, useLang, useMessages } from '../../i18n/lang'
 import { cyclicAt } from '../../lib/array'
 import { HeroCopy } from './HeroCopy'
 import { LifeTimeline } from './LifeTimeline'
@@ -128,6 +130,8 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
     setCarga(loadProps(lineup.current, requested.current, failed.current))
   }, [])
   const stage = cyclicAt(stages, index)
+  const lang = useLang()
+  const m = useMessages()
   // Indo para outra página (o botão da trajetória): a cena para, e o quadro 3D não disputa o processador com ela.
   const leavingPage = useNavigation().state !== 'idle'
   const select = (id: string) => {
@@ -145,7 +149,7 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
   }
 
   return (
-    <section className="relative h-svh overflow-hidden" aria-label="Apresentação">
+    <section className="relative h-svh overflow-hidden" aria-label={m.hero.section}>
       {/* Se a cena falha (import, render, WebGL), sai só ela: SceneBoundary. */}
       {options && (
         <SceneBoundary onFail={onSceneFail}>
@@ -177,7 +181,7 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
       <header ref={header} className="pointer-events-none absolute inset-x-0 top-0 pt-5 pb-1">
         <div className="px-5 sm:px-10 wide:pl-hero">
           <a
-            href="/"
+            href={localePath(lang, '/')}
             className="pointer-events-auto text-sm font-medium tracking-wide text-fg/90 transition-colors hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-fg lg:text-base"
           >
             {profile.name}
@@ -200,6 +204,10 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
       />
 
       <HeroCopy ref={text} stage={stage} leaving={phase === 'out'} loading={loading} />
+
+      {/* PT/EN: à esquerda do ícone do código, no mesmo estilo apagado e com a mesma área de toque de 44 px. Último
+          da seção, absoluto: não desloca nada do que já estava na página. */}
+      <LangSwitch className="absolute top-2 right-14 flex h-11 min-w-11 items-center justify-center rounded-full text-sm font-medium tracking-wide text-fg/50 transition-colors hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fg sm:top-2.5 sm:right-19" />
     </section>
   )
 }

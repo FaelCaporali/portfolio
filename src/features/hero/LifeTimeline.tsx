@@ -1,4 +1,5 @@
 import { stages } from '../../content/journey'
+import { useMessages } from '../../i18n/lang'
 import { cx } from '../../lib/cx'
 import { useHydrated } from '../../lib/useHydrated'
 
@@ -16,8 +17,9 @@ interface LifeTimelineProps {
 export function LifeTimeline({ currentId, onSelect }: LifeTimelineProps) {
   // Desligados até a hidratação (a página sai pronta do build): antes disso o clique não troca a vida.
   const hydrated = useHydrated()
+  const { timeline, slots } = useMessages().hero
   return (
-    <nav aria-label="Timeline" className="pointer-events-auto relative">
+    <nav aria-label={timeline} className="pointer-events-auto relative">
       <span aria-hidden className="absolute inset-x-3 top-1/2 h-px -translate-y-1/2 bg-fg/15" />
       <ol className="relative flex items-center gap-1 sm:gap-2.5">
         {stages.map((s) => {
@@ -27,9 +29,9 @@ export function LifeTimeline({ currentId, onSelect }: LifeTimelineProps) {
               <button
                 type="button"
                 disabled={!hydrated}
-                aria-label={s.slot}
+                aria-label={slots[s.id]}
                 aria-current={on ? 'step' : undefined}
-                title={s.slot}
+                title={slots[s.id]}
                 onClick={() => {
                   onSelect(s.id)
                 }}

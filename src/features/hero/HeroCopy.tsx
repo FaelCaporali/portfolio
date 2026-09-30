@@ -1,7 +1,10 @@
 import { useRef, type Ref } from 'react'
 import { Link } from 'react-router'
 import { stages, type Stage } from '../../content/journey'
-import { journeyLink, profile, profileLinks } from '../../content/profile'
+import { journeyPath, profileLinks } from '../../content/profile'
+import { LANGS } from '../../../shared/i18n'
+import { localePath, MESSAGES, useLang, type Lang } from '../../i18n/lang'
+import type { Messages } from '../../i18n/messages/en'
 import { pill } from '../../ui/pill'
 import { useHydrated } from '../../lib/useHydrated'
 import { CopyContacts } from '../contact/CopyContacts'
@@ -19,19 +22,23 @@ interface HeroCopyProps {
   loading: boolean
 }
 
-const SLOTS = stages.map((s) => s.slot)
-/** "Today I am a(n)" / "Yesterday I was a(n)". */
-const abertura = (s: Stage) => `${s.past ? 'Yesterday I was' : 'Today I am'} a${/^[aeiou]/i.test(s.slot) ? 'n' : ''}`
+/** As vidas de cada idioma, na ordem do indicador (a lista que useFitFontSize mede: a mesma referência por idioma). */
+const SLOTS = Object.fromEntries(LANGS.map((l) => [l, stages.map((s) => MESSAGES[l].hero.slots[s.id])])) as Record<
+  Lang,
+  string[]
+>
+/** "Today I am a(n)" / "Yesterday I was a(n)"; em português, "Hoje sou" / "Ontem fui". */
+const abertura = (m: Messages, s: Stage) => m.hero.opening(!!s.past, m.hero.slots[s.id])
 
 /**
  * "loading" no lugar da vida enquanto a cena 3D não chega (index.css: .loading-word): a palavra respira e três pontos
  * sobem em onda. Uma palavra só, sem letras soltas: o HTML e o leitor de tela leem "Today I am loading". Fora de
  * .slot-word de propósito: as sondas do estúdio 3D e o e2e leem a vida em .slot-word.
  */
-function LoadingWord() {
+function LoadingWord({ word }: { word: string }) {
   return (
     <span className="loading-word">
-      loading
+      {word}
       <span aria-hidden className="loading-dots">
         <span className="loading-dot" />
         <span className="loading-dot" />
@@ -44,8 +51,10 @@ function LoadingWord() {
 /** Coluna de texto do herói: a vida atual, os títulos, os links e o contato direto. */
 export function HeroCopy({ ref, stage, leaving, loading }: HeroCopyProps) {
   const slotRef = useRef<HTMLSpanElement>(null)
+  const lang = useLang()
+  const m = MESSAGES[lang]
   // Largo (lg): a vida mais longa sempre numa linha, com a fonte do visitante. Abaixo, reserva de duas linhas.
-  const slotSize = useFitFontSize(slotRef, SLOTS, WIDE_QUERY)
+  const slotSize = useFitFontSize(slotRef, SLOTS[lang], WIDE_QUERY)
   // As amostras só existem no navegador, depois da hidratação: fora do HTML (buscadores e IAs leriam as vidas como
   // texto escondido) e do caminho do LCP; absolutas e invisíveis, não mexem no layout.
   const amostras = useHydrated()
@@ -56,13 +65,13 @@ export function HeroCopy({ ref, stage, leaving, loading }: HeroCopyProps) {
     >
       <h1>
         <span className="relative block text-lg text-fg/65 lg:text-2xl">
-          <span data-vida-texto>{loading ? 'Today I am' : abertura(stage)}</span>
+          <span data-vida-texto>{loading ? m.hero.loadingOpening : abertura(m, stage)}</span>
           {/* Amostras paradas e escondidas de cada vida (#138): a cena 3D pinta o fundo de uma vida antes de ela
               entrar, medindo o texto dela aqui, na mesma coluna e na mesma fonte (devops/referencias.ts). */}
           {amostras &&
             stages.map((s) => (
               <span key={s.id} data-medida={s.prop} aria-hidden className="invisible absolute inset-x-0 top-0">
-                {abertura(s)}
+                {abertura(m, s)}
               </span>
             ))}
         </span>{' '}
@@ -76,22 +85,26 @@ export function HeroCopy({ ref, stage, leaving, loading }: HeroCopyProps) {
         >
           <span data-vida-texto>
             {/* Com a cena, a vida entra com a entrada que o SlotWord já tem (monta de novo). */}
-            {loading ? <LoadingWord /> : <SlotWord text={stage.slot} life={stage.id} leaving={leaving} />}
+            {loading ? (
+              <LoadingWord word={m.hero.loading} />
+            ) : (
+              <SlotWord text={m.hero.slots[stage.id]} life={stage.id} leaving={leaving} />
+            )}
           </span>
           {amostras &&
             stages.map((s) => (
               <span key={s.id} data-medida={s.prop} aria-hidden className="invisible absolute inset-x-0 top-0">
-                <SlotWord text={s.slot} life={s.id} leaving={false} medida />
+                <SlotWord text={m.hero.slots[s.id]} life={s.id} leaving={false} medida />
               </span>
             ))}
         </span>
       </h1>
       {/* Celular: um título por linha. A partir de sm: numa linha só, separados por um ponto apagado. */}
       <ul
-        aria-label="Títulos"
+        aria-label={m.hero.titlesLabel}
         className="mt-4 flex flex-col gap-0.5 text-sm leading-snug font-medium text-fg/75 sm:mt-5 sm:flex-row sm:flex-wrap sm:items-baseline sm:gap-y-1 sm:text-hero-titles lg:mt-6 lg:text-lg short:mt-2"
       >
-        {profile.titles.map((t, i) => (
+        {m.hero.titles.map((t, i) => (
           <li key={t} className="flex items-baseline">
             {i > 0 && (
               <span aria-hidden className="mx-2 hidden text-fg/25 sm:inline lg:mx-3">
@@ -103,7 +116,7 @@ export function HeroCopy({ ref, stage, leaving, loading }: HeroCopyProps) {
         ))}
       </ul>
       <nav
-        aria-label="Links"
+        aria-label={m.hero.linksLabel}
         className="pointer-events-auto mt-6 flex flex-col items-start gap-3 sm:mt-7 lg:mt-8 lg:gap-4 short:mt-3 short:gap-2"
       >
         {/* Leva ao início da trajetória, sempre (J48, 28/09); o salto direto para a vida fica para depois. Pelo
@@ -111,11 +124,11 @@ export function HeroCopy({ ref, stage, leaving, loading }: HeroCopyProps) {
             afunda o botão no mesmo quadro (:active), e a barra do roteador (NavigationProgress) segue até a
             trajetória pintar (U2). */}
         <Link
-          to={journeyLink.href}
+          to={localePath(lang, journeyPath)}
           prefetch="intent"
           className="inline-flex items-center gap-2 rounded-full bg-fg px-5 py-3 text-sm font-semibold text-on-fg transition-[color,background-color,transform] duration-150 hover:bg-fg/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fg active:scale-[0.96] active:bg-fg/70 motion-reduce:active:scale-100 short:py-2"
         >
-          {journeyLink.label} <span aria-hidden>→</span>
+          {m.hero.journeyLink} <span aria-hidden>→</span>
         </Link>
         {/* Três pílulas: cabem numa linha desde 320 px. */}
         <ul className="flex flex-wrap gap-1.5 sm:gap-2">

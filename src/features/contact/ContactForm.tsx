@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef } from 'react'
 import { LIMITS, type Field } from '../../../shared/contact/contract'
-import { FIELD_HINT } from './texts'
+import { useMessages } from '../../i18n/lang'
+import { errorText, fieldHint } from './texts'
 import { useContactForm } from './useContactForm'
 import { useTurnstile } from './useTurnstile'
 
@@ -19,6 +20,8 @@ const LABEL = 'mb-1 block text-xs text-fg/60'
 export function ContactForm({ active }: { active: boolean }) {
   const { container: captcha, token, failed, renew } = useTurnstile(active)
   const { status, invalid, submit, clearInvalid, restart } = useContactForm({ token, failed, renew })
+  const m = useMessages()
+  const t = m.contact
   const form = useRef<HTMLFormElement>(null)
   const again = useRef<HTMLButtonElement>(null)
   const id = useId()
@@ -28,7 +31,7 @@ export function ContactForm({ active }: { active: boolean }) {
   // A verificação humana ainda não terminou (U2, D-143: a demora da 1ª abertura): nem token nem falha. O botão avisa
   // e não envia (o envio sem token já para em useContactForm). Com o token, "Send"; falha, o texto que já existe.
   const verifying = token === null && !failed && status.kind !== 'sending'
-  const sendLabel = status.kind === 'sending' ? 'Sending…' : 'Send'
+  const sendLabel = status.kind === 'sending' ? t.sending : t.send
   const nameInput = () => form.current?.querySelector<HTMLInputElement>('input[name="name"]')
 
   useEffect(() => {
@@ -58,7 +61,7 @@ export function ContactForm({ active }: { active: boolean }) {
   const hint = (name: Field) =>
     invalid.includes(name) && (
       <p id={hintId(name)} className="mt-1 text-xs text-error">
-        {FIELD_HINT[name]}
+        {fieldHint(m, name)}
       </p>
     )
 
@@ -66,14 +69,14 @@ export function ContactForm({ active }: { active: boolean }) {
     <>
       {status.kind === 'sent' && (
         <div role="status" className="mt-4 space-y-3 text-sm text-fg/80">
-          <p>Thanks! Message received. I&apos;ll get back to you soon.</p>
+          <p>{t.sent}</p>
           <button
             type="button"
             ref={again}
             onClick={restart}
             className="cursor-pointer text-fg underline underline-offset-4 hover:text-fg/80"
           >
-            Send another message
+            {t.another}
           </button>
         </div>
       )}
@@ -86,7 +89,7 @@ export function ContactForm({ active }: { active: boolean }) {
       >
         <div>
           <label htmlFor={`${id}-name`} className={LABEL}>
-            Name
+            {t.name}
           </label>
           <input
             {...fieldProps('name')}
@@ -100,7 +103,7 @@ export function ContactForm({ active }: { active: boolean }) {
         </div>
         <div>
           <label htmlFor={`${id}-contact`} className={LABEL}>
-            E-mail or WhatsApp, so I can reply
+            {t.contact}
           </label>
           <input
             {...fieldProps('contact')}
@@ -115,7 +118,7 @@ export function ContactForm({ active }: { active: boolean }) {
         </div>
         <div>
           <label htmlFor={`${id}-message`} className={LABEL}>
-            Message
+            {t.message}
           </label>
           <textarea
             {...fieldProps('message')}
@@ -149,10 +152,10 @@ export function ContactForm({ active }: { active: boolean }) {
               className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent motion-reduce:animate-none"
             />
           )}
-          {verifying ? 'Verifying…' : sendLabel}
+          {verifying ? t.verifying : sendLabel}
         </button>
         <p role="status" className="min-h-[1lh] text-xs text-error">
-          {status.kind === 'error' ? status.text : ''}
+          {status.kind === 'error' ? errorText(status.key, m) : ''}
         </p>
       </form>
     </>

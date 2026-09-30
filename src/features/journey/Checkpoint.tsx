@@ -1,15 +1,13 @@
 import { memo, useMemo } from 'react'
 import { periodLabel, type Checkpoint as Data } from '../../content/journey-timeline'
+import { MESSAGES, useLang, type Lang } from '../../i18n/lang'
+import { tagLabel } from '../../i18n/tags'
 import { cx } from '../../lib/cx'
 import type { Lane, Placed } from './layout'
 import { useReading, type Reading } from './reading'
 import { eyebrow } from './parts'
 
-const TAG_GROUPS = [
-  { key: 'tools', label: 'Tools' },
-  { key: 'concepts', label: 'Concepts' },
-  { key: 'skills', label: 'Skills' },
-] as const
+const TAG_GROUPS = ['tools', 'concepts', 'skills'] as const
 
 /* Classes inteiras por faixa (o Tailwind só gera o que lê no código). No celular, tudo numa coluna só. */
 const CARD: Record<Lane, string> = {
@@ -40,6 +38,10 @@ const NODE: Record<Lane, string> = {
  */
 const BIG =
   'text-[min(2.75rem,calc((100vw_-_5rem)/7.4))] lg:text-[min(5.6vw,3.875rem)] leading-landmark font-semibold tracking-landmark'
+/** Em português a mais longa é "Empreendedor" (≈7,8em): a mesma conta, com a palavra dela. */
+const BIG_PT =
+  'text-[min(2.75rem,calc((100vw_-_5rem)/8.2))] lg:text-[min(5vw,3.7rem)] leading-landmark font-semibold tracking-landmark'
+const big = (lang: Lang) => (lang === 'pt' ? BIG_PT : BIG)
 
 /**
  * Um marco do mapa, em duas camadas (J27): o que se lê de relance (data, título, papel, a frase, as conquistas e as
@@ -97,7 +99,9 @@ export const Checkpoint = memo(function Checkpoint({ item, hidden, yearFirst, ma
  */
 const Card = memo(function Card({ item, matched }: { item: Placed; matched: string }) {
   const { c, scope, life, lane } = item
-  const period = periodLabel(c)
+  const lang = useLang()
+  const m = MESSAGES[lang].journey
+  const period = periodLabel(c, lang)
   const wide = lane === 'wide'
   const chosen = useMemo(() => new Set(matched ? matched.split('\n') : []), [matched])
   return (
@@ -125,26 +129,26 @@ const Card = memo(function Card({ item, matched }: { item: Placed; matched: stri
             wide ? 'text-2xl sm:text-3xl lg:text-4xl' : 'text-xl sm:text-2xl',
           )}
         >
-          {c.title.en}
+          {c.title[lang]}
         </h3>
-        {c.subtitle && <p className="ink mt-1.5 text-base font-medium sm:text-lg">{c.subtitle.en}</p>}
+        {c.subtitle && <p className="ink mt-1.5 text-base font-medium sm:text-lg">{c.subtitle[lang]}</p>}
         <p className={cx('mt-4 leading-relaxed text-fg/85', wide ? 'text-lg lg:text-xl' : 'text-base sm:text-lg')}>
-          {c.headline.en}
+          {c.headline[lang]}
         </p>
-        {c.highlights && <Highlights items={c.highlights.en} className="mt-5 hidden sm:block" />}
+        {c.highlights && <Highlights items={c.highlights[lang]} className="mt-5 hidden sm:block" />}
       </div>
-      <Tags tags={c.tags} wide={wide} chosen={chosen} />
+      <Tags tags={c.tags} wide={wide} chosen={chosen} lang={lang} />
       <details className="group mt-6 border-t border-fg/8 pt-4">
         <summary className="inline-flex min-h-9 cursor-pointer list-none items-center gap-2 text-sm font-medium text-fg/70 hover:text-fg focus-visible:outline-2 focus-visible:outline-fg [&::-webkit-details-marker]:hidden">
-          <span className="group-open:hidden">Read the story</span>
-          <span className="hidden group-open:inline">Close the story</span>
+          <span className="group-open:hidden">{m.readStory}</span>
+          <span className="hidden group-open:inline">{m.closeStory}</span>
           <span aria-hidden className="text-(--accent) transition-transform duration-300 group-open:rotate-45">
             +
           </span>
         </summary>
-        {c.highlights && <Highlights items={c.highlights.en} className="mt-4 sm:hidden" />}
+        {c.highlights && <Highlights items={c.highlights[lang]} className="mt-4 sm:hidden" />}
         <div className="mt-3 max-w-[68ch] space-y-4 text-story leading-relaxed text-fg/80">
-          {c.body.en.map((p) => (
+          {c.body[lang].map((p) => (
             <p key={p}>{p}</p>
           ))}
         </div>
@@ -156,7 +160,7 @@ const Card = memo(function Card({ item, matched }: { item: Placed; matched: stri
           rel="noopener noreferrer"
           className="mt-4 inline-flex min-h-6 items-center gap-1.5 justify-self-start text-sm font-medium text-fg/85 underline decoration-(--accent) underline-offset-4 hover:text-fg"
         >
-          {c.link.label.en} <span aria-hidden>↗</span>
+          {c.link.label[lang]} <span aria-hidden>↗</span>
         </a>
       )}
     </article>
@@ -165,9 +169,11 @@ const Card = memo(function Card({ item, matched }: { item: Placed; matched: stri
 
 /** A vida do herói que começa neste marco: o nome grande, na cor dela, sem numeração (J66). */
 function Landmark({ life, lane }: { life: NonNullable<Placed['life']>; lane: Lane }) {
+  const lang = useLang()
+  const slot = MESSAGES[lang].hero.slots[life.id]
   return (
     <div className={cx('landmark relative mb-5 lg:mb-0', LANDMARK[lane])}>
-      <p className={cx(BIG, 'text-(--accent)')}>{life.slot}</p>
+      <p className={cx(big(lang), 'text-(--accent)')}>{slot}</p>
     </div>
   )
 }
@@ -178,7 +184,7 @@ function Landmark({ life, lane }: { life: NonNullable<Placed['life']>; lane: Lan
  */
 function YearMark({ year }: { year: string }) {
   return (
-    <p aria-hidden className={cx('year-mark pb-6 tabular-nums lg:pb-10 lg:text-center', BIG)}>
+    <p aria-hidden className={cx('year-mark pb-6 tabular-nums lg:pb-10 lg:text-center', big(useLang()))}>
       {year}
     </p>
   )
@@ -205,10 +211,21 @@ function Highlights({ items, className }: { items: string[]; className: string }
  * Tags separadas em ferramentas, conceitos e habilidades (J26), num peso abaixo do texto: são o índice do que o marco
  * usou, não a história. No marco largo, três colunas lado a lado; nos outros, um grupo embaixo do outro.
  */
-function Tags({ tags, wide, chosen }: { tags: Data['tags']; wide: boolean; chosen: ReadonlySet<string> }) {
-  const groups = TAG_GROUPS.flatMap((g) => {
-    const items = tags?.[g.key]
-    return items?.length ? [{ ...g, items }] : []
+function Tags({
+  tags,
+  wide,
+  chosen,
+  lang,
+}: {
+  tags: Data['tags']
+  wide: boolean
+  chosen: ReadonlySet<string>
+  lang: Lang
+}) {
+  const labels = MESSAGES[lang].journey.groups
+  const groups = TAG_GROUPS.flatMap((key) => {
+    const items = tags?.[key]
+    return items?.length ? [{ key, label: labels[key], items }] : []
   })
   if (!groups.length) return null
   return (
@@ -228,7 +245,7 @@ function Tags({ tags, wide, chosen }: { tags: Data['tags']; wide: boolean; chose
                   key={t}
                   className={cx('tag rounded-full px-2.5 py-0.5 text-tag', `tag-${g.key}`, chosen.has(t) && 'is-match')}
                 >
-                  {t}
+                  {tagLabel(lang, g.key, t)}
                 </li>
               ))}
             </ul>

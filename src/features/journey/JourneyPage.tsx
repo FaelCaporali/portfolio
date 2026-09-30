@@ -1,6 +1,9 @@
-import { memo, useDeferredValue, useEffect, useMemo } from 'react'
+import { memo, useDeferredValue, useEffect, useLayoutEffect, useMemo } from 'react'
+import { LANGS } from '../../../shared/i18n'
 import { checkpoints, periodLabel, type Checkpoint as Data } from '../../content/journey-timeline'
 import type { Stage } from '../../content/journey'
+import { restorePlace } from '../../i18n/keepPlace'
+import { useLang, useMessages, type Lang } from '../../i18n/lang'
 import { ContactWidget } from '../contact/ContactWidget'
 import { Checkpoint } from './Checkpoint'
 import { Frame } from './Frame'
@@ -22,23 +25,22 @@ import './journey.css'
  * classe `life-<id>`.
  */
 
-/** O primeiro e o último ano de uma parte: as datas das partes saem do conteúdo, nunca escritas à mão (J41). */
-function years(part: Data['part']): string {
+/**
+ * O primeiro e o último ano de uma parte (null: até hoje): as datas das partes saem do conteúdo, nunca escritas à mão
+ * (J41).
+ */
+function years(part: Data['part']): Part {
   const dates = checkpoints
     .filter((c) => c.part === part)
     .flatMap((c) => [c.period?.start, c.period?.end])
     .filter((d): d is string => !!d)
   const ys = dates.filter((d) => d !== 'present').map((d) => Number(d.slice(0, 4)))
   if (!ys.length) throw new Error(`journey.json: a parte ${part} não tem marco datado`)
-  const last = dates.includes('present') ? 'today' : String(Math.max(...ys))
-  return `${String(Math.min(...ys))} – ${last}`
+  return { id: part, first: Math.min(...ys), last: dates.includes('present') ? null : Math.max(...ys) }
 }
 
 /** Cada parte vai do primeiro ao último ano dos seus marcos; o prólogo e a história se sobrepõem (J46). */
-const PARTS: Record<Data['part'], Part> = {
-  prologue: { id: 'prologue', title: 'Prologue', span: years('prologue') },
-  story: { id: 'story', title: 'The story', span: years('story') },
-}
+const PARTS: Record<Data['part'], Part> = { prologue: years('prologue'), story: years('story') }
 
 /** Cada marco pertence à última vida que começou até ele: é a cor dele e a vida acesa nos pontos do cabeçalho. */
 let current: Stage | undefined
@@ -64,8 +66,13 @@ const rows: Row[] = groups.flatMap((g) => [
 const BOUNDS = { min: Math.min(...scoped.map((i) => i.from)), max: Math.max(...scoped.map((i) => i.to)) }
 const tagsIn = (g: Group) => new Set(scoped.flatMap((i) => i.c.tags?.[g] ?? []))
 const KNOWN = { tools: tagsIn('tools'), concepts: tagsIn('concepts'), skills: tagsIn('skills') }
-/** O rótulo de cada marco no topo do menu do mapa (celular). */
-const LABELS = new Map(placed.map((i) => [markId(i), [periodLabel(i.c), i.c.title.en].filter(Boolean).join(' · ')]))
+/** O rótulo de cada marco no topo do menu do mapa (celular), em cada idioma. */
+const LABELS = Object.fromEntries(
+  LANGS.map((l) => [
+    l,
+    new Map(placed.map((i) => [markId(i), [periodLabel(i.c, l), i.c.title[l]].filter(Boolean).join(' · ')])),
+  ]),
+) as Record<Lang, Map<string, string>>
 
 /** As tags do marco que o filtro escolheu, numa chave de texto: o cartão só redesenha quando ela muda. */
 const matchedIn = (item: (typeof placed)[number], chosen: ReadonlySet<string>) =>
@@ -82,7 +89,8 @@ const LiveMinimap = memo(function LiveMinimap({ reading, out }: { reading: Readi
 })
 const LiveIndex = memo(function LiveIndex({ reading, out }: { reading: Reading; out: ReadonlySet<string> }) {
   const mark = useReading(reading, (s) => s.mark)
-  return <IndexSheet rows={rows} out={out} current={mark} label={LABELS.get(mark ?? '')} />
+  const labels = LABELS[useLang()]
+  return <IndexSheet rows={rows} out={out} current={mark} label={labels.get(mark ?? '')} />
 })
 
 export function JourneyPage() {
@@ -115,7 +123,11 @@ export function JourneyPage() {
     }
     return ids
   }, [out])
-  const { timeline, route, bar, reading } = useJourneyMotion(out)
+  const lang = useLang()
+  const m = useMessages().journey
+  const { timeline, route, bar, reading } = useJourneyMotion(out, lang)
+  // O idioma trocou (o controle PT/EN): o marco que estava à vista volta ao mesmo ponto da tela, antes da pintura.
+  useLayoutEffect(restorePlace, [lang])
 
   return (
     <>
@@ -131,9 +143,9 @@ export function JourneyPage() {
           />
           <svg ref={route} aria-hidden className="route pointer-events-none absolute top-0 left-0 overflow-visible" />
           <p hidden={out.size < placed.length} className="py-24 text-center text-lg text-fg/70">
-            Nothing on the map matches these filters.{' '}
+            {m.empty}{' '}
             <button type="button" onClick={filters.clear} className="underline underline-offset-4 hover:text-fg">
-              Clear filters
+              {m.clearAll}
             </button>
           </p>
           {groups.map((g) => (
