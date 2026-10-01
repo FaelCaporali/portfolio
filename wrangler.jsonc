@@ -40,9 +40,13 @@
       "migrations_dir": "worker/migrations"
     }
   ],
-  // Por IP, por data center: 3 envios por minuto.
-  "ratelimits": [{ "name": "CONTACT_LIMITER", "namespace_id": "1001", "simple": { "limit": 3, "period": 60 } }],
-  // Reenvio do que ficou pendente e limpeza das mensagens com mais de 90 dias.
+  // Contato: por IP, por data center, 3 envios por minuto. MCP: por rede (ASN), por data center, 60 chamadas por minuto;
+  // por IP não serve, porque no Claude e no ChatGPT todos chegam pelos IPs do provedor (worker/mcp/route.ts).
+  "ratelimits": [
+    { "name": "CONTACT_LIMITER", "namespace_id": "1001", "simple": { "limit": 3, "period": 60 } },
+    { "name": "MCP_LIMITER", "namespace_id": "1002", "simple": { "limit": 60, "period": 60 } }
+  ],
+  // Reenvio do que ficou pendente, limpeza do que passou de 90 dias e o resumo semanal do MCP (worker/cron.ts).
   "triggers": { "crons": ["*/15 * * * *"] },
   "vars": {
     "ALLOWED_ORIGINS": "https://fael.caporali.dev",

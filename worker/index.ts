@@ -5,11 +5,11 @@
  */
 import { CONTACT_PATH } from '../shared/contact/contract'
 import { handleContact } from './contact'
-import { retryAndPurge } from './cron'
+import { mcpHousekeeping, retryAndPurge } from './cron'
 import { json } from './http'
 import { langRedirect, withLangVary } from './lang'
 import { SITE_ORIGIN } from '../shared/i18n'
-import { isWorkersDev, MCP_PATH, wantsPage } from './mcp/route'
+import { isWorkersDev, limitMcp, MCP_PATH, wantsPage } from './mcp/route'
 import { withPageCsp } from './page'
 
 /**
@@ -19,7 +19,7 @@ import { withPageCsp } from './page'
 const NOT_FOUND_PAGE = '/__spa-fallback'
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url)
     const { pathname } = url
     const mcp = pathname === MCP_PATH && !wantsPage(request)
@@ -28,8 +28,9 @@ export default {
     if (isWorkersDev(url) && !mcp) return Response.redirect(`${SITE_ORIGIN}${pathname}${url.search}`, 301)
     if (pathname === CONTACT_PATH) return handleContact(request, env)
     if (pathname.startsWith('/api/')) return json(404, { ok: false, error: 'not_found' })
-    // Sob demanda: o SDK do MCP só é avaliado quando um cliente MCP chama (worker/mcp/route.ts).
-    if (mcp) return (await import('./mcp/server')).handleMcp(request, env)
+    // Sob demanda: o SDK do MCP só é avaliado quando um cliente MCP chama, e depois do limite por rede
+    // (worker/mcp/route.ts).
+    if (mcp) return (await limitMcp(request, env)) ?? (await import('./mcp/server')).handleMcp(request, env, ctx)
     // Endereço antigo da trajetória, anunciado antes de a página ganhar o nome em inglês do resto do site.
     if (pathname === '/trajetoria' || pathname === '/trajetoria/') {
       return Response.redirect(new URL('/journey', request.url).href, 301)
@@ -49,6 +50,11 @@ export default {
     ctx.waitUntil(
       retryAndPurge(env, controller.scheduledTime).then((r) =>
         console.log(JSON.stringify({ event: 'contact_cron', ...r })),
+      ),
+    )
+    ctx.waitUntil(
+      mcpHousekeeping(env, controller.scheduledTime).then((r) =>
+        console.log(JSON.stringify({ event: 'mcp_cron', ...r })),
       ),
     )
   },

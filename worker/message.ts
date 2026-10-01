@@ -12,6 +12,8 @@ export interface Message {
   body: string
   country: string | null
   attempts: number
+  /** Cliente MCP que mandou a mensagem (send_message); null = formulário do site. */
+  via: string | null
 }
 
 /** Tentativas de envio (a do formulário + as do cron) antes de desistir. */

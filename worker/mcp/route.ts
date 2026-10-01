@@ -20,3 +20,15 @@ export const isWorkersDev = (url: URL) => url.hostname.endsWith('.workers.dev')
 export const wantsPage = (request: Request) =>
   (request.method === 'GET' || request.method === 'HEAD') &&
   !(request.headers.get('Accept') ?? '').includes('text/event-stream')
+
+/**
+ * Limite por rede (ASN), antes de carregar o SDK: uma rede que dispara chamadas não gasta a CPU do servidor nem as
+ * cotas do dia (mcp/audit.ts). Responde no formato JSON-RPC, que todo cliente MCP lê.
+ */
+export async function limitMcp(request: Request, env: Env): Promise<Response | null> {
+  const asn = (request.cf as IncomingRequestCfProperties | undefined)?.asn
+  const { success } = await env.MCP_LIMITER.limit({ key: `mcp:${typeof asn === 'number' ? asn : 'unknown'}` })
+  if (success) return null
+  const body = { jsonrpc: '2.0', id: null, error: { code: -32000, message: 'Too many requests from this network.' } }
+  return Response.json(body, { status: 429, headers: { 'Retry-After': '60', 'Cache-Control': 'no-store' } })
+}

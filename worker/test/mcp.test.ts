@@ -38,7 +38,7 @@ const withTag = (group: 'tools' | 'concepts' | 'skills', tag: string) =>
     .map((c) => c.id)
 
 describe('conexão', () => {
-  it('protocolo atual: as cinco ferramentas, na ordem, só leitura, e as instruções', async () => {
+  it('protocolo atual: as sete ferramentas, na ordem, as cinco de leitura marcadas, e as instruções', async () => {
     const client = await connect()
     const { tools } = await client.listTools()
     expect(tools.map((t) => t.name)).toEqual([
@@ -47,9 +47,12 @@ describe('conexão', () => {
       'search_journey',
       'get_checkpoint',
       'get_delivered',
+      'send_message',
+      'beacon',
     ])
-    expect(tools.every((t) => t.annotations?.readOnlyHint === true)).toBe(true)
+    expect(tools.map((t) => t.annotations?.readOnlyHint)).toEqual([true, true, true, true, true, false, false])
     expect(client.getInstructions()).toMatch(/get_profile/)
+    expect(client.getInstructions()).toMatch(/beacon/)
   })
 
   it('os seletores estão no tools/list: cada grupo de search_journey lista todos os valores de journey.json', async () => {
@@ -66,7 +69,7 @@ describe('conexão', () => {
 
   it('cliente de 2025 na mesma rota: lista e chama', async () => {
     const client = await connect(true)
-    expect((await client.listTools()).tools).toHaveLength(5)
+    expect((await client.listTools()).tools).toHaveLength(7)
     expect(data(await call(client, 'get_profile')).name).toBe('Fael Caporali')
   })
 })

@@ -4,10 +4,10 @@ import { statusAfter, type Delivery, type Message } from './message'
 export async function insert(db: D1Database, m: Message): Promise<void> {
   await db
     .prepare(
-      'INSERT INTO messages (id, created_at, name, contact, reply_email, body, country, attempts) ' +
-        'VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      'INSERT INTO messages (id, created_at, name, contact, reply_email, body, country, attempts, via) ' +
+        'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
     )
-    .bind(m.id, m.created_at, m.name, m.contact, m.reply_email, m.body, m.country, m.attempts)
+    .bind(m.id, m.created_at, m.name, m.contact, m.reply_email, m.body, m.country, m.attempts, m.via)
     .run()
 }
 
@@ -29,9 +29,10 @@ export async function record(db: D1Database, id: string, attempts: number, d: De
   }
 }
 
-export async function countSince(db: D1Database, since: number): Promise<number> {
+/** Mensagens do formulário desde `since` (as do MCP têm teto próprio, em mcp/audit.ts). */
+export async function countFormSince(db: D1Database, since: number): Promise<number> {
   const row = await db
-    .prepare('SELECT COUNT(*) AS n FROM messages WHERE created_at >= ?')
+    .prepare('SELECT COUNT(*) AS n FROM messages WHERE created_at >= ? AND via IS NULL')
     .bind(since)
     .first<{ n: number }>()
   return row?.n ?? 0
@@ -41,7 +42,7 @@ export async function countSince(db: D1Database, since: number): Promise<number>
 export async function pendingBefore(db: D1Database, before: number, limit: number): Promise<Message[]> {
   const { results } = await db
     .prepare(
-      'SELECT id, created_at, name, contact, reply_email, body, country, attempts FROM messages ' +
+      'SELECT id, created_at, name, contact, reply_email, body, country, attempts, via FROM messages ' +
         "WHERE status = 'pending' AND created_at < ? ORDER BY created_at LIMIT ?",
     )
     .bind(before, limit)

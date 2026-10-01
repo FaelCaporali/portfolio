@@ -1,4 +1,4 @@
-/** Cron: reenvio de pendentes, desistência e retenção. */
+/** Cron: reenvio de pendentes, desistência e retenção das mensagens (o lado do MCP está em mcp-send.test.ts). */
 import { createExecutionContext, createScheduledController, waitOnExecutionContext } from 'cloudflare:test'
 import { env } from 'cloudflare:workers'
 import { describe, expect, it } from 'vitest'
@@ -27,7 +27,9 @@ describe('cron', () => {
     await seed('fresh', now - 60_000)
     await seed('done', now - 10 * 60_000, 'sent')
     await runCron(t.env, now)
-    expect(t.send).toHaveBeenCalledOnce()
+    // O mesmo cron manda o resumo semanal do MCP; aqui só contam os e-mails de contato.
+    const contact = t.send.mock.calls.filter(([mail]) => mail.subject.startsWith('Contato'))
+    expect(contact).toHaveLength(1)
     const byId = Object.fromEntries((await rows()).map((r) => [r.id, r]))
     expect(byId.old).toMatchObject({ status: 'sent', attempts: 2 })
     expect(byId.fresh).toMatchObject({ status: 'pending', attempts: 1 })

@@ -3,6 +3,7 @@
  * requisições de navegador que vão para a página do site.
  */
 import { Client, StreamableHTTPClientTransport } from '@modelcontextprotocol/client'
+import { createExecutionContext } from 'cloudflare:test'
 import { env } from 'cloudflare:workers'
 import { describe, expect, it } from 'vitest'
 import worker from '../index'
@@ -25,7 +26,7 @@ describe('HTTP', () => {
   it('outra página no navegador (Origin de fora) é recusada; a do próprio site conecta e lista', async () => {
     await expect(connectFrom('https://evil.example')).rejects.toThrow(/403|Forbidden/)
     const site = await connectFrom('https://fael.caporali.dev')
-    expect((await site.listTools()).tools).toHaveLength(5)
+    expect((await site.listTools()).tools).toHaveLength(7)
   })
 
   it('workers.dev: o MCP conecta lá; página, contato e o resto vão com 301 para o site', async () => {
@@ -36,7 +37,7 @@ describe('HTTP', () => {
     )
     await client.connect(new StreamableHTTPClientTransport(new URL(`${dev}/mcp`), { fetch: fetchWorker }))
     open.push(client)
-    expect((await client.listTools()).tools).toHaveLength(5)
+    expect((await client.listTools()).tools).toHaveLength(7)
 
     for (const [path, init] of [
       ['/', {}],
@@ -50,8 +51,8 @@ describe('HTTP', () => {
     }
   })
 
-  it('corpo acima de 16 KiB é recusado antes de qualquer leitura (413), mesmo sem Content-Length', async () => {
-    const big = JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'tools/list', params: { pad: 'x'.repeat(17 * 1024) } })
+  it('corpo acima de 64 KiB é recusado antes de qualquer leitura (413), mesmo sem Content-Length', async () => {
+    const big = JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'tools/list', params: { pad: 'x'.repeat(65 * 1024) } })
     const stream = new Blob([big]).stream()
     const r = await fetchWorker(MCP_URL, {
       method: 'POST',
@@ -73,7 +74,11 @@ describe('HTTP', () => {
       ['GET', '*/*'],
       ['HEAD', '*/*'],
     ] as const) {
-      const r = await worker.fetch(new Request(MCP_URL, { method, headers: { Accept: accept } }), withPage)
+      const r = await worker.fetch(
+        new Request(MCP_URL, { method, headers: { Accept: accept } }),
+        withPage,
+        createExecutionContext(),
+      )
       expect(r.status, `${method} ${accept}`).toBe(200)
       expect(r.headers.get('Content-Security-Policy'), `${method} ${accept}`).toContain('nonce-')
       if (method === 'GET') expect(await r.text()).toContain('pagina')
