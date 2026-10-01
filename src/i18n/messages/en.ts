@@ -44,6 +44,11 @@ export const en = {
     titles: ['FullStack Dev', 'QA Analyst', 'TechLead'],
     linksLabel: 'Links',
     journeyLink: 'See the full journey',
+    /**
+     * Fim do rótulo (depois de um espaço) que sai no celular deitado estreito, onde o par não cabe (HeroCopy); em
+     * inglês, cabe inteiro.
+     */
+    journeyLinkTail: '',
     resume: 'Résumé',
     timeline: 'Timeline',
     source: 'View source on GitHub',

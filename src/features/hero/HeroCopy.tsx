@@ -135,7 +135,18 @@ export function HeroCopy({ ref, stage, leaving, loading }: HeroCopyProps) {
             prefetch="intent"
             className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-fg px-5 text-sm font-semibold whitespace-nowrap text-on-fg transition-[color,background-color,transform] duration-150 hover:bg-fg/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fg active:scale-[0.96] active:bg-fg/70 motion-reduce:active:scale-100 sm:w-auto short:h-9 short:w-auto short:shrink-0 short:px-3 short:text-xs"
           >
-            {m.hero.journeyLink} <span aria-hidden>→</span>
+            {/* Celular deitado estreito (< 760 px): o par em pt passava da coluna; sai só o fim do rótulo, que fica
+                inteiro no HTML. */}
+            <span>
+              {m.hero.journeyLink}
+              {m.hero.journeyLinkTail && (
+                <>
+                  {' '}
+                  <span className="max-[47.5rem]:short:hidden">{m.hero.journeyLinkTail}</span>
+                </>
+              )}
+            </span>{' '}
+            <span aria-hidden>→</span>
           </Link>
           {/* O conteúdo objetivo abaixo do herói (#overview): âncora, funciona sem JavaScript; a rolagem é suave só sem
               movimento reduzido (index.css). Fundo liso, sem backdrop-filter: o canvas anima por baixo. Vem depois do
