@@ -1,0 +1,137 @@
+/* A rota de "Um pouco do que entreguei" (Delivered.tsx; 10-direcao-v3.md §5). As cores vêm das classes life-<id>
+   (--accent) e de .ov-neutral (overview.css); gradientes e traços parados, sem filter nem animação. */
+
+/* "Um pouco do que entreguei" como um trecho do mapa da trajetória (10 §5): um nó por parada (o .dot), o primeiro aceso
+   como o marco em leitura (.is-current), e o caminho pontilhado (o 2/7 do .route-base) na cor da vida de cada parada.
+   Abaixo do lg, coluna única: uma perna por parada, do centro do nó ao centro do próximo, e uma poça de luz. No lg, as
+   paradas alternam de lado numa grade de 12 colunas (vão g), o nó 28 px antes da coluna do texto, a perna desce até o
+   fim da parada e uma curva SVG (.ov-curve) a leva ao nó da próxima. */
+.ov-route {
+  --g: 1.5rem;
+  --stop-gap: 1.75rem; /* o mb-7 da parada; 48 px do sm (sm:mb-12) */
+  --next-c: calc(var(--text-offer) * 0.575); /* o centro do nó da próxima parada, a partir do topo dela */
+  /* x do nó da parada à direita no largo: 28 px antes da coluna 6. */
+  --x-right: calc((100% - 11 * var(--g)) / 12 * 5 + 5 * var(--g) - 28px);
+}
+.ov-stop.is-last {
+  --next-c: calc(var(--text-lede) * 0.75);
+}
+.ov-stop:not(.is-before)::before,
+.ov-stop:not(.is-before)::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+}
+.ov-stop:not(.is-before)::before {
+  left: 6.25px;
+  width: 1.5px;
+  top: calc(var(--text-offer) * 0.575);
+  bottom: calc(-1 * (var(--stop-gap) + var(--next-c)));
+  background: repeating-linear-gradient(
+    to bottom,
+    color-mix(in oklab, var(--accent) 55%, transparent) 0 2px,
+    transparent 2px 9px
+  );
+}
+.ov-stop:not(.is-before)::after {
+  z-index: -1;
+  left: -1.25rem;
+  width: 85%;
+  top: -2rem;
+  height: calc(100% + 4rem);
+  background: radial-gradient(closest-side, color-mix(in oklab, var(--accent) 10%, transparent), transparent);
+}
+.ov-curve {
+  display: none;
+}
+@media (width >= 40rem) {
+  .ov-route {
+    --stop-gap: 3rem;
+  }
+  .ov-stop.is-last {
+    --next-c: calc(var(--text-before) * 0.7);
+  }
+}
+@media (width >= 64rem) {
+  .ov-stop {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--g);
+  }
+  .ov-stop.is-left > .ov-node {
+    left: -28px;
+  }
+  .ov-stop.is-right > .ov-node {
+    left: var(--x-right);
+  }
+  .ov-stop:not(.is-before)::before {
+    left: calc(-28px + 6.25px);
+    top: calc(var(--text-offer) * 0.575 + 7px);
+    bottom: 0;
+  }
+  .ov-stop.is-right::before {
+    left: calc(var(--x-right) + 6.25px);
+  }
+  /* A luz do lado do papel. */
+  .ov-stop:not(.is-before)::after {
+    left: auto;
+    right: -6%;
+    width: 46%;
+    top: -25%;
+    height: 150%;
+    background: radial-gradient(closest-side, color-mix(in oklab, var(--accent) 15%, transparent), transparent);
+  }
+  .ov-stop.is-right::after {
+    right: auto;
+    left: -6%;
+  }
+  /* Do centro do nó desta (x = -21 px, no fim da perna) ao da próxima, do outro lado. */
+  .ov-curve {
+    display: block;
+    position: absolute;
+    top: 100%;
+    left: -21px;
+    width: calc((100% - 11 * var(--g)) / 12 * 5 + 5 * var(--g));
+    height: calc(var(--spacing-stop) + var(--text-offer) * 0.575);
+    overflow: visible;
+  }
+  .ov-stop.is-last > .ov-curve {
+    height: calc(var(--spacing-stop) + var(--text-before) * 0.7);
+  }
+  .ov-curve.is-reverse {
+    transform: scaleX(-1);
+  }
+}
+@media (width >= 90rem) {
+  .ov-route {
+    --g: 2rem;
+  }
+}
+.ov-curve path {
+  fill: none;
+  stroke-width: 1.5;
+  stroke-dasharray: 2 7;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+.ov-curve stop {
+  stop-color: var(--accent);
+  stop-opacity: 0.7;
+}
+.ov-node {
+  border: 2px solid var(--accent);
+  background: var(--color-page);
+}
+.ov-node.is-current {
+  background: var(--accent);
+  box-shadow:
+    0 0 0 4px color-mix(in oklab, var(--accent) 22%, transparent),
+    0 0 16px var(--accent);
+}
+/* Antes da tecnologia: um anel com as quatro vidas de antes (accents.ts: --spectrum-before). */
+.ov-node.is-before {
+  border-color: transparent;
+  background:
+    linear-gradient(var(--color-page), var(--color-page)) padding-box,
+    linear-gradient(135deg, var(--spectrum-before, var(--color-fg), var(--color-fg))) border-box;
+}

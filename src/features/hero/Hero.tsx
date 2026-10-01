@@ -12,6 +12,7 @@ import { SceneBoundary } from './SceneBoundary'
 import { SourceLink } from './SourceLink'
 import { useDragRotation } from './hooks/useDragRotation'
 import { useFreeArea } from './hooks/useFreeArea'
+import { useOnScreen } from './hooks/useOnScreen'
 import { usePointerGaze } from './hooks/usePointerGaze'
 import type { Phase } from './model/carousel'
 import { advance, candidates, createLineup, loadOrder, peek, skipFailed, type Lineup } from './model/lineup'
@@ -134,6 +135,11 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
   const m = useMessages()
   // Indo para outra página (o botão da trajetória): a cena para, e o quadro 3D não disputa o processador com ela.
   const leavingPage = useNavigation().state !== 'idle'
+  // Fora da vista (o conteúdo abaixo do herói, 05-contrato O3): a cena para de desenhar e volta ao entrar, sem novo
+  // "loading". O relógio do carrossel anda no quadro da cena (Director): parada, nenhuma vida troca escondida, e
+  // texto e busto voltam juntos de onde estavam.
+  const section = useRef<HTMLElement>(null)
+  const onScreen = useOnScreen(section)
   const select = (id: string) => {
     const i = stages.findIndex((s) => s.id === id)
     // Vida cujo glb falhou: o clique é descartado e o carrossel segue (o aviso visual é da tarefa 143).
@@ -149,13 +155,13 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
   }
 
   return (
-    <section className="relative h-svh overflow-hidden" aria-label={m.hero.section}>
+    <section ref={section} className="relative h-svh overflow-hidden" aria-label={m.hero.section}>
       {/* Se a cena falha (import, render, WebGL), sai só ela: SceneBoundary. */}
       {options && (
         <SceneBoundary onFail={onSceneFail}>
           <Suspense fallback={null}>
             <HeroCanvas
-              paused={leavingPage}
+              paused={leavingPage || !onScreen}
               stage={stage}
               first={opening}
               options={options}

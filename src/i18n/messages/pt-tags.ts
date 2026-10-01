@@ -190,7 +190,7 @@ export const ptSkills: Record<string, string> = {
   Entrepreneurship: 'Empreendedorismo',
   'Full-stack development': 'Desenvolvimento full-stack',
   'Hands-on delivery': 'Execução prática',
-  Hiring: 'Contratação',
+  Hiring: 'Recrutamento',
   'Interface design': 'Design de interface',
   'Knowledge transfer': 'Transferência de conhecimento',
   Leadership: 'Liderança',
@@ -225,4 +225,18 @@ export const ptSkills: Record<string, string> = {
   'Test automation': 'Automação de testes',
   'Test design': 'Projeto de testes',
   'Vendor management': 'Gestão de fornecedores',
+}
+
+/**
+ * Etiquetas da home (ofertas e stack, src/content/overview.json) que a trajetória não usa (11-contrato-v3, A9). As que
+ * a trajetória usa vêm dos dicionários acima, com a mesma tradução nas duas páginas.
+ */
+export const ptHomeTags: Record<string, string> = {
+  'E2E testing': 'Testes E2E',
+  Evals: 'Avaliação de agentes',
+  'LangChain and LangGraph': 'LangChain e LangGraph',
+  Observability: 'Observabilidade',
+  'OpenAI and Anthropic SDKs': 'SDKs da OpenAI e da Anthropic',
+  'RAG and embeddings': 'RAG e embeddings',
+  'Tech leadership': 'Liderança técnica',
 }

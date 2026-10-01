@@ -42,12 +42,51 @@
   --text-eyebrow-sm: 0.62rem; /* eyebrow dos grupos de tags e das partes no índice */
   --text-eyebrow-xs: 0.6rem; /* eyebrow das partes no minimapa */
 
+  /* Tipo da home abaixo do herói (Overview; 07-direcao-visual.md §3.3): interpola de 320 px ao largo, com entrelinha,
+     espaçamento de letra e peso de cada papel. */
+  --text-section: clamp(2.25rem, 1.5rem + 3.75vw, 4.5rem); /* título de seção: 36 em 320, 72 em 1440 */
+  --text-section--line-height: 1;
+  --text-section--letter-spacing: -0.035em;
+  --text-section--font-weight: 600;
+  --text-offer-lead: clamp(1.5rem, 1.1rem + 1.6vw, 2.25rem); /* título da oferta principal */
+  --text-offer-lead--line-height: 1.1;
+  --text-offer-lead--letter-spacing: -0.025em;
+  --text-offer: clamp(1.25rem, 1.05rem + 0.9vw, 1.75rem); /* título das outras ofertas e do que já entreguei */
+  --text-offer--line-height: 1.15;
+  --text-offer--letter-spacing: -0.02em;
+  --text-lede: clamp(1.125rem, 1rem + 0.5vw, 1.375rem); /* o texto que segue o título */
+  --text-lede--line-height: 1.5;
+  --text-before: clamp(1.25rem, 1rem + 1vw, 1.75rem); /* "antes da tecnologia" */
+  --text-before--line-height: 1.4;
+  --text-body: clamp(1rem, 0.95rem + 0.2vw, 1.0625rem); /* corpo */
+  --text-body--line-height: 1.6;
+  --text-proof: clamp(0.875rem, 0.8rem + 0.4vw, 0.9375rem); /* provas, resultados e fatos: 14 em 320, 15 do 560 */
+  --text-proof--line-height: 1.55;
+  /* v3 (10-direcao-v3.md §8): o título das seções de apoio (stack e perguntas), menor que o das de venda, e o papel em
+     cada parada de "Um pouco do que entreguei" no largo, como o rótulo grande de um mapa. */
+  --text-section-sm: clamp(1.75rem, 1.35rem + 2vw, 2.75rem); /* 28 em 320, 44 do 1440 */
+  --text-section-sm--line-height: 1.05;
+  --text-section-sm--letter-spacing: -0.03em;
+  --text-section-sm--font-weight: 600;
+  --text-role: clamp(1.375rem, -0.05rem + 2.6vw, 2.25rem); /* 25,8 em 1024, 36 do 1440 */
+  --text-role--line-height: 1.1;
+  --text-role--letter-spacing: -0.025em;
+  --text-role--font-weight: 600;
+
   /* Larguras de tela, em px como antes (min-[360px], min-[400px]): 360 é o celular comum, 400 o grande. */
   --breakpoint-phone: 360px;
   --breakpoint-phone-lg: 400px;
+  --breakpoint-desktop: 90rem; /* 1440: a grade da home abre o vão; em rem, como sm a 2xl, para ordenar com eles */
 
   /* Respiro do herói no layout largo: texto e nome a 7vw da borda. */
   --spacing-hero: 7vw;
+  /* Respiro da home abaixo do herói (07 §3.4, com o piso do celular mais baixo para a região não crescer além da v1):
+     entre seções (64 no celular, 104 em 1024, 133 em 1440, 144 do 1600) e do título ao conteúdo (32 a 64). */
+  --spacing-section: clamp(4rem, 2rem + 7vw, 9rem);
+  --spacing-section-inner: clamp(2rem, 1rem + 3vw, 4rem);
+  --spacing-stop: 5.5rem; /* entre as paradas de "Um pouco do que entreguei" no largo (10 §5.1) */
+  /* Largura máxima do conteúdo da home (07 §3.1): 86vw até 1680 px, que ela só alcança a partir de 1953 px. */
+  --container-region: 105rem;
 
   /* Camadas (z-index). */
   --z-index-backdrop: 20; /* -z-backdrop: o brilho de fundo da trajetória */
@@ -84,6 +123,13 @@
 
 html {
   color-scheme: dark;
+}
+/* A home desce suave até o conteúdo abaixo do herói (o CTA "Cut the BS", #overview); com movimento reduzido, salta. Só
+   na página que tem a região. */
+@media (prefers-reduced-motion: no-preference) {
+  html:has(#overview) {
+    scroll-behavior: smooth;
+  }
 }
 body {
   margin: 0;

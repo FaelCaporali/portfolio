@@ -1,0 +1,226 @@
+/* A home abaixo do herói (Overview.tsx; direção "Grade das vidas", .wai/pagina-objetiva/07-direcao-visual.md §3):
+   cada bloco aceso pela cor da vida onde a prova dele mora na trajetória (a classe life-<id> dá --accent; CSS gerado de
+   journey.ts). A cor é luz, não fundo, como na trajetória: gradientes parados da vida com transparente, nenhuma cor
+   nova. Sem backdrop-filter nem filter (o canvas do herói está logo acima). Animação só de opacity e transform,
+   parada com movimento reduzido. */
+
+/* Luz da região: sai do topo, na cor da vida em que o herói abre (life-ai), e liga o herói ao conteúdo. */
+.ov-light {
+  background: radial-gradient(45% 35% at 10% 0%, color-mix(in oklab, var(--accent) 10%, transparent), transparent 70%);
+}
+
+/* Textura parada (a faixa das ofertas e o fechamento): uma grade de pontos que some nas bordas de cima e de baixo. Num
+   pseudo-elemento: a máscara não pode apagar o conteúdo. */
+.ov-dots {
+  position: relative;
+  isolation: isolate;
+}
+.ov-dots::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: radial-gradient(rgb(var(--fg-rgb) / 0.07) 1px, transparent 1.5px);
+  background-size: 24px 24px;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 15%, #000 85%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 15%, #000 85%, transparent);
+}
+
+/* Painel de oferta: luz da vida no canto, borda na cor dela e um fio de luz no topo. No hover e no foco, o contorno e a
+   sombra acendem (só a opacidade anima). */
+.ov-panel {
+  position: relative;
+  background:
+    radial-gradient(120% 80% at 0% 0%, color-mix(in oklab, var(--accent) 12%, transparent), transparent 60%),
+    var(--color-surface);
+  border: 1px solid color-mix(in oklab, var(--accent) 20%, transparent);
+}
+.ov-panel.is-lead {
+  background:
+    radial-gradient(120% 80% at 0% 0%, color-mix(in oklab, var(--accent) 16%, transparent), transparent 60%),
+    var(--color-surface);
+}
+/* Faixas 2 e 4 (10 §3): a luz nasce à direita, para quatro faixas não virarem quatro cartões iguais. */
+.ov-panel.is-right {
+  background:
+    radial-gradient(120% 80% at 100% 0%, color-mix(in oklab, var(--accent) 12%, transparent), transparent 60%),
+    var(--color-surface);
+}
+.ov-panel::before,
+.ov-panel::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+}
+.ov-panel::before {
+  top: -1px;
+  inset-inline: 24px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in oklab, var(--accent) 70%, transparent) 30%,
+    transparent 75%
+  );
+}
+.ov-panel.is-right::before {
+  background: linear-gradient(
+    270deg,
+    transparent,
+    color-mix(in oklab, var(--accent) 70%, transparent) 30%,
+    transparent 75%
+  );
+}
+.ov-panel::after {
+  inset: -1px;
+  border-radius: inherit;
+  border: 1px solid color-mix(in oklab, var(--accent) 45%, transparent);
+  box-shadow: 0 24px 60px -32px color-mix(in oklab, var(--accent) 45%, transparent);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.ov-panel:hover::after,
+.ov-panel:focus-within::after {
+  opacity: 1;
+}
+
+/* Sem vida (a stack, o início da trajetória): a "cor" do bloco é o primeiro plano. */
+.ov-neutral {
+  --accent: var(--color-fg);
+}
+
+/* Etiquetas: o estilo das ferramentas da trajetória (fundo, sem borda): não têm forma de botão. */
+.ov-tag {
+  background: rgb(var(--fg-rgb) / 0.06);
+  color: rgb(var(--fg-rgb) / 0.8);
+  border-radius: 6px;
+}
+
+/* Texto pequeno na cor da vida, misturado ao branco para o contraste AA (o .ink da trajetória). */
+.ov-ink {
+  color: color-mix(in oklab, var(--accent) 72%, var(--color-fg));
+}
+
+/* Links das provas, da história, do código aberto e do fecho (10 §2.3): sozinhos na linha ou numa lista, sem
+   sublinhado em repouso (a seta na cor da vida é o sinal que não é só cor); no hover e no foco, o texto acende, o
+   sublinhado de 1 px na cor da vida aparece e a seta anda 3 px. No meio de um parágrafo (.is-inline: "Read the full
+   story"), o sublinhado fica, como antes. */
+.ov-link {
+  text-decoration-line: none;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--accent);
+  text-underline-offset: 4px;
+  transition: color 0.15s ease;
+}
+.ov-link:hover,
+.ov-link:focus-visible {
+  color: var(--color-fg);
+  text-decoration-line: underline;
+}
+.ov-link.is-inline {
+  text-decoration-line: underline;
+  text-decoration-color: color-mix(in oklab, var(--accent) 50%, transparent);
+}
+.ov-link.is-inline:hover,
+.ov-link.is-inline:focus-visible {
+  text-decoration-color: var(--accent);
+}
+.ov-arrow {
+  display: inline-block;
+  color: var(--accent);
+  transition: transform 0.15s ease;
+}
+.ov-link:hover .ov-arrow,
+.ov-more:hover .ov-arrow {
+  transform: translateX(3px);
+}
+.ov-more {
+  transition: color 0.15s ease;
+}
+.ov-more:hover {
+  color: var(--color-fg);
+}
+
+/* O CTA de cada oferta (10 §4.2): contorno e fundo na cor da vida, o balão nela; no hover, a borda acende, sem
+   transição. */
+.ov-cta2 {
+  border: 1px solid color-mix(in oklab, var(--accent) 45%, transparent);
+  background: color-mix(in oklab, var(--accent) 8%, transparent);
+}
+.ov-cta2:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+.ov-cta2 svg {
+  color: var(--accent);
+}
+
+/* A stack em texto corrido (10 §6): o "·" decorativo no fim de cada item (nunca no começo da linha), fora do nome
+   acessível. */
+.ov-run > li:not(:last-child)::after {
+  content: '·';
+  content: '·' / '';
+  margin-left: 0.5em;
+  color: rgb(var(--fg-rgb) / 0.35);
+}
+
+/* A prova principal da oferta de IA: o fio da vida de destino à esquerda. */
+.ov-lead-proof {
+  border-left: 2px solid var(--accent);
+}
+
+/* Fechamento: a luz da vida vem de baixo, e um fio com as nove cores no topo da faixa (o anel do "Contact me"). */
+.ov-closing {
+  background: radial-gradient(
+    70% 120% at 12% 100%,
+    color-mix(in oklab, var(--accent) 14%, transparent),
+    transparent 70%
+  );
+}
+.ov-closing::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 1px;
+  opacity: 0.5;
+  pointer-events: none;
+  background: linear-gradient(90deg, var(--spectrum, var(--color-fg), var(--color-fg)));
+}
+
+/* O CTA do fechamento: o anel do espectro do "Contact me" (index.css: .contact-cta), parado. */
+.ov-ring {
+  position: relative;
+  isolation: isolate;
+}
+.ov-ring::before {
+  content: '';
+  position: absolute;
+  inset: -1.5px;
+  padding: 1.5px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: conic-gradient(var(--spectrum-loop, var(--color-fg), var(--color-fg)));
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+}
+
+/* Movimento reduzido: nenhuma transição ativa na região (10 §10.13), também nos componentes de fora dela que moram aqui
+   (o currículo e os contatos diretos do fechamento); este CSS não tem camada e vence os utilitários. */
+@media (prefers-reduced-motion: reduce) {
+  #overview,
+  #overview *,
+  #overview *::before,
+  #overview *::after {
+    transition: none;
+  }
+  .ov-link:hover .ov-arrow,
+  .ov-more:hover .ov-arrow {
+    transform: none;
+  }
+}

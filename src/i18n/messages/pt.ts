@@ -61,6 +61,7 @@ export const pt: Messages = {
     name: 'Nome',
     contact: 'E-mail ou WhatsApp para eu responder',
     message: 'Mensagem',
+    about: 'Sobre',
     send: 'Enviar',
     sending: 'Enviando…',
     verifying: 'Verificando…',

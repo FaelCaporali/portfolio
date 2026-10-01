@@ -1,6 +1,7 @@
 import { useRef, type Ref } from 'react'
 import { Link } from 'react-router'
 import { stages, type Stage } from '../../content/journey'
+import { OVERVIEW_ID, overview } from '../../content/overview'
 import { journeyPath, profileLinks } from '../../content/profile'
 import { LANGS } from '../../../shared/i18n'
 import { localePath, MESSAGES, useLang, type Lang } from '../../i18n/lang'
@@ -119,17 +120,35 @@ export function HeroCopy({ ref, stage, leaving, loading }: HeroCopyProps) {
         aria-label={m.hero.linksLabel}
         className="pointer-events-auto mt-6 flex flex-col items-start gap-3 sm:mt-7 lg:mt-8 lg:gap-4 short:mt-3 short:gap-2"
       >
-        {/* Leva ao início da trajetória, sempre (J48, 28/09); o salto direto para a vida fica para depois. Pelo
-            roteador, sem recarregar: a página começa a baixar quando o ponteiro ou o foco chega ao botão. O toque
-            afunda o botão no mesmo quadro (:active), e a barra do roteador (NavigationProgress) segue até a
-            trajetória pintar (U2). */}
-        <Link
-          to={localePath(lang, journeyPath)}
-          prefetch="intent"
-          className="inline-flex items-center gap-2 rounded-full bg-fg px-5 py-3 text-sm font-semibold text-on-fg transition-[color,background-color,transform] duration-150 hover:bg-fg/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fg active:scale-[0.96] active:bg-fg/70 motion-reduce:active:scale-100 short:py-2"
-        >
-          {m.hero.journeyLink} <span aria-hidden>→</span>
-        </Link>
+        {/* O par: a trajetória (cheio, o destaque) e o conteúdo abaixo do herói (contornado), com a mesma altura e o
+            mesmo raio (08-contrato-v2 C3; 07-direcao-visual §4). No celular em pé uma linha não cabe (pt precisa de
+            454 px) e uma linha a mais tiraria 52 px da área livre do busto (useFreeArea): o par fica em "L", com a
+            mesma borda direita, e o "Cut" sobe 12 px acima do botão da trajetória (o vão do botão às pílulas), fora do
+            fluxo, sem mover nada. Do sm para cima, numa linha; deitado (short), numa linha mais baixa. */}
+        <div className="relative flex w-full max-w-[22.5rem] items-center sm:w-auto sm:max-w-none sm:gap-3 lg:gap-4 short:w-auto short:max-w-none short:gap-2">
+          {/* Leva ao início da trajetória, sempre (J48, 28/09); o salto direto para a vida fica para depois. Pelo
+              roteador, sem recarregar: a página começa a baixar quando o ponteiro ou o foco chega ao botão. O toque
+              afunda o botão no mesmo quadro (:active), e a barra do roteador (NavigationProgress) segue até a
+              trajetória pintar (U2). */}
+          <Link
+            to={localePath(lang, journeyPath)}
+            prefetch="intent"
+            className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-fg px-5 text-sm font-semibold whitespace-nowrap text-on-fg transition-[color,background-color,transform] duration-150 hover:bg-fg/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fg active:scale-[0.96] active:bg-fg/70 motion-reduce:active:scale-100 sm:w-auto short:h-9 short:w-auto short:shrink-0 short:px-3 short:text-xs"
+          >
+            {m.hero.journeyLink} <span aria-hidden>→</span>
+          </Link>
+          {/* O conteúdo objetivo abaixo do herói (#overview): âncora, funciona sem JavaScript; a rolagem é suave só sem
+              movimento reduzido (index.css). Fundo liso, sem backdrop-filter: o canvas anima por baixo. Vem depois do
+              botão da trajetória no DOM, a ordem da tela no largo; no celular ele fica à direita dos títulos, ao lado,
+              e a leitura trajetória → Cut segue valendo (11-contrato-v3, revisão: com order, o Tab invertia no
+              largo). */}
+          <a
+            href={`#${OVERVIEW_ID}`}
+            className="absolute right-0 bottom-full mb-3 inline-flex h-11 items-center gap-2 rounded-full border border-fg/30 bg-page/70 px-4 text-sm font-medium whitespace-nowrap text-fg/85 transition-colors hover:border-fg/60 hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fg sm:static sm:mb-0 short:static short:mb-0 short:h-9 short:shrink-0 short:gap-1.5 short:px-3 short:text-xs"
+          >
+            {overview.cta[lang]} <span aria-hidden>↓</span>
+          </a>
+        </div>
         {/* Três pílulas: cabem numa linha desde 320 px. */}
         <ul className="flex flex-wrap gap-1.5 sm:gap-2">
           <li>

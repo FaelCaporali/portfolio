@@ -16,12 +16,17 @@ const LABEL = 'mb-1 block text-xs text-fg/60'
  * Foco: só se move quando quem o tinha deixa de existir ou quando a pessoa pede. Ao abrir, entra no painel (padrão de
  * diálogo); campo inválido recebe o foco; enviado, o formulário some e o foco vai para "enviar outra"; "enviar outra"
  * volta ao primeiro campo. Erro de envio não mexe no foco: o texto é anunciado pelo status.
+ *
+ * Assunto (`topic`, o título da oferta cujo CTA abriu o painel; o ContactWidget o mostra como descrição do diálogo):
+ * vai no começo da mensagem ("[Sobre: …]"), sem campo novo no Worker. A validação continua sobre o texto da pessoa,
+ * e o limite do campo desconta o prefixo (texto longo digitado antes vai sem ele: useContactForm).
  */
-export function ContactForm({ active }: { active: boolean }) {
-  const { container: captcha, token, failed, renew } = useTurnstile(active)
-  const { status, invalid, submit, clearInvalid, restart } = useContactForm({ token, failed, renew })
+export function ContactForm({ active, topic }: { active: boolean; topic?: string | null }) {
   const m = useMessages()
   const t = m.contact
+  const prefix = topic ? `[${t.about}: ${topic}]\n\n` : ''
+  const { container: captcha, token, failed, renew } = useTurnstile(active)
+  const { status, invalid, submit, clearInvalid, restart } = useContactForm({ token, failed, renew }, prefix)
   const form = useRef<HTMLFormElement>(null)
   const again = useRef<HTMLButtonElement>(null)
   const id = useId()
@@ -123,7 +128,7 @@ export function ContactForm({ active }: { active: boolean }) {
           <textarea
             {...fieldProps('message')}
             rows={4}
-            maxLength={LIMITS.message}
+            maxLength={LIMITS.message - prefix.length}
             required
             className={`${INPUT} resize-y`}
           />

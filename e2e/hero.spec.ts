@@ -56,9 +56,12 @@ test('sem rolagem horizontal e currículo com os dois PDFs', async ({ page }) =>
   await page.goto('/')
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)
   expect(overflow).toBeLessThanOrEqual(0)
-  await page.getByRole('button', { name: /Résumé/ }).click()
-  await expect(page.getByRole('link', { name: /Português/ })).toHaveAttribute('href', '/cv/fael-caporali-cv-pt.pdf')
-  await expect(page.getByRole('link', { name: /English/ })).toHaveAttribute('href', '/cv/fael-caporali-cv-en.pdf')
+  // O do herói: o fechamento da home (#overview) tem o mesmo menu do currículo, e a rota do que entreguei tem um item
+  // com "English" no nome; a busca fica na navegação do herói.
+  const links = page.getByRole('navigation', { name: 'Links' })
+  await links.getByRole('button', { name: /Résumé/ }).click()
+  await expect(links.getByRole('link', { name: /Português/ })).toHaveAttribute('href', '/cv/fael-caporali-cv-pt.pdf')
+  await expect(links.getByRole('link', { name: /English/ })).toHaveAttribute('href', '/cv/fael-caporali-cv-en.pdf')
 })
 
 // Celular deitado: layout largo (texto à esquerda, busto à direita), texto abaixo do cabeçalho e inteiro na tela.

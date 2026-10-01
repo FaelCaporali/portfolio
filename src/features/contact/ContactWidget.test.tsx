@@ -1,6 +1,8 @@
-import { act, render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { LIMITS } from '../../../shared/contact/contract'
+import { requestContact } from './contactRequest'
 import { ContactWidget } from './ContactWidget'
 import { FALLBACK, STILL_VERIFYING, errorText } from './texts'
 
@@ -91,6 +93,63 @@ describe('widget de contato', () => {
       website: '',
       token: 'tok-1',
     })
+  })
+
+  it('aberto pelo CTA de uma oferta: mostra o assunto e o junta à mensagem; o mínimo vale para o texto da pessoa', async () => {
+    fetchMock.mockResolvedValue(Response.json({ ok: true }))
+    const user = userEvent.setup()
+    render(<ContactWidget />)
+    const topic = 'Technical leadership and team training'
+    act(() => {
+      requestContact(undefined, topic)
+    })
+    expect(screen.getByText(topic)).toBeVisible()
+    expect(screen.getByText(/^About:/)).toBeVisible()
+    const prefix = `[About: ${topic}]\n\n`
+    expect(screen.getByLabelText('Message')).toHaveAttribute('maxLength', String(LIMITS.message - prefix.length))
+    await user.type(screen.getByLabelText('Name'), 'Maria')
+    await user.type(screen.getByLabelText('E-mail or WhatsApp, so I can reply'), 'maria@example.com')
+    // Curta demais: o assunto não conta para o mínimo.
+    await user.type(screen.getByLabelText('Message'), 'Oi')
+    await user.click(screen.getByRole('button', { name: 'Send' }))
+    expect(screen.getByLabelText('Message')).toHaveAttribute('aria-invalid', 'true')
+    expect(fetchMock).not.toHaveBeenCalled()
+    await user.type(screen.getByLabelText('Message'), ', vamos falar do meu time?')
+    await user.click(screen.getByRole('button', { name: 'Send' }))
+    expect(await screen.findByText(/Message received/)).toBeVisible()
+    const [, init] = fetchMock.mock.calls[0] ?? []
+    expect((JSON.parse(init?.body as string) as { message: string }).message).toBe(
+      `${prefix}Oi, vamos falar do meu time?`,
+    )
+  })
+
+  it('texto no limite digitado antes de abrir por uma oferta: vai sem o assunto, sem o Worker recusar', async () => {
+    fetchMock.mockResolvedValue(Response.json({ ok: true }))
+    const user = await openAndFill({ message: 'Oi' })
+    const longo = 'a'.repeat(LIMITS.message - 1)
+    fireEvent.input(screen.getByLabelText('Message'), { target: { value: longo } })
+    await user.keyboard('{Escape}')
+    act(() => {
+      requestContact(undefined, 'Quality without slowing delivery')
+    })
+    await user.click(screen.getByRole('button', { name: 'Send' }))
+    expect(await screen.findByText(/Message received/)).toBeVisible()
+    const [, init] = fetchMock.mock.calls[0] ?? []
+    expect((JSON.parse(init?.body as string) as { message: string }).message).toBe(longo)
+  })
+
+  it('aberto depois pelo botão flutuante, o formulário esquece o assunto', async () => {
+    const user = userEvent.setup()
+    render(<ContactWidget />)
+    act(() => {
+      requestContact(undefined, 'From MVP to a product that scales')
+    })
+    expect(screen.getByText(/^About:/)).toBeVisible()
+    await user.keyboard('{Escape}')
+    await user.click(screen.getByRole('button', { name: 'Contact me' }))
+    expect(screen.getByRole('dialog')).toBeVisible()
+    expect(screen.queryByText(/^About:/)).toBeNull()
+    expect(screen.getByLabelText('Message')).toHaveAttribute('maxLength', String(LIMITS.message))
   })
 
   it.each([

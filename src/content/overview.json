@@ -1,0 +1,408 @@
+{
+  "cta": {
+    "en": "Cut the BS",
+    "pt": "Sem lero-lero"
+  },
+  "more": {
+    "text": {
+      "en": "and many more",
+      "pt": "e muito mais"
+    },
+    "label": {
+      "en": "and many more on the full journey",
+      "pt": "e muito mais na trajetória completa"
+    }
+  },
+  "offers": {
+    "title": {
+      "en": "What I can build for you",
+      "pt": "O que posso fazer por você"
+    },
+    "lede": {
+      "en": "Closed-scope projects, contracts and consulting. Every offer below comes from work I've already delivered.",
+      "pt": "Projetos de escopo fechado, contratos e consultoria. Tudo o que ofereço aqui vem de trabalho que já entreguei."
+    },
+    "items": [
+      {
+        "title": {
+          "en": "AI products and agents, in production",
+          "pt": "Produtos e agentes de IA em produção"
+        },
+        "text": {
+          "en": "From an idea or a first prototype all the way to production: agents that work together with human review, WhatsApp agents, RAG knowledge bases, agent evaluation and usage-based billing.",
+          "pt": "Da ideia ou do primeiro protótipo até a produção: agentes que trabalham em conjunto com revisão humana, agentes no WhatsApp, base de conhecimento com RAG, avaliação de agentes e cobrança por consumo."
+        },
+        "proof": [
+          {
+            "journeyId": "previa",
+            "en": "Construction-planning agents for large projects, in production: a root agent with a methodology specialist (Lean Construction, Advanced Work Packaging, PMBOK) and human review where the numbers matter",
+            "pt": "Agentes de planejamento de obras para grandes empreendimentos, em produção: um agente raiz com um especialista em metodologia (Lean Construction, Advanced Work Packaging, PMBOK) e revisão humana onde os números importam"
+          },
+          {
+            "journeyId": "brickup-ai",
+            "en": "A construction planner that began as an n8n automation and became a product in the platform's plans",
+            "pt": "Um planejador de obras que nasceu como automação em n8n e virou produto nos planos da plataforma"
+          },
+          {
+            "journeyId": "mpc",
+            "en": "A multi-tenant platform of customer-service agents on WhatsApp, built for a regulated market",
+            "pt": "Uma plataforma multi-tenant de agentes de atendimento no WhatsApp, feita para um mercado regulado"
+          }
+        ],
+        "tags": ["AI agents", "RAG", "Evals"],
+        "action": {
+          "en": "Get your AI off the ground",
+          "pt": "Vamos tirar a sua IA do papel"
+        }
+      },
+      {
+        "title": {
+          "en": "From MVP to a product that scales",
+          "pt": "Do MVP ao produto que escala"
+        },
+        "text": {
+          "en": "I turn MVPs and existing systems into software a team can maintain and grow: monorepo, multi-tenancy, CI/CD, infrastructure as code and cloud architecture.",
+          "pt": "Transformo MVPs e sistemas que já existem em software que o time consegue manter e fazer crescer: monorepo, multi-tenancy, CI/CD, infraestrutura como código e arquitetura na nuvem."
+        },
+        "proof": [
+          {
+            "journeyId": "bid",
+            "en": "Five MVPs built with Lovable brought into one monorepo, with row-level security and Terraform on GCP",
+            "pt": "Cinco MVPs feitos no Lovable reunidos num só monorepo, com RLS e Terraform no GCP"
+          },
+          {
+            "journeyId": "bid",
+            "en": "A warehouse system, from triage to shipping, in production",
+            "pt": "Um sistema de estoque, da triagem ao envio, em produção"
+          },
+          {
+            "journeyId": "beamble-architecture",
+            "en": "A live shopping platform moved from a single server to ECS, with blue-green deployments and infrastructure as code",
+            "pt": "Uma plataforma de compras ao vivo levada de um servidor único para ECS, com deploy blue-green e infraestrutura como código"
+          }
+        ],
+        "tags": ["Architecture", "CI/CD", "Infrastructure as code"],
+        "action": {
+          "en": "Show me your MVP",
+          "pt": "Me mostra o seu MVP"
+        }
+      },
+      {
+        "title": {
+          "en": "Quality without slowing delivery",
+          "pt": "Qualidade sem travar a entrega"
+        },
+        "text": {
+          "en": "Test strategy and automation, feature flags and observability, and a QA function that stays with the team after I leave.",
+          "pt": "Estratégia e automação de testes, feature flags e observabilidade, e uma área de qualidade que fica com o time depois que eu saio."
+        },
+        "proof": [
+          {
+            "journeyId": "brickup-quality",
+            "en": "Open defects down from about 300 to under 100, together with engineering",
+            "pt": "Defeitos abertos de cerca de 300 para menos de 100, junto com a engenharia"
+          },
+          {
+            "journeyId": "brickup-quality",
+            "en": "Monitoring and proactive alerts that catch failures before customers have to report them",
+            "pt": "Monitoramento e alertas proativos que pegam as falhas antes de o cliente precisar avisar"
+          }
+        ],
+        "tags": ["E2E testing", "Feature flags", "Observability"],
+        "action": {
+          "en": "Walk me through how you ship",
+          "pt": "Me explica como vocês entregam"
+        }
+      },
+      {
+        "title": {
+          "en": "Technical leadership and team training",
+          "pt": "Liderança técnica e formação de times"
+        },
+        "text": {
+          "en": "Leading a team from the problem to the delivery: requirements, cadence and deadlines, hiring, and training people until the team runs on its own.",
+          "pt": "Conduzo o time do problema à entrega: requisitos, cadência e prazos, contratação e formação de pessoas até o time andar sozinho."
+        },
+        "proof": [
+          {
+            "journeyId": "brickup-lead",
+            "en": "Designed the hiring process and coordinated a team of five developers",
+            "pt": "Desenhei o processo seletivo e coordenei um time de cinco desenvolvedores"
+          },
+          {
+            "journeyId": "brickup-quality",
+            "en": "Trained the team in new quality practices, and the QA who took over my role",
+            "pt": "Formei o time nas novas práticas de qualidade e o QA que assumiu o meu lugar"
+          },
+          {
+            "journeyId": "mpc",
+            "en": "Mentored a junior developer and handed over with the team trained and operating procedures in place",
+            "pt": "Orientei um desenvolvedor júnior e entreguei com o time treinado e os procedimentos de operação prontos"
+          },
+          {
+            "journeyId": "beamble-lead",
+            "en": "Led an international project in English, setting cadence and deadlines between the client and the developers",
+            "pt": "Liderei um projeto internacional em inglês, definindo cadência e prazos entre o cliente e os desenvolvedores"
+          }
+        ],
+        "tags": ["Tech leadership", "Mentoring", "Hiring"],
+        "action": {
+          "en": "Let's talk about your team",
+          "pt": "Me fala do seu time"
+        }
+      }
+    ],
+    "facts": [
+      {
+        "en": "Belo Horizonte, Brazil",
+        "pt": "Belo Horizonte, MG"
+      },
+      {
+        "en": "Remote for Brazil and abroad, or hybrid in BH",
+        "pt": "Remoto para o Brasil e o exterior, ou híbrido em BH"
+      },
+      {
+        "en": "Portuguese and English",
+        "pt": "Português e inglês"
+      },
+      {
+        "en": "Closed-scope projects, contracts or consulting",
+        "pt": "Projeto fechado, contrato ou consultoria"
+      }
+    ],
+    "action": {
+      "en": "Tell me about your project",
+      "pt": "Me conta o seu projeto"
+    }
+  },
+  "experience": {
+    "title": {
+      "en": "A bit of what I've delivered",
+      "pt": "Um pouco do que entreguei"
+    },
+    "story": {
+      "en": "The story",
+      "pt": "A história"
+    },
+    "items": [
+      {
+        "journeyId": "mpc",
+        "context": {
+          "en": "AI customer service on WhatsApp, in a regulated market",
+          "pt": "Atendimento com IA no WhatsApp, num mercado regulado"
+        },
+        "role": {
+          "en": "Tech Lead and Full-Stack Engineer",
+          "pt": "Tech Lead e Engenheiro Full-Stack"
+        },
+        "results": {
+          "en": [
+            "Designed and built a multi-tenant platform of AI agents, with RAG, an agent evaluation tool and token-based billing, and mapped every requirement of the sector's regulation to the code.",
+            "Set up CI/CD with unit, integration and E2E tests, led a team of five and handed over with the first clients live and the team trained."
+          ],
+          "pt": [
+            "Projetei e construí uma plataforma multi-tenant de agentes de IA, com RAG, uma ferramenta de avaliação de agentes e cobrança por consumo de tokens, e mapeei no código cada requisito da regulação do setor.",
+            "Montei o CI/CD com testes unitários, de integração e E2E, coordenei um time de cinco pessoas e entreguei com os primeiros clientes no ar e o time treinado."
+          ]
+        }
+      },
+      {
+        "journeyId": "brickup-quality",
+        "context": {
+          "en": "A construction-tech platform",
+          "pt": "Uma plataforma de tecnologia para a construção civil"
+        },
+        "role": {
+          "en": "QA Manager and Tech Lead",
+          "pt": "Gerente de QA e Tech Lead"
+        },
+        "results": {
+          "en": [
+            "Joined as QA and went on to lead a team of five developers; ran hiring and trained the QA who took over the role.",
+            "Feature flags and Datadog RUM brought open defects from about 300 to under 100.",
+            "Led the construction-planning agents, from an n8n automation to products still in production."
+          ],
+          "pt": [
+            "Entrei como QA e passei a coordenar um time de cinco desenvolvedores; conduzi a seleção e formei o QA que assumiu a função.",
+            "Feature flags e Datadog RUM levaram os defeitos abertos de cerca de 300 para menos de 100.",
+            "Conduzi os agentes de planejamento de obras, de uma automação em n8n a produtos que seguem em produção."
+          ]
+        }
+      },
+      {
+        "journeyId": "bid",
+        "context": {
+          "en": "Device trade-in and asset management",
+          "pt": "Trade-in e gestão de ativos de aparelhos"
+        },
+        "role": {
+          "en": "Technical Consultant and Tech Lead",
+          "pt": "Consultor Técnico e Tech Lead"
+        },
+        "results": {
+          "en": [
+            "Brought five Lovable-built MVPs into a single React/TypeScript monorepo, with multi-tenancy through PostgreSQL row-level security, CI/CD and Terraform on GCP.",
+            "Put the warehouse system into production and set up a harness so the owner could keep building with AI and still reach production."
+          ],
+          "pt": [
+            "Reuni cinco MVPs feitos no Lovable num único monorepo React/TypeScript, com multi-tenancy por RLS no PostgreSQL, CI/CD e Terraform no GCP.",
+            "Coloquei o sistema de estoque em produção e montei um harness para o dono seguir construindo com IA e ainda assim chegar à produção."
+          ]
+        }
+      },
+      {
+        "journeyId": "beamble-lead",
+        "context": {
+          "en": "A software house: live shopping for high-end fashion and a live-music platform",
+          "pt": "Uma software house: compras ao vivo de moda de luxo e uma plataforma de música ao vivo"
+        },
+        "role": {
+          "en": "QA Engineer, then Tech Lead",
+          "pt": "QA Engineer, depois Tech Lead"
+        },
+        "results": {
+          "en": [
+            "Led engineering across three products, in English, between the client, the international team and the Brazilian developers.",
+            "Designed the AWS infrastructure, the move to services and the international delivery integrations; built a React front end and an AI agent that researches each musician and suggests goals for the profile."
+          ],
+          "pt": [
+            "Respondi pela engenharia de três produtos, em inglês, entre o cliente, o time internacional e os desenvolvedores brasileiros.",
+            "Desenhei a infraestrutura AWS, a separação em serviços e as integrações de entrega internacional; construí um frontend React e um agente de IA que pesquisa cada músico e sugere metas para o perfil."
+          ]
+        }
+      }
+    ],
+    "before": {
+      "text": {
+        "en": "Before tech, I spent ten years running my own businesses and a language school's finances. That's where my eye for product, cost and priority comes from.",
+        "pt": "Antes da tecnologia, foram dez anos tocando negócios próprios e as finanças de uma escola de idiomas. É de lá que vem o meu olhar para produto, custo e prioridade."
+      },
+      "link": {
+        "en": "Read the full story",
+        "pt": "Ler a história completa"
+      }
+    }
+  },
+  "stack": {
+    "title": {
+      "en": "Some of my stack",
+      "pt": "Um pouco da minha stack"
+    },
+    "groups": [
+      {
+        "label": {
+          "en": "Languages",
+          "pt": "Linguagens"
+        },
+        "items": ["TypeScript", "JavaScript", "Node.js", "Python", "SQL"]
+      },
+      {
+        "label": {
+          "en": "Front end and mobile",
+          "pt": "Frontend e mobile"
+        },
+        "items": ["React", "React Native", "Expo", "Tailwind", "Vite"]
+      },
+      {
+        "label": {
+          "en": "Back end and data",
+          "pt": "Backend e dados"
+        },
+        "items": ["PostgreSQL", "pgvector", "Prisma", "Express", "Laravel"]
+      },
+      {
+        "label": {
+          "en": "Applied AI",
+          "pt": "IA aplicada"
+        },
+        "items": [
+          "RAG and embeddings",
+          "LangChain and LangGraph",
+          "OpenAI and Anthropic SDKs",
+          "n8n",
+          "Agent evaluation"
+        ]
+      },
+      {
+        "label": {
+          "en": "Cloud and DevOps",
+          "pt": "Cloud e DevOps"
+        },
+        "items": ["AWS", "GCP", "Terraform", "Docker", "GitHub Actions"]
+      },
+      {
+        "label": {
+          "en": "Quality and observability",
+          "pt": "Qualidade e observabilidade"
+        },
+        "items": ["Playwright", "Cypress", "Vitest", "Datadog", "Sentry"]
+      }
+    ],
+    "source": {
+      "en": "This site is open source",
+      "pt": "Este site tem código aberto"
+    }
+  },
+  "faq": {
+    "title": {
+      "en": "Common questions",
+      "pt": "Perguntas frequentes"
+    },
+    "items": [
+      {
+        "q": {
+          "en": "What can I hire Fael for?",
+          "pt": "Para que posso contratar o Fael?"
+        },
+        "a": {
+          "en": "Closed-scope projects are the best fit: taking an AI product to production, taking an MVP to a product that scales, setting up quality and delivery, or leading and training a team. Contracts and one-off consulting work too.",
+          "pt": "O melhor encaixe é projeto de escopo fechado: levar um produto de IA à produção, levar um MVP a um produto que escala, estruturar qualidade e entrega, ou liderar e formar um time. Contrato e consultoria pontual também funcionam."
+        }
+      },
+      {
+        "q": {
+          "en": "How is the work contracted?",
+          "pt": "Como funciona a contratação?"
+        },
+        "a": {
+          "en": "Through HC Consultorias, my company, with a contract and an invoice. Other formats, let's talk.",
+          "pt": "Pela HC Consultorias, a minha empresa, com contrato e nota fiscal. Outros formatos, a gente conversa."
+        }
+      },
+      {
+        "q": {
+          "en": "Where from, and in which languages?",
+          "pt": "De onde e em que idioma?"
+        },
+        "a": {
+          "en": "From Belo Horizonte, Brazil: remote for Brazil and abroad, or hybrid in BH. I work in Portuguese and English.",
+          "pt": "De Belo Horizonte: remoto para o Brasil e o exterior, ou híbrido em BH. Trabalho em português e em inglês."
+        }
+      },
+      {
+        "q": {
+          "en": "How do we start?",
+          "pt": "Como começamos?"
+        },
+        "a": {
+          "en": "Send a message about what you want to build, through the form, email or WhatsApp below.",
+          "pt": "Mande uma mensagem contando o que você quer construir, pelo formulário, e-mail ou WhatsApp aqui embaixo."
+        }
+      }
+    ]
+  },
+  "closing": {
+    "title": {
+      "en": "Got something to build?",
+      "pt": "Tem algo para construir?"
+    },
+    "text": {
+      "en": "Whatever it is, I'll answer with the path I'd take.",
+      "pt": "Seja o que for, eu respondo com o caminho que eu seguiria."
+    },
+    "action": {
+      "en": "Drop me a line",
+      "pt": "Me manda uma mensagem"
+    }
+  }
+}

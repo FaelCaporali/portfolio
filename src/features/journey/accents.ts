@@ -11,7 +11,12 @@ import { pt } from '../../i18n/messages/pt'
 export function lifeAccentsCss(): string {
   const colors = stages.map((s) => s.accent).join(',')
   // O espectro também como variável: o anel do "Contact me" (index.css) gira nele, fechando o círculo na primeira cor.
-  const root = `:root{--spectrum:${colors};--spectrum-loop:${colors},${stages[0]?.accent ?? 'var(--color-fg)'}}`
+  // As vidas de antes da tecnologia, em ordem: o anel da última parada de "Um pouco do que entreguei" (route.css).
+  const before = stages
+    .filter((s) => s.track === 'antes')
+    .map((s) => s.accent)
+    .join(',')
+  const root = `:root{--spectrum:${colors};--spectrum-loop:${colors},${stages[0]?.accent ?? 'var(--color-fg)'};--spectrum-before:${before}}`
   const spectrum = `.journey-spectrum{background-image:linear-gradient(90deg,${colors});-webkit-background-clip:text;background-clip:text;color:transparent}`
   // A posição de cada letra da vida no herói (SlotWord: ch-<n> dá --i, que escalona a animação), até a vida mais longa
   // dos dois idiomas.

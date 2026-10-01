@@ -55,6 +55,7 @@ export const en = {
     name: 'Name',
     contact: 'E-mail or WhatsApp, so I can reply',
     message: 'Message',
+    about: 'About',
     send: 'Send',
     sending: 'Sending…',
     verifying: 'Verifying…',

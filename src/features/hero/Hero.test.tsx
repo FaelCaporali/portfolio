@@ -13,13 +13,13 @@ const cena = vi.hoisted(() => ({ quebra: false }))
 vi.mock('./scene/HeroCanvas', async () => {
   const { createElement, Fragment, useState } = await import('react')
   return {
-    HeroCanvas: ({ onScene }: { onScene: () => void }) => {
+    HeroCanvas: ({ onScene, paused }: { onScene: () => void; paused: boolean }) => {
       const [caiu, setCaiu] = useState(false)
       if (cena.quebra || caiu) throw new Error('a cena quebrou')
       return createElement(
         Fragment,
         null,
-        createElement('button', { type: 'button', onClick: onScene }, 'cena pronta'),
+        createElement('button', { type: 'button', onClick: onScene, 'data-paused': String(paused) }, 'cena pronta'),
         createElement(
           'button',
           {
@@ -167,5 +167,50 @@ describe('herói: "Today I am loading" até a cena 3D (U2)', () => {
     expect(titulo()).toHaveAccessibleName(LOADING)
     await user.click(await screen.findByRole('button', { name: 'cena pronta' }))
     expect(titulo()).toHaveAccessibleName(VIDA)
+  })
+})
+
+describe('conteúdo abaixo do herói (05-contrato O2, O3; 08-contrato-v2 C1)', () => {
+  it('o CTA "Cut the BS" é uma âncora para #overview, também no HTML do build', () => {
+    const html = renderToString(<RouterProvider router={createMemoryRouter(rotas())} />)
+    const container = document.createElement('div')
+    container.innerHTML = html
+    const cut = within(container).getByRole('link', { name: /^Cut the BS/ })
+    expect(cut).toHaveAttribute('href', '#overview')
+    // A ordem do DOM é a da tela no largo (trajetória → Cut), e o Tab segue a visual; no celular o Cut fica ao lado,
+    // à direita dos títulos (11-contrato-v3, revisão: inverter por CSS order trocava o Tab no largo).
+    const journey = within(container).getByRole('link', { name: /^See the full journey/ })
+    expect(journey.compareDocumentPosition(cut) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
+  it('a cena para quando o herói sai da vista e volta ao entrar, sem novo "loading" e sem trocar a vida', async () => {
+    const vistos: ((entries: { isIntersecting: boolean }[]) => void)[] = []
+    vi.stubGlobal(
+      'IntersectionObserver',
+      class {
+        constructor(cb: (entries: { isIntersecting: boolean }[]) => void) {
+          vistos.push(cb)
+        }
+        observe() {}
+        disconnect() {}
+      },
+    )
+    const user = userEvent.setup()
+    render(<RouterProvider router={createMemoryRouter(rotas())} />)
+    const cena = await screen.findByRole('button', { name: 'cena pronta' })
+    await user.click(cena)
+    expect(cena).toHaveAttribute('data-paused', 'false')
+    const visto = (isIntersecting: boolean) => {
+      act(() => {
+        for (const cb of vistos) cb([{ isIntersecting }])
+      })
+    }
+    visto(false)
+    expect(cena).toHaveAttribute('data-paused', 'true')
+    expect(titulo()).toHaveAccessibleName(VIDA)
+    visto(true)
+    expect(cena).toHaveAttribute('data-paused', 'false')
+    expect(titulo()).toHaveAccessibleName(VIDA)
+    vi.stubGlobal('IntersectionObserver', undefined)
   })
 })
