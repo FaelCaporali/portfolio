@@ -1,37 +1,12 @@
 /**
  * O servidor MCP em /mcp pelo cliente oficial (@modelcontextprotocol/client), dentro do runtime da Cloudflare: o
  * protocolo 2026-07-28 e o de 2025 na mesma rota, as cinco ferramentas de leitura em inglês e português, os filtros com
- * a regra da página da trajetória, os erros de argumento e a recusa de outra origem no navegador.
+ * a regra da página da trajetória e os erros de argumento (o lado HTTP está em mcp-http.test.ts).
  */
-import { Client, StreamableHTTPClientTransport } from '@modelcontextprotocol/client'
-import { env } from 'cloudflare:workers'
-import { afterEach, describe, expect, it } from 'vitest'
+import type { Client } from '@modelcontextprotocol/client'
+import { describe, expect, it } from 'vitest'
 import journey from '../../src/content/journey.json'
-import worker from '../index'
-
-const MCP_URL = 'https://fael.caporali.dev/mcp'
-
-const fetchWorker = (url: string | URL, init?: RequestInit) =>
-  worker.fetch(new Request(url, init) as Request<unknown, IncomingRequestCfProperties>, env)
-
-const open: Client[] = []
-afterEach(async () => {
-  await Promise.all(open.splice(0).map((c) => c.close()))
-})
-
-/**
- * Um cliente conectado ao Worker: o protocolo 2026-07-28 (envelope por requisição, sem initialize) fixado, ou o de
- * 2025 (initialize), que é o que o cliente oficial usa quando ninguém pede outro.
- */
-async function connect(legacy = false) {
-  const client = new Client(
-    { name: 'teste-portfolio', version: '1.0.0' },
-    { versionNegotiation: { mode: legacy ? 'legacy' : { pin: '2026-07-28' } } },
-  )
-  await client.connect(new StreamableHTTPClientTransport(new URL(MCP_URL), { fetch: fetchWorker }))
-  open.push(client)
-  return client
-}
+import { connect } from './mcp-client'
 
 type Result = Awaited<ReturnType<Client['callTool']>>
 
@@ -232,57 +207,6 @@ describe('ferramentas', () => {
     for (const args of [{ lang: 'fr' }, { tools: 'React' }, { text: 'x'.repeat(201) }, { from: 'ontem' }]) {
       const r = await call(client, 'search_journey', args).catch((e: unknown) => e)
       expect(r instanceof Error || (r as Result).isError === true, JSON.stringify(args)).toBe(true)
-    }
-  })
-})
-
-describe('HTTP', () => {
-  /** O cliente oficial com uma Origin fixa em toda requisição (o que um navegador mandaria). */
-  async function connectFrom(origin: string) {
-    const client = new Client({ name: 'teste-portfolio', version: '1.0.0' })
-    const withOrigin = (url: string | URL, init?: RequestInit) => {
-      const headers = new Headers(init?.headers)
-      headers.set('Origin', origin)
-      return fetchWorker(url, { ...init, headers })
-    }
-    await client.connect(new StreamableHTTPClientTransport(new URL(MCP_URL), { fetch: withOrigin }))
-    open.push(client)
-    return client
-  }
-
-  it('outra página no navegador (Origin de fora) é recusada; a do próprio site conecta e lista', async () => {
-    await expect(connectFrom('https://evil.example')).rejects.toThrow(/403|Forbidden/)
-    const site = await connectFrom('https://fael.caporali.dev')
-    expect((await site.listTools()).tools).toHaveLength(5)
-  })
-
-  it('corpo acima de 16 KiB é recusado antes de qualquer leitura (413), mesmo sem Content-Length', async () => {
-    const big = JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'tools/list', params: { pad: 'x'.repeat(17 * 1024) } })
-    const stream = new Blob([big]).stream()
-    const r = await fetchWorker(MCP_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Accept: 'application/json, text/event-stream' },
-      body: stream,
-      duplex: 'half',
-    } as RequestInit)
-    expect(r.status).toBe(413)
-  })
-
-  it('navegador, prévia de link e HEAD em /mcp recebem a página do site, não o servidor MCP', async () => {
-    const page = '<!doctype html><title>pagina</title>'
-    const withPage = {
-      ...env,
-      ASSETS: { fetch: () => Promise.resolve(new Response(page, { headers: { 'Content-Type': 'text/html' } })) },
-    } as unknown as Env
-    for (const [method, accept] of [
-      ['GET', 'text/html,application/xhtml+xml'],
-      ['GET', '*/*'],
-      ['HEAD', '*/*'],
-    ] as const) {
-      const r = await worker.fetch(new Request(MCP_URL, { method, headers: { Accept: accept } }), withPage)
-      expect(r.status, `${method} ${accept}`).toBe(200)
-      expect(r.headers.get('Content-Security-Policy'), `${method} ${accept}`).toContain('nonce-')
-      if (method === 'GET') expect(await r.text()).toContain('pagina')
     }
   })
 })

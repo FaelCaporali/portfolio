@@ -6,7 +6,10 @@
   "main": "worker/index.ts",
   "compatibility_date": "2026-09-21",
   "routes": [{ "pattern": "fael.caporali.dev", "custom_domain": true }],
-  "workers_dev": false,
+  // O MCP para os agentes mora em fael-caporali.rafaelhon.workers.dev/mcp, fora da zona e do Bot Fight Mode (D-MCP11,
+  // .wai/mcp/02-plano.md); lá o Worker só responde ao MCP e manda o resto para o site (worker/index.ts). Arquivos
+  // estáticos fora do run_worker_first saem direto também nesse endereço.
+  "workers_dev": true,
   "preview_urls": false,
   // O site: as páginas pré-renderizadas e os arquivos do build do React Router (pnpm build). O wrangler empacota o
   // Worker direto de worker/index.ts. /journey serve journey/index.html sem a barra no fim (drop-trailing-slash);
