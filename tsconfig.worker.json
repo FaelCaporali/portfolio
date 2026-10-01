@@ -5,5 +5,17 @@
     "composite": true,
     "types": ["@cloudflare/vitest-plugin/types"]
   },
-  "include": ["worker", "shared"]
+  "include": [
+    "worker",
+    "shared",
+    // O conteúdo público que o MCP serve (worker/mcp/content.ts): só módulos sem React, um por um.
+    "src/content/journey.json",
+    "src/content/overview.json",
+    "src/content/profile.ts",
+    "src/content/journey.ts",
+    "src/i18n/messages/en.ts",
+    "src/i18n/messages/pt.ts",
+    "src/i18n/messages/pt-tags.ts",
+    "src/i18n/tags.ts"
+  ]
 }

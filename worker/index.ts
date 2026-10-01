@@ -1,5 +1,6 @@
 /**
- * Roteamento do Worker único do site: a API do contato, 404 JSON no resto de /api/, a detecção de idioma na primeira
+ * Roteamento do Worker único do site: a API do contato, 404 JSON no resto de /api/, o servidor MCP em /mcp
+ * (worker/mcp/), a detecção de idioma na primeira
  * visita (worker/lang.ts) e as páginas HTML (com a CSP de nonce). Arquivos estáticos não passam por aqui
  * (run_worker_first no wrangler.jsonc).
  */
@@ -8,6 +9,7 @@ import { handleContact } from './contact'
 import { retryAndPurge } from './cron'
 import { json } from './http'
 import { langRedirect, withLangVary } from './lang'
+import { MCP_PATH, wantsPage } from './mcp/route'
 import { withPageCsp } from './page'
 
 /**
@@ -21,6 +23,8 @@ export default {
     const { pathname } = new URL(request.url)
     if (pathname === CONTACT_PATH) return handleContact(request, env)
     if (pathname.startsWith('/api/')) return json(404, { ok: false, error: 'not_found' })
+    // Sob demanda: o SDK do MCP só é avaliado quando um cliente MCP chama (worker/mcp/route.ts).
+    if (pathname === MCP_PATH && !wantsPage(request)) return (await import('./mcp/server')).handleMcp(request, env)
     // Endereço antigo da trajetória, anunciado antes de a página ganhar o nome em inglês do resto do site.
     if (pathname === '/trajetoria' || pathname === '/trajetoria/') {
       return Response.redirect(new URL('/journey', request.url).href, 301)
