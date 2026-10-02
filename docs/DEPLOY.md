@@ -37,9 +37,9 @@ Worker `fael-caporali-placeholder` (sem tempo fora do ar). Depois dele, uma vez:
 1. `TURNSTILE_SECRET` no Worker (painel → Workers → `fael-caporali` → Settings → Variables and Secrets), com o segredo
    do widget. Até lá o formulário recusa o envio e mostra o e-mail e o WhatsApp.
 2. Envio real ponta a ponta e conferência de SPF/DKIM/DMARC no cabeçalho recebido.
-3. `CF_API_TOKEN` no Worker (`pnpm exec wrangler secret put CF_API_TOKEN`): um API token da conta com a permissão
-   "Account Analytics: Read", para o resumo semanal ler as visitas do Analytics Engine (`worker/visits.ts`). Sem ele, o
-   resumo diz que falta e o resto funciona.
+3. `CF_API_TOKEN` no Worker (painel → Workers → `fael-caporali` → Settings → Variables and Secrets, como secret): um
+   API token da conta com a permissão "Account Analytics: Read", para o resumo semanal ler as visitas do Analytics
+   Engine (`worker/visits.ts`). Sem ele, o resumo diz que falta e o resto funciona.
 
 Deploy local, se um dia precisar: `pnpm exec wrangler login` e `pnpm run deploy` (`pnpm deploy` sem `run` é outro
 comando do pnpm), com `VITE_TURNSTILE_SITEKEY` no ambiente.
