@@ -15,6 +15,10 @@ const SEARCH = [
   'Claude-SearchBot',
   'PerplexityBot',
   'DuckAssistBot',
+  // Ferramentas do próprio Google que rastreiam a página (teste ao vivo do Search Console e o PSI): nenhuma delas
+  // casava com OTHER_BOT ("inspectiontool" e "lighthouse" não têm "bot" como palavra), e caíam em 'human'.
+  'Google-InspectionTool',
+  'Chrome-Lighthouse',
 ] as const
 /** Buscam a página na hora, a pedido de quem conversa com o assistente. */
 const ASSISTANT = ['ChatGPT-User', 'Claude-User', 'Perplexity-User', 'meta-externalfetcher', 'MistralAI-User'] as const
