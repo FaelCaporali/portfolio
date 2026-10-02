@@ -35,6 +35,26 @@ describe('carrossel', () => {
     const c = createClock()
     expect(tick(c, 0.016, { ...normal, held: true, jump: true })).toEqual({ dissolve: 0, next: false, phase: 'out' })
   })
+  it('próxima vida não pronta: a atual segura a pausa e sai assim que ela fica pronta (#138)', () => {
+    const c = createClock()
+    expect(run(c, TIMING.hold + 3, { ...normal, nextReady: false })).toEqual([])
+    expect(tick(c, 0.05, { ...normal, nextReady: true })).toEqual({ dissolve: 0, next: false, phase: 'out' })
+  })
+  it('escolha no indicador espera a vida escolhida ficar pronta (#138)', () => {
+    const c = createClock()
+    expect(tick(c, 0.05, { ...normal, jump: true, nextReady: false }).phase).toBeNull()
+    expect(tick(c, 0.05, { ...normal, jump: true }).phase).toBe('out')
+  })
+  it('saída já começada e nenhuma vida pronta: a atual volta do furacão, sem trocar, e espera na pausa (#138)', () => {
+    const c = createClock()
+    run(c, TIMING.hold + 0.05)
+    const events = run(c, TIMING.out + TIMING.in + 3, { ...normal, nextReady: false })
+    expect(events).toEqual([
+      { dissolve: DISSOLVE_MAX, next: false, phase: 'in' },
+      { dissolve: 0, next: false, phase: 'hold' },
+    ])
+    expect(tick(c, 0.05, normal).phase).toBe('out')
+  })
   it('movimento reduzido troca direto, sem furacão', () => {
     const c = createClock()
     const events = run(c, TIMING.hold + 0.05, { ...normal, reducedMotion: true })

@@ -65,8 +65,8 @@ Entrega garantida: a mensagem é gravada antes do envio. Falhou o envio, o visit
 ## Dados (LGPD)
 
 Tabela `messages`: nome, contato, mensagem, país (da Cloudflare), status. Sem IP, sem identificador do visitante.
-Apagadas após 90 dias pelo cron. O aviso de privacidade no formulário ainda não está no site (entra com o
-monitoramento).
+Apagadas após 90 dias pelo cron. Abaixo do botão de envio, uma linha diz para que servem os dados e por quanto tempo
+ficam, com o link para a página de privacidade (`/privacy`, `src/content/privacy.ts`).
 
 ## Desenvolvimento
 

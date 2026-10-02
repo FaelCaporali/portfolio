@@ -13,8 +13,16 @@ export function usePopover() {
   const trigger = useRef<HTMLButtonElement>(null)
   const panelId = useId()
 
+  /** Quem abriu de fora do botão: recebe o foco de volta ao fechar (sem ele, o próprio botão). */
+  const opener = useRef<HTMLElement | null>(null)
+  /** Abre de fora do botão (o contato pedido pela home, contactRequest.ts). */
+  const show = useCallback((from?: HTMLElement) => {
+    opener.current = from ?? null
+    setOpen(true)
+  }, [])
   const close = useCallback(() => {
-    if (root.current?.contains(document.activeElement)) trigger.current?.focus()
+    if (root.current?.contains(document.activeElement)) (opener.current ?? trigger.current)?.focus()
+    opener.current = null
     setOpen(false)
   }, [])
   useDismiss(open, close, root)
@@ -51,9 +59,10 @@ export function usePopover() {
     'aria-expanded': open,
     'aria-controls': panelId,
     onClick: () => {
+      opener.current = null
       setOpen((o) => !o)
     },
   }
 
-  return { open, close, closeTo, root, panelId, triggerProps }
+  return { open, show, close, closeTo, root, panelId, triggerProps }
 }

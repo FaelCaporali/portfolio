@@ -12,7 +12,9 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? 'github' : 'list',
-  use: { baseURL: 'http://localhost:5199', trace: 'retain-on-failure' },
+  // Inglês fixo: o site detecta o idioma do navegador (src/i18n/useDetectLang.ts) e, numa máquina em pt-BR, levaria
+  // os testes em inglês para /pt. Os casos em português pedem o pt-BR (e2e/lang.spec.ts).
+  use: { baseURL: 'http://localhost:5199', trace: 'retain-on-failure', locale: 'en-US' },
   projects: [
     { name: 'desktop', use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } } },
     // O menor celular que o layout suporta sem ajuste (ver #39).

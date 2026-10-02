@@ -11,7 +11,7 @@
  * Movimento reduzido: nada roda; os barcos ficam na composição parada do glb (lado L).
  * Nó que o glb ainda não tiver fica de fora (a peça chega por partes durante a volta).
  */
-import { useGLTF } from '@react-three/drei'
+import { useGlb } from '../../carga'
 import { useFrame } from '@react-three/fiber'
 import { useLayoutEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
@@ -40,7 +40,7 @@ function sob(o: THREE.Object3D, teste: (p: THREE.Object3D) => boolean) {
 
 /** Clona a cena (geometrias e texturas seguem do cache do useGLTF) e troca cada material por um com a desintegração. */
 function useVelaScene() {
-  const { scene } = useGLTF(velaUrl, false)
+  const { scene } = useGlb(velaUrl)
   const cena = useMemo(() => {
     const root = scene.getObjectByName('vela')
     if (!root) throw new Error('vela.glb sem a raiz vela')
@@ -100,5 +100,3 @@ export function Vela() {
 
   return <primitive object={root} />
 }
-
-useGLTF.preload(velaUrl, false)

@@ -1,7 +1,8 @@
 /**
  * Vidas do herói: "Today I am a [slot]" / "Yesterday I was a [slot]".
- * Decisão do Fael (23/09): vidas em ordem cronológica (é a ordem do indicador); o carrossel abre em OPENING e segue
- * embaralhado (model/lineup.ts). São 9 desde 27/09: o Tech Consultant saiu ("Tech consultant... serão 9 cenas").
+ * Decisão do Fael (23/09): vidas em ordem cronológica (é a ordem do indicador); o carrossel abre em OPENING e segue de
+ * trás para frente, em laço (30/09, D-U2b; model/lineup.ts). São 9 desde 27/09: o Tech Consultant saiu ("Tech
+ * consultant... serão 9 cenas").
  * Fatos e comprovação moram na página da trajetória, não aqui.
  */
 type ExprKey = 'mouthSmile' | 'browInnerUp' | 'browOuterUp' | 'browDown'

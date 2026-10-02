@@ -1,4 +1,5 @@
 import { useRef, type PointerEvent } from 'react'
+import { track } from '../../../lib/track'
 import { createDrag, dragBy, grab, release } from '../model/drag'
 
 /** Arrasto do busto: eventos de ponteiro do Canvas → estado do giro (ref lido a cada quadro pela cena). */
@@ -9,6 +10,7 @@ export function useDragRotation() {
   const onPointerDown = (e: PointerEvent) => {
     e.currentTarget.setPointerCapture(e.pointerId)
     grab(drag.current)
+    track('bust_drag')
     last.current = { x: e.clientX, y: e.clientY, t: performance.now() }
   }
   const onPointerMove = (e: PointerEvent) => {

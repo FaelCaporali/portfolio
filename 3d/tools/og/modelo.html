@@ -1,0 +1,84 @@
+<!doctype html>
+<!-- Modelo da imagem de compartilhamento (og:image), 1200×630. Preenchido por 3d/tools/og/gerar.mjs: os textos, as
+     cores e a pilha de fontes vêm do site (o gerador os lê de src/); aqui só a diagramação. Área segura: 60 px. -->
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      :root {
+        --page: #0b0b0e;
+        --fg-rgb: 255 255 255;
+        --accent: #00e5ff;
+        --font: ui-sans-serif, system-ui, sans-serif;
+      }
+      * {
+        margin: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+        background: var(--page);
+        color: rgb(var(--fg-rgb));
+        font-family: var(--font);
+        -webkit-font-smoothing: antialiased;
+      }
+      /* O busto chega opaco, no fundo da página (busto.html): o degradê do pescoço do site já o dissolve no fundo. */
+      .busto {
+        position: absolute;
+      }
+      .texto {
+        position: absolute;
+        left: 72px;
+        top: 0;
+        bottom: 0;
+        width: 640px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      h1 {
+        font-size: 84px;
+        line-height: 0.95;
+        font-weight: 700;
+        letter-spacing: -0.035em;
+      }
+      .vida {
+        margin-top: 30px;
+        font-size: 44px;
+        line-height: 1.05;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        color: var(--accent);
+      }
+      .titulos {
+        margin-top: 16px;
+        font-size: 28px;
+        line-height: 1.3;
+        font-weight: 500;
+        color: rgb(var(--fg-rgb) / 0.75);
+      }
+      .sep {
+        color: rgb(var(--fg-rgb) / 0.3);
+        margin: 0 0.3em;
+      }
+      .lugar {
+        margin-top: 34px;
+        font-size: 24px;
+        line-height: 1.3;
+        color: rgb(var(--fg-rgb) / 0.6);
+      }
+    </style>
+  </head>
+  <body>
+    <img class="busto" alt="" />
+    <div class="texto">
+      <h1></h1>
+      <p class="vida"></p>
+      <p class="titulos"></p>
+      <p class="lugar"></p>
+    </div>
+  </body>
+</html>

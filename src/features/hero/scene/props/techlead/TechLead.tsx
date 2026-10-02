@@ -11,7 +11,7 @@
  * furacão (montada já parada, começa em TIMING.in); com a pausa segurada o ciclo recomeça com o fundo limpo. Tudo
  * apaga com a desintegração. Movimento reduzido: estado final parado.
  */
-import { useGLTF } from '@react-three/drei'
+import { useGlb } from '../../carga'
 import { useFrame } from '@react-three/fiber'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
@@ -19,6 +19,8 @@ import techleadUrl from '../../../../../../3d/export/props/techlead.glb?url'
 import { TIMING } from '../../../model/carousel'
 import { alvoDoAdereco } from '../../../model/gaze'
 import { dissolveUniforms, withDissolve } from '../../dissolve'
+import { ateATroca } from '../../pausa'
+import { criarPintor } from '../pintor'
 import { formato } from '../devops/composicao'
 import { criarAncora, type Grupo } from '../ancora'
 import { useDisposal } from '../materials'
@@ -31,6 +33,8 @@ import { medirTela } from './zonas'
 const FUNDO: Grupo = { escala: 1, desloc: [0, 0, 0] }
 /** Com a pausa segurada, o ciclo recomeça este tanto depois do fim (s), se a saída não começou. */
 const RECOMECA = 0.3
+/** A vida no carrossel (a amostra do texto dela no herói, HeroCopy). */
+const VIDA = 'techlead'
 
 /** O cabo desce pela lateral do pescoço: só ele some com o degradê do pescoço (notas do modelador, LOG v1). */
 const CABO = 'tl_cabo'
@@ -50,7 +54,7 @@ const dentroDe = (o: THREE.Object3D, nome: string) => {
 
 /** Clona a cena (geometrias e texturas seguem do cache do useGLTF) e troca cada material por um com a desintegração. */
 function useTechLeadScene() {
-  const { scene } = useGLTF(techleadUrl, false)
+  const { scene } = useGlb(techleadUrl)
   const cena = useMemo(() => {
     const raiz = scene.getObjectByName('techlead')
     if (!raiz) throw new Error('techlead.glb sem a raiz techlead')
@@ -95,16 +99,29 @@ function useTechLeadScene() {
       }
     })
 
-    /** Fundo para a tela (no resize, nunca por quadro); precisa do atlas de logos. */
-    const ajustarFundo = (
-      canvas: HTMLCanvasElement,
-      camera: THREE.Camera,
-      w: number,
-      h: number,
-      img: HTMLImageElement,
-    ) => {
-      const m = medirTela(canvas, camera, w, h, grupoFundo.matrixWorld, cantos)
-      if (m) fundo.ajustar(camera, formato(w, h), m, img)
+    /** Pinta o fundo (em fatias, uma pintura por vez; #138). */
+    const pintor = criarPintor()
+    /**
+     * Fundo para a tela (no resize, nunca por quadro); precisa do atlas de logos. O texto que conta é a amostra parada
+     * desta vida (HeroCopy): o mesmo nos bastidores e em cena.
+     */
+    const ajustarFundo = (gl: THREE.WebGLRenderer, camera: THREE.Camera, w: number, h: number, img: HTMLImageElement) =>
+      pintor.pedir(`${String(w)}x${String(h)}`, () => {
+        const m = medirTela(gl.domElement, camera, w, h, grupoFundo.matrixWorld, cantos, VIDA)
+        if (!m) return null
+        const subir = (t: THREE.Texture) => {
+          gl.initTexture(t)
+        }
+        return ateATroca(fundo.ajustar(camera, formato(w, h), m, img, subir))
+      })
+    const precisaFundo = (w: number, h: number) => pintor.precisa(`${String(w)}x${String(h)}`)
+    /** Nos bastidores (Props.tsx, #138): o fundo pronto antes de a vida entrar, como estará no 1º quadro dela. */
+    root.userData.prepararFundo = async (gl: THREE.WebGLRenderer, camera: THREE.Camera, w: number, h: number) => {
+      const img = await carregarLogos()
+      await document.fonts.ready
+      root.updateMatrixWorld(true)
+      ajustarFundo(gl, camera, w, h, img)
+      await pintor.pronta()
     }
     /** Alvo dos olhos (espaço da raiz, o do frame): o ponto do fundo da batida atual. */
     const olhar = (camera: THREE.Camera, w: number, h: number) => {
@@ -148,21 +165,22 @@ function useTechLeadScene() {
       alvoDoAdereco.peso = 0
     }
     const dispose = () => {
+      pintor.cancelar()
       materials.forEach((m) => m.dispose())
       fundo.dispose()
     }
-    return { root, ajustarFundo, pose, parado, dispose }
+    return { root, ajustarFundo, precisaFundo, pose, parado, dispose }
   }, [scene])
   useDisposal(cena)
   return cena
 }
 
 export function TechLead() {
-  const { root, ajustarFundo, pose, parado } = useTechLeadScene()
+  const { root, ajustarFundo, precisaFundo, pose, parado } = useTechLeadScene()
   const [reduced] = useState(prefersReducedMotion)
   const relogio = useRef({ c: 0, t: 0, iniciado: false })
   const atlas = useRef<HTMLImageElement | null>(null)
-  const ajustado = useRef({ w: 0, h: 0, quadros: 0, img: false })
+  const quadros = useRef(0)
   useEffect(() => {
     let vivo = true
     carregarLogos()
@@ -180,15 +198,12 @@ export function TechLead() {
   }, [])
 
   useFrame(({ camera, size, gl }, delta) => {
-    const a = ajustado.current
-    a.quadros += 1
+    quadros.current += 1
     const img = atlas.current
-    // O primeiro quadro desenha a âncora; o 30º repinta com o texto da UI já na fonte final.
-    if (img && a.quadros > 1 && (a.w !== size.width || a.h !== size.height || !a.img || a.quadros === 30)) {
-      ajustarFundo(gl.domElement, camera, size.width, size.height, img)
-      a.w = size.width
-      a.h = size.height
-      a.img = true
+    // Pintado nos bastidores, não repinta; aqui só no resize ou com as fontes chegando depois (o 1º quadro desenha
+    // a âncora, se a vida não passou pelos bastidores).
+    if (img && quadros.current > 1 && precisaFundo(size.width, size.height)) {
+      ajustarFundo(gl, camera, size.width, size.height, img)
     }
     if (reduced) {
       parado()
@@ -209,5 +224,3 @@ export function TechLead() {
 
   return <primitive object={root} />
 }
-
-useGLTF.preload(techleadUrl, false)

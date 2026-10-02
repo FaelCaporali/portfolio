@@ -12,7 +12,7 @@
     "preview": "wrangler dev --port 4299 --ip 127.0.0.1",
     "typecheck": "tsc -b",
     "test": "vitest run",
-    "deploy": "pnpm build && wrangler deploy",
+    "deploy": "pnpm build && pnpm db:migrate && wrangler deploy",
     "cf-typegen": "wrangler types worker/worker-configuration.d.ts",
     "db:migrate": "wrangler d1 migrations apply fael-caporali --remote",
     "format": "prettier --write .",
@@ -23,13 +23,15 @@
     "knip": "VITE_TURNSTILE_SITEKEY=knip knip"
   },
   "dependencies": {
+    "@modelcontextprotocol/server": "2.2.0",
     "@react-three/drei": "^10.7.0",
     "@react-three/fiber": "^9.3.0",
     "gsap": "^3.13.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router": "^7.18.4",
-    "three": "^0.180.0"
+    "three": "^0.180.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@cloudflare/vitest-plugin": "1.2.4",
@@ -38,6 +40,7 @@
     "@gltf-transform/core": "^4.5.0",
     "@gltf-transform/extensions": "^4.5.0",
     "@gltf-transform/functions": "^4.5.0",
+    "@modelcontextprotocol/client": "2.2.0",
     "@playwright/test": "^1.63.0",
     "@react-router/dev": "^7.18.4",
     "@tailwindcss/vite": "^4.1.0",

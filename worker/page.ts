@@ -6,6 +6,8 @@
  * demais arquivos saem direto dos assets com a CSP do public/_headers (mesmas diretivas, sem nonce).
  */
 
+import { FILTERING_ATTR } from '../shared/journey-filters'
+
 /** Script do Web Analytics da Cloudflare e o endereço para onde ele envia as medições. */
 const ANALYTICS_SCRIPT = 'https://static.cloudflareinsights.com'
 const ANALYTICS_BEACON = 'https://cloudflareinsights.com'
@@ -36,18 +38,25 @@ function newNonce(): string {
 
 /**
  * Página HTML ganha a CSP com nonce, o mesmo nonce em todos os seus <script>, e sai sem cache (o nonce não pode se
- * repetir). O resto passa como veio. No servidor de dev do Vite as páginas não passam por aqui.
+ * repetir). `filtering`: a trajetória pedida com filtro ganha a marca no <html> (shared/journey-filters.ts). O resto
+ * passa como veio. No servidor de dev do Vite as páginas não passam por aqui.
  */
-export function withPageCsp(response: Response): Response {
+export function withPageCsp(response: Response, filtering = false): Response {
   if (!response.headers.get('Content-Type')?.includes('text/html')) return response
   const nonce = newNonce()
-  const html = new HTMLRewriter()
-    .on('script', {
+  let rewriter = new HTMLRewriter().on('script', {
+    element(el) {
+      el.setAttribute('nonce', nonce)
+    },
+  })
+  if (filtering) {
+    rewriter = rewriter.on('html', {
       element(el) {
-        el.setAttribute('nonce', nonce)
+        el.setAttribute(FILTERING_ATTR, '')
       },
     })
-    .transform(response)
+  }
+  const html = rewriter.transform(response)
   const page = new Response(html.body, response)
   page.headers.set('Content-Security-Policy', pageCsp(nonce))
   page.headers.set('Cache-Control', 'no-store')

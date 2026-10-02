@@ -10,7 +10,7 @@
  * furacão (montada já parada, começa em TIMING.in); com a pausa segurada o ciclo recomeça. Tudo desintegra com o busto.
  * Movimento reduzido: estado final parado (o 8 completo, as decisões aprovadas, o robô montado e comemorando).
  */
-import { useGLTF } from '@react-three/drei'
+import { useGlb } from '../../carga'
 import { useFrame } from '@react-three/fiber'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
@@ -18,6 +18,8 @@ import aiUrl from '../../../../../../3d/export/props/ai.glb?url'
 import { TIMING } from '../../../model/carousel'
 import { alvoDoAdereco } from '../../../model/gaze'
 import { dissolveUniforms, withDissolve } from '../../dissolve'
+import { ateATroca } from '../../pausa'
+import { criarPintor } from '../pintor'
 import { useOwnEnvIntensity, withOwnEnv } from '../../envIntensity'
 import { formato } from '../devops/composicao'
 import { criarAncora, type Grupo } from '../ancora'
@@ -34,6 +36,8 @@ const FUNDO: Grupo = { escala: 1, desloc: [0, 0, 0] }
 /** Com a pausa segurada, o ciclo recomeça este tanto depois do fim (s), se a saída não começou. */
 const RECOMECA = 0.3
 const TELA = 'ai_tela'
+/** A vida no carrossel (a amostra do texto dela no herói, HeroCopy). */
+const VIDA = 'ai'
 
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -49,7 +53,7 @@ function acharFrame(o: THREE.Object3D) {
 
 /** Clona a cena do glb, troca os materiais (desintegração; a tela vira o rosto) e monta fundo, mesa e robô. */
 function useAiScene() {
-  const { scene } = useGLTF(aiUrl, false)
+  const { scene } = useGlb(aiUrl)
   const cena = useMemo(() => {
     const raiz = scene.getObjectByName('ai')
     if (!raiz) throw new Error('ai.glb sem a raiz ai')
@@ -94,26 +98,37 @@ function useAiScene() {
     const mira: [number, number] = [0, 0]
     let cabeca: Float32Array | null = null
 
-    /** Fundo e mesa para a tela (no resize, nunca por quadro); precisa do atlas e da silhueta da cabeça. */
-    const ajustarFundo = (
-      canvas: HTMLCanvasElement,
-      camera: THREE.Camera,
-      w: number,
-      h: number,
-      img: HTMLImageElement,
-    ) => {
-      const frame = acharFrame(root)
-      const bust = frame?.getObjectByName('bust')
-      if (!frame || !bust) return false
-      const f = formato(w, h)
-      Object.assign(grupo, GRUPO_ROBO[f])
-      root.updateMatrixWorld(true)
-      cabeca ??= verticesCabeca(bust, frame)
-      const r = { cantos: robo.cantos, base: robo.base, mundo: mesa.matrixWorld }
-      const m = medirTela(canvas, camera, w, h, grupoFundo.matrixWorld, cabeca, r)
-      if (!m) return false
-      fundo.ajustar(camera, f, m, img)
-      return true
+    /** Pinta o fundo (em fatias, uma pintura por vez; #138). */
+    const pintor = criarPintor()
+    /**
+     * Fundo e mesa para a tela (no resize, nunca por quadro); precisa do atlas e da silhueta da cabeça. O texto que
+     * conta é a amostra parada desta vida (HeroCopy): o mesmo nos bastidores e em cena.
+     */
+    const ajustarFundo = (gl: THREE.WebGLRenderer, camera: THREE.Camera, w: number, h: number, img: HTMLImageElement) =>
+      pintor.pedir(`${String(w)}x${String(h)}`, () => {
+        const frame = acharFrame(root)
+        const bust = frame?.getObjectByName('bust')
+        if (!frame || !bust) return null
+        const f = formato(w, h)
+        Object.assign(grupo, GRUPO_ROBO[f])
+        root.updateMatrixWorld(true)
+        cabeca ??= verticesCabeca(bust, frame)
+        const r = { cantos: robo.cantos, base: robo.base, mundo: mesa.matrixWorld }
+        const m = medirTela(gl.domElement, camera, w, h, grupoFundo.matrixWorld, cabeca, r, VIDA)
+        if (!m) return null
+        return ateATroca(
+          fundo.ajustar(camera, f, m, img, (t) => {
+            gl.initTexture(t)
+          }),
+        )
+      })
+    const precisaFundo = (w: number, h: number) => pintor.precisa(`${String(w)}x${String(h)}`)
+    /** Nos bastidores (Props.tsx, #138): o fundo pronto antes de a vida entrar, como estará no 1º quadro dela. */
+    root.userData.prepararFundo = async (gl: THREE.WebGLRenderer, camera: THREE.Camera, w: number, h: number) => {
+      const img = await carregarLogos()
+      await document.fonts.ready
+      ajustarFundo(gl, camera, w, h, img)
+      await pintor.pronta()
     }
     /** Olhos do Fael (espaço da raiz): o ponto do fundo da cena atual. */
     const olhar = (camera: THREE.Camera, w: number, h: number) => {
@@ -153,23 +168,24 @@ function useAiScene() {
       alvoDoAdereco.peso = 0
     }
     const dispose = () => {
+      pintor.cancelar()
       materials.forEach((m) => m.dispose())
       rosto.dispose()
       fundo.dispose()
     }
-    return { root, materials, ajustarFundo, pose, parado, dispose }
+    return { root, materials, ajustarFundo, precisaFundo, pose, parado, dispose }
   }, [scene])
   useDisposal(cena)
   return cena
 }
 
 export function Ai() {
-  const { root, materials, ajustarFundo, pose, parado } = useAiScene()
+  const { root, materials, ajustarFundo, precisaFundo, pose, parado } = useAiScene()
   useOwnEnvIntensity(useMemo(() => withOwnEnv(materials), [materials]))
   const [reduced] = useState(prefersReducedMotion)
   const relogio = useRef({ c: 0, t: 0, iniciado: false })
   const atlas = useRef<HTMLImageElement | null>(null)
-  const ajustado = useRef({ w: 0, h: 0, quadros: 0, img: false })
+  const quadros = useRef(0)
   useEffect(() => {
     let vivo = true
     carregarLogos()
@@ -187,15 +203,12 @@ export function Ai() {
   }, [])
 
   useFrame(({ camera, size, gl }, delta) => {
-    const a = ajustado.current
-    a.quadros += 1
+    quadros.current += 1
     const img = atlas.current
-    // O primeiro quadro desenha a âncora; o 30º repinta com o texto da UI já na fonte final.
-    const mudou = a.w !== size.width || a.h !== size.height || !a.img || a.quadros === 30
-    if (img && a.quadros > 1 && mudou && ajustarFundo(gl.domElement, camera, size.width, size.height, img)) {
-      a.w = size.width
-      a.h = size.height
-      a.img = true
+    // Pintado nos bastidores, não repinta; aqui só no resize ou com as fontes chegando depois (o 1º quadro desenha
+    // a âncora, se a vida não passou pelos bastidores).
+    if (img && quadros.current > 1 && precisaFundo(size.width, size.height)) {
+      ajustarFundo(gl, camera, size.width, size.height, img)
     }
     if (reduced) {
       parado(camera, size.width, size.height)
@@ -216,5 +229,3 @@ export function Ai() {
 
   return <primitive object={root} />
 }
-
-useGLTF.preload(aiUrl, false)

@@ -1,12 +1,10 @@
 /**
- * Identidade e links públicos. Fonte: CV 09/09 (perfis) e Lattes (ID 3842816194833398);
- * títulos redigidos pelo Fael (23/09).
- * Nome público "Fael Caporali" (decisão do Fael, 23/09). Idioma padrão (D-C) ainda aberto: por ora, inglês.
+ * Identidade e links públicos. Fonte: CV 09/09 (perfis) e Lattes (ID 3842816194833398).
+ * Nome público "Fael Caporali" (decisão do Fael, 23/09). Os textos de interface (títulos redigidos pelo Fael em 23/09,
+ * rótulos dos botões) moram em src/i18n/messages/, um arquivo por idioma.
  */
 export const profile = {
   name: 'Fael Caporali',
-  /** Um título por linha. */
-  titles: ['FullStack Dev', 'QA Analyst', 'TechLead'],
 }
 
 export interface ProfileLink {
@@ -15,14 +13,11 @@ export interface ProfileLink {
 }
 
 /**
- * Página da trajetória (a rota /journey, src/routes.ts). O botão do herói leva ao início dela, sempre (J48, 28/09:
- * "por hora o btn deve levar ao início, sempre"); o salto direto para a vida da tela (pedido de 23/09) fica para
- * depois.
+ * Página da trajetória (a rota /journey, src/routes.ts; em português, /pt/journey). O botão do herói leva ao início
+ * dela, sempre (J48, 28/09: "por hora o btn deve levar ao início, sempre"); o salto direto para a vida da tela (pedido
+ * de 23/09) fica para depois.
  */
-export const journeyLink: ProfileLink = {
-  label: 'See the full journey',
-  href: '/journey',
-}
+export const journeyPath = '/journey'
 
 /** Currículo: baixa direto no idioma escolhido (versão 2026-09). */
 export const resumes: ProfileLink[] = [
@@ -49,10 +44,7 @@ export const directContacts: DirectContact[] = [
 ]
 
 /** Código deste portfólio (repositório público no GitHub). */
-export const sourceLink: ProfileLink = {
-  label: 'View source on GitHub',
-  href: 'https://github.com/FaelCaporali/portfolio',
-}
+export const sourceHref = 'https://github.com/FaelCaporali/portfolio'
 
 /** Abrem em outra aba. */
 export const profileLinks: ProfileLink[] = [

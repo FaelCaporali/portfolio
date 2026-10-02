@@ -1,11 +1,15 @@
-/** Composição e entrega do e-mail pela binding send_email (destino e remetente fixos no wrangler.jsonc). */
+/** Composição e entrega dos e-mails pela binding send_email (destino e remetente fixos no wrangler.jsonc). */
 import { asPhone } from '../shared/contact/validation'
 import type { Delivery, Message } from './message'
 
-const SENDER = { email: 'worker@mail.caporali.dev', name: 'Portfólio · contato' }
-const DESTINATION = 'fael@caporali.dev'
+export const SENDER = { email: 'worker@mail.caporali.dev', name: 'Portfólio · contato' }
+export const DESTINATION = 'fael@caporali.dev'
 
-const BRT = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo', dateStyle: 'short', timeStyle: 'short' })
+export const BRT = new Intl.DateTimeFormat('pt-BR', {
+  timeZone: 'America/Sao_Paulo',
+  dateStyle: 'short',
+  timeStyle: 'short',
+})
 
 /** Só texto puro: nada do visitante vira HTML. Assunto montado aqui, de campo já sem quebras de linha. */
 export function compose(m: Message): EmailMessageBuilder {
@@ -19,13 +23,13 @@ export function compose(m: Message): EmailMessageBuilder {
     m.body,
     '',
     '--',
-    `Formulário de fael.caporali.dev · id ${m.id}`,
+    m.via ? `MCP do portfólio (${m.via}) · id ${m.id}` : `Formulário de fael.caporali.dev · id ${m.id}`,
   ]
   return {
     from: SENDER,
     to: DESTINATION,
     ...(m.reply_email ? { replyTo: { email: m.reply_email, name: m.name } } : {}),
-    subject: `Contato pelo portfólio: ${m.name}`,
+    subject: m.via ? `Contato pelo MCP do portfólio: ${m.name}` : `Contato pelo portfólio: ${m.name}`,
     text: lines.join('\n'),
   }
 }
@@ -38,11 +42,14 @@ function errorCode(e: unknown): string {
   return match?.[0] ?? 'E_UNKNOWN'
 }
 
-export async function deliver(env: Env, m: Message): Promise<Delivery> {
+/** Entrega um e-mail já composto; erro vira só o código. */
+export async function send(env: Env, mail: EmailMessageBuilder): Promise<Delivery> {
   try {
-    const { messageId } = await env.EMAIL.send(compose(m))
+    const { messageId } = await env.EMAIL.send(mail)
     return { ok: true, messageId }
   } catch (e) {
     return { ok: false, code: errorCode(e) }
   }
 }
+
+export const deliver = (env: Env, m: Message): Promise<Delivery> => send(env, compose(m))

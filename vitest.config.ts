@@ -33,6 +33,8 @@ export default defineConfig({
       {
         // Site e contrato: funções puras e componentes num DOM simulado.
         plugins: [react()],
+        // Data fixa do build (vite.config.ts) para os testes não dependerem do dia.
+        define: { __BUILD_DATE__: JSON.stringify('2026-10-02') },
         test: {
           name: 'front',
           environment: 'jsdom',

@@ -41,6 +41,8 @@ export default defineConfig(({ command, mode }) => {
     // As páginas saem prontas do build (reactRouter, react-router.config.ts); o Worker (worker/index.ts, a API do
     // contato) roda à parte no `wrangler dev` (pnpm dev:api, porta 8787), e o dev encaminha /api para ele.
     plugins: [tailwindcss(), reactRouter(), lifeAccents()],
+    // O dia do build: dateModified dos dados estruturados e lastmod do sitemap (src/i18n/structured-data.ts).
+    define: { __BUILD_DATE__: JSON.stringify(new Date().toISOString().slice(0, 10)) },
     // Demo remota pelo ngrok: o subdomínio muda a cada túnel, então libera o domínio inteiro (só no servidor de dev).
     // Porta fixa: ALLOWED_ORIGINS do .dev.vars aponta para ela (o Worker recusa outra origem; o proxy mantém a
     // origem do navegador).

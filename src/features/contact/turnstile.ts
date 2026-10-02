@@ -9,6 +9,8 @@ interface RenderOptions {
   theme: 'dark' | 'light' | 'auto'
   size: 'normal' | 'flexible' | 'compact'
   appearance: 'always' | 'execute' | 'interaction-only'
+  /** Idioma do desafio (ex.: 'en', 'pt-br'); o da página, não o do navegador. */
+  language: string
   callback: (token: string) => void
   'expired-callback': () => void
   'error-callback': () => void

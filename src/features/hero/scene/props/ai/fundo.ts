@@ -7,6 +7,7 @@
  * ativa fica em destaque e as passadas em silhueta (uBrilho). Apaga com a desintegração (uD).
  */
 import * as THREE from 'three'
+import { desenhado } from '../../pausa'
 import type { Formato } from '../devops/composicao'
 import { chat, chatMini } from './bloco_chat'
 import { humanoMini, ladoHumano } from './bloco_humano'
@@ -82,58 +83,90 @@ export function criarFundo() {
     return raio.ray.intersectPlane(plano, out) ?? out.set(0, 0, Z_FUNDO)
   }
 
-  /** Pinta e encaixa as janelas e as fitas para a medida `md` (no resize). */
-  const ajustar = (camera: THREE.Camera, f: Formato, md: Medida, img: HTMLImageElement) => {
+  /**
+   * Pinta e encaixa as janelas e as fitas para a medida `md` (no resize), em passos (#138: quem roda fatia, e.g.
+   * emFatias): o pincel grava, a pintura toca aos poucos e as texturas sobem à GPU (`subir`) uma por passo; janelas,
+   * fitas e olhar só mudam na troca que ele devolve. Cancelado no meio, descarta as texturas novas.
+   */
+  function* ajustar(
+    camera: THREE.Camera,
+    f: Formato,
+    md: Medida,
+    img: HTMLImageElement,
+    subir: (t: THREE.Texture) => void,
+  ): Generator<unknown, () => void> {
     const pai = paineis[0]?.mesh.parent
-    if (!pai) return
+    if (!pai) return () => undefined
     camera.updateMatrixWorld()
-    inv.copy(pai.matrixWorld).invert()
+    const invInicio = pai.matrixWorld.clone().invert()
     const zonas = zonasPara(f, md)
     const escala = Math.min(ESCALA_MAX, window.devicePixelRatio || 1)
-    estado.zonas = zonas
-    estado.robo = md.robo
-    estado.alvos = { robo: { x: md.pe[0], y: md.pe[1] - 30 } }
-    for (const p of paineis) {
-      const q = zonas[p.nome]
-      if (!q) {
-        p.mesh.visible = false
-        continue
+    const alvos: typeof estado.alvos = { robo: { x: md.pe[0], y: md.pe[1] - 30 } }
+    const pintados: { p: (typeof paineis)[number]; q: Quadro; troca: ReturnType<Revela['preparar']> }[] = []
+    let pronto = false
+    try {
+      for (const p of paineis) {
+        const q = zonas[p.nome]
+        if (!q) continue
+        const tl: Tela = { p: new Pincel(q, escala, true), img, f, alvos }
+        pintar(tl, p.nome, q)
+        tl.p.fechar()
+        yield
+        yield* tl.p.pintura()
+        const troca = p.r.preparar(tl.p.cor, tl.p.dadosParaSubir, tl.p.fundoCor)
+        pintados.push({ p, q, troca })
+        for (const t of troca.novas) {
+          // O desenho do canvas termina na GPU antes, fora da thread: a subida é só a cópia.
+          yield desenhado(t.image as HTMLCanvasElement)
+          subir(t)
+          yield
+        }
       }
-      const tl: Tela = { p: new Pincel(q, escala), img, f, alvos: estado.alvos }
-      pintar(tl, p.nome, q)
-      tl.p.fechar()
-      p.r.texturas(tl.p.cor, tl.p.dados, tl.p.fundoCor)
-      noPlano(q.x0, q.y0, camera, md.w, md.h, a)
-      noPlano(q.x1, q.y1, camera, md.w, md.h, b)
-      p.mesh.position.set((a.x + b.x) / 2, (a.y + b.y) / 2, Z_FUNDO)
-      p.mesh.scale.set(Math.abs(b.x - a.x), Math.abs(a.y - b.y), 1)
-      p.mesh.userData.rect = { ...q }
-      p.mesh.visible = true
+      pronto = true
+    } finally {
+      if (!pronto) for (const { troca } of pintados) for (const t of troca.novas) t.dispose()
     }
-    const meia = Math.max(0.6, ((md.cabeca.y1 - md.cabeca.y0) / 539) * 0.9)
-    const mapa = (x: number, y: number, out: THREE.Vector3) => noPlano(x, y, camera, md.w, md.h, out)
-    const c = montarOito(md, zonas)
-    estado.caminho = c
-    marcosFio = []
-    if (c) {
-      fio.ajustar(c, meia, mapa)
-      const F = T.fio
-      marcosFio = [
-        [F.sai, 0],
-        [F.mesa, c.marcos.mesa],
-        [F.chat, c.marcos.chat],
-        [F.cruza[0], c.marcos.chat],
-        [F.cruza[1], c.marcos.humano],
-        [F.volta[0], c.marcos.humano],
-        [F.volta[1], c.total],
-      ]
-    }
-    const { limiar, escudo } = estado.alvos
-    eloTotal = 0
-    if (limiar && escudo && zonas.ide) {
-      const e = montarElo([limiar.x, limiar.y], zonas.ide, [escudo.x, escudo.y])
-      elo.ajustar(e, meia * 1.1, mapa)
-      eloTotal = e.total
+    // A troca, de uma vez (quem roda chama quando tudo o que aparece junto estiver pronto).
+    return () => {
+      inv.copy(invInicio)
+      estado.zonas = zonas
+      estado.robo = md.robo
+      estado.alvos = alvos
+      for (const p of paineis) p.mesh.visible = false
+      for (const { p, q, troca } of pintados) {
+        troca.usar()
+        noPlano(q.x0, q.y0, camera, md.w, md.h, a)
+        noPlano(q.x1, q.y1, camera, md.w, md.h, b)
+        p.mesh.position.set((a.x + b.x) / 2, (a.y + b.y) / 2, Z_FUNDO)
+        p.mesh.scale.set(Math.abs(b.x - a.x), Math.abs(a.y - b.y), 1)
+        p.mesh.userData.rect = { ...q }
+        p.mesh.visible = true
+      }
+      const meia = Math.max(0.6, ((md.cabeca.y1 - md.cabeca.y0) / 539) * 0.9)
+      const mapa = (x: number, y: number, out: THREE.Vector3) => noPlano(x, y, camera, md.w, md.h, out)
+      const c = montarOito(md, zonas)
+      estado.caminho = c
+      marcosFio = []
+      if (c) {
+        fio.ajustar(c, meia, mapa)
+        const F = T.fio
+        marcosFio = [
+          [F.sai, 0],
+          [F.mesa, c.marcos.mesa],
+          [F.chat, c.marcos.chat],
+          [F.cruza[0], c.marcos.chat],
+          [F.cruza[1], c.marcos.humano],
+          [F.volta[0], c.marcos.humano],
+          [F.volta[1], c.total],
+        ]
+      }
+      const { limiar, escudo } = estado.alvos
+      eloTotal = 0
+      if (limiar && escudo && zonas.ide) {
+        const e = montarElo([limiar.x, limiar.y], zonas.ide, [escudo.x, escudo.y])
+        elo.ajustar(e, meia * 1.1, mapa)
+        eloTotal = e.total
+      }
     }
   }
 

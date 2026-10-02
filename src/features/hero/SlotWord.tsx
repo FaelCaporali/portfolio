@@ -7,13 +7,28 @@ import { cx } from '../../lib/cx'
  * life-<id> dá a cor da vida: classes, não estilo inline, porque a página sai pronta do build e a CSP não aceita
  * atributo style (as classes são do CSS gerado, src/features/journey/accents.ts).
  * O leitor de tela recebe a frase inteira; as letras soltas são só visuais.
+ * `medida`: a amostra parada e escondida que a cena 3D mede (HeroCopy, #138): sem animação, sem leitor de tela.
  */
-export function SlotWord({ text, life, leaving }: { text: string; life: string; leaving: boolean }) {
+export function SlotWord({
+  text,
+  life,
+  leaving,
+  medida = false,
+}: {
+  text: string
+  life: string
+  leaving: boolean
+  medida?: boolean
+}) {
   const words = text.split(' ')
   const starts = words.map((_, w) => Array.from(words.slice(0, w).join('')).length)
   return (
-    <span key={text} className={cx('slot-word', `life-${life}`, leaving && 'is-leaving')} aria-live="polite">
-      <span className="sr-only">{text}</span>
+    <span
+      key={text}
+      className={cx('slot-word', `life-${life}`, leaving && 'is-leaving', medida && '[&_.ch]:animate-none!')}
+      aria-live={medida ? undefined : 'polite'}
+    >
+      {!medida && <span className="sr-only">{text}</span>}
       <span aria-hidden>
         {words.map((word, w) => (
           // eslint-disable-next-line @eslint-react/no-array-index-key -- palavras fixas: a posição é a identidade

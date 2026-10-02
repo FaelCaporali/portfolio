@@ -89,6 +89,8 @@ export interface Revela {
   }
   /** Troca as texturas (no resize); as anteriores são liberadas. */
   texturas: (cor: HTMLCanvasElement, dados: HTMLCanvasElement) => void
+  /** As texturas novas, para subir à GPU antes (#138), e a troca, que só então as põe no material. */
+  preparar: (cor: HTMLCanvasElement, dados: HTMLCanvasElement) => { novas: THREE.Texture[]; usar: () => void }
   dispose: () => void
 }
 
@@ -115,9 +117,7 @@ export function criarRevela(nome: string, opcoes: { campo: boolean; brilho: numb
     transparent: true,
     depthWrite: false,
   })
-  const texturas = (cor: HTMLCanvasElement, dados: HTMLCanvasElement) => {
-    u.uCor.value?.dispose()
-    u.uDados.value?.dispose()
+  const preparar = (cor: HTMLCanvasElement, dados: HTMLCanvasElement) => {
     const tc = new THREE.CanvasTexture(cor)
     tc.colorSpace = THREE.SRGBColorSpace
     tc.generateMipmaps = false
@@ -127,13 +127,21 @@ export function criarRevela(nome: string, opcoes: { campo: boolean; brilho: numb
     td.generateMipmaps = false
     td.minFilter = THREE.NearestFilter
     td.magFilter = THREE.NearestFilter
-    u.uCor.value = tc
-    u.uDados.value = td
+    const usar = () => {
+      u.uCor.value?.dispose()
+      u.uDados.value?.dispose()
+      u.uCor.value = tc
+      u.uDados.value = td
+    }
+    return { novas: [tc, td], usar }
+  }
+  const texturas = (cor: HTMLCanvasElement, dados: HTMLCanvasElement) => {
+    preparar(cor, dados).usar()
   }
   const dispose = () => {
     u.uCor.value?.dispose()
     u.uDados.value?.dispose()
     material.dispose()
   }
-  return { material, u, texturas, dispose }
+  return { material, u, texturas, preparar, dispose }
 }

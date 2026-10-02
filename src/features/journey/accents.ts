@@ -1,4 +1,5 @@
 import { stages } from '../../content/journey'
+import { pt } from '../../i18n/messages/pt'
 
 /**
  * As cores das vidas como CSS, para o build e o servidor de dev (vite.config.ts, virtual:journey-accents.css): a CSP
@@ -10,10 +11,17 @@ import { stages } from '../../content/journey'
 export function lifeAccentsCss(): string {
   const colors = stages.map((s) => s.accent).join(',')
   // O espectro também como variável: o anel do "Contact me" (index.css) gira nele, fechando o círculo na primeira cor.
-  const root = `:root{--spectrum:${colors};--spectrum-loop:${colors},${stages[0]?.accent ?? '#fff'}}`
+  // As vidas de antes da tecnologia, em ordem: o anel da última parada de "Um pouco do que entreguei" (route.css).
+  const before = stages
+    .filter((s) => s.track === 'antes')
+    .map((s) => s.accent)
+    .join(',')
+  const root = `:root{--spectrum:${colors};--spectrum-loop:${colors},${stages[0]?.accent ?? 'var(--color-fg)'};--spectrum-before:${before}}`
   const spectrum = `.journey-spectrum{background-image:linear-gradient(90deg,${colors});-webkit-background-clip:text;background-clip:text;color:transparent}`
-  // A posição de cada letra da vida no herói (SlotWord: ch-<n> dá --i, que escalona a animação).
-  const letters = Math.max(...stages.map((s) => s.slot.replaceAll(' ', '').length))
+  // A posição de cada letra da vida no herói (SlotWord: ch-<n> dá --i, que escalona a animação), até a vida mais longa
+  // dos dois idiomas.
+  const slots = [...stages.map((s) => s.slot), ...Object.values(pt.hero.slots)]
+  const letters = Math.max(...slots.map((s) => s.replaceAll(' ', '').length))
   const positions = Array.from({ length: letters }, (_, i) => `.ch-${String(i)}{--i:${String(i)}}`)
   return [root, ...stages.map((s) => `.life-${s.id}{--accent:${s.accent}}`), spectrum, ...positions].join('\n')
 }

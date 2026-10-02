@@ -234,6 +234,8 @@ export function createHeroDebug(get: () => RootState): HeroDebug {
   return {
     ready: () => {
       const g = groups(get().scene)
+      // A cena aparece inteira quando o busto e a vida estão prontos (#138): até lá algum ancestral está escondido.
+      for (let o: THREE.Object3D | null = g?.prop ?? null; o; o = o.parent) if (!o.visible) return false
       let meshes = 0
       g?.prop.traverse((o) => {
         if (isMesh(o)) meshes++

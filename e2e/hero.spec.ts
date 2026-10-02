@@ -1,5 +1,12 @@
 import { expect, test, type Page } from '@playwright/test'
 
+/*
+ * U2: até o 1º quadro da cena 3D o herói diz "Today I am loading" (também no HTML), e a vida só entra com o busto na
+ * tela. Sem GPU, o runner desenha o busto por software e a cena leva segundos: quem lê a vida logo na carga espera a
+ * cena com este prazo (antes a vida já vinha no HTML).
+ */
+const CENA = { timeout: 45_000 }
+
 /** Erros do console durante o teste (WebGL, shader, React). */
 function collectErrors(page: Page) {
   const errors: string[] = []
@@ -14,8 +21,12 @@ test('herói: vida, títulos, links e o busto sem erro no console', async ({ pag
   const errors = collectErrors(page)
   const bust = page.waitForResponse((r) => r.url().includes('busto-s13.glb') && r.ok())
   await page.goto('/')
-  // Nome acessível: a frase inteira, com espaço, e não letra a letra.
-  await expect(page.getByRole('heading', { level: 1 })).toHaveAccessibleName(/^Today I am an? \S/)
+  // Nome acessível: a frase inteira, com espaço, e não letra a letra ("loading" até a cena, depois a vida).
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Fael Caporali')
+  await expect(page.getByRole('heading', { level: 2, name: /^Today I am/ })).toHaveAccessibleName(
+    /^Today I am an? \S/,
+    CENA,
+  )
   // Leva ao início da trajetória, sempre (J48).
   await expect(page.getByRole('link', { name: 'See the full journey' })).toHaveAttribute('href', '/journey')
   await expect(page.getByRole('link', { name: 'LinkedIn' })).toHaveAttribute('target', '_blank')
@@ -32,7 +43,7 @@ test('?slot começa na vida pedida e o carrossel troca sozinho', async ({ page }
   await page.goto('/?slot=vela')
   // O texto que o leitor de tela recebe (as letras animadas são aria-hidden).
   const slot = page.locator('.slot-word .sr-only')
-  await expect(slot).toHaveText('Sailing Instructor')
+  await expect(slot).toHaveText('Sailing Instructor', CENA)
   // Sem GPU o headless roda a ~7 FPS e o relógio limita o passo por quadro: a troca leva mais que os ~5 s reais.
   await expect(slot).not.toHaveText('Sailing Instructor', { timeout: 90_000 })
 })
@@ -49,9 +60,12 @@ test('sem rolagem horizontal e currículo com os dois PDFs', async ({ page }) =>
   await page.goto('/')
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)
   expect(overflow).toBeLessThanOrEqual(0)
-  await page.getByRole('button', { name: /Résumé/ }).click()
-  await expect(page.getByRole('link', { name: /Português/ })).toHaveAttribute('href', '/cv/fael-caporali-cv-pt.pdf')
-  await expect(page.getByRole('link', { name: /English/ })).toHaveAttribute('href', '/cv/fael-caporali-cv-en.pdf')
+  // O do herói: o fechamento da home (#overview) tem o mesmo menu do currículo, e a rota do que entreguei tem um item
+  // com "English" no nome; a busca fica na navegação do herói.
+  const links = page.getByRole('navigation', { name: 'Links' })
+  await links.getByRole('button', { name: /Résumé/ }).click()
+  await expect(links.getByRole('link', { name: /Português/ })).toHaveAttribute('href', '/cv/fael-caporali-cv-pt.pdf')
+  await expect(links.getByRole('link', { name: /English/ })).toHaveAttribute('href', '/cv/fael-caporali-cv-en.pdf')
 })
 
 // Celular deitado: layout largo (texto à esquerda, busto à direita), texto abaixo do cabeçalho e inteiro na tela.
@@ -62,8 +76,10 @@ for (const [width, height] of [
   test(`paisagem ${width}×${height}: texto abaixo do cabeçalho, sem cortar`, async ({ page }) => {
     await page.setViewportSize({ width, height })
     await page.goto('/?slot=ai&d=0')
+    // Mede o texto com a vida (a mais longa), não com o "loading" que vem antes da cena.
+    await expect(page.locator('.slot-word .sr-only')).toHaveText(/\S/, CENA)
     const header = await page.locator('header').boundingBox()
-    const title = await page.getByRole('heading', { level: 1 }).boundingBox()
+    const title = await page.getByRole('heading', { level: 2, name: /^Today I am/ }).boundingBox()
     const contact = await page.getByRole('list', { name: 'Contact' }).boundingBox()
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)
     if (!header || !title || !contact) throw new Error('herói incompleto')

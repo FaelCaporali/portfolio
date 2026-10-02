@@ -7,6 +7,7 @@
  */
 import type { Par } from './decisoes'
 import { PASSO_T } from './revela'
+import { Gravacao } from '../gravacao'
 
 export interface Marca {
   t: number
@@ -38,6 +39,7 @@ export class Pincel {
   private readonly h: number
   readonly q: Quadro
   readonly escala: number
+  private readonly gravacao: Gravacao | null
   /** Centro e instante de cada ícone pintado (os traços que sobem da folha chegam neles: tracos.ts). */
   readonly marcos: { x: number; y: number; t: number }[] = []
   /** Pontos com nome para o olhar (o CloudWatch do alarme). */
@@ -46,7 +48,11 @@ export class Pincel {
   readonly pares: Par[] = []
 
   /** `escala`: px do canvas por unidade do desenho (dpr no fundo). */
-  constructor(q: Quadro, escala: number) {
+  /**
+   * Com `adiado` (fundo, #138), o pincel só grava enquanto os blocos pintam e a pintura toca depois, em fatias
+   * (`pintura`); sem ele, pinta na hora, como sempre.
+   */
+  constructor(q: Quadro, escala: number, adiado = false) {
     this.q = q
     this.escala = escala
     const w = Math.max(1, Math.ceil((q.x1 - q.x0) * escala))
@@ -60,8 +66,14 @@ export class Pincel {
     const c = this.cor.getContext('2d')
     const d = this.dados.getContext('2d')
     if (!c || !d) throw new Error('pincel: canvas 2D indisponível')
-    this.c = c
-    this.d = d
+    this.gravacao = adiado ? new Gravacao() : null
+    this.c = this.gravacao ? this.gravacao.contexto(c) : c
+    this.d = this.gravacao ? this.gravacao.contexto(d) : d
+  }
+
+  /** Toca a pintura gravada (pincel `adiado`), um passo por vez; quem roda decide as fatias. */
+  *pintura(): Generator<void, void> {
+    if (this.gravacao) yield* this.gravacao.tocar()
   }
 
   /** Roda `fn` na cor (em cada metade pedida) e nos dados com a tinta da marca (instante `t`, grupo, posição `b`). */

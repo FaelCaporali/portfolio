@@ -37,6 +37,9 @@ Worker `fael-caporali-placeholder` (sem tempo fora do ar). Depois dele, uma vez:
 1. `TURNSTILE_SECRET` no Worker (painel → Workers → `fael-caporali` → Settings → Variables and Secrets), com o segredo
    do widget. Até lá o formulário recusa o envio e mostra o e-mail e o WhatsApp.
 2. Envio real ponta a ponta e conferência de SPF/DKIM/DMARC no cabeçalho recebido.
+3. `CF_API_TOKEN` no Worker (painel → Workers → `fael-caporali` → Settings → Variables and Secrets, como secret): um
+   API token da conta com a permissão "Account Analytics: Read", para o resumo semanal ler as visitas do Analytics
+   Engine (`worker/visits.ts`). Sem ele, o resumo diz que falta e o resto funciona.
 
 Deploy local, se um dia precisar: `pnpm exec wrangler login` e `pnpm run deploy` (`pnpm deploy` sem `run` é outro
 comando do pnpm), com `VITE_TURNSTILE_SITEKEY` no ambiente.
@@ -46,6 +49,9 @@ comando do pnpm), com `VITE_TURNSTILE_SITEKEY` no ambiente.
 - Assets: 20.000 arquivos por versão, 25 MiB por arquivo; `_headers` com até 100 regras e 2.000 caracteres por linha.
 - Só a API e as páginas HTML acordam o Worker (`run_worker_first`): uma visita gasta 1 requisição das 100.000/dia;
   JS, modelos, PDFs e ícones saem direto dos assets.
+- Registro de visitas no Analytics Engine (`worker/visits.ts`): 100.000 pontos gravados e 10.000 consultas por dia,
+  cota própria (não divide o D1 com o contato e o MCP). Cada página gasta 1 ponto na entrega; o envio do navegador
+  (tempo visível e o que a pessoa fez) gasta mais 1 ponto, 1 por evento e 1 requisição do Worker. Guarda 3 meses.
 - CSP com nonce nas páginas (`worker/page.ts`): a Cloudflare põe o mesmo nonce nos scripts que injeta (JS Detections do
   Bot Fight Mode e Web Analytics), sem `'unsafe-inline'`.
 - Worker: 10 ms de CPU por requisição (o contato espera rede, não CPU), 5 crons por conta (usa 1).

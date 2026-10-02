@@ -10,7 +10,7 @@
  * muda).
  */
 import { useFrame, useThree } from '@react-three/fiber'
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import * as THREE from 'three'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 
@@ -22,12 +22,20 @@ const own = (m: THREE.Material): m is Standard =>
 /** Materiais que pedem reflexo próprio (extras do glb). */
 export const withOwnEnv = (materials: readonly THREE.Material[]) => materials.filter(own)
 
+/**
+ * A sala nítida, uma por renderer, viva enquanto o canvas vive (o contexto perdido a libera): as vidas são montadas de
+ * novo a cada visita (#138), e refazer o PMREM em cada uma compilava os shaders dele na thread principal.
+ */
+const salas = new WeakMap<THREE.WebGLRenderer, THREE.Texture>()
 function sharpRoom(gl: THREE.WebGLRenderer) {
+  const pronta = salas.get(gl)
+  if (pronta) return pronta
   const pmrem = new THREE.PMREMGenerator(gl)
   const room = new RoomEnvironment()
   const texture = pmrem.fromScene(room, 0).texture
   room.dispose()
   pmrem.dispose()
+  salas.set(gl, texture)
   return texture
 }
 
@@ -39,7 +47,6 @@ export function useOwnEnvIntensity(materials: readonly Standard[]) {
     () => (materials.some((m) => m.userData.envSharp === true) ? sharpRoom(gl) : null),
     [gl, materials],
   )
-  useEffect(() => () => sharp?.dispose(), [sharp])
   useFrame(() => {
     for (const m of materials) {
       const env = m.userData.envSharp === true ? sharp : scene.environment

@@ -7,7 +7,7 @@ import { parseContact, type ContactInput } from '../shared/contact/validation'
 import { csvSet, json, readCapped } from './http'
 import { deliver } from './mail'
 import { DAILY_CAP, DAY_MS, type Message } from './message'
-import { countSince, insert, record } from './repository'
+import { countFormSince, insert, record } from './repository'
 import { verifyTurnstile } from './turnstile'
 
 const fail = (status: number, error: ContactErrorCode, extra?: HeadersInit) => json(status, { ok: false, error }, extra)
@@ -49,7 +49,7 @@ async function readInput(request: Request): Promise<ContactInput | Response> {
 /** Teto global por 24 h. Banco fora do ar não impede o envio: Turnstile e limite por IP continuam valendo. */
 async function overDailyCap(db: D1Database, now: number): Promise<boolean> {
   try {
-    return (await countSince(db, now - DAY_MS)) >= DAILY_CAP
+    return (await countFormSince(db, now - DAY_MS)) >= DAILY_CAP
   } catch {
     return false
   }
@@ -65,14 +65,18 @@ function toMessage(input: ContactInput, request: Request, now: number): Message 
     body: input.message,
     country: typeof request.cf?.country === 'string' ? request.cf.country : null,
     attempts: 0,
+    via: null,
   }
 }
 
+/** Entregue agora, guardada para o cron reenviar, ou perdida (envio e banco falharam; `code` é o erro do envio). */
+export type Stored = { outcome: 'sent' } | { outcome: 'queued' | 'lost'; code: string }
+
 /**
- * Grava antes de enviar. Falhou o envio com a mensagem gravada: o visitante vê sucesso e o cron reenvia.
- * Falharam envio e banco: o visitante vê o erro (e os contatos diretos).
+ * Grava antes de enviar. Falhou o envio com a mensagem gravada: quem enviou vê sucesso e o cron reenvia.
+ * Falharam envio e banco: quem enviou vê o erro (e os contatos diretos). Também serve ao send_message do MCP.
  */
-async function storeAndDeliver(env: Env, message: Message): Promise<Response> {
+export async function storeAndDeliver(env: Env, message: Message): Promise<Stored> {
   let stored = true
   try {
     await insert(env.DB, message)
@@ -89,16 +93,8 @@ async function storeAndDeliver(env: Env, message: Message): Promise<Response> {
     }
   }
 
-  if (delivery.ok) {
-    log('sent', { id: message.id })
-    return json(200, { ok: true })
-  }
-  if (stored) {
-    log('queued', { id: message.id, code: delivery.code })
-    return json(200, { ok: true })
-  }
-  log('lost', { code: delivery.code })
-  return fail(503, 'unavailable')
+  if (delivery.ok) return { outcome: 'sent' }
+  return { outcome: stored ? 'queued' : 'lost', code: delivery.code }
 }
 
 export async function handleContact(request: Request, env: Env): Promise<Response> {
@@ -132,5 +128,12 @@ export async function handleContact(request: Request, env: Env): Promise<Respons
     return fail(429, 'busy')
   }
 
-  return storeAndDeliver(env, toMessage(input, request, now))
+  const message = toMessage(input, request, now)
+  const stored = await storeAndDeliver(env, message)
+  if (stored.outcome === 'lost') {
+    log('lost', { code: stored.code })
+    return fail(503, 'unavailable')
+  }
+  log(stored.outcome, stored.outcome === 'queued' ? { id: message.id, code: stored.code } : { id: message.id })
+  return json(200, { ok: true })
 }

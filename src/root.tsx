@@ -1,20 +1,32 @@
-import type { ReactNode } from 'react'
-import { isRouteErrorResponse, Link, Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router'
-import { useHydrated } from './lib/useHydrated'
+import { useEffect, type ReactNode } from 'react'
+import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration, useLocation } from 'react-router'
+import { langFromPath, LOCALES } from './i18n/lang'
+import { startTracking, trackPage } from './lib/track'
+import { ErrorPage } from './ui/ErrorPage'
+import { NavigationProgress } from './ui/NavigationProgress'
 import './index.css'
 // As cores das vidas como classes e variáveis (a trajetória e o anel do "Contact me"), geradas de journey.ts
 // (vite.config.ts): a CSP não aceita estilo inline.
 import 'virtual:journey-accents.css'
 
 /**
- * O documento de todas as páginas. Título e descrição vêm de cada rota (meta, em src/routes/); os <script> que o
- * roteador escreve no HTML recebem o nonce da CSP no Worker (worker/page.ts).
+ * O documento de todas as páginas. As metas vêm de cada rota (meta, em src/routes/, calculadas do idioma em
+ * src/i18n/meta.ts); o <html lang> é o do endereço (/pt… = pt-BR), e a troca de idioma pelo roteador o refaz. Os
+ * <script> que o roteador escreve no HTML recebem o nonce da CSP no Worker (worker/page.ts).
  */
 export function Layout({ children }: { children: ReactNode }) {
+  const tag = LOCALES[langFromPath(useLocation().pathname)].tag
+  // A página vazia do build (__spa-fallback.html) sai com lang="en" e a hidratação não corrige atributo: /pt/… que
+  // não existe ganha o lang certo aqui.
+  useEffect(() => {
+    if (document.documentElement.lang !== tag) document.documentElement.lang = tag
+  }, [tag])
   return (
-    <html lang="en">
+    <html lang={tag}>
       <head>
         <meta charSet="UTF-8" />
+        {/* A cor da barra do navegador no celular: o fundo da página (--color-page). */}
+        <meta name="theme-color" content="#0b0b0e" />
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content"
@@ -34,8 +46,20 @@ export function Layout({ children }: { children: ReactNode }) {
   )
 }
 
+/**
+ * Todas as páginas, com a barra de carregamento da troca de página pelo roteador (U2) e o registro de visitas
+ * (src/lib/track.ts): começa na hidratação e marca cada troca de página.
+ */
 export default function Root() {
-  return <Outlet />
+  const { pathname } = useLocation()
+  useEffect(() => startTracking(window.location.pathname), [])
+  useEffect(() => trackPage(pathname), [pathname])
+  return (
+    <>
+      <NavigationProgress />
+      <Outlet />
+    </>
+  )
 }
 
 /**
@@ -47,24 +71,10 @@ export function HydrateFallback() {
 }
 
 /**
- * Endereço que não existe (o Worker responde 404 com a página vazia do roteador) ou erro inesperado. A página vazia
- * sai do build sem nada no corpo (HydrateFallback): o aviso só aparece depois da hidratação, para as duas árvores
- * serem iguais.
+ * Endereço que não existe (o Worker responde 404 com a página vazia do roteador) ou erro inesperado, no idioma do
+ * endereço (ErrorPage).
  */
 export function ErrorBoundary({ error }: { error: unknown }) {
-  const hydrated = useHydrated()
-  if (!hydrated) return null
-  const missing = isRouteErrorResponse(error) && error.status === 404
-  return (
-    <main className="mx-auto flex min-h-svh max-w-xl flex-col justify-center gap-4 px-5 text-white">
-      <title>{missing ? 'Page not found · Fael Caporali' : 'Something went wrong · Fael Caporali'}</title>
-      <h1 className="text-3xl font-semibold tracking-tight">{missing ? 'Page not found' : 'Something went wrong'}</h1>
-      <p className="text-white/70">
-        {missing ? 'There is nothing at this address.' : 'The page could not be shown. Please try again.'}
-      </p>
-      <Link to="/" className="text-white underline underline-offset-4 hover:text-white/80">
-        Back to the home page
-      </Link>
-    </main>
-  )
+  const lang = langFromPath(useLocation().pathname)
+  return <ErrorPage lang={lang} missing={isRouteErrorResponse(error) && error.status === 404} />
 }

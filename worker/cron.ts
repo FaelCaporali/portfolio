@@ -1,5 +1,10 @@
-/** Tarefa agendada: reenvia o que ficou pendente e apaga o que passou da retenção. */
+/**
+ * Tarefa agendada: reenvia o que ficou pendente, apaga o que passou da retenção e manda o resumo semanal do site e do
+ * MCP.
+ */
 import { deliver } from './mail'
+import { purge } from './mcp/audit'
+import { weeklySummary } from './mcp/notify'
 import { RETENTION_MS, RETRY_AFTER_MS } from './message'
 import { deleteBefore, pendingBefore, record } from './repository'
 
@@ -18,4 +23,14 @@ export async function retryAndPurge(env: Env, now: number): Promise<{ retried: n
   }
   const purged = await deleteBefore(env.DB, now - RETENTION_MS)
   return { retried: pending.length, sent, purged }
+}
+
+/**
+ * O MCP no mesmo cron: retenção do registro (90 dias, como as mensagens) e o resumo semanal quando for a hora. Cada
+ * etapa falha sozinha: um erro na limpeza não impede o resumo, e o erro vai para o log.
+ */
+export async function mcpHousekeeping(env: Env, now: number): Promise<{ purged: number | 'failed'; summary: string }> {
+  const purged = await purge(env.DB, now - RETENTION_MS).catch(() => 'failed' as const)
+  const summary = await weeklySummary(env, now).catch(() => 'failed')
+  return { purged, summary }
 }

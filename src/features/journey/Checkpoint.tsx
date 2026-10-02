@@ -1,14 +1,13 @@
-import { memo } from 'react'
+import { memo, useMemo } from 'react'
 import { periodLabel, type Checkpoint as Data } from '../../content/journey-timeline'
+import { MESSAGES, useLang, type Lang } from '../../i18n/lang'
+import { tagLabel } from '../../i18n/tags'
 import { cx } from '../../lib/cx'
 import type { Lane, Placed } from './layout'
+import { useReading, type Reading } from './reading'
 import { eyebrow } from './parts'
 
-const TAG_GROUPS = [
-  { key: 'tools', label: 'Tools' },
-  { key: 'concepts', label: 'Concepts' },
-  { key: 'skills', label: 'Skills' },
-] as const
+const TAG_GROUPS = ['tools', 'concepts', 'skills'] as const
 
 /* Classes inteiras por faixa (o Tailwind só gera o que lê no código). No celular, tudo numa coluna só. */
 const CARD: Record<Lane, string> = {
@@ -38,7 +37,11 @@ const NODE: Record<Lane, string> = {
  * máximo), daí o teto de 3.875rem.
  */
 const BIG =
-  'text-[min(2.75rem,calc((100vw_-_5rem)/7.4))] lg:text-[min(5.6vw,3.875rem)] leading-[0.95] font-semibold tracking-[-0.045em]'
+  'text-[min(2.75rem,calc((100vw_-_5rem)/7.4))] lg:text-[min(5.6vw,3.875rem)] leading-landmark font-semibold tracking-landmark'
+/** Em português a mais longa é "Empreendedor" (≈7,8em): a mesma conta, com a palavra dela. */
+const BIG_PT =
+  'text-[min(2.75rem,calc((100vw_-_5rem)/8.2))] lg:text-[min(5vw,3.7rem)] leading-landmark font-semibold tracking-landmark'
+const big = (lang: Lang) => (lang === 'pt' ? BIG_PT : BIG)
 
 /**
  * Um marco do mapa, em duas camadas (J27): o que se lê de relance (data, título, papel, a frase, as conquistas e as
@@ -52,21 +55,23 @@ interface Props {
   hidden: boolean
   /** A primeira parada à vista do ano: o ano grande vem antes dela. */
   yearFirst: boolean
-  /** As tags escolhidas no filtro: acendem no cartão. */
-  chosen: ReadonlySet<string>
-  /** O marco em leitura: o ponto enche e o cartão acende a borda. */
-  current: boolean
-  /** Entrada na rolagem (só com movimento liberado): esperando (false) ou já entrou (true). */
-  reveal: boolean | undefined
+  /** As tags do marco escolhidas no filtro, uma por linha: acendem no cartão. */
+  matched: string
+  /**
+   * O que está em leitura: se é este o marco (o ponto enche e o cartão acende a borda) e a entrada dele na rolagem (só
+   * com movimento liberado: esperando ou já entrou). Lido aqui, para a troca de marco redesenhar só os dois marcos.
+   */
+  reading: Reading
 }
 
-export const Checkpoint = memo(function Checkpoint({ item, hidden, yearFirst, chosen, current, reveal }: Props) {
+export const Checkpoint = memo(function Checkpoint({ item, hidden, yearFirst, matched, reading }: Props) {
   const { c, scope, life, lane, year } = item
-  const period = periodLabel(c)
-  const wide = lane === 'wide'
+  const id = life?.id ?? c.id
+  const current = useReading(reading, (s) => s.mark === id)
+  const reveal = useReading(reading, (s) => s.reveal.get(id))
   return (
     <li
-      id={life?.id ?? c.id}
+      id={id}
       hidden={hidden}
       data-checkpoint
       data-scope={scope?.id}
@@ -80,79 +85,95 @@ export const Checkpoint = memo(function Checkpoint({ item, hidden, yearFirst, ch
       )}
     >
       {year && <YearMark year={year} />}
-      <div className={cx('lg:grid lg:grid-cols-12 lg:gap-x-8', wide && life && 'lg:gap-y-6')}>
+      <div className={cx('lg:grid lg:grid-cols-12 lg:gap-x-8', lane === 'wide' && life && 'lg:gap-y-6')}>
         {life && <Landmark life={life} lane={lane} />}
-        <article
-          className={cx(
-            'card relative rounded-3xl border border-white/[0.08] p-5 sm:p-7',
-            CARD[lane],
-            wide && 'lg:p-10',
-            wide && life && 'lg:row-start-2',
-          )}
-        >
-          <span
-            aria-hidden
-            data-node={scope?.id ?? ''}
-            className={cx(
-              'dot absolute h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-(--accent) bg-[#0b0b0e]',
-              NODE[lane],
-            )}
-          />
-          <div>
-            {period && <p className="ink text-2xl font-semibold tracking-tight tabular-nums sm:text-3xl">{period}</p>}
-            <h3
-              className={cx(
-                'mt-2 leading-tight font-semibold tracking-tight text-white',
-                wide ? 'text-2xl sm:text-3xl lg:text-4xl' : 'text-xl sm:text-2xl',
-              )}
-            >
-              {c.title.en}
-            </h3>
-            {c.subtitle && <p className="ink mt-1.5 text-base font-medium sm:text-lg">{c.subtitle.en}</p>}
-            <p
-              className={cx('mt-4 leading-relaxed text-white/85', wide ? 'text-lg lg:text-xl' : 'text-base sm:text-lg')}
-            >
-              {c.headline.en}
-            </p>
-            {c.highlights && <Highlights items={c.highlights.en} className="mt-5 hidden sm:block" />}
-          </div>
-          <Tags tags={c.tags} wide={wide} chosen={chosen} />
-          <details className="group mt-6 border-t border-white/[0.08] pt-4">
-            <summary className="inline-flex min-h-9 cursor-pointer list-none items-center gap-2 text-sm font-medium text-white/70 hover:text-white focus-visible:outline-2 focus-visible:outline-white [&::-webkit-details-marker]:hidden">
-              <span className="group-open:hidden">Read the story</span>
-              <span className="hidden group-open:inline">Close the story</span>
-              <span aria-hidden className="text-(--accent) transition-transform duration-300 group-open:rotate-45">
-                +
-              </span>
-            </summary>
-            {c.highlights && <Highlights items={c.highlights.en} className="mt-4 sm:hidden" />}
-            <div className="mt-3 max-w-[68ch] space-y-4 text-[0.98rem] leading-relaxed text-white/80">
-              {c.body.en.map((p) => (
-                <p key={p}>{p}</p>
-              ))}
-            </div>
-          </details>
-          {c.link && (
-            <a
-              href={c.link.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-4 inline-flex min-h-6 items-center gap-1.5 justify-self-start text-sm font-medium text-white/85 underline decoration-(--accent) underline-offset-4 hover:text-white"
-            >
-              {c.link.label.en} <span aria-hidden>↗</span>
-            </a>
-          )}
-        </article>
+        <Card item={item} matched={matched} />
       </div>
     </li>
   )
 })
 
+/**
+ * O cartão do marco. À parte, com memo: o filtro e a leitura mudam o <li> (à vista, em leitura, entrada), e o cartão
+ * só redesenha quando mudam as tags dele que o filtro escolheu (142).
+ */
+const Card = memo(function Card({ item, matched }: { item: Placed; matched: string }) {
+  const { c, scope, life, lane } = item
+  const lang = useLang()
+  const m = MESSAGES[lang].journey
+  const period = periodLabel(c, lang)
+  const wide = lane === 'wide'
+  const chosen = useMemo(() => new Set(matched ? matched.split('\n') : []), [matched])
+  return (
+    <article
+      className={cx(
+        'card relative rounded-3xl border border-fg/8 p-5 sm:p-7',
+        CARD[lane],
+        wide && 'lg:p-10',
+        wide && life && 'lg:row-start-2',
+      )}
+    >
+      <span
+        aria-hidden
+        data-node={scope?.id ?? ''}
+        className={cx(
+          'dot absolute h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-(--accent) bg-page',
+          NODE[lane],
+        )}
+      />
+      <div>
+        {period && <p className="ink text-2xl font-semibold tracking-tight tabular-nums sm:text-3xl">{period}</p>}
+        <h3
+          className={cx(
+            'mt-2 leading-tight font-semibold tracking-tight text-fg',
+            wide ? 'text-2xl sm:text-3xl lg:text-4xl' : 'text-xl sm:text-2xl',
+          )}
+        >
+          {c.title[lang]}
+        </h3>
+        {c.subtitle && <p className="ink mt-1.5 text-base font-medium sm:text-lg">{c.subtitle[lang]}</p>}
+        <p className={cx('mt-4 leading-relaxed text-fg/85', wide ? 'text-lg lg:text-xl' : 'text-base sm:text-lg')}>
+          {c.headline[lang]}
+        </p>
+        {c.highlights && <Highlights items={c.highlights[lang]} className="mt-5 hidden sm:block" />}
+      </div>
+      <Tags tags={c.tags} wide={wide} chosen={chosen} lang={lang} />
+      <details className="group mt-6 border-t border-fg/8 pt-4">
+        <summary className="inline-flex min-h-9 cursor-pointer list-none items-center gap-2 text-sm font-medium text-fg/70 hover:text-fg focus-visible:outline-2 focus-visible:outline-fg [&::-webkit-details-marker]:hidden">
+          <span className="group-open:hidden">{m.readStory}</span>
+          <span className="hidden group-open:inline">{m.closeStory}</span>
+          <span aria-hidden className="text-(--accent) transition-transform duration-300 group-open:rotate-45">
+            +
+          </span>
+        </summary>
+        {c.highlights && <Highlights items={c.highlights[lang]} className="mt-4 sm:hidden" />}
+        <div className="mt-3 max-w-[68ch] space-y-4 text-story leading-relaxed text-fg/80">
+          {c.body[lang].map((p) => (
+            <p key={p}>{p}</p>
+          ))}
+        </div>
+      </details>
+      {c.link && (
+        <a
+          href={c.link.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-4 inline-flex min-h-6 items-center gap-1.5 justify-self-start text-sm font-medium text-fg/85 underline decoration-(--accent) underline-offset-4 hover:text-fg"
+        >
+          {c.link.label[lang]} <span aria-hidden>↗</span>
+        </a>
+      )}
+    </article>
+  )
+})
+
 /** A vida do herói que começa neste marco: o nome grande, na cor dela, sem numeração (J66). */
 function Landmark({ life, lane }: { life: NonNullable<Placed['life']>; lane: Lane }) {
+  const lang = useLang()
+  const slot = MESSAGES[lang].hero.slots[life.id]
   return (
     <div className={cx('landmark relative mb-5 lg:mb-0', LANDMARK[lane])}>
-      <p className={cx(BIG, 'text-(--accent)')}>{life.slot}</p>
+      <p className={cx(big(lang), 'text-(--accent)')}>{slot}</p>
     </div>
   )
 }
@@ -163,7 +184,7 @@ function Landmark({ life, lane }: { life: NonNullable<Placed['life']>; lane: Lan
  */
 function YearMark({ year }: { year: string }) {
   return (
-    <p aria-hidden className={cx('year-mark pb-6 tabular-nums lg:pb-10 lg:text-center', BIG)}>
+    <p aria-hidden className={cx('year-mark pb-6 tabular-nums lg:pb-10 lg:text-center', big(useLang()))}>
       {year}
     </p>
   )
@@ -175,7 +196,7 @@ function YearMark({ year }: { year: string }) {
  */
 function Highlights({ items, className }: { items: string[]; className: string }) {
   return (
-    <ul className={cx('space-y-2.5 text-[0.95rem] leading-relaxed text-white/75', className)}>
+    <ul className={cx('space-y-2.5 text-highlight leading-relaxed text-fg/75', className)}>
       {items.map((h) => (
         <li key={h} className="relative pl-5">
           <span aria-hidden className="absolute top-[0.6em] left-0 h-1.5 w-1.5 rounded-full bg-(--accent)" />
@@ -190,10 +211,21 @@ function Highlights({ items, className }: { items: string[]; className: string }
  * Tags separadas em ferramentas, conceitos e habilidades (J26), num peso abaixo do texto: são o índice do que o marco
  * usou, não a história. No marco largo, três colunas lado a lado; nos outros, um grupo embaixo do outro.
  */
-function Tags({ tags, wide, chosen }: { tags: Data['tags']; wide: boolean; chosen: ReadonlySet<string> }) {
-  const groups = TAG_GROUPS.flatMap((g) => {
-    const items = tags?.[g.key]
-    return items?.length ? [{ ...g, items }] : []
+function Tags({
+  tags,
+  wide,
+  chosen,
+  lang,
+}: {
+  tags: Data['tags']
+  wide: boolean
+  chosen: ReadonlySet<string>
+  lang: Lang
+}) {
+  const labels = MESSAGES[lang].journey.groups
+  const groups = TAG_GROUPS.flatMap((key) => {
+    const items = tags?.[key]
+    return items?.length ? [{ key, label: labels[key], items }] : []
   })
   if (!groups.length) return null
   return (
@@ -205,19 +237,15 @@ function Tags({ tags, wide, chosen }: { tags: Data['tags']; wide: boolean; chose
     >
       {groups.map((g) => (
         <div key={g.key} className="contents">
-          <dt className={cx(eyebrow, 'pt-1 text-[0.62rem] text-white/45')}>{g.label}</dt>
+          <dt className={cx(eyebrow, 'pt-1 text-eyebrow-sm text-fg/45')}>{g.label}</dt>
           <dd className={cx('-mt-1 sm:mt-0', wide && 'lg:-mt-1')}>
             <ul aria-label={g.label} className="flex flex-wrap gap-1.5">
               {g.items.map((t) => (
                 <li
                   key={t}
-                  className={cx(
-                    'tag rounded-full px-2.5 py-0.5 text-[0.72rem]',
-                    `tag-${g.key}`,
-                    chosen.has(t) && 'is-match',
-                  )}
+                  className={cx('tag rounded-full px-2.5 py-0.5 text-tag', `tag-${g.key}`, chosen.has(t) && 'is-match')}
                 >
-                  {t}
+                  {tagLabel(lang, g.key, t)}
                 </li>
               ))}
             </ul>

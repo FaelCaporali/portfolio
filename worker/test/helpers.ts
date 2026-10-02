@@ -1,4 +1,5 @@
 /** Apoio dos testes do Worker: requisições prontas, dublês do Turnstile e da binding de e-mail, leitura do D1. */
+import { createExecutionContext } from 'cloudflare:test'
 import { env } from 'cloudflare:workers'
 import { afterEach, beforeEach, vi } from 'vitest'
 import { CONTACT_PATH } from '../../shared/contact/contract'
@@ -47,7 +48,7 @@ export const t = {
 /** Registra os dublês no arquivo de teste: D1 vazio, e-mail aceito, siteverify aprovando e nenhum outro fetch. */
 export function useWorkerDoubles() {
   beforeEach(async () => {
-    await env.DB.exec('DELETE FROM messages')
+    await env.DB.batch(['messages', 'mcp_calls', 'mcp_quota'].map((table) => env.DB.prepare(`DELETE FROM ${table}`)))
     t.send = vi.fn(sendOk)
     t.env = { ...env, EMAIL: { send: t.send } as unknown as SendEmail }
     t.siteverify = { success: true, action: 'contact', hostname: 'fael.caporali.dev' }
@@ -65,7 +66,7 @@ export function useWorkerDoubles() {
 export const sentMail = () => t.send.mock.calls[0]?.[0] as EmailMessageBuilder
 
 export const call = (req: Request, e: Env = t.env) =>
-  worker.fetch(req as Request<unknown, IncomingRequestCfProperties>, e)
+  worker.fetch(req as Request<unknown, IncomingRequestCfProperties>, e, createExecutionContext())
 
 export const rows = () =>
   env.DB.prepare('SELECT * FROM messages ORDER BY created_at')

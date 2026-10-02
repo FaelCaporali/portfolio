@@ -105,6 +105,7 @@ describe('envio', () => {
       body: 'Olá, tudo bem? Teste.',
       country: 'BR',
       attempts: 0,
+      via: null,
     }
     await expect(env.EMAIL.send(compose(m))).resolves.toHaveProperty('messageId')
   })
@@ -119,6 +120,7 @@ describe('envio', () => {
       body: 'Olá, tudo bem? Teste.',
       country: null,
       attempts: 0,
+      via: null,
     }
     await expect(env.EMAIL.send({ ...compose(m), to: 'alvo@example.com' })).rejects.toThrow()
     await expect(env.EMAIL.send({ ...compose(m), from: 'fael@caporali.dev' })).rejects.toThrow()

@@ -5,10 +5,12 @@
  * (.wai/trajetoria/fontes.json, pelo id). Requisitos J24–J37 em .wai/trajetoria/REQUISITOS.md.
  * Vai no pedaço da rota /journey (src/routes.ts) e no HTML dela, gerado no build: o herói não o baixa.
  */
+import type { Lang } from '../../shared/i18n'
+import { MESSAGES } from '../i18n/lang'
+import { hasTagLabel } from '../i18n/tags'
 import data from './journey.json'
 import { stages, type StageId } from './journey'
 
-type Lang = 'en' | 'pt'
 export type Text = Record<Lang, string>
 type TextList = Record<Lang, string[]>
 
@@ -56,28 +58,36 @@ function check(c: Checkpoint): Checkpoint {
   if (c.highlights && c.highlights.en.length !== c.highlights.pt.length) {
     throw new Error(`${where}: conquistas en/pt desiguais`)
   }
+  checkTags(c, where)
   return c
+}
+
+/** Conceito ou habilidade sem tradução em src/i18n/messages/pt-tags.ts derruba o build (a página em pt a mostraria). */
+function checkTags(c: Checkpoint, where: string) {
+  for (const group of ['tools', 'concepts', 'skills'] as const) {
+    const missing = (c.tags?.[group] ?? []).filter((t) => !hasTagLabel(group, t))
+    if (missing.length) throw new Error(`${where}: tag sem tradução em pt-tags.ts: ${missing.join(', ')}`)
+  }
 }
 
 export const checkpoints: Checkpoint[] = (data.checkpoints as Checkpoint[]).map(check).sort((a, b) => a.order - b.order)
 
 export const intro: { lede: Text } = data.intro
 
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-
-function when(d: string): string {
-  if (d === 'present') return 'present'
+function when(d: string, lang: Lang): string {
+  const { months, present } = MESSAGES[lang].journey
+  if (d === 'present') return present
   const [year, month] = d.split('-')
-  return month ? `${MONTHS[Number(month) - 1] ?? ''} ${year ?? ''}` : (year ?? '')
+  return month ? `${months[Number(month) - 1] ?? ''} ${year ?? ''}` : (year ?? '')
 }
 
-/** "Jun 2023 – present", "2013 – 2017", "2025"; o texto livre quando a data não é exata. */
-export function periodLabel(c: Checkpoint): string | undefined {
+/** "Jun 2023 – present" ("jun 2023 – hoje"), "2013 – 2017", "2025"; o texto livre quando a data não é exata. */
+export function periodLabel(c: Checkpoint, lang: Lang): string | undefined {
   const p = c.period
   if (!p) return undefined
-  if (p.text) return p.text.en
-  const start = p.start ? when(p.start) : undefined
-  const end = p.end ? when(p.end) : undefined
+  if (p.text) return p.text[lang]
+  const start = p.start ? when(p.start, lang) : undefined
+  const end = p.end ? when(p.end, lang) : undefined
   if (start && end && start !== end) return `${start} – ${end}`
   return start ?? end
 }
