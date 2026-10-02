@@ -180,6 +180,13 @@ describe('herói: "Today I am loading" até a cena 3D (U2)', () => {
     await user.click(await screen.findByRole('button', { name: 'cena pronta' }))
     expect(titulo()).toHaveAccessibleName(VIDA)
   })
+
+  it('com aceleração de GPU, nenhuma imagem /hero-bot é pedida: zero mudança do caminho de hoje', async () => {
+    const user = userEvent.setup()
+    render(<RouterProvider router={createMemoryRouter(rotas())} />)
+    await user.click(await screen.findByRole('button', { name: 'cena pronta' }))
+    expect(document.querySelector('img[src^="/hero-bot/"]')).toBeNull()
+  })
 })
 
 describe('conteúdo abaixo do herói (05-contrato O2, O3; 08-contrato-v2 C1)', () => {

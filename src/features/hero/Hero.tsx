@@ -1,4 +1,4 @@
-import { Suspense, lazy, useCallback, useRef, useState, useSyncExternalStore } from 'react'
+import { Suspense, lazy, useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { flushSync } from 'react-dom'
 import { useNavigation } from 'react-router'
 import { OPENING, stages, type PropId } from '../../content/journey'
@@ -7,6 +7,7 @@ import { LangSwitch } from '../../i18n/LangSwitch'
 import { localePath, useLang, useMessages } from '../../i18n/lang'
 import { cyclicAt } from '../../lib/array'
 import { HeroCopy } from './HeroCopy'
+import { HeroFallbackImage } from './HeroFallbackImage'
 import { LifeTimeline } from './LifeTimeline'
 import { SceneBoundary } from './SceneBoundary'
 import { SourceLink } from './SourceLink'
@@ -15,7 +16,7 @@ import { useFreeArea } from './hooks/useFreeArea'
 import { useOnScreen } from './hooks/useOnScreen'
 import { usePointerGaze } from './hooks/usePointerGaze'
 import { hasAcceleration } from './model/acceleration'
-import type { Phase } from './model/carousel'
+import { TIMING, type Phase } from './model/carousel'
 import { advance, candidates, createLineup, loadOrder, peek, skipFailed, type Lineup } from './model/lineup'
 import { readHeroOptions, type HeroOptions } from './model/options'
 
@@ -148,6 +149,18 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
     setCarga(loadProps(lineup.current, requested.current, failed.current))
   }, [])
   const stage = cyclicAt(stages, index)
+  // Sem aceleração de GPU real (sceneFailed, inclusive a cena que caiu depois de montada), o lugar do busto é uma
+  // imagem parada (HeroFallbackImage), e o relógio do carrossel segue sozinho — o MESMO tempo do 3D (TIMING), sem
+  // desintegração. Fala do Fael (Capítulo 11 do plano, 03-plano-versao-robos.md): "ausência de GPU não impede render
+  // 3d [...] deveria ter imagens". O clique no indicador já troca na hora (select, abaixo); este efeito só cobre a
+  // passagem do tempo. `carga.next` é a mesma vida que a cena real usaria como `onNext` (loadProps, acima).
+  useEffect(() => {
+    if (!sceneFailed) return
+    const holdMs = (opening ? TIMING.holdFirst : TIMING.hold) * 1000
+    const id = window.setTimeout(() => next(carga.next), holdMs)
+    return () => window.clearTimeout(id)
+  }, [sceneFailed, opening, index, carga.next, next])
+  const nextStage = sceneFailed ? (stages.find((s) => s.prop === carga.next) ?? null) : null
   const lang = useLang()
   const m = useMessages()
   // Indo para outra página (o botão da trajetória): a cena para, e o quadro 3D não disputa o processador com ela.
@@ -199,6 +212,11 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
           </Suspense>
         </SceneBoundary>
       )}
+
+      {/* Sem aceleração (a sonda falhou, ou a cena caiu): a imagem da vida atual no lugar do busto, nunca vazio. Só
+          depois da hidratação (options não nulo) — o servidor não sabe da GPU, e a 1ª renderização do cliente tem de
+          bater com o HTML dele (nem canvas, nem imagem) até esse ponto. */}
+      {options && sceneFailed && <HeroFallbackImage stage={stage} nextStage={nextStage} alt={m.hero.slots[stage.id]} />}
 
       {/* Cabeçalho na largura toda: o nome à esquerda e, abaixo dele, o indicador centralizado na página. A base do
           cabeçalho é o topo do espaço livre do busto no celular (useFreeArea). */}
