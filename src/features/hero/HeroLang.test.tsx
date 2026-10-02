@@ -58,11 +58,16 @@ afterEach(() => {
 })
 
 describe('herói em português (/pt)', () => {
-  it('o HTML do build sai em português: "Hoje estou carregando", títulos, botão e o controle EN', () => {
+  it('o HTML do build sai em português: "Hoje sou AI Product Engineer", títulos, botão e o controle EN', () => {
     const html = renderToString(<RouterProvider router={createMemoryRouter(rotas(), { initialEntries: ['/pt'] })} />)
     const box = document.createElement('div')
     box.innerHTML = html
-    expect(box.querySelector('h2')?.textContent).toBe('Hoje estou carregando')
+    // A vida de abertura como texto (D-SEO7); o "Hoje estou carregando" da tela vem do CSS.
+    expect(box.querySelector('h2')?.textContent).toBe('Hoje sou AI Product Engineer')
+    expect([...box.querySelectorAll('[data-com-js]')].map((e) => e.getAttribute('data-com-js'))).toEqual([
+      'Hoje estou',
+      'carregando',
+    ])
     expect(box.querySelector('h1')?.textContent).toBe('Fael Caporali')
     expect(within(box).getByRole('list', { name: 'Títulos' })).toHaveTextContent('Analista de QA')
     expect(within(box).getByRole('link', { name: /Ver a trajetória completa/ })).toHaveAttribute('href', '/pt/journey')

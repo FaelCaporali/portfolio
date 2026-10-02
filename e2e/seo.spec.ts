@@ -125,6 +125,11 @@ test.describe('SEO no HTML entregue', () => {
       expect(types).toContain('Person')
       const text = bodyText(html)
       expect(text).toContain('Fael Caporali')
+      // A frase do herói no HTML é a vida de abertura (D-SEO7); o "loading" existe só na tela, desenhado pelo CSS.
+      if (path === '/' || path === '/pt') {
+        expect(text).toContain(path === '/' ? 'Today I am an AI Product Engineer' : 'Hoje sou AI Product Engineer')
+        expect(text).not.toMatch(/Today I am loading|Hoje estou carregando/)
+      }
       const faq = graph.find((n) => n['@type'] === 'FAQPage') as
         { mainEntity: { name: string; acceptedAnswer: { text: string } }[] } | undefined
       for (const q of faq?.mainEntity ?? []) {

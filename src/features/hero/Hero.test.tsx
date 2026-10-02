@@ -73,12 +73,18 @@ afterEach(() => {
 })
 
 describe('herói: "Today I am loading" até a cena 3D (U2)', () => {
-  it('o HTML do build sai com "Today I am loading" e a hidratação bate', async () => {
+  it('o HTML do build traz a vida de abertura como texto, o "loading" só pelo CSS, e a hidratação bate', async () => {
     const html = renderToString(<RouterProvider router={createMemoryRouter(rotas())} />)
     const container = document.createElement('div')
     container.innerHTML = html
-    // O texto do h2 sem as marcas: a frase que buscadores e leitores recebem; o h1 é o nome.
-    expect(container.querySelector('h2')?.textContent).toBe(LOADING)
+    // O texto do h2 sem as marcas: a frase que buscadores, IAs e quem navega sem JavaScript recebem (D-SEO7); o
+    // "loading" da tela vem do CSS (data-com-js), sem texto. O h1 é o nome.
+    expect(container.querySelector('h2')?.textContent).toMatch(VIDA)
+    expect(html).not.toContain('>loading<')
+    expect([...container.querySelectorAll('[data-com-js]')].map((e) => e.getAttribute('data-com-js'))).toEqual([
+      'Today I am',
+      'loading',
+    ])
     expect(container.querySelector('h1')?.textContent).toBe('Fael Caporali')
     expect(html).not.toContain('aria-current')
 

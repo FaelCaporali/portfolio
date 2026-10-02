@@ -7,6 +7,7 @@ import { LANGS } from '../../../shared/i18n'
 import { localePath, MESSAGES, useLang, type Lang } from '../../i18n/lang'
 import type { Messages } from '../../i18n/messages/en'
 import { pill } from '../../ui/pill'
+import { cx } from '../../lib/cx'
 import { useHydrated } from '../../lib/useHydrated'
 import { CopyContacts } from '../contact/CopyContacts'
 import { useFitFontSize } from './hooks/useFitFontSize'
@@ -33,13 +34,13 @@ const abertura = (m: Messages, s: Stage) => m.hero.opening(!!s.past, m.hero.slot
 
 /**
  * "loading" no lugar da vida enquanto a cena 3D não chega (index.css: .loading-word): a palavra respira e três pontos
- * sobem em onda. Uma palavra só, sem letras soltas: o HTML e o leitor de tela leem "Today I am loading". Fora de
- * .slot-word de propósito: as sondas do estúdio 3D e o e2e leem a vida em .slot-word.
+ * sobem em onda. Uma palavra só, sem letras soltas: o leitor de tela lê "Today I am loading". Fora de .slot-word de
+ * propósito: as sondas do estúdio 3D e o e2e leem a vida em .slot-word. `antesDoJs`: a palavra vem do CSS (SemJs).
  */
-function LoadingWord({ word }: { word: string }) {
+function LoadingWord({ word, antesDoJs }: { word: string; antesDoJs: boolean }) {
   return (
-    <span className="loading-word">
-      {word}
+    <span className="loading-word" data-com-js={antesDoJs ? word : undefined} aria-hidden={antesDoJs || undefined}>
+      {!antesDoJs && word}
       <span aria-hidden className="loading-dots">
         <span className="loading-dot" />
         <span className="loading-dot" />
@@ -49,6 +50,16 @@ function LoadingWord({ word }: { word: string }) {
   )
 }
 
+/**
+ * O HTML do build (antes da hidratação) traz a vida de abertura como texto: é o que buscadores, assistentes de IA e
+ * quem navega sem JavaScript leem (index.css: .sem-js, que @media (scripting: none) mostra). Com JavaScript a tela não
+ * muda: até o React assumir, o "loading" é desenhado pelo CSS (data-com-js), sem texto no HTML; depois, o de verdade,
+ * no mesmo elemento (a respiração não recomeça). D-SEO7, .wai/seo-geo/04-plano.md.
+ */
+function SemJs({ text, className }: { text: string; className?: string }) {
+  return <span className={cx('sem-js', className)}>{text}</span>
+}
+
 /** Coluna de texto do herói: a vida atual, os títulos, os links e o contato direto. */
 export function HeroCopy({ ref, stage, leaving, loading }: HeroCopyProps) {
   const slotRef = useRef<HTMLSpanElement>(null)
@@ -56,9 +67,27 @@ export function HeroCopy({ ref, stage, leaving, loading }: HeroCopyProps) {
   const m = MESSAGES[lang]
   // Largo (lg): a vida mais longa sempre numa linha, com a fonte do visitante. Abaixo, reserva de duas linhas.
   const slotSize = useFitFontSize(slotRef, SLOTS[lang], WIDE_QUERY)
-  // As amostras só existem no navegador, depois da hidratação: fora do HTML (buscadores e IAs leriam as vidas como
-  // texto escondido) e do caminho do LCP; absolutas e invisíveis, não mexem no layout.
-  const amostras = useHydrated()
+  // As amostras (abaixo) só existem no navegador, depois da hidratação: fora do HTML (buscadores e IAs leriam as vidas
+  // como texto escondido) e do caminho do LCP; absolutas e invisíveis, não mexem no layout.
+  const hidratado = useHydrated()
+  const antesDoJs = loading && !hidratado
+  // "Today I am" + a vida; no "loading", a palavra que respira (antes da hidratação, a vida de abertura em SemJs).
+  const inicio = loading ? (
+    <>
+      {antesDoJs && <SemJs text={abertura(m, stage)} />}
+      {antesDoJs ? <span aria-hidden data-com-js={m.hero.loadingOpening} /> : m.hero.loadingOpening}
+    </>
+  ) : (
+    abertura(m, stage)
+  )
+  const palavra = loading ? (
+    <>
+      {antesDoJs && <SemJs text={m.hero.slots[stage.id]} className={`life-${stage.id}`} />}
+      <LoadingWord word={m.hero.loading} antesDoJs={antesDoJs} />
+    </>
+  ) : (
+    <SlotWord text={m.hero.slots[stage.id]} life={stage.id} leaving={leaving} />
+  )
   return (
     <div
       ref={ref}
@@ -68,10 +97,10 @@ export function HeroCopy({ ref, stage, leaving, loading }: HeroCopyProps) {
       {/* A frase da vida é o subtítulo (h2): o h1 é o nome, no topo (Hero.tsx). */}
       <h2>
         <span className="relative block text-lg text-fg/65 lg:text-2xl">
-          <span data-vida-texto>{loading ? m.hero.loadingOpening : abertura(m, stage)}</span>
+          <span data-vida-texto>{inicio}</span>
           {/* Amostras paradas e escondidas de cada vida (#138): a cena 3D pinta o fundo de uma vida antes de ela
               entrar, medindo o texto dela aqui, na mesma coluna e na mesma fonte (devops/referencias.ts). */}
-          {amostras &&
+          {hidratado &&
             stages.map((s) => (
               <span key={s.id} data-medida={s.prop} aria-hidden className="invisible absolute inset-x-0 top-0">
                 {abertura(m, s)}
@@ -88,13 +117,9 @@ export function HeroCopy({ ref, stage, leaving, loading }: HeroCopyProps) {
         >
           <span data-vida-texto>
             {/* Com a cena, a vida entra com a entrada que o SlotWord já tem (monta de novo). */}
-            {loading ? (
-              <LoadingWord word={m.hero.loading} />
-            ) : (
-              <SlotWord text={m.hero.slots[stage.id]} life={stage.id} leaving={leaving} />
-            )}
+            {palavra}
           </span>
-          {amostras &&
+          {hidratado &&
             stages.map((s) => (
               <span key={s.id} data-medida={s.prop} aria-hidden className="invisible absolute inset-x-0 top-0">
                 <SlotWord text={m.hero.slots[s.id]} life={s.id} leaving={false} medida />

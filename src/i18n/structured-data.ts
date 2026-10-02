@@ -1,4 +1,5 @@
 import { LANGS, SITE_ORIGIN, type Lang } from '../../shared/i18n'
+import { OPENING } from '../content/journey'
 import { overview } from '../content/overview'
 import { directContacts, profile, profileLinks, sourceHref } from '../content/profile'
 import type { Service } from '../content/services'
@@ -61,8 +62,8 @@ export function person(lang: Lang): Node {
     url: `${SITE_ORIGIN}/`,
     image: shareImageUrl(lang),
     description: overview.offers.lede[lang],
-    // Só os títulos que o HTML mostra: a vida "AI Product Engineer" entra na frase do herói depois do JavaScript.
-    jobTitle: m.hero.titles,
+    // A vida de abertura (a frase do herói, no HTML do build desde D-SEO7) e os títulos abaixo dela.
+    jobTitle: [m.hero.slots[OPENING], ...m.hero.titles],
     knowsAbout: overview.stack.groups.flatMap((g) => g.items.map((t) => homeTagLabel(lang, t))),
     knowsLanguage: ['pt-BR', 'en'],
     homeLocation: {

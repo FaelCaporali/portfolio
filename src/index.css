@@ -216,6 +216,23 @@ body {
 .loading-dot:nth-child(3) {
   animation-delay: 0.3s;
 }
+/* A vida de abertura no HTML do build (HeroCopy: SemJs, D-SEO7): o texto que buscadores, assistentes de IA e quem navega
+   sem JavaScript leem. Com JavaScript, até a hidratação, a tela mostra o "loading" desenhado aqui (data-com-js), igual
+   ao que o React põe depois; sem JavaScript, a vida no lugar dele. */
+.sem-js {
+  display: none;
+}
+[data-com-js]::before {
+  content: attr(data-com-js);
+}
+@media (scripting: none) {
+  .sem-js {
+    display: inline;
+  }
+  [data-com-js] {
+    display: none;
+  }
+}
 @keyframes loading-breathe {
   50% {
     opacity: 0.55;
