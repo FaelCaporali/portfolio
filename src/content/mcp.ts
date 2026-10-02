@@ -159,8 +159,8 @@ export const mcp = {
       {
         name: 'get_profile',
         text: {
-          en: 'Who I am, what I can be hired for (with proof), contacts, links and résumés.',
-          pt: 'Quem eu sou, para o que posso ser contratado (com prova), contatos, links e currículos.',
+          en: 'Who I am, what I can be hired for, contacts, links and résumés.',
+          pt: 'Quem eu sou, para o que posso ser contratado, contatos, links e currículos.',
         },
       },
       {
@@ -227,7 +227,11 @@ export const mcp = {
       },
     ] satisfies Text[],
     neverItems: [
-      { en: 'Your IP address.', pt: 'O seu endereço IP.' },
+      // D-MCP21: o registro não grava IP; os logs de invocação da Cloudflare (observability) guardam a requisição.
+      {
+        en: 'Your IP address, in this record. Cloudflare, which hosts this server, keeps request data in its own logs for 3 days.',
+        pt: 'O seu endereço IP, neste registro. A Cloudflare, que hospeda este servidor, guarda os dados da requisição nos logs dela por 3 dias.',
+      },
       {
         en: 'Your conversation with your assistant: only the tool calls reach this server.',
         pt: 'A sua conversa com o assistente: só as chamadas de ferramenta chegam a este servidor.',

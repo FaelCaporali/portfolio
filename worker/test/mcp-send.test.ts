@@ -46,6 +46,33 @@ describe('send_message', () => {
     for (const secret of ['Maria', 'maria@example.com', 'portfólio pelo', 'ACME']) expect(logged).not.toContain(secret)
   })
 
+  it('e-mail que falha (queued): gravada para o cron, e a resposta não diz que chegou (D-MCP22)', async () => {
+    const client = await connect(false, t.env)
+    t.send.mockRejectedValueOnce(new Error('E_INTERNAL_SERVER_ERROR'))
+    const r = await client.callTool({ name: 'send_message', arguments: message })
+    expect(r.isError).toBeFalsy()
+    const answer = JSON.parse(text(r)) as { sent: boolean; note: string }
+    expect(answer.sent).toBe(false)
+    expect(answer.note).toMatch(/^The message was received and will be delivered/)
+    expect((await rows())[0]).toMatchObject({ status: 'pending' })
+    expect((await loggedArgs())[0]?.outcome).toBe('queued')
+  })
+
+  it('em pt, a resposta e as recusas vêm em português (D-MCP22)', async () => {
+    const client = await connect(false, t.env)
+    const sent = await client.callTool({ name: 'send_message', arguments: { ...message, lang: 'pt' } })
+    expect((JSON.parse(text(sent)) as { note: string }).note).toMatch(/^O Fael recebeu a mensagem/)
+    expect(sentMail().text).toContain('[Sobre: Staff Engineer na ACME]')
+    const invalid = await client.callTool({
+      name: 'send_message',
+      arguments: { ...message, lang: 'pt', contact: 'me ache no linkedin' },
+    })
+    expect(text(invalid)).toMatch(/^Inválido: contact\. .*Nada foi enviado\.$/)
+    await env.DB.prepare("UPDATE mcp_quota SET used = ? WHERE kind = 'message'").bind(DAILY.message).run()
+    const limited = await client.callTool({ name: 'send_message', arguments: { ...message, lang: 'pt' } })
+    expect(text(limited)).toMatch(/^O limite diário .* get_profile traz os contatos dele\.$/)
+  })
+
   it('contato inválido: nada é enviado nem gasta a cota', async () => {
     const client = await connect(false, t.env)
     const r = await client.callTool({ name: 'send_message', arguments: { ...message, contact: 'me ache no linkedin' } })

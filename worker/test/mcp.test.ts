@@ -191,6 +191,8 @@ describe('ferramentas', () => {
     const missing = await call(client, 'get_checkpoint', { id: 'nao-existe' })
     expect(missing.isError).toBe(true)
     expect((missing.content as { text: string }[])[0]?.text).toMatch(/Unknown step "nao-existe".*first-business/)
+    const ausente = await call(client, 'get_checkpoint', { lang: 'pt', id: 'nao-existe' })
+    expect((ausente.content as { text: string }[])[0]?.text).toMatch(/^Não existe marco "nao-existe".*first-business/)
   })
 
   it('get_delivered em português: entregas ligadas à trajetória, stack e perguntas', async () => {

@@ -158,7 +158,12 @@ function createServer(site: Site): McpServer {
       audit(ctx, 'get_checkpoint', { lang, id: scrub(id) }, () => {
         const c = getCheckpoint(lang, id)
         if (c) return read(c)
-        return { result: error(`Unknown step "${id}". Existing ids: ${checkpointIds().join(', ')}.`), outcome: 'error' }
+        const ids = checkpointIds().join(', ')
+        const text =
+          lang === 'pt'
+            ? `Não existe marco "${id}". Ids que existem: ${ids}.`
+            : `Unknown step "${id}". Existing ids: ${ids}.`
+        return { result: error(text), outcome: 'error' }
       }),
   )
 
