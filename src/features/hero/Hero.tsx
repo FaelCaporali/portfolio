@@ -14,6 +14,7 @@ import { useDragRotation } from './hooks/useDragRotation'
 import { useFreeArea } from './hooks/useFreeArea'
 import { useOnScreen } from './hooks/useOnScreen'
 import { usePointerGaze } from './hooks/usePointerGaze'
+import { hasAcceleration } from './model/acceleration'
 import type { Phase } from './model/carousel'
 import { advance, candidates, createLineup, loadOrder, peek, skipFailed, type Lineup } from './model/lineup'
 import { readHeroOptions, type HeroOptions } from './model/options'
@@ -29,12 +30,26 @@ const loadProps = (l: Lineup, chosen: number | null, failed?: ReadonlySet<number
 })
 
 /*
- * A cena 3D (three.js) só no navegador: o build pré-renderiza o texto do herói (react-router.config.ts) sem carregar
- * o three. O download começa quando esta página carrega, sem esperar a hidratação.
+ * A cena 3D (three.js) só no navegador, e só com aceleração de GPU real (R1, camada 2 de 03-plano-versao-robos.md):
+ * o build pré-renderiza o texto do herói (react-router.config.ts) sem carregar o three; sem GPU (Googlebot, uma
+ * pessoa com hardware antigo ou VM), o chunk da cena nunca é importado — nem o download, nem o WebGL acontecem.
  */
 const loadCanvas = () => import('./scene/HeroCanvas').then((m) => ({ default: m.HeroCanvas }))
-const canvasModule = import.meta.env.SSR ? null : loadCanvas()
-const HeroCanvas = lazy(() => canvasModule ?? loadCanvas())
+/**
+ * Escape de desenvolvimento (R5): existe só dentro de `import.meta.env.DEV`, no mesmo padrão de
+ * `scene/HeroCanvas.tsx` (DebugHook) — `import.meta.env.DEV` é substituído por `false` em tempo de build, e o bloco
+ * inteiro sai do bundle de produção (vite.dev/guide/env-and-mode; prova por grep no build, Fase 3 do plano). Nunca
+ * aparece como string reconhecível fora deste `if`.
+ */
+function forcedByTooling(search: string): boolean {
+  if (!import.meta.env.DEV) return false
+  return new URLSearchParams(search).has('labAceleracao')
+}
+// SSR (pré-render): nunca acelera. No navegador: GPU real (hasAcceleration) ou, só em dev, o escape acima.
+const canAccelerate = !import.meta.env.SSR && (hasAcceleration() || forcedByTooling(window.location.search))
+// O download começa quando esta página carrega, sem esperar a hidratação — mas só quando pode acelerar.
+const canvasModule = canAccelerate ? loadCanvas() : null
+const HeroCanvas = canvasModule && lazy(() => canvasModule)
 
 /*
  * As opções da página (?slot, ?d, movimento reduzido). No build e na hidratação não há endereço: null, e o texto é o
@@ -86,8 +101,10 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
   const [pending, setPending] = useState<number | null>(null)
   // Vidas cujo glb falhou (#138, a cena avisa): saem da volta e do indicador até o glb chegar.
   const failed = useRef<ReadonlySet<number>>(new Set())
-  // A cena caiu (SceneBoundary): quem troca a vida é o clique no indicador, direto, sem desintegração.
-  const [sceneFailed, setSceneFailed] = useState(false)
+  // A cena caiu (SceneBoundary): quem troca a vida é o clique no indicador, direto, sem desintegração. Sem aceleração
+  // de GPU (camada 2), HeroCanvas é null e a cena nunca chega a montar: começa direto neste MESMO estado, sem
+  // "loading" (R3), em vez de esperar um onFail que nunca vem.
+  const [sceneFailed, setSceneFailed] = useState(!HeroCanvas)
   // "Today I am loading" até o 1º quadro com o busto (U2), sem prazo (D-U2a: "loading sem limites faz sentido contanto
   // que quando busto carregado, troque o texto"): no HTML, na hidratação e a cada montagem (a volta da trajetória
   // também). Cena que cai sai do "loading" na hora, para a vida de abertura.
@@ -156,8 +173,9 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
 
   return (
     <section ref={section} className="relative h-svh overflow-hidden" aria-label={m.hero.section}>
-      {/* Se a cena falha (import, render, WebGL), sai só ela: SceneBoundary. */}
-      {options && (
+      {/* Se a cena falha (import, render, WebGL), sai só ela: SceneBoundary. Sem aceleração de GPU (camada 2),
+          HeroCanvas é null: nem monta, nem importa o chunk. */}
+      {options && HeroCanvas && (
         <SceneBoundary onFail={onSceneFail}>
           <Suspense fallback={null}>
             <HeroCanvas
