@@ -25,21 +25,9 @@
         font-family: var(--font);
         -webkit-font-smoothing: antialiased;
       }
-      /* Brilho da vida atrás do busto: separa o cabelo escuro do fundo na miniatura. */
-      .brilho {
-        position: absolute;
-        inset: 0;
-        background: radial-gradient(
-          ellipse 430px 400px at var(--bx, 900px) var(--by, 300px),
-          color-mix(in srgb, var(--accent) 9%, transparent),
-          transparent 72%
-        );
-      }
+      /* O busto chega opaco, no fundo da página (busto.html): o degradê do pescoço do site já o dissolve no fundo. */
       .busto {
         position: absolute;
-        /* O corte do pescoço some no fundo, como o degradê do pescoço no site (dissolve.ts: NECK_FADE). */
-        -webkit-mask-image: linear-gradient(to bottom, #000 var(--m0, 78%), transparent var(--m1, 96%));
-        mask-image: linear-gradient(to bottom, #000 var(--m0, 78%), transparent var(--m1, 96%));
       }
       .texto {
         position: absolute;
@@ -85,7 +73,6 @@
     </style>
   </head>
   <body>
-    <div class="brilho"></div>
     <img class="busto" alt="" />
     <div class="texto">
       <h1></h1>

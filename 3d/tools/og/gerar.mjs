@@ -1,21 +1,22 @@
-// Imagem de compartilhamento (og:image) do site, 1200×630, en e pt: o busto do herói (S13) à direita, na luz do site,
-// e à esquerda o nome, a vida "AI Product Engineer", os títulos e o lugar, com os textos, cores e fontes do site.
+// Imagem de compartilhamento (og:image) do site, 1200×630, en e pt: o busto do herói (S13) à direita, renderizado
+// pelo pipeline do próprio site, e à esquerda o nome, a vida "AI Product Engineer", os títulos e o lugar.
 //
-// Regenerar (da raiz do repositório; um processo pesado por vez: o Blender termina antes de o Chromium abrir):
-//   node 3d/tools/og/gerar.mjs [--tmp=<pasta>] [--reusar-busto] [--amostras=128] [--qualidade=90]
-// Saída: public/og/fael-caporali-en.jpg e public/og/fael-caporali-pt.jpg (JPEG; cada uma < 300 KB, limite do WhatsApp).
+// Regenerar (da raiz do repositório): node 3d/tools/og/gerar.mjs [--qualidade=90]
+// Saída: public/og/fael-caporali-en.jpg e public/og/fael-caporali-pt.jpg (JPEG; cada uma < 150 KB).
 //
-// Passos: (1) o glb do busto sem meshopt (3d/tools/props/otimizar.mjs --cru), porque o Blender 4.5 não o lê;
-// (2) Blender 4.5 sem interface: 3d/tools/og/busto_og.py renderiza o busto com fundo transparente (Cycles, luz e tom
-// ACES do site, cabeça em 3/4 olhando para a câmera); (3) Chromium do Playwright (sem WebGL) abre modelo.html, põe os
-// textos e o busto e fotografa. Textos lidos de src/ (só o nome é fixo aqui): vida `ai` (journey.ts, slots do
-// pt.ts), títulos (hero.titles de en.ts/pt.ts), lugar e "remoto" (overview.json facts), cor da vida (journey.ts),
-// fundo e fonte (index.css). --reusar-busto: pula (1) e (2) se o PNG do busto já está em --tmp.
+// Um Chromium do Playwright (WebGL por SwiftShader), duas páginas servidas por page.route (sem servidor nem porta):
+// (1) busto.html: three do node_modules, o glb do herói (3d/export/s13/busto-s13.glb, meshopt), os materiais e o
+// degradê do pescoço de src/features/hero/scene/rig.ts e dissolve.ts (o TypeScript sem tipos, por node:module), a luz
+// e o ambiente de Lighting.tsx, o tom ACES de HeroCanvas.tsx, a posição da câmera de HeroCanvas.tsx e a mira de
+// Framing.tsx (lidos do código, não copiados); de frente, expressão neutra, olhar em repouso, sem adereço. O ângulo
+// é o das capturas aprovadas pelo Fael (.wai/seo-geo/og-referencia/angulo-fael-{1,2}.png). (2) modelo.html: textos
+// e o busto; a foto é a JPEG. Textos lidos de src/ (só o nome é fixo aqui): vida `ai` (journey.ts, slots do pt.ts),
+// títulos (hero.titles de en.ts/pt.ts), lugar e "remoto" (overview.json facts), cor da vida (journey.ts), fundo e
+// fonte (index.css).
 import { chromium } from '@playwright/test'
-import { execFileSync } from 'node:child_process'
-import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
-import { tmpdir } from 'node:os'
-import { dirname, join, resolve } from 'node:path'
+import { readFileSync, statSync, writeFileSync, mkdirSync } from 'node:fs'
+import { stripTypeScriptTypes } from 'node:module'
+import { dirname, extname, join, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const AQUI = dirname(fileURLToPath(import.meta.url))
@@ -29,19 +30,16 @@ const opc = Object.fromEntries(
       return [k, v ?? true]
     }),
 )
-const TMP = resolve(String(opc.tmp ?? join(tmpdir(), 'og-fael')))
-const AMOSTRAS = Number(opc.amostras ?? 128)
 const QUALIDADE = Number(opc.qualidade ?? 90)
-const LIMITE = 300 * 1024
+const LIMITE = 150 * 1024
 const W = 1200
 const H = 630
 const SEGURA = 60
-// O busto é renderizado no dobro e mostrado à metade (nitidez na miniatura e no zoom).
-const RENDER = { w: 1280, h: 1260, escala: 0.5 }
-// Caixa do busto (cabelo, rosto e pescoço) na imagem: borda direita e topo. Virado para a direita, a borda direita da
-// caixa é o próprio rosto: 1115 o deixa dentro de x 600–1140 (área segura de 60 px).
-const BUSTO_DIREITA = 1115
-const BUSTO_TOPO = 50
+// Retângulo do busto no cartão (metade direita) e, dentro dele, onde caem o alto do cabelo e a barba (altura Y_BASE no
+// glb, no meio do degradê do pescoço). Renderizado no dobro (DPR) e mostrado à metade: nitidez no zoom.
+const BUSTO = { left: 640, top: 0, w: 560, h: H, topo: 34, base: 596, dpr: 2 }
+const Y_BASE = 0.04
+const ORIGEM = 'http://og.local'
 
 const ler = (p) => readFileSync(join(RAIZ, p), 'utf8')
 function achar(texto, re, nome) {
@@ -95,45 +93,90 @@ function findFacts(o) {
   return null
 }
 
-function busto() {
-  const png = join(TMP, 'busto-og.png')
-  const caixaArq = join(TMP, 'busto-og.json')
-  if (opc['reusar-busto'] && existsSync(png) && existsSync(caixaArq)) return { png, ...JSON.parse(readFileSync(caixaArq, 'utf8')) }
-  const cru = join(TMP, 'busto-cru.glb')
-  execFileSync('node', [join(RAIZ, '3d/tools/props/otimizar.mjs'), '--cru', join(RAIZ, '3d/export/s13/busto-s13.glb'), cru], {
-    cwd: RAIZ,
-    stdio: 'inherit',
-  })
-  const saida = execFileSync(
-    'blender',
-    ['-b', '--factory-startup', '--python', join(AQUI, 'busto_og.py'), '--', cru, png,
-      `--w=${RENDER.w}`, `--h=${RENDER.h}`, `--amostras=${AMOSTRAS}`],
-    { cwd: RAIZ, encoding: 'utf8', maxBuffer: 64 << 20 },
-  )
-  const m = saida.match(/^CAIXA (\d+) (\d+) (\d+) (\d+) (\d+) (\d+)$/m)
-  if (!m || !saida.includes('\nOK ')) throw new Error('o Blender não terminou o render do busto:\n' + saida.slice(-3000))
-  const [, , , x0, y0, x1, y1] = m.map(Number)
-  const caixa = { x0, y0, x1, y1 }
-  writeFileSync(caixaArq, JSON.stringify(caixa))
-  return { png, ...caixa }
+const num = (t) => t.split(',').map(Number)
+
+// A cena do herói como o site a monta, lida do código: luz e ambiente (Lighting.tsx), tom (HeroCanvas.tsx), posição da
+// câmera (HeroCanvas.tsx) e mira (Framing.tsx).
+function cenaDoSite() {
+  const luz = ler('src/features/hero/scene/Lighting.tsx')
+  const canvas = ler('src/features/hero/scene/HeroCanvas.tsx')
+  const framing = ler('src/features/hero/scene/Framing.tsx')
+  if (!canvas.includes('toneMapping: THREE.ACESFilmicToneMapping'))
+    throw new Error('HeroCanvas.tsx não usa mais o tom ACESFilmic: atualize busto.html')
+  const dirs = [...luz.matchAll(/<directionalLight position=\{\[([^\]]+)\]\} intensity=\{([\d.]+)\} color="(#[0-9a-f]{6})"/gi)]
+  if (dirs.length !== 3) throw new Error(`Lighting.tsx: esperava 3 luzes direcionais, achei ${dirs.length}`)
+  return {
+    luz: {
+      ambiente: Number(achar(luz, /<ambientLight intensity=\{([\d.]+)\}/, 'ambientLight')),
+      sigma: Number(achar(luz, /fromScene\(new RoomEnvironment\(\), ([\d.]+)\)/, 'sigma do ambiente')),
+      envIntensidade: Number(achar(luz, /environmentIntensity = ([\d.]+)/, 'environmentIntensity')),
+      dirs: dirs.map((m) => ({ pos: num(m[1]), int: Number(m[2]), cor: m[3] })),
+    },
+    camera: {
+      pos: num(achar(canvas, /camera=\{\{ position: \[([^\]]+)\]/, 'posição da câmera')),
+      mira: num(achar(framing, /cam\.lookAt\(([^)]+)\)/, 'mira da câmera')),
+    },
+  }
 }
 
-async function fotografar(b, t) {
+const TIPOS = { '.js': 'text/javascript', '.html': 'text/html', '.glb': 'model/gltf-binary' }
+// O "site" da página do busto: three do node_modules, o TypeScript do herói sem tipos e o glb, direto do disco.
+function servir(rota) {
+  const url = new URL(rota.request().url())
+  let arq
+  let corpo
+  if (url.pathname === '/busto.html') arq = join(AQUI, 'busto.html')
+  else if (url.pathname === '/glb/busto.glb') arq = join(RAIZ, '3d/export/s13/busto-s13.glb')
+  else if (url.pathname.startsWith('/three/')) arq = join(RAIZ, 'node_modules', url.pathname)
+  else if (url.pathname.startsWith('/src/')) {
+    arq = join(RAIZ, url.pathname)
+    if (!extname(arq)) arq += '.ts'
+    corpo = stripTypeScriptTypes(readFileSync(arq, 'utf8'))
+  }
+  if (!arq) return rota.fulfill({ status: 404 })
+  const tipo = arq.endsWith('.ts') ? TIPOS['.js'] : (TIPOS[extname(arq)] ?? 'application/octet-stream')
+  return rota.fulfill({ status: 200, contentType: tipo, body: corpo ?? readFileSync(arq) })
+}
+
+async function busto(navegador, cores) {
+  const pagina = await navegador.newPage({ viewport: { width: BUSTO.w, height: BUSTO.h }, deviceScaleFactor: BUSTO.dpr })
+  const erros = []
+  pagina.on('pageerror', (e) => erros.push(String(e)))
+  pagina.on('console', (m) => m.type() === 'error' && erros.push(m.text()))
+  try {
+    await pagina.route(`${ORIGEM}/**`, servir)
+    await pagina.goto(`${ORIGEM}/busto.html`)
+    await pagina.waitForFunction(() => window.pronto === true || undefined, null, { timeout: 30_000 }).catch(() => {
+      throw new Error('busto.html não carregou:\n' + erros.join('\n'))
+    })
+    const caixa = await pagina.evaluate((c) => window.renderBusto(c), {
+      ...cenaDoSite(),
+      w: BUSTO.w,
+      h: BUSTO.h,
+      dpr: BUSTO.dpr,
+      page: cores.page,
+      topo: BUSTO.topo,
+      base: BUSTO.base,
+      yBase: Y_BASE,
+    })
+    const png = await pagina.locator('canvas').screenshot({ type: 'png' })
+    return { src: `data:image/png;base64,${png.toString('base64')}`, caixa }
+  } finally {
+    await pagina.close()
+  }
+}
+
+async function fotografar(t) {
   const navegador = await chromium.launch()
   try {
+    const b = await busto(navegador, t.cores)
     const pagina = await navegador.newPage({ viewport: { width: W, height: H }, deviceScaleFactor: 1 })
     await pagina.goto(pathToFileURL(join(AQUI, 'modelo.html')).href)
-    const k = RENDER.escala
-    const pos = {
-      left: Math.round(BUSTO_DIREITA - b.x1 * k),
-      top: Math.round(BUSTO_TOPO - b.y0 * k),
-      w: RENDER.w * k,
-      h: RENDER.h * k,
-    }
+    const pos = { left: BUSTO.left, top: BUSTO.top, w: BUSTO.w, h: BUSTO.h }
     const saidas = []
     for (const lang of ['en', 'pt']) {
       const medidas = await pagina.evaluate(
-        async ({ c, x, pos, src, caixa, k }) => {
+        async ({ c, x, pos, src }) => {
           const r = document.documentElement.style
           r.setProperty('--page', c.page)
           r.setProperty('--fg-rgb', c.fgRgb)
@@ -142,12 +185,6 @@ async function fotografar(b, t) {
           document.documentElement.lang = x.lang
           const img = document.querySelector('.busto')
           Object.assign(img.style, { left: `${pos.left}px`, top: `${pos.top}px`, width: `${pos.w}px`, height: `${pos.h}px` })
-          // Máscara do pescoço: do queixo para baixo, em % da altura da imagem do busto.
-          const fundo = (caixa.y1 * k) / pos.h
-          r.setProperty('--m0', `${((fundo - 0.2) * 100).toFixed(1)}%`)
-          r.setProperty('--m1', `${((fundo - 0.045) * 100).toFixed(1)}%`)
-          r.setProperty('--bx', `${pos.left + ((caixa.x0 + caixa.x1) / 2) * k}px`)
-          r.setProperty('--by', `${pos.top + ((caixa.y0 + caixa.y1) / 2) * k}px`)
           if (img.getAttribute('src') !== src) {
             img.src = src
             await img.decode()
@@ -179,7 +216,7 @@ async function fotografar(b, t) {
             textos: [...document.querySelectorAll('.texto > *')].map(caixaDe),
           }
         },
-        { c: t.cores, x: { ...t[lang], lang }, pos, src: pathToFileURL(b.png).href, caixa: b, k },
+        { c: t.cores, x: { ...t[lang], lang }, pos, src: b.src },
       )
       for (const q of medidas.textos) {
         const fora = q.x0 < SEGURA || q.y0 < SEGURA || q.x1 > W - SEGURA || q.y1 > H - SEGURA
@@ -195,23 +232,23 @@ async function fotografar(b, t) {
       }
       if (buf.length >= LIMITE) throw new Error(`${lang}: ${buf.length} bytes, acima de ${LIMITE}`)
       writeFileSync(arq, buf)
-      saidas.push({ lang, arq, bytes: statSync(arq).size, qualidade: q, busto: pos, ...medidas })
+      saidas.push({ lang, arq, bytes: statSync(arq).size, qualidade: q, ...medidas })
     }
-    return saidas
+    return { saidas, caixa: b.caixa }
   } finally {
     await navegador.close()
   }
 }
 
-mkdirSync(TMP, { recursive: true })
 mkdirSync(join(RAIZ, 'public/og'), { recursive: true })
-const t = textos()
-const b = busto()
-const r = await fotografar(b, t)
-for (const s of r) {
+const { saidas, caixa: c } = await fotografar(textos())
+console.log(
+  `busto: fov ${c.fov.toFixed(2)}°, cabeça x ${(BUSTO.left + c.x0).toFixed(0)}–${(BUSTO.left + c.x1).toFixed(0)}, ` +
+    `cabelo y ${(BUSTO.top + c.y0).toFixed(0)}, barba (y ${Y_BASE} no glb) y ${(BUSTO.top + c.y1).toFixed(0)}`,
+)
+for (const s of saidas) {
   console.log(`${s.lang}: ${s.arq.replace(RAIZ + '/', '')} ${W}×${H} ${(s.bytes / 1024).toFixed(1)} KB (JPEG q${s.qualidade})`)
   console.log(`  fonte: ${s.fonte}`)
-  console.log(`  busto: x ${s.busto.left + b.x0 * RENDER.escala}–${s.busto.left + b.x1 * RENDER.escala}, y ${s.busto.top + b.y0 * RENDER.escala}–${s.busto.top + b.y1 * RENDER.escala}`)
   for (const q of s.textos)
     console.log(`  ${q.sel}: x ${q.x0.toFixed(0)}–${q.x1.toFixed(0)}, y ${q.y0.toFixed(0)}–${q.y1.toFixed(0)}, ${q.linhas} linha(s)`)
 }

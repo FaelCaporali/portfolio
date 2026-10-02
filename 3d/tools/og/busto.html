@@ -1,0 +1,124 @@
+<!doctype html>
+<!-- Busto do herói para a imagem de compartilhamento (og:image), no MESMO pipeline do site: o glb do herói, os
+     materiais e o degradê do pescoço de src/features/hero/scene/rig.ts e dissolve.ts (importados, não copiados), a luz,
+     o ambiente, o tom ACES, a posição e a mira da câmera lidos de Lighting.tsx, HeroCanvas.tsx e Framing.tsx pelo
+     gerador (3d/tools/og/gerar.mjs, que serve esta página por page.route, sem servidor nem porta). Expressão neutra e
+     olhar em repouso (face.ts e gaze.ts zerados), sem adereço. Só a abertura e o deslocamento da lente mudam: a
+     câmera enquadra a cabeça inteira (topo do cabelo à barba) no retângulo pedido. -->
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        background: var(--page, #0b0b0e);
+        overflow: hidden;
+      }
+      canvas {
+        display: block;
+      }
+    </style>
+    <script type="importmap">
+      { "imports": { "three": "/three/build/three.module.js", "three/examples/jsm/": "/three/examples/jsm/" } }
+    </script>
+  </head>
+  <body>
+    <script type="module">
+      import * as THREE from 'three'
+      import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+      import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
+      import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
+      import { buildRig } from '/src/features/hero/scene/rig.ts'
+
+      /**
+       * c: { w, h, dpr, page, luz: { ambiente, sigma, envIntensidade, dirs: [{ pos, int, cor }] }, camera: { pos, mira },
+       *      topo, base, yBase } — topo/base: onde o alto do cabelo e a barba (altura yBase no glb) caem, em px.
+       */
+      window.renderBusto = async (c) => {
+        document.documentElement.style.setProperty('--page', c.page)
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true })
+        renderer.toneMapping = THREE.ACESFilmicToneMapping
+        renderer.setPixelRatio(c.dpr)
+        renderer.setSize(c.w, c.h)
+        document.body.append(renderer.domElement)
+
+        const scene = new THREE.Scene()
+        const pmrem = new THREE.PMREMGenerator(renderer)
+        scene.environment = pmrem.fromScene(new RoomEnvironment(), c.luz.sigma).texture
+        scene.environmentIntensity = c.luz.envIntensidade
+        scene.add(new THREE.AmbientLight(0xffffff, c.luz.ambiente))
+        for (const d of c.luz.dirs) {
+          const l = new THREE.DirectionalLight(d.cor, d.int)
+          l.position.set(...d.pos)
+          scene.add(l)
+        }
+
+        const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder)
+        const glb = await loader.loadAsync('/glb/busto.glb')
+        buildRig(glb.scene) // materiais do site: pele 0,72, olhos sem luz, degradê do pescoço; shape keys em 0
+        scene.add(glb.scene)
+        scene.updateMatrixWorld(true)
+
+        const cam = new THREE.PerspectiveCamera(24, c.w / c.h, 0.05, 10)
+        cam.position.set(...c.camera.pos)
+        cam.lookAt(...c.camera.mira)
+        cam.updateMatrixWorld(true)
+
+        // Na câmera do site, ndc = f·(y/−z) + s. Os extremos de y/−z não dependem de f: acha-os nos vértices e resolve
+        // f (abertura) e s (deslocamento da lente) para o cabelo tocar `topo` e a barba (yBase no glb) tocar `base`.
+        const v = new THREE.Vector3()
+        let aTopo = -Infinity
+        let bMin = Infinity
+        let bMax = -Infinity
+        let aBase = null
+        let zBase = -Infinity
+        glb.scene.traverse((o) => {
+          if (!o.isMesh) return
+          const p = o.geometry.getAttribute('position')
+          for (let i = 0; i < p.count; i++) {
+            v.fromBufferAttribute(p, i).applyMatrix4(o.matrixWorld)
+            const yGlb = v.y
+            const zGlb = v.z
+            v.applyMatrix4(cam.matrixWorldInverse)
+            const a = v.y / -v.z
+            const b = v.x / -v.z
+            if (a > aTopo) aTopo = a
+            if (yGlb > 0.08) {
+              bMin = Math.min(bMin, b)
+              bMax = Math.max(bMax, b)
+            }
+            if (Math.abs(yGlb - c.yBase) < 0.004 && zGlb > zBase) {
+              zBase = zGlb
+              aBase = a
+            }
+          }
+        })
+        const nTopo = 1 - (2 * c.topo) / c.h
+        const nBase = 1 - (2 * c.base) / c.h
+        const f = (nTopo - nBase) / (aTopo - aBase)
+        const sy = nTopo - f * aTopo
+        const fx = f / cam.aspect
+        const sx = -fx * ((bMin + bMax) / 2)
+        cam.fov = THREE.MathUtils.radToDeg(2 * Math.atan(1 / f))
+        cam.updateProjectionMatrix()
+        cam.projectionMatrix.elements[8] = -sx
+        cam.projectionMatrix.elements[9] = -sy
+        cam.projectionMatrixInverse.copy(cam.projectionMatrix).invert()
+
+        await renderer.compileAsync(scene, cam)
+        renderer.render(scene, cam)
+        const px = (n, tam) => ((1 - n) / 2) * tam
+        return {
+          fov: cam.fov,
+          largura: (bMax - bMin) * fx * (c.w / 2),
+          x0: c.w / 2 + (bMin * fx + sx) * (c.w / 2),
+          x1: c.w / 2 + (bMax * fx + sx) * (c.w / 2),
+          y0: px(nTopo, c.h),
+          y1: px(nBase, c.h),
+        }
+      }
+      window.pronto = true
+    </script>
+  </body>
+</html>
