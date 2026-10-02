@@ -14,6 +14,7 @@ import { useFitFontSize } from './hooks/useFitFontSize'
 import { WIDE_QUERY } from './model/layout'
 import { ResumeMenu } from './ResumeMenu'
 import { SlotWord } from './SlotWord'
+import { track } from '../../lib/track'
 
 interface HeroCopyProps {
   ref: Ref<HTMLDivElement>
@@ -160,6 +161,7 @@ export function HeroCopy({ ref, stage, leaving, loading }: HeroCopyProps) {
           <Link
             to={localePath(lang, journeyPath)}
             prefetch="intent"
+            onClick={() => track('journey_open')}
             className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-fg px-5 text-sm font-semibold whitespace-nowrap text-on-fg transition-[color,background-color,transform] duration-150 hover:bg-fg/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fg active:scale-[0.96] active:bg-fg/70 motion-reduce:active:scale-100 sm:w-auto short:h-9 short:w-auto short:shrink-0 short:px-3 short:text-xs"
           >
             {/* Celular deitado estreito (< 760 px): o par em pt passava da coluna; sai só o fim do rótulo, que fica
@@ -182,6 +184,7 @@ export function HeroCopy({ ref, stage, leaving, loading }: HeroCopyProps) {
               largo). */}
           <a
             href={`#${OVERVIEW_ID}`}
+            onClick={() => track('cta_down')}
             className="absolute right-0 bottom-full mb-3 inline-flex h-11 items-center gap-2 rounded-full border border-fg/30 bg-page/70 px-4 text-sm font-medium whitespace-nowrap text-fg/85 transition-colors hover:border-fg/60 hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fg sm:static sm:mb-0 short:static short:mb-0 short:h-9 short:shrink-0 short:gap-1.5 short:px-3 short:text-xs"
           >
             {overview.cta[lang]} <span aria-hidden>↓</span>
@@ -194,7 +197,13 @@ export function HeroCopy({ ref, stage, leaving, loading }: HeroCopyProps) {
           </li>
           {profileLinks.map((l) => (
             <li key={l.label}>
-              <a href={l.href} target="_blank" rel="noopener noreferrer" className={pill}>
+              <a
+                href={l.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => track('profile', l.label)}
+                className={pill}
+              >
                 {l.label}{' '}
                 <span aria-hidden className="hidden text-fg/45 xl:inline">
                   ↗

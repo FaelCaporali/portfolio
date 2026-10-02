@@ -187,7 +187,7 @@ describe('cron do MCP', () => {
       .run()
     await runCron(WEDNESDAY)
     const mail = sentMail()
-    expect(mail.subject).toBe('Resumo semanal do MCP: 4 chamadas')
+    expect(mail.subject).toBe('Resumo semanal do site e do MCP: 4 chamadas do MCP')
     expect(mail.text).toContain('Por ferramenta: search_journey 2 · beacon 1 · get_checkpoint 1')
     expect(mail.text).toContain('Por cliente: Claude 1.0 4')
     expect(mail.text).toContain('Por rede: Anthropic, PBC 4')

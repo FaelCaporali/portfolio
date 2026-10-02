@@ -3,6 +3,7 @@ import { LIMITS, type ContactRequest, type Field } from '../../../shared/contact
 import { parseContact } from '../../../shared/contact/validation'
 import { sendContact } from './api'
 import type { ErrorKey } from './texts'
+import { track } from '../../lib/track'
 
 export type Status = { kind: 'idle' } | { kind: 'sending' } | { kind: 'sent' } | { kind: 'error'; key: ErrorKey }
 
@@ -68,6 +69,7 @@ export function useContactForm(verification: Verification, prefix = '') {
     if (result.kind === 'sent') {
       form.reset()
       setStatus({ kind: 'sent' })
+      track('contact_sent')
     } else if (result.kind === 'invalid') {
       setInvalid(result.fields)
       setStatus({ kind: 'idle' })

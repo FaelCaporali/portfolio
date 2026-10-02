@@ -52,8 +52,13 @@
   // por IP não serve, porque no Claude e no ChatGPT todos chegam pelos IPs do provedor (worker/mcp/route.ts).
   "ratelimits": [
     { "name": "CONTACT_LIMITER", "namespace_id": "1001", "simple": { "limit": 3, "period": 60 } },
-    { "name": "MCP_LIMITER", "namespace_id": "1002", "simple": { "limit": 60, "period": 60 } }
+    { "name": "MCP_LIMITER", "namespace_id": "1002", "simple": { "limit": 60, "period": 60 } },
+    // Registro de visitas (POST /api/e): por IP, 30 por minuto. Cada página manda um só, ao esconder ou ao trocar.
+    { "name": "VISITS_LIMITER", "namespace_id": "1003", "simple": { "limit": 30, "period": 60 } }
   ],
+  // Registro de visitas do site (worker/visits.ts, .wai/monitoramento/02-plano.md): Analytics Engine, grátis no plano
+  // Free (100 mil pontos por dia), cota própria, 3 meses de retenção. O conjunto é criado na primeira escrita.
+  "analytics_engine_datasets": [{ "binding": "VISITS", "dataset": "fael_caporali_visits" }],
   // Registro do MCP acima da cota do dia: a chamada espera na fila até a cota do dia seguinte abrir e é gravada pelo
   // consumidor deste mesmo Worker (worker/mcp/audit.ts, D-MCP26). Plano grátis: 10 mil operações por dia e até 24 h na
   // fila. Lote de 20: até 2 consultas ao D1 por mensagem, abaixo das 50 por invocação do plano grátis. 30 tentativas
@@ -64,12 +69,15 @@
       { "queue": "fael-caporali-mcp-log", "max_batch_size": 20, "max_batch_timeout": 30, "max_retries": 30 }
     ]
   },
-  // Reenvio do que ficou pendente, limpeza do que passou de 90 dias e o resumo semanal do MCP (worker/cron.ts).
+  // Reenvio do que ficou pendente, limpeza do que passou de 90 dias e o resumo semanal do site e do MCP (worker/cron.ts).
   "triggers": { "crons": ["*/15 * * * *"] },
   "vars": {
     "ALLOWED_ORIGINS": "https://fael.caporali.dev",
     "TURNSTILE_HOSTNAMES": "fael.caporali.dev",
-    "ALLOW_TEST_TURNSTILE": "0"
+    "ALLOW_TEST_TURNSTILE": "0",
+    // Conta da Cloudflare, para o resumo semanal ler as visitas pela API SQL do Analytics Engine. O token (secret
+    // CF_API_TOKEN, "Account Analytics: Read") é passo manual: `wrangler secret put CF_API_TOKEN`.
+    "CF_ACCOUNT_ID": "92c5718d3afa29fd2f999d6a935daf95"
   },
   "observability": { "enabled": true }
 }

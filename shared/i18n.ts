@@ -22,7 +22,7 @@ export const SERVICE_PAGES = [
 export type ServicePage = (typeof SERVICE_PAGES)[number]
 
 /** As páginas que existem nos dois idiomas, no endereço inglês (sem prefixo). */
-export const SITE_PAGES = ['/', '/journey', '/mcp', ...SERVICE_PAGES] as const
+export const SITE_PAGES = ['/', '/journey', '/mcp', ...SERVICE_PAGES, '/privacy'] as const
 export type SitePage = (typeof SITE_PAGES)[number]
 
 /** Cookie da escolha manual (o controle PT/EN): a detecção nunca desfaz o que a pessoa escolheu. */

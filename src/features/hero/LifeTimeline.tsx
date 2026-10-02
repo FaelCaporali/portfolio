@@ -2,6 +2,7 @@ import { stages } from '../../content/journey'
 import { useMessages } from '../../i18n/lang'
 import { cx } from '../../lib/cx'
 import { useHydrated } from '../../lib/useHydrated'
+import { track } from '../../lib/track'
 
 interface LifeTimelineProps {
   /** Vida em destaque: a atual, ou a escolhida enquanto a troca acontece; null = nenhuma (o "loading" do herói). */
@@ -34,6 +35,7 @@ export function LifeTimeline({ currentId, onSelect }: LifeTimelineProps) {
                 title={slots[s.id]}
                 onClick={() => {
                   onSelect(s.id)
+                  track('life_pick', s.id)
                 }}
                 className="group grid h-6 w-6 cursor-pointer place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-fg"
               >

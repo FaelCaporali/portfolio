@@ -1,10 +1,11 @@
 /**
  * Roteamento do Worker único do site: a API do contato, 404 JSON no resto de /api/, o servidor MCP em /mcp
  * (worker/mcp/; para os agentes, no workers.dev), a detecção de idioma na primeira visita (worker/lang.ts) e as páginas
- * HTML (com a CSP de nonce). Arquivos estáticos não passam por aqui (run_worker_first no wrangler.jsonc). Também o cron
- * e o consumidor da fila do registro do MCP (MCP_LOG).
+ * HTML (com a CSP de nonce e o registro de visitas, worker/visits.ts). Arquivos estáticos não passam por aqui
+ * (run_worker_first no wrangler.jsonc). Também o cron e o consumidor da fila do registro do MCP (MCP_LOG).
  */
 import { CONTACT_PATH } from '../shared/contact/contract'
+import { VISITS_PATH } from '../shared/visits'
 import { handleContact } from './contact'
 import { mcpHousekeeping, retryAndPurge } from './cron'
 import { json } from './http'
@@ -14,6 +15,7 @@ import { SITE_ORIGIN, stripLang } from '../shared/i18n'
 import { wantsFilteredJourney } from '../shared/journey-filters'
 import { isWorkersDev, limitMcp, MCP_PATH, varyOnAccept, wantsPage } from './mcp/route'
 import { withPageCsp } from './page'
+import { handleVisit, recordView } from './visits'
 
 /**
  * Página vazia do roteador (React Router, gerada no build ao lado das pré-renderizadas): num endereço que não existe,
@@ -52,11 +54,13 @@ export default {
       return pathname === MCP_PATH ? varyOnAccept(away) : away
     }
     if (pathname === CONTACT_PATH) return handleContact(request, env)
+    if (pathname === VISITS_PATH) return handleVisit(request, env)
     if (pathname.startsWith('/api/')) return json(404, { ok: false, error: 'not_found' })
     // Sob demanda: o SDK do MCP só é avaliado quando um cliente MCP chama, e depois do limite por rede
     // (worker/mcp/route.ts).
     if (mcp) return (await limitMcp(request, env)) ?? (await import('./mcp/server')).handleMcp(request, env, ctx)
     const page = await sitePage(request, env, pathname)
+    recordView(request, env, page)
     // Em /mcp a página e o servidor dividem o endereço: o que volta depende do Accept.
     return pathname === MCP_PATH ? varyOnAccept(page) : page
   },

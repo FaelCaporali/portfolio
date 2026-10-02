@@ -48,7 +48,7 @@ describe('metas por idioma', () => {
     expect(pageMeta('xx', 'home')).toEqual([])
   })
 
-  it('sitemap: as 7 páginas nos dois idiomas, cada uma com os 3 alternates e a imagem do idioma', () => {
+  it('sitemap: as 8 páginas nos dois idiomas, cada uma com os 3 alternates e a imagem do idioma', () => {
     const xml = sitemapXml()
     expect([...xml.matchAll(/<loc>(.*?)<\/loc>/g)].map((m) => m[1])).toEqual([
       'https://fael.caporali.dev/',
@@ -58,8 +58,10 @@ describe('metas por idioma', () => {
       'https://fael.caporali.dev/mcp',
       'https://fael.caporali.dev/pt/mcp',
       ...SERVICE_PAGES.flatMap((p) => [`https://fael.caporali.dev${p}`, `https://fael.caporali.dev/pt${p}`]),
+      'https://fael.caporali.dev/privacy',
+      'https://fael.caporali.dev/pt/privacy',
     ])
-    expect(xml.match(/<xhtml:link /g)).toHaveLength(42)
+    expect(xml.match(/<xhtml:link /g)).toHaveLength(48)
     expect(xml).not.toContain('<lastmod>')
     expect(xml).toContain('<image:loc>https://fael.caporali.dev/og/fael-caporali-pt.jpg</image:loc>')
   })

@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef } from 'react'
 import { LIMITS, type Field } from '../../../shared/contact/contract'
-import { useMessages } from '../../i18n/lang'
+import { localePath, useLang, useMessages } from '../../i18n/lang'
 import { errorText, fieldHint } from './texts'
 import { useContactForm } from './useContactForm'
 import { useTurnstile } from './useTurnstile'
@@ -23,6 +23,7 @@ const LABEL = 'mb-1 block text-xs text-fg/60'
  */
 export function ContactForm({ active, topic }: { active: boolean; topic?: string | null }) {
   const m = useMessages()
+  const lang = useLang()
   const t = m.contact
   const prefix = topic ? `[${t.about}: ${topic}]\n\n` : ''
   const { container: captcha, token, failed, renew } = useTurnstile(active)
@@ -161,6 +162,14 @@ export function ContactForm({ active, topic }: { active: boolean; topic?: string
         </button>
         <p role="status" className="min-h-[1lh] text-xs text-error">
           {status.kind === 'error' ? errorText(status.key, m) : ''}
+        </p>
+        {/* Aviso de privacidade (LGPD, art. 9º; .wai/monitoramento/02-plano.md): o que acontece com a mensagem. Link
+            simples, não do roteador: o widget vive fora dele nos testes e em qualquer página. */}
+        <p className="text-xs text-pretty text-fg/55">
+          {t.privacyNote}{' '}
+          <a href={localePath(lang, '/privacy')} className="underline underline-offset-4 hover:text-fg">
+            {t.privacyLink}
+          </a>
         </p>
       </form>
     </>

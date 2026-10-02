@@ -30,6 +30,12 @@ export const pt: Messages = {
       keywords:
         'servidor MCP, Model Context Protocol, conector do Claude, conector do ChatGPT, assistente de IA, recrutador, Fael Caporali, portfólio',
     },
+    privacy: {
+      title: 'Privacidade · Fael Caporali',
+      description:
+        'O que este site registra das visitas e das mensagens, por quanto tempo, e o que nunca registra: nem endereço IP, nem cookies de rastreamento.',
+      keywords: 'privacidade, LGPD, proteção de dados, cookies, analytics, Fael Caporali, portfólio',
+    },
     imageAlt: 'Fael Caporali, AI Product Engineer, Dev FullStack, Analista de QA e TechLead, Belo Horizonte, MG',
     breadcrumbHome: 'Fael Caporali',
   },
@@ -82,6 +88,8 @@ export const pt: Messages = {
     verifying: 'Verificando…',
     sent: 'Obrigado! Mensagem recebida. Respondo em breve.',
     another: 'Enviar outra mensagem',
+    privacyNote: 'Uso seus dados só para responder e apago a mensagem em 90 dias.',
+    privacyLink: 'Privacidade',
     direct: 'Ou fale comigo diretamente',
     hints: {
       name: 'Informe seu nome.',

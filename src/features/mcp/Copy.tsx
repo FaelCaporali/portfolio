@@ -3,6 +3,7 @@ import { mcp } from '../../content/mcp'
 import { useMessages, type Lang } from '../../i18n/lang'
 import { copyText } from '../../lib/clipboard'
 import { cx } from '../../lib/cx'
+import { track } from '../../lib/track'
 import { useHydrated } from '../../lib/useHydrated'
 import { FOCUS } from '../overview/parts'
 
@@ -60,6 +61,7 @@ export function CopyButton({
   const said = { idle: '', copied: mcp.copy.copied[lang], failed }[state]
 
   async function copy() {
+    track('mcp_copy', big ? 'address' : label)
     setState((await copyText(text)) ? 'copied' : 'failed')
     window.clearTimeout(timer.current)
     timer.current = window.setTimeout(() => setState('idle'), 1800)

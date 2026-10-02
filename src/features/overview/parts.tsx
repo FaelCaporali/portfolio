@@ -3,6 +3,7 @@ import { Link } from 'react-router'
 import type { Lang } from '../../../shared/i18n'
 import { journeyStartHref, overview } from '../../content/overview'
 import { cx } from '../../lib/cx'
+import { track } from '../../lib/track'
 import { useHydrated } from '../../lib/useHydrated'
 import { homeTagLabel } from '../../i18n/tags'
 import {
@@ -145,6 +146,7 @@ function useContactTrigger(topic?: string) {
     'aria-controls': panel.panelId,
     disabled: !hydrated,
     onClick: (e: MouseEvent<HTMLButtonElement>) => {
+      track('offer_cta', topic ?? 'start_project')
       requestContact(e.currentTarget, topic)
     },
   }

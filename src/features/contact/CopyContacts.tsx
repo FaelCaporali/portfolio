@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { directContacts, type DirectContact } from '../../content/profile'
 import { useMessages } from '../../i18n/lang'
 import { copyText } from '../../lib/clipboard'
+import { track } from '../../lib/track'
 import { useHydrated } from '../../lib/useHydrated'
 
 /** Ícone do tipo de contato; vira um visto por um instante depois de copiar. */
@@ -46,6 +47,7 @@ export function CopyContacts({ className = '' }: { className?: string }) {
   const copiedText = (c: DirectContact, ok: boolean) => (ok ? t[c.kind].copied : t.failed)
 
   async function copy(c: DirectContact) {
+    track('copy_contact', c.kind)
     const ok = await copyText(c.value)
     setCopied({ label: c.label, ok })
     window.clearTimeout(timer.current)

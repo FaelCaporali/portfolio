@@ -10,6 +10,7 @@ const PAGE_MODULES: Record<SitePage, string> = {
   '/': 'routes/home.tsx',
   '/journey': 'routes/journey.tsx',
   '/mcp': 'routes/mcp-page.tsx',
+  '/privacy': 'routes/privacy-page.tsx',
   ...(Object.fromEntries(SERVICE_PAGES.map((p) => [p, 'routes/service.tsx'])) as Record<ServicePage, string>),
 }
 

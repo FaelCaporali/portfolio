@@ -1,11 +1,13 @@
 /**
- * E-mails do MCP para o Fael (D-MCP4 e D-MCP5): o beacon na hora e o resumo semanal. Sem o SDK: o resumo sai do cron.
- * Pela mesma binding do formulário (destino e remetente fixos no wrangler.jsonc); só texto puro.
+ * E-mails do MCP para o Fael (D-MCP4 e D-MCP5): o beacon na hora e o resumo semanal, que traz também as visitas do site
+ * (worker/visits.ts, D-MON2). Sem o SDK: o resumo sai do cron. Pela mesma binding do formulário (destino e remetente
+ * fixos no wrangler.jsonc); só texto puro.
  */
 import { cleanLine, cleanText } from '../../shared/contact/validation'
 import { MCP_URL } from '../../shared/mcp'
 import { BRT, DESTINATION, send, SENDER } from '../mail'
 import type { Delivery } from '../message'
+import { weekVisits } from '../visits'
 import { bump, DAILY, utcDay } from './audit'
 
 const FROM = { ...SENDER, name: 'Portfólio · MCP' }
@@ -125,7 +127,45 @@ async function weekNumbers(db: D1Database, from: number, to: number) {
 const list = (rows: Row[] | undefined) => (rows?.length ? rows.map((r) => `${r.k ?? '?'} ${r.n}`).join(' · ') : '—')
 const count = (rows: Row[] | undefined) => rows?.[0]?.n ?? 0
 
-function composeSummary(numbers: Row[][], from: number, to: number): EmailMessageBuilder {
+/** Quem pediu a página (shared/bots.ts), em português. */
+const CLIENTS: Record<string, string> = {
+  human: 'pessoas',
+  search: 'busca',
+  assistant: 'assistentes a pedido de alguém',
+  training: 'treino de IA',
+  bot: 'outros robôs',
+}
+
+/** A seção do site no resumo: as visitas da semana, ou por que não vieram. */
+function siteLines(visits: Awaited<ReturnType<typeof weekVisits>>): string[] {
+  if (visits === 'no_token')
+    return ['Visitas: falta o token da API (wrangler secret put CF_API_TOKEN, permissão "Account Analytics: Read").']
+  if (visits === 'failed') return ['Visitas: a consulta ao Analytics Engine falhou nesta semana.']
+  const [byClient, pages, referrers, utms, places, networks, bots, devices, events, seconds, tabs] = visits
+  /** A linha de uma consulta: a lista, ou "consulta falhou" quando só ela falhou. */
+  const line = (label: string, rows: Row[] | null | undefined, show = list) =>
+    `${label}: ${rows === null ? 'consulta falhou' : show(rows)}`
+  return [
+    line('Páginas entregues', byClient, (rows) => list(rows?.map((r) => ({ k: CLIENTS[r.k ?? ''] ?? r.k, n: r.n })))),
+    line('Visitas de pessoas (abas)', tabs, (rows) => String(count(rows))),
+    line('Páginas mais vistas por pessoas', pages),
+    line('Tempo visível por página e por visita (s)', seconds),
+    line('De onde vieram', referrers),
+    line('UTM (origem / meio / campanha)', utms),
+    line('País e cidade', places),
+    line('Rede (a empresa, quando a rede é dela)', networks),
+    line('Dispositivo', devices),
+    line('Robôs e assistentes', bots),
+    line('O que fizeram', events),
+  ]
+}
+
+function composeSummary(
+  numbers: Row[][],
+  visits: Awaited<ReturnType<typeof weekVisits>>,
+  from: number,
+  to: number,
+): EmailMessageBuilder {
   const [
     total,
     tools,
@@ -146,6 +186,10 @@ function composeSummary(numbers: Row[][], from: number, to: number): EmailMessag
   const lines = [
     `Semana de ${period} (horário de Brasília).`,
     '',
+    'O SITE',
+    ...siteLines(visits),
+    '',
+    'O MCP',
     `Chamadas registradas: ${count(total)}` +
       (count(capped)
         ? ` (a cota de ${DAILY.log}/dia esgotou em ${count(capped)} dia(s); o excedente foi para a fila e é gravado no dia seguinte)`
@@ -171,7 +215,7 @@ function composeSummary(numbers: Row[][], from: number, to: number): EmailMessag
   return {
     from: FROM,
     to: DESTINATION,
-    subject: `Resumo semanal do MCP: ${count(total)} chamadas`,
+    subject: `Resumo semanal do site e do MCP: ${count(total)} chamadas do MCP`,
     text: lines.join('\n'),
   }
 }
@@ -190,7 +234,8 @@ export async function weeklySummary(env: Env, now: number): Promise<'sent' | 'do
   const week = utcDay(to)
   if ((await bump(env.DB, week, 'summary', SUMMARY_TRIES)) !== 'ok') return 'done'
   const from = to - WEEK_MS
-  const d = await send(env, composeSummary(await weekNumbers(env.DB, from, to), from, to))
+  const [numbers, visits] = await Promise.all([weekNumbers(env.DB, from, to), weekVisits(env, from, to)])
+  const d = await send(env, composeSummary(numbers, visits, from, to))
   if (!d.ok) return 'failed'
   await env.DB.prepare("UPDATE mcp_quota SET used = ? WHERE day = ? AND kind = 'summary'")
     .bind(SUMMARY_TRIES, week)

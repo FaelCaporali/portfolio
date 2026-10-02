@@ -16,9 +16,9 @@ import {
 } from './structured-data'
 
 /** As páginas com metas nas mensagens; as de oferta (/services/…) têm as delas em src/content/services.ts. */
-type NamedPage = 'home' | 'journey' | 'mcp'
+type NamedPage = 'home' | 'journey' | 'mcp' | 'privacy'
 
-const PATHS: Record<NamedPage, SitePage> = { home: '/', journey: '/journey', mcp: '/mcp' }
+const PATHS: Record<NamedPage, SitePage> = { home: '/', journey: '/journey', mcp: '/mcp', privacy: '/privacy' }
 const NAMED = new Map<string, NamedPage>(Object.entries(PATHS).map(([k, v]) => [v, k as NamedPage]))
 
 /** Endereço absoluto de uma página num idioma (canonical, og:url, hreflang e sitemap). */

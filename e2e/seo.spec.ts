@@ -12,7 +12,18 @@ const SERVICES = [
   '/services/qa-and-test-automation',
   '/services/tech-leadership',
 ]
-const PAGES = ['/', '/journey', '/mcp', '/pt', '/pt/journey', '/pt/mcp', ...SERVICES, ...SERVICES.map((p) => `/pt${p}`)]
+const PAGES = [
+  '/',
+  '/journey',
+  '/mcp',
+  '/privacy',
+  '/pt',
+  '/pt/journey',
+  '/pt/mcp',
+  '/pt/privacy',
+  ...SERVICES,
+  ...SERVICES.map((p) => `/pt${p}`),
+]
 const ORIGIN = 'https://fael.caporali.dev'
 
 const attr = (html: string, re: RegExp) => re.exec(html)?.[1]

@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest'
+import { NAMED_BOTS } from '../../shared/bots'
 import { LANGS, markdownPath } from '../../shared/i18n'
 import { checkpoints } from '../content/journey-timeline'
 import { mcp } from '../content/mcp'
 import { overview } from '../content/overview'
-import { robotsTxt, NAMED_BOTS } from '../routes/robots'
+import { privacy } from '../content/privacy'
+import { robotsTxt } from '../routes/robots'
 import { llmsTxt } from './llms'
-import { homeMarkdown, journeyMarkdown, mcpMarkdown } from './markdown'
+import { homeMarkdown, journeyMarkdown, mcpMarkdown, privacyMarkdown } from './markdown'
 
 describe('markdown das páginas (llmstxt.org)', () => {
   it('endereços: o mesmo da página com .md; a home é index.md', () => {
@@ -45,6 +47,15 @@ describe('markdown das páginas (llmstxt.org)', () => {
     for (const i of mcp.log.neverItems) expect(md).toContain(i[lang])
   })
 
+  it.each(LANGS)('/privacy em %s: cada seção e cada item da página, com o endereço da /mcp', (lang) => {
+    const md = privacyMarkdown(lang)
+    for (const sec of privacy.sections) {
+      expect(md).toContain(`## ${sec.title[lang]}`)
+      for (const i of sec.items) expect(md).toContain(i[lang])
+    }
+    expect(md).toContain(`https://fael.caporali.dev${lang === 'pt' ? '/pt' : ''}/mcp`)
+  })
+
   it('llms.txt no formato da spec: H1, resumo em citação, seções H2 com links "[nome](url): nota", Optional no fim', () => {
     const txt = llmsTxt()
     const lines = txt.split('\n')
@@ -58,7 +69,7 @@ describe('markdown das páginas (llmstxt.org)', () => {
     for (const l of lines.filter((x) => x.startsWith('- ')))
       expect(l).toMatch(/^- \[[^\]]+\]\((https:\/\/|mailto:)[^)]+\)(: .+)?$/)
     for (const lang of LANGS) {
-      for (const p of ['/', '/journey', '/mcp'])
+      for (const p of ['/', '/journey', '/mcp', '/privacy'])
         expect(txt).toContain(`https://fael.caporali.dev${markdownPath(lang, p)}`)
     }
     expect(txt).toContain(mcp.address)

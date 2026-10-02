@@ -62,6 +62,9 @@ describe('widget de contato', () => {
     await user.click(trigger)
     expect(screen.getByRole('dialog')).toBeVisible()
     expect(screen.getByLabelText('Name')).toHaveFocus()
+    // O aviso de privacidade do formulário (LGPD), com o link para a página.
+    expect(screen.getByText(/only to reply, and delete the message after 90 days/)).toBeVisible()
+    expect(screen.getByRole('link', { name: 'Privacy' })).toHaveAttribute('href', '/privacy')
     await user.keyboard('{Escape}')
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     expect(trigger).toHaveFocus()

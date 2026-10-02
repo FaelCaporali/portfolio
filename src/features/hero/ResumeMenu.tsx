@@ -1,6 +1,7 @@
 import { resumes } from '../../content/profile'
 import { useMessages } from '../../i18n/lang'
 import { cx } from '../../lib/cx'
+import { track } from '../../lib/track'
 import { usePopover } from '../../ui/usePopover'
 
 /**
@@ -40,7 +41,10 @@ export function ResumeMenu({ className }: { className: string }) {
             <a
               href={r.href}
               download
-              onClick={close}
+              onClick={() => {
+                track('resume', r.label)
+                close()
+              }}
               className="flex items-center justify-between gap-3 px-4 py-2 text-sm whitespace-nowrap text-fg/80 hover:bg-fg/10 hover:text-fg focus-visible:bg-fg/10 focus-visible:outline-none"
             >
               {r.label}

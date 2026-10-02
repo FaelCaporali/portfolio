@@ -1,4 +1,7 @@
-/** Tarefa agendada: reenvia o que ficou pendente, apaga o que passou da retenção e manda o resumo semanal do MCP. */
+/**
+ * Tarefa agendada: reenvia o que ficou pendente, apaga o que passou da retenção e manda o resumo semanal do site e do
+ * MCP.
+ */
 import { deliver } from './mail'
 import { purge } from './mcp/audit'
 import { weeklySummary } from './mcp/notify'

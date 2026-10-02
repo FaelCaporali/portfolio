@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useMessages } from '../../i18n/lang'
+import { track } from '../../lib/track'
 import { usePopover } from '../../ui/usePopover'
 import { ContactForm } from './ContactForm'
 import { onContactRequest, publishContactPanel } from './contactRequest'
@@ -31,6 +32,9 @@ export function ContactWidget() {
       publishContactPanel({ open: false })
     }
   }, [open, panelId])
+  useEffect(() => {
+    if (open) track('contact_open', topic ?? '')
+  }, [open, topic])
   const titleId = `${panelId}-title`
   const topicId = `${panelId}-topic`
   const t = useMessages().contact

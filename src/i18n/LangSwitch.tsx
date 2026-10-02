@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router'
 import { LANG_COOKIE, LANG_COOKIE_MAX_AGE } from '../../shared/i18n'
+import { track } from '../lib/track'
 import { rememberPlace } from './keepPlace'
 import { LOCALES, localePath, MESSAGES, otherLang, stripLang, useLang, type Lang } from './lang'
 
@@ -41,6 +42,7 @@ export function LangSwitch({ className, full = false, onSwitch, replace = false 
       className={className}
       onClick={(e) => {
         saveLang(lang)
+        track('lang_switch', lang)
         // Nova aba ou janela: o navegador cuida.
         if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
         e.preventDefault()

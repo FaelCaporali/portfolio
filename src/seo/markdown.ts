@@ -7,6 +7,7 @@
 import { localePath, markdownPath, SITE_ORIGIN, type Lang, type SitePage } from '../../shared/i18n'
 import { checkpoints, intro, periodLabel, type Checkpoint } from '../content/journey-timeline'
 import { mcp } from '../content/mcp'
+import { privacy } from '../content/privacy'
 import { journeyHref, overview } from '../content/overview'
 import { directContacts, journeyPath, profile, profileLinks, resumes, sourceHref } from '../content/profile'
 import { serviceTools } from '../content/service-tools'
@@ -149,6 +150,28 @@ export function journeyMarkdown(lang: Lang): string {
 }
 
 /** A /mcp: o endereço, exemplos, os passos de cada cliente, as ferramentas e o que fica registrado. */
+/** O aviso de privacidade (/privacy): as seções da página, com o link da /mcp por extenso. */
+export function privacyMarkdown(lang: Lang): string {
+  return [
+    `# ${privacy.title[lang]} · ${profile.name}`,
+    '',
+    `> ${MESSAGES[lang].meta.privacy.description}`,
+    '',
+    privacy.lede[lang],
+    '',
+    privacy.controller[lang],
+    '',
+    ...privacy.sections.flatMap((sec) => [
+      `## ${sec.title[lang]}`,
+      '',
+      list(sec.items.map((i) => (i.link ? `${i[lang]} ${url(lang, i.link)}` : i[lang]))),
+      '',
+    ]),
+    privacy.updated[lang],
+    '',
+  ].join('\n')
+}
+
 export function mcpMarkdown(lang: Lang): string {
   return [
     `# ${mcp.title[lang]} · ${profile.name}`,
@@ -255,6 +278,7 @@ const PAGES: Record<SitePage, (lang: Lang) => string> = {
   '/': homeMarkdown,
   '/journey': journeyMarkdown,
   '/mcp': mcpMarkdown,
+  '/privacy': privacyMarkdown,
   ...(Object.fromEntries(services.map((s) => [s.path, (lang: Lang) => serviceMarkdown(s, lang)])) as Record<
     Service['path'],
     (lang: Lang) => string

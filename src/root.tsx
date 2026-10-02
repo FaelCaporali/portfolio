@@ -1,6 +1,7 @@
 import { useEffect, type ReactNode } from 'react'
 import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration, useLocation } from 'react-router'
 import { langFromPath, LOCALES } from './i18n/lang'
+import { startTracking, trackPage } from './lib/track'
 import { ErrorPage } from './ui/ErrorPage'
 import { NavigationProgress } from './ui/NavigationProgress'
 import './index.css'
@@ -45,8 +46,14 @@ export function Layout({ children }: { children: ReactNode }) {
   )
 }
 
-/** Todas as páginas, com a barra de carregamento da troca de página pelo roteador (U2). */
+/**
+ * Todas as páginas, com a barra de carregamento da troca de página pelo roteador (U2) e o registro de visitas
+ * (src/lib/track.ts): começa na hidratação e marca cada troca de página.
+ */
 export default function Root() {
+  const { pathname } = useLocation()
+  useEffect(() => startTracking(window.location.pathname), [])
+  useEffect(() => trackPage(pathname), [pathname])
   return (
     <>
       <NavigationProgress />

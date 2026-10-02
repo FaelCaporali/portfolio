@@ -7,6 +7,7 @@ import { useDismiss } from '../../ui/useDismiss'
 import type { Dated } from './layout'
 import { eyebrow } from './parts'
 import type { Filters as FilterApi, Group } from './useFilters'
+import { track } from '../../lib/track'
 
 const GROUPS = ['tools', 'concepts', 'skills'] as const satisfies readonly Group[]
 
@@ -157,6 +158,7 @@ function TagPicker({
             hidden={!!q && !label.toLowerCase().includes(q)}
             aria-pressed={filters.state.tags[group].has(tag)}
             onClick={() => {
+              if (!filters.state.tags[group].has(tag)) track('journey_filter', `${group}:${tag}`)
               filters.toggle(group, tag)
             }}
             className={cx('tag filter-tag rounded-full px-2.5 py-1 text-xs', `tag-${group}`)}
