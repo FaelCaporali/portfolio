@@ -103,9 +103,12 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
   // Vidas cujo glb falhou (#138, a cena avisa): saem da volta e do indicador até o glb chegar.
   const failed = useRef<ReadonlySet<number>>(new Set())
   // A cena caiu (SceneBoundary): quem troca a vida é o clique no indicador, direto, sem desintegração. Sem aceleração
-  // de GPU (camada 2), HeroCanvas é null e a cena nunca chega a montar: começa direto neste MESMO estado, sem
+  // de GPU (camada 2), HeroCanvas é null e a cena nunca chega a montar: noScene, abaixo, cai no mesmo estado, sem
   // "loading" (R3), em vez de esperar um onFail que nunca vem.
-  const [sceneFailed, setSceneFailed] = useState(!HeroCanvas)
+  const [sceneFailed, setSceneFailed] = useState(false)
+  // Sem GPU (HeroCanvas null) conta como cena caída, mas só depois da hidratação (options não nulo): o servidor não
+  // sabe da GPU, e a 1ª renderização do cliente tem de ser igual ao HTML dele (senão o React acusa o erro #418).
+  const noScene = sceneFailed || (options !== null && !HeroCanvas)
   // "Today I am loading" até o 1º quadro com o busto (U2), sem prazo (D-U2a: "loading sem limites faz sentido contanto
   // que quando busto carregado, troque o texto"): no HTML, na hidratação e a cada montagem (a volta da trajetória
   // também). Cena que cai sai do "loading" na hora, para a vida de abertura.
@@ -118,7 +121,7 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
       setSceneReady(true)
     })
   }, [])
-  const loading = !sceneReady && !sceneFailed
+  const loading = !sceneReady && !noScene
   const next = useCallback((prop: PropId) => {
     // A vida para onde a cena troca (a escolhida no indicador ou a 1ª pronta da volta).
     const i = stages.findIndex((s) => s.prop === prop)
@@ -155,12 +158,12 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
   // 3d [...] deveria ter imagens". O clique no indicador já troca na hora (select, abaixo); este efeito só cobre a
   // passagem do tempo. `carga.next` é a mesma vida que a cena real usaria como `onNext` (loadProps, acima).
   useEffect(() => {
-    if (!sceneFailed) return
+    if (!noScene) return
     const holdMs = (opening ? TIMING.holdFirst : TIMING.hold) * 1000
     const id = window.setTimeout(() => next(carga.next), holdMs)
     return () => window.clearTimeout(id)
-  }, [sceneFailed, opening, index, carga.next, next])
-  const nextStage = sceneFailed ? (stages.find((s) => s.prop === carga.next) ?? null) : null
+  }, [noScene, opening, index, carga.next, next])
+  const nextStage = noScene ? (stages.find((s) => s.prop === carga.next) ?? null) : null
   const lang = useLang()
   const m = useMessages()
   // Indo para outra página (o botão da trajetória): a cena para, e o quadro 3D não disputa o processador com ela.
@@ -174,7 +177,7 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
     const i = stages.findIndex((s) => s.id === id)
     // Vida cujo glb falhou: o clique é descartado e o carrossel segue (o aviso visual é da tarefa 143).
     if (failed.current.has(i)) return
-    if (sceneFailed) {
+    if (noScene) {
       if (i >= 0 && i !== index) next(cyclicAt(stages, i).prop)
       return
     }
@@ -216,7 +219,7 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
       {/* Sem aceleração (a sonda falhou, ou a cena caiu): a imagem da vida atual no lugar do busto, nunca vazio. Só
           depois da hidratação (options não nulo) — o servidor não sabe da GPU, e a 1ª renderização do cliente tem de
           bater com o HTML dele (nem canvas, nem imagem) até esse ponto. */}
-      {options && sceneFailed && <HeroFallbackImage stage={stage} nextStage={nextStage} alt={m.hero.slots[stage.id]} />}
+      {options && noScene && <HeroFallbackImage stage={stage} nextStage={nextStage} alt={m.hero.slots[stage.id]} />}
 
       {/* Cabeçalho na largura toda: o nome à esquerda e, abaixo dele, o indicador centralizado na página. A base do
           cabeçalho é o topo do espaço livre do busto no celular (useFreeArea). */}
