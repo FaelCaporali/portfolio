@@ -2,13 +2,16 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { hasAcceleration } from './acceleration'
 
 /** Troca o getContext do canvas (jsdom não implementa WebGL de verdade) para simular cada ambiente. */
-function mockWebgl(renderer: string | null) {
+function mockWebgl(renderer: string | null, loseContext?: () => void) {
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation(((type: string) => {
     if (!type.startsWith('webgl')) return null
     if (renderer === null) return null
     return {
-      getExtension: (name: string) =>
-        name === 'WEBGL_debug_renderer_info' ? { UNMASKED_RENDERER_WEBGL: 0x9246 } : null,
+      getExtension: (name: string) => {
+        if (name === 'WEBGL_debug_renderer_info') return { UNMASKED_RENDERER_WEBGL: 0x9246 }
+        if (name === 'WEBGL_lose_context' && loseContext) return { loseContext }
+        return null
+      },
       getParameter: () => renderer,
     }
   }) as typeof HTMLCanvasElement.prototype.getContext)
@@ -41,5 +44,19 @@ describe('hasAcceleration (R1, camada 2)', () => {
   it('GPU real, sem indício de software: true', () => {
     mockWebgl('ANGLE (NVIDIA, NVIDIA GeForce RTX 3080 Direct3D11 vs_5_0 ps_5_0, D3D11)')
     expect(hasAcceleration()).toBe(true)
+  })
+
+  it('libera o contexto da sonda depois de ler o renderizador, com GPU real', () => {
+    const loseContext = vi.fn()
+    mockWebgl('ANGLE (NVIDIA, NVIDIA GeForce RTX 3080 Direct3D11 vs_5_0 ps_5_0, D3D11)', loseContext)
+    expect(hasAcceleration()).toBe(true)
+    expect(loseContext).toHaveBeenCalledOnce()
+  })
+
+  it('libera o contexto da sonda também quando o renderizador é de software', () => {
+    const loseContext = vi.fn()
+    mockWebgl('llvmpipe (LLVM 15.0.6, 256 bits)', loseContext)
+    expect(hasAcceleration()).toBe(false)
+    expect(loseContext).toHaveBeenCalledOnce()
   })
 })

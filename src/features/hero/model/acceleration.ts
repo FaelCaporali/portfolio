@@ -9,14 +9,18 @@ const SOFTWARE_RENDERER = /swiftshader|llvmpipe|software/i
 
 /** Sem WebGL de verdade, ou com um renderizador de software: `false` (a cena 3D não entra). */
 export function hasAcceleration(): boolean {
+  const canvas = document.createElement('canvas')
+  let gl: WebGL2RenderingContext | null = null
   try {
-    const canvas = document.createElement('canvas')
-    const gl = canvas.getContext('webgl2', { failIfMajorPerformanceCaveat: true })
+    gl = canvas.getContext('webgl2', { failIfMajorPerformanceCaveat: true })
     if (!gl) return false
     const info = gl.getExtension('WEBGL_debug_renderer_info')
     const renderer = info ? String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL)) : ''
     return !SOFTWARE_RENDERER.test(renderer)
   } catch {
     return false
+  } finally {
+    // A sonda é descartável: libera o contexto assim que lê o renderizador, em todo caminho em que foi criado.
+    gl?.getExtension('WEBGL_lose_context')?.loseContext()
   }
 }
