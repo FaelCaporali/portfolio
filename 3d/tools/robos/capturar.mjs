@@ -35,27 +35,12 @@
 //
 // Uso: node 3d/tools/robos/capturar.mjs [vida...]   (sem argumento: as 9; com argumento(s): refaz só essas)
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
-import { BASE, launch } from '../props/site.mjs'
-// sharp (0.35.4) está no store do pnpm mas não linkado na raiz deste node_modules (não é dependência direta do
-// projeto); caminho direto ao build ESM do pacote, só usado aqui, dentro do domínio do TD (3d/tools/robos/).
-import sharp from '/home/fael/projects/portfolio-robos/node_modules/.pnpm/sharp@0.35.4_@types+node@22.20.4/node_modules/sharp/dist/index.mjs'
+import { launch } from '../props/site.mjs'
+import { labPage, montarFolha, paraWebp } from './imagem.mjs'
+import { abrirVida, FUNDO, VIDAS } from './vidas.mjs'
 
 const CAPTURAS_FORA = '/home/fael/projects/portfolio/.wai/seo-geo/08-3d-google/capturas'
 const SAIDA = new URL('../../../public/hero-bot/', import.meta.url).pathname
-
-// Ordem cronológica de src/content/journey.ts `stages` (financeiro…ai); `label` só para a folha de contato, do
-// campo `slot` de cada Stage (journey.ts, lido em 02/10/2026 — atualizar se os slots mudarem).
-const VIDAS = [
-  { id: 'financeiro', esperaMs: 4000, label: 'Financial Assistant' },
-  { id: 'empreendedor', esperaMs: 4000, label: 'Entrepreneur' },
-  { id: 'vela', esperaMs: 4000, label: 'Sailing Instructor' },
-  { id: 'uber', esperaMs: 4000, label: 'Uber Driver' },
-  { id: 'fullstack', esperaMs: 4000, label: 'FullStack Dev' },
-  { id: 'qa', esperaMs: 3650, label: 'QA Analyst' },
-  { id: 'devops', esperaMs: 5150, label: 'Solutions Architect' },
-  { id: 'techlead', esperaMs: 5150, label: 'Tech Lead' },
-  { id: 'ai', esperaMs: 5150, label: 'AI Product Engineer' },
-]
 
 const LADO_WEBP = 480
 const PESO_MAX = 40 * 1024
@@ -65,7 +50,7 @@ const PESO_MAX = 40 * 1024
  * NÃO força quadrado aqui: as 4 vidas com narrativa (ai, devops, qa, techlead) são cenas inteiras, de ponta a ponta
  * da viewport (medido: ~1400 px de largura por ~780 px de altura, contra 1440×900) — um recorte quadrado forçado
  * nessa largura cortaria as pontas (medido e corrigido: 1ª rodada desta captura cortou o headset do techlead e os
- * painéis da esquerda em ai/techlead). O quadrado final vem depois, no sharp (fit "contain", sem cortar nada).
+ * painéis da esquerda em ai/techlead). O quadrado final vem depois (paraWebp, fit "contain", sem cortar nada).
  */
 async function recorte(page, margem) {
   const m = await page.evaluate(() => window.__heroDebug?.masks({}, false) ?? null)
@@ -80,34 +65,9 @@ async function recorte(page, margem) {
   return { x: Math.round(x0), y: Math.round(y0), width: Math.round(x1 - x0), height: Math.round(y1 - y0) }
 }
 
-// /pt explícito: português é o padrão do estúdio (NUCLEO.md §5, "Português do Brasil") e das ferramentas existentes
-// (site.mjs usa aria-label="Apresentação", só existe em pt). Sem isso, a detecção de idioma no cliente
-// (useDetectLang.ts) decide pelo navigator.languages do sistema — nesta sessão dá em português de qualquer jeito,
-// mas navegar direto a /pt evita depender do redirecionamento (e do idioma do SO de quem rodar o script depois).
-async function abrirVida(browser, query) {
-  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 })
-  const page = await ctx.newPage()
-  page.on('pageerror', (e) => console.error('pageerror', e.message))
-  page.on('console', (m) => m.type() === 'error' && console.error('console', m.text()))
-  const busto = page.waitForResponse((r) => r.url().includes('busto-s13.glb'), { timeout: 90_000 })
-  await page.goto(`${BASE}/pt/?${query}`)
-  await page.locator('canvas').waitFor({ timeout: 90_000 })
-  await busto
-  await page.waitForFunction(() => window.__heroDebug?.ready() === true, null, { timeout: 90_000 })
-  // Esconde a interface por cima da cena (texto da vida, indicador, link do código, idioma, balão de contato, MCP
-  // flutuante) — só para a captura; a cena 3D (1º filho da seção) fica, com o fundo do próprio site.
-  await page.addStyleTag({
-    content: `
-      section[aria-label="Apresentação"] > *:not(:first-child) { visibility: hidden !important; }
-      .mcp-fab, div.fixed { visibility: hidden !important; }
-    `,
-  })
-  return { ctx, page }
-}
-
 /** Abre a vida congelada (?slot&d=0), espera o quadro certo e devolve o PNG da cena (cabeça + adereço), sem recortar. */
 async function capturarUma(browser, vida) {
-  const { ctx, page } = await abrirVida(browser, `slot=${vida.id}&d=0`)
+  const { ctx, page } = await abrirVida(browser, vida.id, { width: 1440, height: 900 })
   await page.waitForTimeout(vida.esperaMs)
   const clip = (await recorte(page, 60)) ?? { x: 20, y: 70, width: 1400, height: 780 }
   const png = await page.screenshot({ clip, type: 'png' })
@@ -117,76 +77,38 @@ async function capturarUma(browser, vida) {
   return png
 }
 
-// "contain", nunca "cover": a caixa de recorte não é quadrada (cenas largas como ai/devops/qa/techlead, ~1400×780) —
-// cover cortaria as pontas para preencher o quadrado. Com contain, a imagem inteira cabe dentro de 480×480, com
-// barras na cor real do fundo do herói nos lados que sobram — nunca recorte.
-//
-// Cor medida, não suposta: `--color-page` (src/index.css) é #0b0b0e = (11, 11, 14); o pixel do fundo na captura real
-// do herói (sem.GPU, longe do texto) bate nisso. A 1ª rodada desta captura usou #000 (preto puro): comparado à área
-// de conteúdo da própria imagem (que já sai na cor do fundo do site, por vir da captura real), a barra ficava mais
-// escura que o resto — quadrado visível na borda (medido: linha 0–55 em #000 vs linha 60+ em (12,11,14), um salto de
-// luminância que a vista pega). Corrigido para a cor do token, igual ao resto da cena.
-const FUNDO = { r: 11, g: 11, b: 14 }
-
-/** PNG (caixa inteira, qualquer proporção) → WebP ≤ PESO_MAX (P2: ~480×480, até 40 KB), qualidade decrescente até caber. */
-async function paraWebp(png) {
-  let ultimo = null
-  for (const q of [82, 74, 66, 58, 50, 42, 34, 26, 20]) {
-    ultimo = await sharp(png)
-      .resize(LADO_WEBP, LADO_WEBP, { fit: 'contain', background: FUNDO })
-      .webp({ quality: q })
-      .toBuffer()
-    if (ultimo.byteLength <= PESO_MAX) return ultimo
-  }
-  return ultimo
-}
-
-/** Folha de contato única (≤ 1568 px de largura, rótulo por vida) — padrão do estúdio, lida com um Read só.
- * Só entra quem já tem PNG capturado (reexecuções parciais não quebram a folha; avisa quem falta). */
-async function montarFolha(todasVidas) {
-  const vidas = todasVidas.filter((v) => existsSync(`${CAPTURAS_FORA}/${v.id}.png`))
-  const faltando = todasVidas.filter((v) => !existsSync(`${CAPTURAS_FORA}/${v.id}.png`))
-  if (faltando.length) console.log('faltando na folha:', faltando.map((v) => v.id).join(', '))
-  const cols = 3
-  const cel = 480
-  const rotulo = 28
-  const largura = cols * cel
-  const linhas = Math.ceil(vidas.length / cols)
-  const altura = linhas * (cel + rotulo)
-  const composicoes = []
-  for (let i = 0; i < vidas.length; i++) {
-    const v = vidas[i]
-    const col = i % cols
-    const lin = Math.floor(i / cols)
-    const png = readFileSync(`${CAPTURAS_FORA}/${v.id}.png`)
-    const thumb = await sharp(png).resize(cel, cel, { fit: 'contain', background: FUNDO }).png().toBuffer()
-    composicoes.push({ input: thumb, left: col * cel, top: lin * (cel + rotulo) + rotulo })
-    const svg = `<svg width="${cel}" height="${rotulo}"><rect width="100%" height="100%" fill="#111"/>
-      <text x="8" y="${rotulo - 9}" font-family="sans-serif" font-size="16" fill="#fff">${v.id} — ${v.label}</text></svg>`
-    composicoes.push({ input: Buffer.from(svg), left: col * cel, top: lin * (cel + rotulo) })
-  }
-  const folha = await sharp({ create: { width: largura, height: altura, channels: 3, background: '#000' } })
-    .composite(composicoes)
-    .png()
-    .toBuffer()
-  mkdirSync(CAPTURAS_FORA, { recursive: true })
-  writeFileSync(`${CAPTURAS_FORA}/folha.png`, folha)
-}
-
 const pedidas = process.argv.slice(2)
 const alvo = pedidas.length ? VIDAS.filter((v) => pedidas.includes(v.id)) : VIDAS
 if (pedidas.length && alvo.length !== pedidas.length) throw new Error(`vida desconhecida em ${JSON.stringify(pedidas)}`)
 
 mkdirSync(SAIDA, { recursive: true })
 const browser = await launch()
+const lab = await labPage(browser)
 const pesos = {}
+const webps = {}
 for (const vida of alvo) {
   const png = await capturarUma(browser, vida)
-  const webp = await paraWebp(png)
+  // "contain", nunca "cover": a caixa de recorte não é quadrada (cenas largas como ai/devops/qa/techlead, ~1400×780)
+  // — cover cortaria as pontas para preencher o quadrado. Com contain, a imagem inteira cabe dentro de 480×480, com
+  // barras na cor real do fundo do herói (FUNDO, vidas.mjs) nos lados que sobram — nunca recorte.
+  const webp = await paraWebp(lab, png, { width: LADO_WEBP, height: LADO_WEBP, background: FUNDO, mode: 'contain', maxBytes: PESO_MAX })
   writeFileSync(`${SAIDA}${vida.id}.webp`, webp)
+  webps[vida.id] = webp
   pesos[vida.id] = webp.byteLength
   console.log(vida.id, `${(webp.byteLength / 1024).toFixed(1)} KB`)
 }
+
+// Folha com quem tem webp desta execução, e com quem já estava salvo em disco (reexecuções parciais não a quebram).
+const todasComWebp = VIDAS.map((v) => ({
+  ...v,
+  webp: webps[v.id] ?? (existsSync(`${SAIDA}${v.id}.webp`) ? readFileSync(`${SAIDA}${v.id}.webp`) : null),
+}))
+const faltando = todasComWebp.filter((v) => !v.webp)
+if (faltando.length) console.log('faltando na folha:', faltando.map((v) => v.id).join(', '))
+const celulas = todasComWebp.filter((v) => v.webp).map((v) => ({ webp: v.webp, rotulo: `${v.id} — ${v.label}` }))
+const folha = await montarFolha(lab, celulas)
+mkdirSync(CAPTURAS_FORA, { recursive: true })
+writeFileSync(`${CAPTURAS_FORA}/folha.png`, folha)
 await browser.close()
-await montarFolha(VIDAS)
+
 console.log(JSON.stringify(pesos, null, 2))
