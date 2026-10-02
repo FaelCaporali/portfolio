@@ -5,13 +5,13 @@ import { OVERVIEW_ID, overview } from '../../content/overview'
 import { journeyPath, profileLinks } from '../../content/profile'
 import { LANGS } from '../../../shared/i18n'
 import { localePath, MESSAGES, useLang, type Lang } from '../../i18n/lang'
-import type { Messages } from '../../i18n/messages/en'
 import { pill } from '../../ui/pill'
 import { cx } from '../../lib/cx'
 import { useHydrated } from '../../lib/useHydrated'
 import { CopyContacts } from '../contact/CopyContacts'
 import { useFitFontSize } from './hooks/useFitFontSize'
 import { WIDE_QUERY } from './model/layout'
+import { abertura } from './model/text'
 import { ResumeMenu } from './ResumeMenu'
 import { SlotWord } from './SlotWord'
 import { track } from '../../lib/track'
@@ -30,8 +30,6 @@ const SLOTS = Object.fromEntries(LANGS.map((l) => [l, stages.map((s) => MESSAGES
   Lang,
   string[]
 >
-/** "Today I am a(n)" / "Yesterday I was a(n)"; em português, "Hoje sou" / "Ontem fui". */
-const abertura = (m: Messages, s: Stage) => m.hero.opening(!!s.past, m.hero.slots[s.id])
 
 /**
  * "loading" no lugar da vida enquanto a cena 3D não chega (index.css: .loading-word): a palavra respira e três pontos
