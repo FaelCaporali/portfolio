@@ -366,15 +366,21 @@ body {
   }
 }
 
-/* O ícone do MCP na home (features/mcp/McpLink.tsx), recolhido no lg depois do herói: a pílula some (opacidade e
-   deslocamento, sem mexer no layout) e o disco ganha borda e fundo próprios; o hover e o foco reabrem a pílula. Abaixo
-   do lg a pílula nem existe e o disco já tem borda e fundo. */
+/* O ícone do MCP na home (features/mcp/McpLink.tsx), recolhido no lg depois do herói: o rótulo some (opacidade e
+   deslocamento, sem mexer no layout), e o disco ganha borda e fundo e desliza da linha do PT/EN (lg:right-30) para o
+   lugar do ícone do código (centro a 54 px da borda, como sm:right-[2.125rem]): 120 − 34 = 86 px. Abaixo do lg o
+   rótulo nem existe e o disco já tem borda e fundo. */
 @media (width >= 64rem) {
-  .mcp-fab[data-compact]:not(:hover, :focus-visible) {
+  .mcp-fab[data-compact] {
+    transform: translateX(5.375rem);
+    color: var(--color-fg);
     border-color: color-mix(in oklab, var(--color-fg) 20%, transparent);
     background-color: var(--color-raised);
   }
-  .mcp-fab[data-compact]:not(:hover, :focus-visible) .mcp-fab-label {
+  .mcp-fab[data-compact]:hover {
+    border-color: color-mix(in oklab, var(--color-fg) 50%, transparent);
+  }
+  .mcp-fab[data-compact] .mcp-fab-label {
     opacity: 0;
     transform: translateX(0.5rem);
     visibility: hidden;

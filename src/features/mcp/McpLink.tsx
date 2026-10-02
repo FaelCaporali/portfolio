@@ -29,11 +29,13 @@ function useCompact(firstScreen: RefObject<Element | null>): boolean {
 }
 
 /**
- * O ícone do MCP fixo na home (D-MCP14/17/18; .wai/mcp/04-direcao-mcp.md §5): o logo num disco de 40 px no canto
- * superior direito, centrado sob o ícone do código, que leva à /mcp. No lg, a pílula com o rótulo atrás do disco
- * enquanto o herói ocupa metade da tela ou mais; depois, só o disco (reabre no hover e no foco). O disco nunca muda de
- * lugar nem de tamanho: a troca é só de opacidade e deslocamento (index.css: .mcp-fab). Sem JS, a pílula fica aberta no
- * lg, o estado da primeira tela. Camada abaixo do contato: o painel dele cobre o disco onde se encontram.
+ * O ícone do MCP fixo na home (D-MCP14/17/18/19; .wai/mcp/04-direcao-mcp.md §5), que leva à /mcp. Abaixo do lg, o
+ * logo num disco de 40 px no canto superior direito, centrado sob o ícone do código. No lg, enquanto o herói ocupa
+ * metade da tela ou mais, fica na linha do PT/EN e do código, à esquerda deles e no estilo apagado deles: o rótulo e o
+ * logo, sem caixa, fora da área do 3D (D-MCP19). Depois do herói (eles já saíram da tela) o rótulo some e o disco ganha
+ * borda e fundo e desliza para o lugar do código, no canto; a troca é só de opacidade e deslocamento (index.css:
+ * .mcp-fab). Sem JS, o estado da primeira tela. Camada abaixo do contato: o painel dele cobre o disco onde se
+ * encontram.
  */
 export function McpLink() {
   const lang = useLang()
@@ -50,11 +52,11 @@ export function McpLink() {
         prefetch="intent"
         aria-label={label}
         data-compact={compact ? '' : undefined}
-        className="mcp-fab group fixed top-20 right-3.5 z-float-low flex size-10 items-center justify-center rounded-full border border-fg/20 bg-raised text-fg transition-[border-color,background-color] duration-200 ease-out hover:border-fg/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fg motion-reduce:transition-none min-[364px]:top-[3.625rem] sm:right-[2.125rem] lg:border-transparent lg:bg-transparent"
+        className="mcp-fab group fixed top-20 right-3.5 z-float-low flex size-10 items-center justify-center rounded-full border border-fg/20 bg-raised text-fg transition-[transform,border-color,background-color,color] duration-200 ease-out hover:border-fg/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fg motion-reduce:transition-none min-[364px]:top-[3.625rem] sm:right-[2.125rem] lg:top-3 lg:right-30 lg:border-transparent lg:bg-transparent lg:text-fg/50 lg:hover:text-fg"
       >
         <span
           aria-hidden
-          className="mcp-fab-label absolute -top-px -right-px hidden h-10 items-center rounded-full border border-fg/20 bg-raised pr-12 pl-4 text-sm whitespace-nowrap text-fg/80 transition-[opacity,transform,visibility] duration-200 ease-out group-hover:text-fg motion-reduce:transition-none lg:flex"
+          className="mcp-fab-label absolute top-0 right-full hidden h-10 items-center text-sm font-medium tracking-wide whitespace-nowrap text-fg/50 transition-[opacity,transform,visibility] duration-200 ease-out group-hover:text-fg group-focus-visible:text-fg motion-reduce:transition-none lg:flex"
         >
           {label} →
         </span>
