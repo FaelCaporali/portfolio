@@ -181,6 +181,10 @@ describe('cron do MCP', () => {
     await seed(due - 7200_000, 'get_checkpoint', { lang: 'pt', id: 'mpc' })
     await seed(due - 7200_000, 'beacon', {}, 'email_failed')
     await seed(due - 8 * 24 * 3600_000, 'get_profile', { lang: 'en' }) // semana anterior: fora
+    const saturday = utcDay(due - 2 * 24 * 3600_000)
+    await env.DB.prepare("INSERT INTO mcp_quota (day, kind, used) VALUES (?1, 'log', ?2), (?1, 'log_lost', 3)")
+      .bind(saturday, DAILY.log)
+      .run()
     await runCron(WEDNESDAY)
     const mail = sentMail()
     expect(mail.subject).toBe('Resumo semanal do MCP: 4 chamadas')
@@ -191,6 +195,9 @@ describe('cron do MCP', () => {
     expect(mail.text).toContain('Textos buscados: agents 1')
     expect(mail.text).toContain('Marcos abertos: mpc 1')
     expect(mail.text).toContain('Falhas e limites: beacon: email_failed 1')
+    expect(mail.text).toContain(
+      `Chamadas registradas: 4 (a cota de ${DAILY.log}/dia esgotou em 1 dia(s); o excedente foi para a fila e é gravado no dia seguinte); 3 não couberam nem na fila e não foram gravadas`,
+    )
     await runCron(WEDNESDAY + 15 * 60_000)
     expect(t.send).toHaveBeenCalledOnce()
   })

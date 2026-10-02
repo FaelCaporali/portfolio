@@ -4,7 +4,8 @@
  * telefone mascarados e cortado. Nome, contato e mensagem do send_message não entram no registro.
  *
  * O D1 grátis para de gravar ao passar de 100 mil linhas escritas no dia UTC, e o formulário depende dele. Por isso
- * tudo o que o MCP grava passa por uma cota do dia: acima dela, nada mais é gravado (a chamada responde igual).
+ * tudo o que o MCP grava passa por uma cota do dia. Acima da cota do registro a chamada responde igual e vai para a
+ * fila MCP_LOG, que a grava quando a cota do dia seguinte abrir (D-MCP26).
  */
 
 /**
@@ -12,7 +13,7 @@
  * limite grátis do D1.
  */
 export const DAILY = { log: 2000, message: 10, beacon: 20 } as const
-type Kind = keyof typeof DAILY | 'summary'
+type Kind = keyof typeof DAILY | 'log_lost' | 'summary'
 
 /** O dia UTC (AAAA-MM-DD) de um instante, a chave das cotas. */
 export const utcDay = (ms: number) => new Date(ms).toISOString().slice(0, 10)
@@ -104,33 +105,126 @@ export function source(request: Request): { network: string | null; country: str
   }
 }
 
-/** Grava a chamada se a cota de registro do dia permitir. Falha de banco só vira aviso no log do Worker. */
-export async function record(db: D1Database, request: Request, call: Call, now: number): Promise<void> {
+/** Uma linha de mcp_calls, como vai ao D1 e, quando não cabe, à fila (JSON). */
+export interface LogRow {
+  created_at: number
+  tool: string
+  args: string | null
+  client: string | null
+  protocol: string | null
+  network: string | null
+  country: string | null
+  outcome: string
+  duration_ms: number
+}
+
+/**
+ * Espera antes de tentar de novo quando o banco falha: 1 h, para uma queda longa do D1 não gastar as 10 mil operações
+ * diárias da fila (cada nova tentativa é uma leitura); max_retries no wrangler.jsonc cobre as 24 h da fila.
+ */
+const RETRY_SECONDS = 3600
+/** A fila aceita no máximo 24 h de espera (delaySeconds) e, no plano grátis, guarda a mensagem por 24 h. */
+const MAX_DELAY_SECONDS = 24 * 3600
+const QUEUE_RETENTION_MS = MAX_DELAY_SECONDS * 1000
+/** Teto do contador de perdidas: ele também grava uma linha por chamada. */
+const LOST_CAP = 10_000
+
+/** Conta a chamada que não foi gravada nem guardada na fila (resumo semanal) e avisa no log do Worker. */
+async function lose(db: D1Database, tool: string, now: number): Promise<void> {
+  console.warn(JSON.stringify({ event: 'mcp_audit_lost', tool }))
+  await bump(db, utcDay(now), 'log_lost', LOST_CAP)
+}
+
+/** Segundos até a cota do registro zerar (meia-noite UTC), com um minuto de folga para o relógio. */
+export function untilNextUtcDay(now: number): number {
+  const d = new Date(now)
+  const midnight = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + 1)
+  return Math.min(MAX_DELAY_SECONDS, Math.ceil((midnight - now) / 1000) + 60)
+}
+
+/**
+ * Grava a linha se a cota do dia permitir. Senão devolve quanto esperar: até o dia seguinte (teto) ou 15 minutos (banco
+ * fora do ar). Limite conhecido: se o INSERT falha depois de gastar a cota, a nova tentativa gasta outra unidade.
+ */
+async function store(db: D1Database, row: LogRow, now: number): Promise<number | null> {
+  const took = await take(db, 'log', now)
+  if (took === 'full') return untilNextUtcDay(now)
+  if (took === 'error') return RETRY_SECONDS
   try {
-    if ((await take(db, 'log', now)) !== 'ok') return
-    const { network, country } = source(request)
-    // Sem corte aqui: o JSON precisa continuar válido para o resumo semanal, e o esquema de cada ferramenta já limita
-    // o tamanho (o maior, search_journey, fica em poucos KiB).
-    const args = call.args ? JSON.stringify(call.args) : null
     await db
       .prepare(
         'INSERT INTO mcp_calls (created_at, tool, args, client, protocol, network, country, outcome, duration_ms) ' +
           'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
       )
       .bind(
-        now,
-        call.tool,
-        args,
-        call.client,
-        line(request.headers.get('MCP-Protocol-Version') ?? '') || null,
-        network,
-        country,
-        call.outcome,
-        call.durationMs,
+        row.created_at,
+        row.tool,
+        row.args,
+        row.client,
+        row.protocol,
+        row.network,
+        row.country,
+        row.outcome,
+        row.duration_ms,
       )
       .run()
+    return null
   } catch {
-    console.warn(JSON.stringify({ event: 'mcp_audit_failed', tool: call.tool }))
+    return RETRY_SECONDS
+  }
+}
+
+/**
+ * Grava a chamada; o que não cabe na cota do dia (ou encontra o banco fora do ar) vai para a fila com a espera certa.
+ * Se a fila também recusar (10 mil operações por dia no plano grátis), a chamada é contada como perdida.
+ */
+export async function record(
+  env: Pick<Env, 'DB' | 'MCP_LOG'>,
+  request: Request,
+  call: Call,
+  now: number,
+): Promise<void> {
+  const { network, country } = source(request)
+  const row: LogRow = {
+    created_at: now,
+    tool: call.tool,
+    // Sem corte aqui: o JSON precisa continuar válido para o resumo semanal, e o esquema de cada ferramenta já limita
+    // o tamanho (o maior, search_journey, fica em poucos KiB).
+    args: call.args ? JSON.stringify(call.args) : null,
+    client: call.client,
+    protocol: line(request.headers.get('MCP-Protocol-Version') ?? '') || null,
+    network,
+    country,
+    outcome: call.outcome,
+    duration_ms: call.durationMs,
+  }
+  const wait = await store(env.DB, row, now)
+  if (wait === null) return
+  try {
+    await env.MCP_LOG.send(row, { delaySeconds: wait })
+  } catch {
+    await lose(env.DB, call.tool, now)
+  }
+}
+
+/**
+ * Consumidor da fila MCP_LOG: grava cada linha com a hora original da chamada se a cota do dia permitir; a que não
+ * cabe volta para a fila com a mesma espera. A fila guarda a mensagem por 24 h (plano grátis; a doc não diz se a espera
+ * entra na conta, por isso conto desde o envio, o caso mais curto): a que não
+ * caberia mais nesse prazo (excedente acima da cota de dois dias seguidos) sai da fila e é contada como perdida, em vez
+ * de sumir calada. Até 2 consultas ao D1 por mensagem: o lote do wrangler.jsonc fica abaixo das 50 por invocação.
+ */
+export async function drainLog(batch: MessageBatch<LogRow>, db: D1Database, now: number): Promise<void> {
+  for (const message of batch.messages) {
+    const wait = await store(db, message.body, now)
+    if (wait === null) {
+      message.ack()
+    } else if (now + wait * 1000 >= message.timestamp.getTime() + QUEUE_RETENTION_MS) {
+      await lose(db, message.body.tool, now)
+      message.ack()
+    } else {
+      message.retry({ delaySeconds: wait })
+    }
   }
 }
 

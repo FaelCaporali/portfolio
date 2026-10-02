@@ -1,13 +1,15 @@
 /**
  * Registro do MCP (T4 e T5 do plano): sem coluna de IP, cada chamada gravada com cliente, rede e país, texto livre
- * mascarado, teto diário do registro e limite por rede antes do servidor.
+ * mascarado, teto diário do registro com a fila do excedente (D-MCP26) e limite por rede antes do servidor.
  */
 import { Client, StreamableHTTPClientTransport } from '@modelcontextprotocol/client'
+import { createExecutionContext, createMessageBatch, getQueueResult } from 'cloudflare:test'
 import { env } from 'cloudflare:workers'
-import { describe, expect, it } from 'vitest'
-import { DAILY, scrub, utcDay } from '../mcp/audit'
+import { describe, expect, it, vi } from 'vitest'
+import worker from '../index'
+import { DAILY, drainLog, scrub, untilNextUtcDay, utcDay, type LogRow } from '../mcp/audit'
 import { connect, fetchWorker, MCP_URL, network, open } from './mcp-client'
-import { useWorkerDoubles } from './helpers'
+import { brokenDb, useWorkerDoubles } from './helpers'
 
 useWorkerDoubles()
 
@@ -24,6 +26,11 @@ const calls = () =>
   env.DB.prepare('SELECT tool, args, client, protocol, network, country, outcome FROM mcp_calls ORDER BY id')
     .all<CallRow>()
     .then((r) => r.results)
+
+const lost = () =>
+  env.DB.prepare("SELECT COALESCE(SUM(used), 0) AS n FROM mcp_quota WHERE kind = 'log_lost'").first<number>('n')
+const fillLog = (used: number) =>
+  env.DB.prepare("INSERT INTO mcp_quota (day, kind, used) VALUES (?, 'log', ?)").bind(utcDay(Date.now()), used).run()
 
 describe('registro', () => {
   it('nenhuma coluna de IP nem de identificador da pessoa, no registro e nas mensagens', async () => {
@@ -83,14 +90,40 @@ describe('registro', () => {
     expect(scrub('x'.repeat(300))).toHaveLength(200)
   })
 
-  it(`teto de ${DAILY.log} linhas por dia UTC: acima dele a chamada responde e nada é gravado`, async () => {
-    await env.DB.prepare("INSERT INTO mcp_quota (day, kind, used) VALUES (?, 'log', ?)")
-      .bind(utcDay(Date.now()), DAILY.log)
-      .run()
-    const client = await connect()
-    const r = await client.callTool({ name: 'get_profile' })
+  it(`teto de ${DAILY.log} por dia UTC: acima dele a chamada responde e vai para a fila até o dia seguinte`, async () => {
+    await fillLog(DAILY.log)
+    const send = vi.fn((_row: LogRow, _options?: QueueSendOptions) => Promise.resolve())
+    const client = await connect(false, { ...env, MCP_LOG: { send } as unknown as Queue })
+    const before = untilNextUtcDay(Date.now())
+    const r = await client.callTool({ name: 'get_profile', arguments: { lang: 'pt' } })
     expect(r.isError).toBeFalsy()
     expect(await calls()).toEqual([])
+    expect(send).toHaveBeenCalledOnce()
+    const [row, options] = send.mock.calls[0] ?? []
+    expect(row).toMatchObject({ tool: 'get_profile', args: '{"lang":"pt"}', client: 'teste-portfolio 1.0.0' })
+    expect(row).toMatchObject({ protocol: '2026-07-28', outcome: 'ok' })
+    expect(options?.delaySeconds).toBeLessThanOrEqual(before)
+    expect(options?.delaySeconds).toBeGreaterThan(before - 5)
+  })
+
+  it('banco fora do ar: a chamada responde e vai para a fila, de novo em 1 hora', async () => {
+    const send = vi.fn((_row: LogRow, _options?: QueueSendOptions) => Promise.resolve())
+    const client = await connect(false, { ...env, DB: brokenDb, MCP_LOG: { send } as unknown as Queue })
+    expect((await client.callTool({ name: 'get_profile' })).isError).toBeFalsy()
+    expect(send.mock.calls[0]?.[1]).toEqual({ delaySeconds: 3600 })
+  })
+
+  it('fila que recusa (cota de operações do dia): a chamada é contada como perdida', async () => {
+    await fillLog(DAILY.log)
+    const send = vi.fn(() => Promise.reject(new Error('Queue send failed')))
+    const client = await connect(false, { ...env, MCP_LOG: { send } as unknown as Queue })
+    expect((await client.callTool({ name: 'get_profile' })).isError).toBeFalsy()
+    expect(await lost()).toBe(1)
+  })
+
+  it('espera até a meia-noite UTC, com um minuto de folga e no máximo as 24 h da fila', () => {
+    expect(untilNextUtcDay(Date.UTC(2026, 9, 1, 23, 59, 30))).toBe(90)
+    expect(untilNextUtcDay(Date.UTC(2026, 9, 2, 0, 0, 0))).toBe(24 * 3600)
   })
 
   it('limite por rede (ASN), antes do servidor: a 61ª requisição no minuto → 429 em JSON-RPC', async () => {
@@ -109,5 +142,68 @@ describe('registro', () => {
     expect(status[60]).toBe(429)
     expect(last.headers.get('Retry-After')).toBe('60')
     expect(await last.json()).toMatchObject({ jsonrpc: '2.0', error: { code: -32000 } })
+  })
+})
+
+describe('fila do registro (MCP_LOG)', () => {
+  const row = (tool: string): LogRow => ({
+    created_at: Date.UTC(2026, 9, 1, 23, 0),
+    tool,
+    args: null,
+    client: 'Claude 1.0',
+    protocol: '2026-07-28',
+    network: 'Anthropic, PBC',
+    country: 'US',
+    outcome: 'ok',
+    duration_ms: 3,
+  })
+  async function drain(messages: LogRow[], e: Env = env) {
+    const batch = createMessageBatch<LogRow>(
+      'fael-caporali-mcp-log',
+      messages.map((body, i) => ({ id: `m${i}`, timestamp: new Date(), attempts: 1, body })),
+    )
+    // O consumidor não usa o ctx; o getQueueResult pede um para esperar os waitUntil.
+    await worker.queue(batch, e)
+    return getQueueResult(batch, createExecutionContext())
+  }
+
+  /** Mensagens que anotam ack e retry (o getQueueResult do pool não guarda o delaySeconds do retry). */
+  function spied(bodies: LogRow[], sent = new Date()) {
+    const messages = bodies.map((body) => ({ body, timestamp: sent, ack: vi.fn(), retry: vi.fn() }))
+    return { batch: { messages } as unknown as MessageBatch<LogRow>, messages }
+  }
+
+  it('o Worker entrega o lote ao consumidor: o que cabe é gravado com a hora original, o resto volta', async () => {
+    await fillLog(DAILY.log - 1)
+    const result = await drain([row('get_profile'), row('search_journey')])
+    expect(result.explicitAcks).toEqual(['m0'])
+    expect(result.retryMessages.map((m) => m.msgId)).toEqual(['m1'])
+    const saved = await env.DB.prepare('SELECT created_at, tool, client, network FROM mcp_calls').all()
+    expect(saved.results).toEqual([
+      { created_at: Date.UTC(2026, 9, 1, 23, 0), tool: 'get_profile', client: 'Claude 1.0', network: 'Anthropic, PBC' },
+    ])
+  })
+
+  it('o que não cabe na cota espera até o dia seguinte; com o banco fora do ar, 1 hora', async () => {
+    await fillLog(DAILY.log)
+    const now = Date.now()
+    const full = spied([row('get_profile')])
+    await drainLog(full.batch, env.DB, now)
+    expect(full.messages[0]?.ack).not.toHaveBeenCalled()
+    expect(full.messages[0]?.retry).toHaveBeenCalledWith({ delaySeconds: untilNextUtcDay(now) })
+    const down = spied([row('get_profile')])
+    await drainLog(down.batch, brokenDb, now)
+    expect(down.messages[0]?.retry).toHaveBeenCalledWith({ delaySeconds: 3600 })
+    expect(await calls()).toEqual([])
+  })
+
+  it('o que não caberia mais nas 24 h da fila sai dela e é contado como perdido', async () => {
+    await fillLog(DAILY.log)
+    const now = Date.now()
+    const old = spied([row('get_profile')], new Date(now - 24 * 3600_000 + 30_000))
+    await drainLog(old.batch, env.DB, now)
+    expect(old.messages[0]?.retry).not.toHaveBeenCalled()
+    expect(old.messages[0]?.ack).toHaveBeenCalledOnce()
+    expect(await lost()).toBe(1)
   })
 })

@@ -113,6 +113,11 @@ async function weekNumbers(db: D1Database, from: number, to: number) {
         "SELECT NULL AS k, COUNT(*) AS n FROM mcp_quota WHERE kind = 'log' AND used >= ?1 AND day >= ?2 AND day < ?3",
       )
       .bind(DAILY.log, utcDay(from), utcDay(to)),
+    db
+      .prepare(
+        "SELECT NULL AS k, COALESCE(SUM(used), 0) AS n FROM mcp_quota WHERE kind = 'log_lost' AND day >= ?1 AND day < ?2",
+      )
+      .bind(utcDay(from), utcDay(to)),
   ])
   return results.map((r) => r.results)
 }
@@ -135,6 +140,7 @@ function composeSummary(numbers: Row[][], from: number, to: number): EmailMessag
     problems,
     messages,
     capped,
+    lost,
   ] = numbers
   const period = `${BRT.format(from).slice(0, 5)} a ${BRT.format(to - 1).slice(0, 5)}`
   const lines = [
@@ -142,8 +148,9 @@ function composeSummary(numbers: Row[][], from: number, to: number): EmailMessag
     '',
     `Chamadas registradas: ${count(total)}` +
       (count(capped)
-        ? ` (o teto de ${DAILY.log}/dia foi atingido em ${count(capped)} dia(s); o excedente não entra)`
-        : ''),
+        ? ` (a cota de ${DAILY.log}/dia esgotou em ${count(capped)} dia(s); o excedente foi para a fila e é gravado no dia seguinte)`
+        : '') +
+      (count(lost) ? `; ${count(lost)} não couberam nem na fila e não foram gravadas` : ''),
     `Mensagens pelo MCP: ${count(messages)}`,
     '',
     `Por ferramenta: ${list(tools)}`,

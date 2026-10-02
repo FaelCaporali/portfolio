@@ -22,10 +22,11 @@ CREATE TABLE mcp_calls (
 CREATE INDEX mcp_calls_created ON mcp_calls (created_at);
 
 -- Cotas por dia UTC (o limite grátis do D1 zera à meia-noite UTC): quantas linhas de registro, mensagens e beacons
--- o MCP já gastou; 'summary' marca o resumo semanal já enviado (day = a segunda-feira da semana).
+-- o MCP já gastou; 'log_lost' conta as chamadas que nem a fila do registro guardou (D-MCP26); 'summary' marca o
+-- resumo semanal já enviado (day = a segunda-feira da semana).
 CREATE TABLE mcp_quota (
   day   TEXT NOT NULL,                         -- AAAA-MM-DD
-  kind  TEXT NOT NULL CHECK (kind IN ('log', 'message', 'beacon', 'summary')),
+  kind  TEXT NOT NULL CHECK (kind IN ('log', 'log_lost', 'message', 'beacon', 'summary')),
   used  INTEGER NOT NULL,
   PRIMARY KEY (day, kind)
 ) WITHOUT ROWID;

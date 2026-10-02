@@ -1,12 +1,14 @@
 /**
  * Roteamento do Worker único do site: a API do contato, 404 JSON no resto de /api/, o servidor MCP em /mcp
  * (worker/mcp/; para os agentes, no workers.dev), a detecção de idioma na primeira visita (worker/lang.ts) e as páginas
- * HTML (com a CSP de nonce). Arquivos estáticos não passam por aqui (run_worker_first no wrangler.jsonc).
+ * HTML (com a CSP de nonce). Arquivos estáticos não passam por aqui (run_worker_first no wrangler.jsonc). Também o cron
+ * e o consumidor da fila do registro do MCP (MCP_LOG).
  */
 import { CONTACT_PATH } from '../shared/contact/contract'
 import { handleContact } from './contact'
 import { mcpHousekeeping, retryAndPurge } from './cron'
 import { json } from './http'
+import { drainLog, type LogRow } from './mcp/audit'
 import { langRedirect, withLangVary } from './lang'
 import { SITE_ORIGIN } from '../shared/i18n'
 import { isWorkersDev, limitMcp, MCP_PATH, varyOnAccept, wantsPage } from './mcp/route'
@@ -69,4 +71,9 @@ export default {
       ),
     )
   },
-} satisfies ExportedHandler<Env>
+
+  // Chamadas do MCP que não couberam na cota do registro do dia (worker/mcp/audit.ts, D-MCP26).
+  async queue(batch, env) {
+    await drainLog(batch, env.DB, Date.now())
+  },
+} satisfies ExportedHandler<Env, LogRow>

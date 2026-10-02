@@ -87,7 +87,7 @@ function createServer(site: Site): McpServer {
     const started = Date.now()
     const { result, outcome } = await run(client)
     const durationMs = Date.now() - started
-    site.ctx.waitUntil(record(site.env.DB, site.request, { tool, args, client, outcome, durationMs }, Date.now()))
+    site.ctx.waitUntil(record(site.env, site.request, { tool, args, client, outcome, durationMs }, Date.now()))
     return result
   }
 
@@ -96,7 +96,7 @@ function createServer(site: Site): McpServer {
     {
       title: 'Profile',
       description:
-        'Who Fael is: titles, current roles, summary, what he can be hired for (with proof), direct contacts, links and résumé PDFs.',
+        'Who Fael is: titles, current roles, summary, what he can be hired for, direct contacts, links and résumé PDFs.',
       inputSchema: z.object({ lang }),
       annotations: READ_ONLY,
     },
