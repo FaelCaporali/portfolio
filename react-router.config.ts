@@ -17,6 +17,11 @@ export default {
     '/sitemap.xml',
     '/robots.txt',
     '/llms.txt',
+    // Rota interna da variante dos robôs da home (camada 1, 03-plano-versao-robos.md): fora de SITE_PAGES de
+    // propósito (não pode entrar no sitemap nem na detecção de idioma do Worker). Bloqueada a pedido direto
+    // (worker/index.ts); só alcançada por env.ASSETS.fetch, com a mesma precedência de '/__spa-fallback'.
+    '/__hero-bot',
+    '/pt/__hero-bot',
   ],
   // O comportamento do React Router v8 já agora (a v8 pede Node 22.22+; a máquina de dev tem 22.21): build por
   // ambientes do Vite e os padrões novos, que aqui não mudam nada (sem action nem middleware; os loaders

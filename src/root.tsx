@@ -1,5 +1,14 @@
 import { useEffect, type ReactNode } from 'react'
-import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration, useLocation } from 'react-router'
+import {
+  isRouteErrorResponse,
+  Links,
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+  useLocation,
+  useMatches,
+} from 'react-router'
 import { langFromPath, LOCALES } from './i18n/lang'
 import { startTracking, trackPage } from './lib/track'
 import { ErrorPage } from './ui/ErrorPage'
@@ -10,14 +19,25 @@ import './index.css'
 import 'virtual:journey-accents.css'
 
 /**
+ * A variante dos robôs da home (routes/home-bot.tsx, D-ROBO-HIDR de 03-plano-versao-robos.md) não hidrata: o
+ * roteador casaria as rotas pela URL da janela (sempre `/` ou `/pt`), montaria o herói humano por cima e as vidas
+ * extras desapareceriam do DOM renderizado. Nenhuma rota casada com esse `handle` recebe <Scripts /> (nem os
+ * modulepreload que ela injeta) nem <ScrollRestoration /> (também um <script>): HTML puro, sem JavaScript do app.
+ */
+function useHydrate(): boolean {
+  return useMatches().every((m) => (m.handle as { hydrate?: boolean } | undefined)?.hydrate !== false)
+}
+
+/**
  * O documento de todas as páginas. As metas vêm de cada rota (meta, em src/routes/, calculadas do idioma em
  * src/i18n/meta.ts); o <html lang> é o do endereço (/pt… = pt-BR), e a troca de idioma pelo roteador o refaz. Os
  * <script> que o roteador escreve no HTML recebem o nonce da CSP no Worker (worker/page.ts).
  */
 export function Layout({ children }: { children: ReactNode }) {
   const tag = LOCALES[langFromPath(useLocation().pathname)].tag
+  const hydrate = useHydrate()
   // A página vazia do build (__spa-fallback.html) sai com lang="en" e a hidratação não corrige atributo: /pt/… que
-  // não existe ganha o lang certo aqui.
+  // não existe ganha o lang certo aqui. Rota sem hidratação: não roda, o atributo do build já é o certo.
   useEffect(() => {
     if (document.documentElement.lang !== tag) document.documentElement.lang = tag
   }, [tag])
@@ -39,8 +59,8 @@ export function Layout({ children }: { children: ReactNode }) {
       </head>
       <body>
         {children}
-        <ScrollRestoration />
-        <Scripts />
+        {hydrate && <ScrollRestoration />}
+        {hydrate && <Scripts />}
       </body>
     </html>
   )
