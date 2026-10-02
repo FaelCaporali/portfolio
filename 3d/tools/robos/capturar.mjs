@@ -119,8 +119,14 @@ async function capturarUma(browser, vida) {
 
 // "contain", nunca "cover": a caixa de recorte não é quadrada (cenas largas como ai/devops/qa/techlead, ~1400×780) —
 // cover cortaria as pontas para preencher o quadrado. Com contain, a imagem inteira cabe dentro de 480×480, com
-// barras do preto do próprio fundo do site (#000, a cor do fundo do herói) nos lados que sobram — nunca recorte.
-const FUNDO = { r: 0, g: 0, b: 0 }
+// barras na cor real do fundo do herói nos lados que sobram — nunca recorte.
+//
+// Cor medida, não suposta: `--color-page` (src/index.css) é #0b0b0e = (11, 11, 14); o pixel do fundo na captura real
+// do herói (sem.GPU, longe do texto) bate nisso. A 1ª rodada desta captura usou #000 (preto puro): comparado à área
+// de conteúdo da própria imagem (que já sai na cor do fundo do site, por vir da captura real), a barra ficava mais
+// escura que o resto — quadrado visível na borda (medido: linha 0–55 em #000 vs linha 60+ em (12,11,14), um salto de
+// luminância que a vista pega). Corrigido para a cor do token, igual ao resto da cena.
+const FUNDO = { r: 11, g: 11, b: 14 }
 
 /** PNG (caixa inteira, qualquer proporção) → WebP ≤ PESO_MAX (P2: ~480×480, até 40 KB), qualidade decrescente até caber. */
 async function paraWebp(png) {
