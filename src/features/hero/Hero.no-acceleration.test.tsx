@@ -56,7 +56,7 @@ describe('herói sem aceleração de GPU: imagem no lugar do busto (Capítulo 11
     expect(titulo()).toHaveAccessibleName(vidaRegex(opening.slot))
     expect(document.querySelector('.loading-word')).toBeNull()
     const img = screen.getByRole('img', { name: opening.slot })
-    expect(img).toHaveAttribute('src', `/hero-bot/${opening.id}.webp`)
+    expect(img).toHaveAttribute('src', `/hero-fallback/${opening.id}-mobile.webp`)
     expect(img).not.toHaveAttribute('loading')
   })
 
@@ -70,7 +70,7 @@ describe('herói sem aceleração de GPU: imagem no lugar do busto (Capítulo 11
     expect(titulo()).toHaveAccessibleName(vidaRegex(depoisDaAbertura.slot))
     expect(screen.getByRole('img', { name: depoisDaAbertura.slot })).toHaveAttribute(
       'src',
-      `/hero-bot/${depoisDaAbertura.id}.webp`,
+      `/hero-fallback/${depoisDaAbertura.id}-mobile.webp`,
     )
   })
 

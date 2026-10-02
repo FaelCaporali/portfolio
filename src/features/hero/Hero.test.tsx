@@ -181,11 +181,12 @@ describe('herói: "Today I am loading" até a cena 3D (U2)', () => {
     expect(titulo()).toHaveAccessibleName(VIDA)
   })
 
-  it('com aceleração de GPU, nenhuma imagem /hero-bot é pedida: zero mudança do caminho de hoje', async () => {
+  it('com aceleração de GPU, nenhuma imagem /hero-bot nem /hero-fallback é pedida: zero mudança do caminho de hoje', async () => {
     const user = userEvent.setup()
     render(<RouterProvider router={createMemoryRouter(rotas())} />)
     await user.click(await screen.findByRole('button', { name: 'cena pronta' }))
     expect(document.querySelector('img[src^="/hero-bot/"]')).toBeNull()
+    expect(document.querySelector('[src^="/hero-fallback/"], [srcset^="/hero-fallback/"]')).toBeNull()
   })
 })
 
