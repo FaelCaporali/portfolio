@@ -1,14 +1,16 @@
 import type { MetaFunction } from 'react-router'
 import { ContactWidget } from '../features/contact/ContactWidget'
 import { Hero } from '../features/hero/Hero'
+import { McpLink } from '../features/mcp/McpLink'
 import { Overview } from '../features/overview/Overview'
 import { pageMeta } from '../i18n/meta'
 
 export const meta: MetaFunction = ({ params }) => pageMeta(params.lang, 'home')
 
 /**
- * A página inicial: o herói e, rolando abaixo, o conteúdo objetivo (Overview, #overview), com o contato. O texto sai
- * no HTML do build; a cena 3D monta no navegador (Hero).
+ * A página inicial: o herói e, rolando abaixo, o conteúdo objetivo (Overview, #overview), com o ícone fixo do MCP
+ * (só aqui, D-MCP2; no Tab depois do conteúdo e antes do contato) e o contato. O texto sai no HTML do build; a cena 3D
+ * monta no navegador (Hero).
  */
 export default function Home() {
   return (
@@ -17,6 +19,7 @@ export default function Home() {
         <Hero />
         <Overview />
       </main>
+      <McpLink />
       <ContactWidget />
     </>
   )

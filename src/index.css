@@ -92,6 +92,7 @@
   --z-index-backdrop: 20; /* -z-backdrop: o brilho de fundo da trajetória */
   --z-index-glow: 10; /* -z-glow: o brilho da abertura, atrás do título */
   --z-index-popover: 10; /* painel sobre os vizinhos, abaixo dos flutuantes: currículo, menu do filtro */
+  --z-index-float-low: 15; /* flutuante secundário, abaixo do contato e do painel dele: o ícone do MCP na home */
   --z-index-float: 20; /* flutuantes: contato, barra de filtro, minimapa */
   --z-index-header: 30; /* cabeçalho fixo da trajetória */
   --z-index-progress: 60; /* barra de troca de página, acima de tudo */
@@ -362,5 +363,20 @@ body {
   .contact-cta,
   .contact-cta::before {
     animation: none;
+  }
+}
+
+/* O ícone do MCP na home (features/mcp/McpLink.tsx), recolhido no lg depois do herói: a pílula some (opacidade e
+   deslocamento, sem mexer no layout) e o disco ganha borda e fundo próprios; o hover e o foco reabrem a pílula. Abaixo
+   do lg a pílula nem existe e o disco já tem borda e fundo. */
+@media (width >= 64rem) {
+  .mcp-fab[data-compact]:not(:hover, :focus-visible) {
+    border-color: color-mix(in oklab, var(--color-fg) 20%, transparent);
+    background-color: var(--color-raised);
+  }
+  .mcp-fab[data-compact]:not(:hover, :focus-visible) .mcp-fab-label {
+    opacity: 0;
+    transform: translateX(0.5rem);
+    visibility: hidden;
   }
 }

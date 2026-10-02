@@ -13,6 +13,8 @@
     "src/content/overview.json",
     "src/content/profile.ts",
     "src/content/journey.ts",
+    // O texto da página /mcp: o teste confere as ferramentas dela contra o servidor.
+    "src/content/mcp.ts",
     "src/i18n/messages/en.ts",
     "src/i18n/messages/pt.ts",
     "src/i18n/messages/pt-tags.ts",

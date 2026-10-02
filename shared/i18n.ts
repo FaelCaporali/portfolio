@@ -10,7 +10,7 @@ export const LANGS: readonly Lang[] = ['en', 'pt']
 export const SITE_ORIGIN = 'https://fael.caporali.dev'
 
 /** As páginas que existem nos dois idiomas, no endereço inglês (sem prefixo). */
-export const SITE_PAGES = ['/', '/journey'] as const
+export const SITE_PAGES = ['/', '/journey', '/mcp'] as const
 export type SitePage = (typeof SITE_PAGES)[number]
 
 /** Cookie da escolha manual (o controle PT/EN): a detecção nunca desfaz o que a pessoa escolheu. */

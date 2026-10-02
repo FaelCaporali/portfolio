@@ -3,9 +3,9 @@ import { LANGS, localePath, SITE_ORIGIN, type Lang, type SitePage } from '../../
 import { profileLinks } from '../content/profile'
 import { langFromParam, LOCALES, MESSAGES, otherLang } from './lang'
 
-type Page = 'home' | 'journey'
+type Page = 'home' | 'journey' | 'mcp'
 
-const PATHS: Record<Page, SitePage> = { home: '/', journey: '/journey' }
+const PATHS: Record<Page, SitePage> = { home: '/', journey: '/journey', mcp: '/mcp' }
 
 /** Endereço absoluto de uma página num idioma (canonical, og:url, hreflang e sitemap). */
 export const absoluteUrl = (lang: Lang, path: string) => `${SITE_ORIGIN}${localePath(lang, path)}`
@@ -44,7 +44,8 @@ export function pageMeta(param: string | undefined, page: Page): MetaDescriptor[
     {
       'script:ld+json': {
         '@context': 'https://schema.org',
-        '@type': 'ProfilePage',
+        // A /mcp é página sobre a pessoa, não o perfil dela.
+        '@type': page === 'mcp' ? 'WebPage' : 'ProfilePage',
         name: m.title,
         description: m.description,
         url,

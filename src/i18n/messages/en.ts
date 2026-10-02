@@ -19,6 +19,11 @@ export const en = {
       title: 'The full journey · Fael Caporali',
       description: "Fael Caporali's career, from running his own ventures to QA, tech lead and AI product engineering.",
     },
+    mcp: {
+      title: 'Ask your AI assistant · Fael Caporali',
+      description:
+        "Connect Claude, ChatGPT or any Model Context Protocol (MCP) client to Fael Caporali's portfolio: profile, filterable journey, delivered work and a direct message.",
+    },
   },
   /** O controle que leva a ESTE idioma (aparece na página do outro). */
   lang: { short: 'EN', switchTo: 'Read in English' },

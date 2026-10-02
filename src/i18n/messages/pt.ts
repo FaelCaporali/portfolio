@@ -18,6 +18,11 @@ export const pt: Messages = {
       description:
         'A carreira de Fael Caporali: dos negócios próprios ao QA, à liderança técnica e à engenharia de produtos com IA.',
     },
+    mcp: {
+      title: 'Pergunte ao seu assistente de IA · Fael Caporali',
+      description:
+        'Conecte o Claude, o ChatGPT ou qualquer cliente Model Context Protocol (MCP) ao portfólio de Fael Caporali: perfil, trajetória com filtros, entregas e mensagem direta.',
+    },
   },
   lang: { short: 'PT', switchTo: 'Ler em português' },
   errors: {

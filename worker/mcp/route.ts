@@ -22,6 +22,16 @@ export const wantsPage = (request: Request) =>
   !(request.headers.get('Accept') ?? '').includes('text/event-stream')
 
 /**
+ * A resposta de página em /mcp (a página, o redirect de idioma, o 404) depende do Accept, porque o mesmo endereço é o
+ * servidor para o cliente MCP: um cache não pode servir uma no lugar da outra.
+ */
+export function varyOnAccept(response: Response): Response {
+  const page = new Response(response.body, response)
+  page.headers.append('Vary', 'Accept')
+  return page
+}
+
+/**
  * Limite por rede (ASN), antes de carregar o SDK: uma rede que dispara chamadas não gasta a CPU do servidor nem as
  * cotas do dia (mcp/audit.ts). Responde no formato JSON-RPC, que todo cliente MCP lê.
  */

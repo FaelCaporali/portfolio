@@ -9,7 +9,7 @@ import { mcpHousekeeping, retryAndPurge } from './cron'
 import { json } from './http'
 import { langRedirect, withLangVary } from './lang'
 import { SITE_ORIGIN } from '../shared/i18n'
-import { isWorkersDev, limitMcp, MCP_PATH, wantsPage } from './mcp/route'
+import { isWorkersDev, limitMcp, MCP_PATH, varyOnAccept, wantsPage } from './mcp/route'
 import { withPageCsp } from './page'
 
 /**
@@ -18,6 +18,23 @@ import { withPageCsp } from './page'
  */
 const NOT_FOUND_PAGE = '/__spa-fallback'
 
+/** As páginas do site (arquivos do build), com o idioma da primeira visita e a CSP. */
+async function sitePage(request: Request, env: Env, pathname: string): Promise<Response> {
+  // Endereço antigo da trajetória, anunciado antes de a página ganhar o nome em inglês do resto do site.
+  if (pathname === '/trajetoria' || pathname === '/trajetoria/') {
+    return Response.redirect(new URL('/journey', request.url).href, 301)
+  }
+  // Primeira visita de quem prefere português: a página em /pt (worker/lang.ts).
+  const redirect = langRedirect(request)
+  if (redirect) return redirect
+  const asset = await env.ASSETS.fetch(request)
+  if (asset.status === 404 && request.headers.get('Accept')?.includes('text/html')) {
+    const page = await env.ASSETS.fetch(new URL(NOT_FOUND_PAGE, request.url))
+    return withPageCsp(new Response(page.body, { status: 404, headers: page.headers }))
+  }
+  return withLangVary(request, withPageCsp(asset))
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url)
@@ -25,25 +42,19 @@ export default {
     const mcp = pathname === MCP_PATH && !wantsPage(request)
     // No workers.dev (o endereço do MCP fora do Bot Fight Mode) só o MCP responde: página, contato e o resto vão para
     // o site, sem conteúdo duplicado nem outra porta para o formulário.
-    if (isWorkersDev(url) && !mcp) return Response.redirect(`${SITE_ORIGIN}${pathname}${url.search}`, 301)
+    if (isWorkersDev(url) && !mcp) {
+      const away = Response.redirect(`${SITE_ORIGIN}${pathname}${url.search}`, 301)
+      // O 301 vai para cache: em /mcp, um GET de cliente MCP no mesmo endereço não pode receber o da página.
+      return pathname === MCP_PATH ? varyOnAccept(away) : away
+    }
     if (pathname === CONTACT_PATH) return handleContact(request, env)
     if (pathname.startsWith('/api/')) return json(404, { ok: false, error: 'not_found' })
     // Sob demanda: o SDK do MCP só é avaliado quando um cliente MCP chama, e depois do limite por rede
     // (worker/mcp/route.ts).
     if (mcp) return (await limitMcp(request, env)) ?? (await import('./mcp/server')).handleMcp(request, env, ctx)
-    // Endereço antigo da trajetória, anunciado antes de a página ganhar o nome em inglês do resto do site.
-    if (pathname === '/trajetoria' || pathname === '/trajetoria/') {
-      return Response.redirect(new URL('/journey', request.url).href, 301)
-    }
-    // Primeira visita de quem prefere português: a página em /pt (worker/lang.ts).
-    const redirect = langRedirect(request)
-    if (redirect) return redirect
-    const asset = await env.ASSETS.fetch(request)
-    if (asset.status === 404 && request.headers.get('Accept')?.includes('text/html')) {
-      const page = await env.ASSETS.fetch(new URL(NOT_FOUND_PAGE, request.url))
-      return withPageCsp(new Response(page.body, { status: 404, headers: page.headers }))
-    }
-    return withLangVary(request, withPageCsp(asset))
+    const page = await sitePage(request, env, pathname)
+    // Em /mcp a página e o servidor dividem o endereço: o que volta depende do Accept.
+    return pathname === MCP_PATH ? varyOnAccept(page) : page
   },
 
   scheduled(controller, env, ctx) {

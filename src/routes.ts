@@ -9,6 +9,7 @@ import { SITE_PAGES, type SitePage } from '../shared/i18n'
 const PAGE_MODULES: Record<SitePage, string> = {
   '/': 'routes/home.tsx',
   '/journey': 'routes/journey.tsx',
+  '/mcp': 'routes/mcp-page.tsx',
 }
 
 /**

@@ -39,14 +39,24 @@ describe('metas por idioma', () => {
     expect(pageMeta('xx', 'home')).toEqual([])
   })
 
-  it('sitemap: os 4 endereços, cada um com os 3 alternates', () => {
+  it('sitemap: os 6 endereços, cada um com os 3 alternates', () => {
     const xml = sitemapXml()
     expect([...xml.matchAll(/<loc>(.*?)<\/loc>/g)].map((m) => m[1])).toEqual([
       'https://fael.caporali.dev/',
       'https://fael.caporali.dev/pt',
       'https://fael.caporali.dev/journey',
       'https://fael.caporali.dev/pt/journey',
+      'https://fael.caporali.dev/mcp',
+      'https://fael.caporali.dev/pt/mcp',
     ])
-    expect(xml.match(/<xhtml:link /g)).toHaveLength(12)
+    expect(xml.match(/<xhtml:link /g)).toHaveLength(18)
+  })
+
+  it('/mcp: página sobre a pessoa (WebPage), não o perfil, com canonical e alternates próprios', () => {
+    const meta = pageMeta('pt', 'mcp')
+    expect(find(meta, 'title', 'Pergunte ao seu assistente de IA · Fael Caporali')).toBeDefined()
+    expect(links(meta, 'canonical').map((l) => l.href)).toEqual(['https://fael.caporali.dev/pt/mcp'])
+    const ld = meta.find((d) => 'script:ld+json' in d) as { 'script:ld+json': { '@type': string } } | undefined
+    expect(ld?.['script:ld+json']['@type']).toBe('WebPage')
   })
 })

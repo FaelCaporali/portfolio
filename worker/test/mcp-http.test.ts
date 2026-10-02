@@ -6,6 +6,7 @@ import { Client, StreamableHTTPClientTransport } from '@modelcontextprotocol/cli
 import { createExecutionContext } from 'cloudflare:test'
 import { env } from 'cloudflare:workers'
 import { describe, expect, it } from 'vitest'
+import { mcp } from '../../src/content/mcp'
 import worker from '../index'
 import { fetchWorker, MCP_URL, open } from './mcp-client'
 
@@ -48,6 +49,8 @@ describe('HTTP', () => {
       const r = await fetchWorker(`${dev}${path}`, { ...init, redirect: 'manual' })
       expect(r.status, path).toBe(301)
       expect(r.headers.get('Location'), path).toBe(`https://fael.caporali.dev${path}`)
+      // O 301 vai para cache: em /mcp, separado pelo Accept do servidor MCP no mesmo endereço; no resto, sem Vary.
+      expect(r.headers.get('Vary'), path).toBe(path === '/mcp' ? 'Accept' : null)
     }
   })
 
@@ -81,7 +84,27 @@ describe('HTTP', () => {
       )
       expect(r.status, `${method} ${accept}`).toBe(200)
       expect(r.headers.get('Content-Security-Policy'), `${method} ${accept}`).toContain('nonce-')
+      // O mesmo endereço é o servidor para o cliente MCP: o cache precisa separar pelo Accept.
+      expect(r.headers.get('Vary'), `${method} ${accept}`).toMatch(/\bAccept\b/)
       if (method === 'GET') expect(await r.text()).toContain('pagina')
     }
+    // Navegador em português: o redirect para /pt/mcp também depende do Accept, além do idioma.
+    const pt = await worker.fetch(
+      new Request(MCP_URL, { headers: { Accept: 'text/html', 'Accept-Language': 'pt-BR' } }),
+      withPage,
+      createExecutionContext(),
+    )
+    expect(pt.status).toBe(302)
+    expect(pt.headers.get('Location')).toBe('https://fael.caporali.dev/pt/mcp')
+    expect(pt.headers.get('Vary')).toBe('Accept-Language, Cookie, Accept')
+  })
+
+  it('a página /mcp lista as mesmas ferramentas, na mesma ordem, que o servidor', async () => {
+    const client = new Client({ name: 'teste-portfolio', version: '1.0.0' })
+    await client.connect(new StreamableHTTPClientTransport(new URL(MCP_URL), { fetch: fetchWorker }))
+    open.push(client)
+    const served = (await client.listTools()).tools.map((t) => t.name)
+    expect(mcp.tools.items.map((t) => t.name)).toEqual(served)
+    for (const ask of mcp.asks.items) for (const tool of ask.tools) expect(served).toContain(tool)
   })
 })

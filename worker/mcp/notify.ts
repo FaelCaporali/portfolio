@@ -3,12 +3,13 @@
  * Pela mesma binding do formulário (destino e remetente fixos no wrangler.jsonc); só texto puro.
  */
 import { cleanLine, cleanText } from '../../shared/contact/validation'
+import { MCP_URL } from '../../shared/mcp'
 import { BRT, DESTINATION, send, SENDER } from '../mail'
 import type { Delivery } from '../message'
 import { bump, DAILY, utcDay } from './audit'
 
 const FROM = { ...SENDER, name: 'Portfólio · MCP' }
-const FOOTER = ['', '--', 'MCP do portfólio · https://fael-caporali.rafaelhon.workers.dev/mcp']
+const FOOTER = ['', '--', `MCP do portfólio · ${MCP_URL}`]
 
 /** O que o agente contou no beacon, já limpo (uma linha, ou parágrafos na nota) e com os tetos do esquema. */
 export interface Beacon {
