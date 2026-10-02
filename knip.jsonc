@@ -19,6 +19,9 @@
   "react-router": { "config": ["react-router.config.ts"] },
   "ignoreDependencies": [
     // Módulos virtuais do runtime (cloudflare:test, cloudflare:workers), fornecidos pelo workerd, não pelo npm.
-    "cloudflare"
+    "cloudflare",
+    // 3d/tools/robos/capturar.mjs importa por caminho direto ao store do pnpm (comentário no próprio arquivo): está
+    // instalado (dependência de outro pacote), mas não é dependência direta deste projeto — knip não vê o import.
+    "sharp"
   ]
 }
