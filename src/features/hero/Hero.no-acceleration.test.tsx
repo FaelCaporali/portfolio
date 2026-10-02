@@ -60,12 +60,17 @@ describe('herói sem aceleração de GPU: imagem no lugar do busto (Capítulo 11
     expect(img).not.toHaveAttribute('loading')
   })
 
-  it('troca sozinha, no mesmo relógio do carrossel (TIMING.holdFirst), sem precisar de clique', async () => {
+  it('troca sozinha, na cadência do 3D (parado + desintegração + reconstrução), sem precisar de clique', async () => {
     vi.useFakeTimers()
     render(<RouterProvider router={createMemoryRouter(rotas())} />)
     expect(screen.getByRole('img', { name: opening.slot })).toBeInTheDocument()
+    // Abertura: 3 s parada + 1 s + 1 s de transição (TIMING); 1 ms antes, ainda é ela.
     await act(async () => {
-      await vi.advanceTimersByTimeAsync(3000)
+      await vi.advanceTimersByTimeAsync(4999)
+    })
+    expect(screen.getByRole('img', { name: opening.slot })).toBeInTheDocument()
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1)
     })
     expect(titulo()).toHaveAccessibleName(vidaRegex(depoisDaAbertura.slot))
     expect(screen.getByRole('img', { name: depoisDaAbertura.slot })).toHaveAttribute(

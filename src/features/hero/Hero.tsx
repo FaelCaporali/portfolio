@@ -159,10 +159,13 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
   // passagem do tempo. `carga.next` é a mesma vida que a cena real usaria como `onNext` (loadProps, acima).
   useEffect(() => {
     if (!noScene) return
-    const holdMs = (opening ? TIMING.holdFirst : TIMING.hold) * 1000
+    // A mesma cadência do 3D: o tempo parado mais o da desintegração e o da reconstrução, que aqui viram o fade; com
+    // movimento reduzido o 3D troca direto ao fim do tempo de leitura, e a imagem também.
+    const transition = options?.reducedMotion ? 0 : TIMING.out + TIMING.in
+    const holdMs = ((opening ? TIMING.holdFirst : TIMING.hold) + transition) * 1000
     const id = window.setTimeout(() => next(carga.next), holdMs)
     return () => window.clearTimeout(id)
-  }, [noScene, opening, index, carga.next, next])
+  }, [noScene, opening, index, carga.next, next, options?.reducedMotion])
   const nextStage = noScene ? (stages.find((s) => s.prop === carga.next) ?? null) : null
   const lang = useLang()
   const m = useMessages()
