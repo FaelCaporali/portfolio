@@ -187,7 +187,6 @@ export function service(lang: Lang, s: Service, pageUrl: string): Node {
     url: pageUrl,
     provider: { '@id': PERSON_ID },
     areaServed: ['BR', 'Worldwide'],
-    availableLanguage: ['pt-BR', 'en'],
     mainEntityOfPage: { '@id': `${pageUrl}#webpage` },
   }
 }
