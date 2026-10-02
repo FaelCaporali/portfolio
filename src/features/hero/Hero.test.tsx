@@ -35,6 +35,10 @@ vi.mock('./scene/HeroCanvas', async () => {
   }
 })
 
+// Sonda de verdade (WebGL, document.createElement('canvas')) não existe no jsdom: mockada em `true` para o suite
+// seguir exercitando a <HeroCanvas> mockada acima, como sempre fez (a sonda em si: model/acceleration.test.ts).
+vi.mock('./model/acceleration', () => ({ hasAcceleration: () => true }))
+
 const abertura = stages.find((s) => s.id === OPENING)
 if (!abertura) throw new Error('vida de abertura fora da lista')
 const VIDA = new RegExp(`^Today I am an? ${abertura.slot}$`)
@@ -175,6 +179,14 @@ describe('herói: "Today I am loading" até a cena 3D (U2)', () => {
     expect(titulo()).toHaveAccessibleName(LOADING)
     await user.click(await screen.findByRole('button', { name: 'cena pronta' }))
     expect(titulo()).toHaveAccessibleName(VIDA)
+  })
+
+  it('com aceleração de GPU, nenhuma imagem /hero-bot nem /hero-fallback é pedida: zero mudança do caminho de hoje', async () => {
+    const user = userEvent.setup()
+    render(<RouterProvider router={createMemoryRouter(rotas())} />)
+    await user.click(await screen.findByRole('button', { name: 'cena pronta' }))
+    expect(document.querySelector('img[src^="/hero-bot/"]')).toBeNull()
+    expect(document.querySelector('[src^="/hero-fallback/"], [srcset^="/hero-fallback/"]')).toBeNull()
   })
 })
 

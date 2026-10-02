@@ -64,6 +64,12 @@ describe('quem pediu, pelo User-Agent', () => {
     ['Mozilla/5.0 (compatible; Claude-User/1.0; +Claude-User@anthropic.com)', 'assistant', 'Claude-User'],
     ['Mozilla/5.0 (compatible; ClaudeBot/1.0; +claudebot@anthropic.com)', 'training', 'ClaudeBot'],
     ['Mozilla/5.0 AppleWebKit/537.36; compatible; GPTBot/1.2', 'training', 'GPTBot'],
+    ['Mozilla/5.0 (compatible; Google-InspectionTool/1.0;)', 'search', 'Google-InspectionTool'],
+    [
+      'Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome-Lighthouse',
+      'search',
+      'Chrome-Lighthouse',
+    ],
     ['curl/8.5.0', 'bot', ''],
     ['', 'bot', ''],
   ])('%s → %s', (ua, client, bot) => {

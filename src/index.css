@@ -191,6 +191,25 @@ body {
   }
 }
 
+/* Imagem parada no lugar do busto 3D, sem aceleração de GPU real (HeroFallbackImage.tsx): troca suave entre vidas, só
+   opacity (o compositor anima, sem disputar quadro com nada). Com movimento reduzido, troca direto. */
+.hero-fallback-img {
+  animation: hero-fallback-fade 0.4s ease-out both;
+}
+@keyframes hero-fallback-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-fallback-img {
+    animation-duration: 0.01s;
+  }
+}
+
 /* "Today I am loading" (U2, D-143a): até o 1º quadro da cena 3D, no lugar da vida. A palavra respira e três pontos
    sobem em onda. Só opacity e transform, que o compositor anima: nada de filter/blur por cima do canvas (a GPU refaz o
    desfoque a cada quadro e o 3D atrasa, ver .contact-cta). Com movimento reduzido, tudo parado. */

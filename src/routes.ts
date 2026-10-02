@@ -39,9 +39,11 @@ export default [
       return route(md.slice(1), 'routes/markdown.ts', { id: `markdown${md}` })
     }),
   ),
-  route(
-    ':lang?',
-    'routes/lang.tsx',
-    SITE_PAGES.map((path) => (path === '/' ? index(PAGE_MODULES[path]) : pageRoute(path))),
-  ),
+  route(':lang?', 'routes/lang.tsx', [
+    ...SITE_PAGES.map((path) => (path === '/' ? index(PAGE_MODULES[path]) : pageRoute(path))),
+    // Rota interna da variante dos robôs da home (camada 1, 03-plano-versao-robos.md): nunca em SITE_PAGES — não pode
+    // vazar para o sitemap.xml nem para a detecção de idioma do Worker (shared/i18n.ts). O Worker bloqueia o pedido
+    // direto (worker/index.ts); só alcançada por env.ASSETS.fetch com a URL reescrita (sitePage).
+    route('__hero-bot', 'routes/home-bot.tsx'),
+  ]),
 ] satisfies RouteConfig

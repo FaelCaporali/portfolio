@@ -38,7 +38,9 @@ describe('detecção de idioma (Worker)', () => {
     const r = await page('/', { 'Accept-Language': 'en-US,en;q=0.9' })
     expect(r.status).toBe(200)
     expect(r.headers.get('Location')).toBeNull()
-    expect(r.headers.get('Vary')).toBe('Accept-Language, Cookie')
+    // Na home (só nela) o Vary também leva User-Agent (decisão 10, 03-plano-versao-robos.md): a resposta depende do
+    // User-Agent desde que a variante dos robôs existe (worker/index.ts, sitePage).
+    expect(r.headers.get('Vary')).toBe('Accept-Language, Cookie, User-Agent')
   })
 
   it('pt com cookie lang=en (a escolha manual) → 200', async () => {

@@ -21,6 +21,9 @@ vi.mock('./scene/HeroCanvas', async () => {
     },
   }
 })
+// Sonda de verdade (WebGL) não existe no jsdom: mockada em `true` para o suite seguir exercitando a cena mockada
+// acima (a sonda em si tem o teste dela, model/acceleration.test.ts).
+vi.mock('./model/acceleration', () => ({ hasAcceleration: () => true }))
 
 /** As rotas do site (src/routes.ts): o idioma como segmento opcional, os mesmos ids nos dois idiomas. */
 const rotas = () => [

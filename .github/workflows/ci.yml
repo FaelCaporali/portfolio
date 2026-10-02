@@ -1,5 +1,6 @@
 # Qualidade em todo push e pull request; deploy do Worker (site + API do contato) em fael.caporali.dev depois que a
-# qualidade e o e2e passam na main. Actions fixadas por commit (a tag só no comentário): tag de terceiro pode mudar.
+# qualidade passa na main (o e2e está desligado no CI, ver o job). Actions fixadas por commit (a tag só no
+# comentário): tag de terceiro pode mudar.
 name: CI
 
 on:
@@ -37,8 +38,12 @@ jobs:
         env:
           VITE_TURNSTILE_SITEKEY: 1x00000000000000000000AA
 
+  # Desligado no CI por decisão do Fael (02/10/2026): "Desliga o e2e se ele falha! Vai gastar meus minuto de hj
+  # actions?". A suíte segue no repositório e roda local (pnpm e2e). Para religar: tirar o `if: false` e voltar o
+  # `e2e` ao `needs` do deploy.
   e2e:
     name: e2e (Playwright contra o pnpm dev)
+    if: false
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
@@ -64,7 +69,7 @@ jobs:
 
   deploy:
     name: Deploy em fael.caporali.dev
-    needs: [quality, e2e]
+    needs: [quality]
     # Liga quando o Fael cria a variável DEPLOY_ENABLED=true e os segredos CLOUDFLARE_API_TOKEN e
     # CLOUDFLARE_ACCOUNT_ID no repositório (docs/DEPLOY.md). Até lá o job aparece como pulado, não como falha.
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && vars.DEPLOY_ENABLED == 'true'

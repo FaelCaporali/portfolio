@@ -1,4 +1,4 @@
-import { Suspense, lazy, useCallback, useRef, useState, useSyncExternalStore } from 'react'
+import { Suspense, lazy, useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { flushSync } from 'react-dom'
 import { useNavigation } from 'react-router'
 import { OPENING, stages, type PropId } from '../../content/journey'
@@ -7,6 +7,7 @@ import { LangSwitch } from '../../i18n/LangSwitch'
 import { localePath, useLang, useMessages } from '../../i18n/lang'
 import { cyclicAt } from '../../lib/array'
 import { HeroCopy } from './HeroCopy'
+import { HeroFallbackImage } from './HeroFallbackImage'
 import { LifeTimeline } from './LifeTimeline'
 import { SceneBoundary } from './SceneBoundary'
 import { SourceLink } from './SourceLink'
@@ -14,7 +15,8 @@ import { useDragRotation } from './hooks/useDragRotation'
 import { useFreeArea } from './hooks/useFreeArea'
 import { useOnScreen } from './hooks/useOnScreen'
 import { usePointerGaze } from './hooks/usePointerGaze'
-import type { Phase } from './model/carousel'
+import { hasAcceleration } from './model/acceleration'
+import { TIMING, type Phase } from './model/carousel'
 import { advance, candidates, createLineup, loadOrder, peek, skipFailed, type Lineup } from './model/lineup'
 import { readHeroOptions, type HeroOptions } from './model/options'
 
@@ -29,12 +31,26 @@ const loadProps = (l: Lineup, chosen: number | null, failed?: ReadonlySet<number
 })
 
 /*
- * A cena 3D (three.js) só no navegador: o build pré-renderiza o texto do herói (react-router.config.ts) sem carregar
- * o three. O download começa quando esta página carrega, sem esperar a hidratação.
+ * A cena 3D (three.js) só no navegador, e só com aceleração de GPU real (R1, camada 2 de 03-plano-versao-robos.md):
+ * o build pré-renderiza o texto do herói (react-router.config.ts) sem carregar o three; sem GPU (Googlebot, uma
+ * pessoa com hardware antigo ou VM), o chunk da cena nunca é importado — nem o download, nem o WebGL acontecem.
  */
 const loadCanvas = () => import('./scene/HeroCanvas').then((m) => ({ default: m.HeroCanvas }))
-const canvasModule = import.meta.env.SSR ? null : loadCanvas()
-const HeroCanvas = lazy(() => canvasModule ?? loadCanvas())
+/**
+ * Escape de desenvolvimento (R5): existe só dentro de `import.meta.env.DEV`, no mesmo padrão de
+ * `scene/HeroCanvas.tsx` (DebugHook) — `import.meta.env.DEV` é substituído por `false` em tempo de build, e o bloco
+ * inteiro sai do bundle de produção (vite.dev/guide/env-and-mode; prova por grep no build, Fase 3 do plano). Nunca
+ * aparece como string reconhecível fora deste `if`.
+ */
+function forcedByTooling(search: string): boolean {
+  if (!import.meta.env.DEV) return false
+  return new URLSearchParams(search).has('labAceleracao')
+}
+// SSR (pré-render): nunca acelera. No navegador: GPU real (hasAcceleration) ou, só em dev, o escape acima.
+const canAccelerate = !import.meta.env.SSR && (hasAcceleration() || forcedByTooling(window.location.search))
+// O download começa quando esta página carrega, sem esperar a hidratação — mas só quando pode acelerar.
+const canvasModule = canAccelerate ? loadCanvas() : null
+const HeroCanvas = canvasModule && lazy(() => canvasModule)
 
 /*
  * As opções da página (?slot, ?d, movimento reduzido). No build e na hidratação não há endereço: null, e o texto é o
@@ -86,8 +102,13 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
   const [pending, setPending] = useState<number | null>(null)
   // Vidas cujo glb falhou (#138, a cena avisa): saem da volta e do indicador até o glb chegar.
   const failed = useRef<ReadonlySet<number>>(new Set())
-  // A cena caiu (SceneBoundary): quem troca a vida é o clique no indicador, direto, sem desintegração.
+  // A cena caiu (SceneBoundary): quem troca a vida é o clique no indicador, direto, sem desintegração. Sem aceleração
+  // de GPU (camada 2), HeroCanvas é null e a cena nunca chega a montar: noScene, abaixo, cai no mesmo estado, sem
+  // "loading" (R3), em vez de esperar um onFail que nunca vem.
   const [sceneFailed, setSceneFailed] = useState(false)
+  // Sem GPU (HeroCanvas null) conta como cena caída, mas só depois da hidratação (options não nulo): o servidor não
+  // sabe da GPU, e a 1ª renderização do cliente tem de ser igual ao HTML dele (senão o React acusa o erro #418).
+  const noScene = sceneFailed || (options !== null && !HeroCanvas)
   // "Today I am loading" até o 1º quadro com o busto (U2), sem prazo (D-U2a: "loading sem limites faz sentido contanto
   // que quando busto carregado, troque o texto"): no HTML, na hidratação e a cada montagem (a volta da trajetória
   // também). Cena que cai sai do "loading" na hora, para a vida de abertura.
@@ -100,7 +121,7 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
       setSceneReady(true)
     })
   }, [])
-  const loading = !sceneReady && !sceneFailed
+  const loading = !sceneReady && !noScene
   const next = useCallback((prop: PropId) => {
     // A vida para onde a cena troca (a escolhida no indicador ou a 1ª pronta da volta).
     const i = stages.findIndex((s) => s.prop === prop)
@@ -131,6 +152,21 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
     setCarga(loadProps(lineup.current, requested.current, failed.current))
   }, [])
   const stage = cyclicAt(stages, index)
+  // Sem aceleração de GPU real (sceneFailed, inclusive a cena que caiu depois de montada), o lugar do busto é uma
+  // imagem parada (HeroFallbackImage), e o relógio do carrossel segue sozinho — o MESMO tempo do 3D (TIMING), sem
+  // desintegração. Fala do Fael (Capítulo 11 do plano, 03-plano-versao-robos.md): "ausência de GPU não impede render
+  // 3d [...] deveria ter imagens". O clique no indicador já troca na hora (select, abaixo); este efeito só cobre a
+  // passagem do tempo. `carga.next` é a mesma vida que a cena real usaria como `onNext` (loadProps, acima).
+  useEffect(() => {
+    if (!noScene) return
+    // A mesma cadência do 3D: o tempo parado mais o da desintegração e o da reconstrução, que aqui viram o fade; com
+    // movimento reduzido o 3D troca direto ao fim do tempo de leitura, e a imagem também.
+    const transition = options?.reducedMotion ? 0 : TIMING.out + TIMING.in
+    const holdMs = ((opening ? TIMING.holdFirst : TIMING.hold) + transition) * 1000
+    const id = window.setTimeout(() => next(carga.next), holdMs)
+    return () => window.clearTimeout(id)
+  }, [noScene, opening, index, carga.next, next, options?.reducedMotion])
+  const nextStage = noScene ? (stages.find((s) => s.prop === carga.next) ?? null) : null
   const lang = useLang()
   const m = useMessages()
   // Indo para outra página (o botão da trajetória): a cena para, e o quadro 3D não disputa o processador com ela.
@@ -144,7 +180,7 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
     const i = stages.findIndex((s) => s.id === id)
     // Vida cujo glb falhou: o clique é descartado e o carrossel segue (o aviso visual é da tarefa 143).
     if (failed.current.has(i)) return
-    if (sceneFailed) {
+    if (noScene) {
       if (i >= 0 && i !== index) next(cyclicAt(stages, i).prop)
       return
     }
@@ -156,8 +192,9 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
 
   return (
     <section ref={section} className="relative h-svh overflow-hidden" aria-label={m.hero.section}>
-      {/* Se a cena falha (import, render, WebGL), sai só ela: SceneBoundary. */}
-      {options && (
+      {/* Se a cena falha (import, render, WebGL), sai só ela: SceneBoundary. Sem aceleração de GPU (camada 2),
+          HeroCanvas é null: nem monta, nem importa o chunk. */}
+      {options && HeroCanvas && (
         <SceneBoundary onFail={onSceneFail}>
           <Suspense fallback={null}>
             <HeroCanvas
@@ -181,6 +218,11 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
           </Suspense>
         </SceneBoundary>
       )}
+
+      {/* Sem aceleração (a sonda falhou, ou a cena caiu): a imagem da vida atual no lugar do busto, nunca vazio. Só
+          depois da hidratação (options não nulo) — o servidor não sabe da GPU, e a 1ª renderização do cliente tem de
+          bater com o HTML dele (nem canvas, nem imagem) até esse ponto. */}
+      {options && noScene && <HeroFallbackImage stage={stage} nextStage={nextStage} alt={m.hero.slots[stage.id]} />}
 
       {/* Cabeçalho na largura toda: o nome à esquerda e, abaixo dele, o indicador centralizado na página. A base do
           cabeçalho é o topo do espaço livre do busto no celular (useFreeArea). */}
