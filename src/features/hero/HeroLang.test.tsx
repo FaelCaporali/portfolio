@@ -34,7 +34,7 @@ const rotas = () => [
     ],
   },
 ]
-const titulo = () => screen.getByRole('heading', { level: 1 })
+const titulo = () => screen.getByRole('heading', { level: 2 })
 
 beforeAll(() => {
   Object.defineProperty(window, 'matchMedia', {
@@ -62,7 +62,8 @@ describe('herói em português (/pt)', () => {
     const html = renderToString(<RouterProvider router={createMemoryRouter(rotas(), { initialEntries: ['/pt'] })} />)
     const box = document.createElement('div')
     box.innerHTML = html
-    expect(box.querySelector('h1')?.textContent).toBe('Hoje estou carregando')
+    expect(box.querySelector('h2')?.textContent).toBe('Hoje estou carregando')
+    expect(box.querySelector('h1')?.textContent).toBe('Fael Caporali')
     expect(within(box).getByRole('list', { name: 'Títulos' })).toHaveTextContent('Analista de QA')
     expect(within(box).getByRole('link', { name: /Ver a trajetória completa/ })).toHaveAttribute('href', '/pt/journey')
     const en = within(box).getByRole('link', { name: 'Read in English' })

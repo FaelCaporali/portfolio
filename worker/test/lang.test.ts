@@ -90,3 +90,22 @@ describe('detecção de idioma (Worker)', () => {
     expect(r.headers.get('Location')).toBeNull()
   })
 })
+
+describe('trajetória pedida com filtro (CLS)', () => {
+  it.each(['/journey?tools=React', '/pt/journey?from=2023&skills=Mentoring'])(
+    '%s: o <html> sai marcado para a lista esperar o filtro',
+    async (path) => {
+      const r = await page(path, { 'Accept-Language': path.startsWith('/pt') ? 'pt-BR' : 'en' })
+      expect(r.status).toBe(200)
+      expect(await r.text()).toContain('<html data-filtering="">')
+    },
+  )
+
+  it.each(['/journey', '/journey?utm_source=x', '/?tools=React'])(
+    '%s: sem filtro da trajetória, sem marca',
+    async (p) => {
+      const r = await page(p, { 'Accept-Language': 'en' })
+      expect(await r.text()).not.toContain('data-filtering')
+    },
+  )
+})

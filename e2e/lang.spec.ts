@@ -14,7 +14,9 @@ test.describe('navegador em português, sem escolha salva', () => {
     await expect(page).toHaveURL(/\/pt$/)
     await expect(page.locator('html')).toHaveAttribute('lang', 'pt-BR')
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://fael.caporali.dev/pt')
-    await expect(page.getByRole('heading', { level: 1 })).toHaveAccessibleName(/^Hoje (estou|sou|fui) \S/)
+    await expect(page.getByRole('heading', { level: 2, name: /^(Hoje|Ontem) / })).toHaveAccessibleName(
+      /^Hoje (estou|sou|fui) \S/,
+    )
     await expect(page.getByRole('link', { name: /Ver a trajetória completa/ })).toHaveAttribute('href', '/pt/journey')
   })
 
@@ -44,11 +46,15 @@ test('herói: PT troca idioma, título e canonical sem recarregar, com o mesmo <
     'antes',
   )
   await expect(page.locator('.loading-word')).toHaveCount(0)
-  await expect(page.getByRole('heading', { level: 1 })).toHaveAccessibleName(/^(Hoje sou|Ontem fui) \S/)
+  await expect(page.getByRole('heading', { level: 2, name: /^(Hoje|Ontem) / })).toHaveAccessibleName(
+    /^(Hoje sou|Ontem fui) \S/,
+  )
   await page.goBack()
   await expect(page).toHaveURL(/\/\?slot=qa$/)
   await expect(page.locator('html')).toHaveAttribute('lang', 'en')
-  await expect(page.getByRole('heading', { level: 1 })).toHaveAccessibleName(/^(Today I am|Yesterday I was) an? \S/)
+  await expect(page.getByRole('heading', { level: 2, name: /^(Today|Yesterday) / })).toHaveAccessibleName(
+    /^(Today I am|Yesterday I was) an? \S/,
+  )
 })
 
 test('trajetória rolada e filtrada: a troca mantém o filtro e o marco à vista', async ({ page, isMobile }) => {

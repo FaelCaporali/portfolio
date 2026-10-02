@@ -225,6 +225,18 @@ body:not([class*='life-']) .page-glow {
   }
 }
 
+/* Trajetória pedida com filtro (/journey?tools=…): a lista fica invisível até o filtro entrar (JourneyPage tira a
+   marca do Worker, shared/journey-filters.ts); sem JavaScript, ou se ele falhar, ela aparece sozinha em 3 s. */
+html[data-filtering] .timeline {
+  visibility: hidden;
+  animation: filtering-reveal 0s 3s forwards;
+}
+@keyframes filtering-reveal {
+  to {
+    visibility: visible;
+  }
+}
+
 /* Filtros (Filters.tsx): a tag escolhida acende; nos cartões, a tag que casa com o filtro ganha contorno;
    no minimapa, o marco fora do filtro fica apagado. */
 .filter-tag {

@@ -186,12 +186,15 @@ function HeroView({ start, options }: { start: number; options: HeroOptions | nu
           cabeçalho é o topo do espaço livre do busto no celular (useFreeArea). */}
       <header ref={header} className="pointer-events-none absolute inset-x-0 top-0 pt-5 pb-1">
         <div className="px-5 sm:px-10 wide:pl-hero">
-          <a
-            href={localePath(lang, '/')}
-            className="pointer-events-auto text-sm font-medium tracking-wide text-fg/90 transition-colors hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-fg lg:text-base"
-          >
-            {profile.name}
-          </a>
+          {/* O nome é o h1 da home (buscadores e leitores de tela); na tela, o mesmo link de sempre. */}
+          <h1>
+            <a
+              href={localePath(lang, '/')}
+              className="pointer-events-auto text-sm font-medium tracking-wide text-fg/90 transition-colors hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-fg lg:text-base"
+            >
+              {profile.name}
+            </a>
+          </h1>
         </div>
         <div className="mt-2 flex justify-center">
           {/* No "loading" nenhuma vida está na tela: nenhum ponto atual, só a escolha feita nele (vale na chegada). */}

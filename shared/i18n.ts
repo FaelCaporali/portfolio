@@ -9,8 +9,20 @@ export const LANGS: readonly Lang[] = ['en', 'pt']
 /** Origem pública do site: canonical, og:url, hreflang e o sitemap saem dela. */
 export const SITE_ORIGIN = 'https://fael.caporali.dev'
 
+/**
+ * Uma página por oferta da home (src/content/services.ts), na ordem de overview.json: a resposta do site às buscas de
+ * quem quer contratar (.wai/seo-geo/04-plano.md, F1b). O endereço inglês serve aos dois idiomas, como /journey.
+ */
+export const SERVICE_PAGES = [
+  '/services/ai-agents',
+  '/services/mvp-to-scalable-product',
+  '/services/qa-and-test-automation',
+  '/services/tech-leadership',
+] as const
+export type ServicePage = (typeof SERVICE_PAGES)[number]
+
 /** As páginas que existem nos dois idiomas, no endereço inglês (sem prefixo). */
-export const SITE_PAGES = ['/', '/journey', '/mcp'] as const
+export const SITE_PAGES = ['/', '/journey', '/mcp', ...SERVICE_PAGES] as const
 export type SitePage = (typeof SITE_PAGES)[number]
 
 /** Cookie da escolha manual (o controle PT/EN): a detecção nunca desfaz o que a pessoa escolheu. */
@@ -21,6 +33,17 @@ export const LANG_COOKIE_MAX_AGE = 60 * 60 * 24 * 365
 export function localePath(lang: Lang, path: string): string {
   if (lang === 'en') return path
   return path === '/' ? '/pt' : `/pt${path}`
+}
+
+/**
+ * A versão em markdown de uma página (llmstxt.org: o mesmo endereço com .md; a home é index.md):
+ * '/' → '/index.md', '/pt' → '/pt/index.md', '/pt/journey' → '/pt/journey.md'.
+ */
+export function markdownPath(lang: Lang, path: string): string {
+  const page = localePath(lang, path)
+  if (page === '/') return '/index.md'
+  if (page === '/pt') return '/pt/index.md'
+  return `${page}.md`
 }
 
 /** O idioma pelo endereço: /pt e /pt/… são português; o resto, inglês. */

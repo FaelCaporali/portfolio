@@ -22,7 +22,11 @@ test('herói: vida, títulos, links e o busto sem erro no console', async ({ pag
   const bust = page.waitForResponse((r) => r.url().includes('busto-s13.glb') && r.ok())
   await page.goto('/')
   // Nome acessível: a frase inteira, com espaço, e não letra a letra ("loading" até a cena, depois a vida).
-  await expect(page.getByRole('heading', { level: 1 })).toHaveAccessibleName(/^Today I am an? \S/, CENA)
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Fael Caporali')
+  await expect(page.getByRole('heading', { level: 2, name: /^Today I am/ })).toHaveAccessibleName(
+    /^Today I am an? \S/,
+    CENA,
+  )
   // Leva ao início da trajetória, sempre (J48).
   await expect(page.getByRole('link', { name: 'See the full journey' })).toHaveAttribute('href', '/journey')
   await expect(page.getByRole('link', { name: 'LinkedIn' })).toHaveAttribute('target', '_blank')
@@ -75,7 +79,7 @@ for (const [width, height] of [
     // Mede o texto com a vida (a mais longa), não com o "loading" que vem antes da cena.
     await expect(page.locator('.slot-word .sr-only')).toHaveText(/\S/, CENA)
     const header = await page.locator('header').boundingBox()
-    const title = await page.getByRole('heading', { level: 1 }).boundingBox()
+    const title = await page.getByRole('heading', { level: 2, name: /^Today I am/ }).boundingBox()
     const contact = await page.getByRole('list', { name: 'Contact' }).boundingBox()
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)
     if (!header || !title || !contact) throw new Error('herói incompleto')

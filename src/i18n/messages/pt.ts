@@ -10,19 +10,28 @@ const FALLBACK = 'Não foi possível enviar agora. Fale comigo pelos contatos ab
 export const pt: Messages = {
   meta: {
     home: {
-      title: 'Fael Caporali',
-      description: 'Rafael Caporali — desenvolvedor full-stack sênior, Belo Horizonte.',
+      title: 'Fael Caporali · AI Product Engineer e Dev Full-Stack',
+      description:
+        'Produtos e agentes de IA em produção, do MVP ao produto que escala, QA e liderança técnica. De Belo Horizonte: remoto ou híbrido em BH.',
+      keywords:
+        'AI product engineer, agentes de IA, agente de IA no WhatsApp, RAG, LangChain, n8n, avaliação de agentes, consultoria de IA, do MVP ao produto, MVP no Lovable, desenvolvedor full-stack, TypeScript, React, Node.js, monorepo, Terraform, AWS, GCP, QA, automação de testes, Playwright, Cypress, tech lead, desenvolvimento de software, Belo Horizonte, BH, remoto',
     },
     journey: {
-      title: 'A trajetória completa · Fael Caporali',
+      title: 'A trajetória completa · Fael Caporali, AI Product Engineer',
       description:
         'A carreira de Fael Caporali: dos negócios próprios ao QA, à liderança técnica e à engenharia de produtos com IA.',
+      keywords:
+        'Fael Caporali, carreira, AI product engineer, tech lead, QA, desenvolvedor full-stack, agentes de IA, empreendedor, Belo Horizonte',
     },
     mcp: {
       title: 'Pergunte ao seu assistente de IA · Fael Caporali',
       description:
-        'Conecte o Claude, o ChatGPT ou qualquer cliente Model Context Protocol (MCP) ao portfólio de Fael Caporali: perfil, trajetória com filtros, entregas e mensagem direta.',
+        'Conecte o Claude, o ChatGPT ou qualquer cliente MCP (Model Context Protocol) ao portfólio de Fael Caporali: perfil, trajetória, entregas e mensagem direta.',
+      keywords:
+        'servidor MCP, Model Context Protocol, conector do Claude, conector do ChatGPT, assistente de IA, recrutador, Fael Caporali, portfólio',
     },
+    imageAlt: 'Fael Caporali, AI Product Engineer, Dev FullStack, Analista de QA e TechLead, Belo Horizonte, MG',
+    breadcrumbHome: 'Fael Caporali',
   },
   lang: { short: 'PT', switchTo: 'Ler em português' },
   errors: {

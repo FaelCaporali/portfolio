@@ -1,9 +1,10 @@
 import { Link } from 'react-router'
 import { journeyHref, LIFE_OF, overview } from '../../content/overview'
 import type { StageId } from '../../content/journey'
-import type { Lang } from '../../i18n/lang'
+import { services } from '../../content/services'
+import { localePath, type Lang } from '../../i18n/lang'
 import { cx } from '../../lib/cx'
-import { GRID, H2, KeepHyphens, LINK, More, OfferCta, StartProject, Tags, WithArrow, WRAP } from './parts'
+import { FOCUS, GRID, H2, KeepHyphens, LINK, More, OfferCta, StartProject, Tags, WithArrow, WRAP } from './parts'
 
 const { offers } = overview
 
@@ -12,7 +13,7 @@ const { offers } = overview
  * carrossel do herói; o MVP pousa em devops (bid e a arquitetura da plataforma); a qualidade, em qa; a liderança, em
  * techlead (o "Tech Lead" do herói; beamble-lead é a âncora dessa vida).
  */
-const OFFER_LIVES: readonly StageId[] = ['ai', 'devops', 'qa', 'techlead']
+export const OFFER_LIVES: readonly StageId[] = ['ai', 'devops', 'qa', 'techlead']
 
 /**
  * Ofertas (10-direcao-v3.md §3, arranjo C): cabeçalho assimétrico do xl (título nas colunas 1–7; o texto e a ação
@@ -48,7 +49,15 @@ export function Offers({ lang }: { lang: Lang }) {
             >
               <div className="lg:col-span-6 lg:row-start-1">
                 <h3 id={titleId} className={cx('font-semibold text-balance', lead ? 'text-offer-lead' : 'text-offer')}>
-                  <KeepHyphens text={o.title[lang]} />
+                  {/* O título leva à página da oferta (/services/…), o mesmo conteúdo mais completo para quem
+                      chega pela busca; o texto do link é o próprio título. */}
+                  {services[i] ? (
+                    <Link to={localePath(lang, services[i].path)} prefetch="intent" className={cx('ov-link', FOCUS)}>
+                      <WithArrow text={o.title[lang]} />
+                    </Link>
+                  ) : (
+                    <KeepHyphens text={o.title[lang]} />
+                  )}
                 </h3>
                 <p className="mt-3 max-w-[64ch] text-body text-pretty text-fg/80">{o.text[lang]}</p>
               </div>
@@ -96,7 +105,7 @@ export function Offers({ lang }: { lang: Lang }) {
  * Fatos de contratação: uma faixa com fio em cima e embaixo e divisórias entre as células. Uma por linha abaixo de 640
  * px (no 2×2 do celular as células de 175 px quebravam em 3 linhas; 10 §2.2), 2×2 até o lg, quatro numa linha no largo.
  */
-function Facts({ lang }: { lang: Lang }) {
+export function Facts({ lang }: { lang: Lang }) {
   return (
     <ul className="mt-6 grid border-y border-fg/10 text-proof text-fg/75 sm:mt-8 sm:grid-cols-2 lg:grid-cols-4">
       {offers.facts.map((f) => (

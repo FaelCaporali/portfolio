@@ -1,5 +1,6 @@
 import { memo, useDeferredValue, useEffect, useLayoutEffect, useMemo } from 'react'
 import { LANGS } from '../../../shared/i18n'
+import { FILTERING_ATTR } from '../../../shared/journey-filters'
 import { checkpoints, periodLabel, type Checkpoint as Data } from '../../content/journey-timeline'
 import type { Stage } from '../../content/journey'
 import { restorePlace } from '../../i18n/keepPlace'
@@ -128,6 +129,13 @@ export function JourneyPage() {
   const { timeline, route, bar, reading } = useJourneyMotion(out, lang)
   // O idioma trocou (o controle PT/EN): o marco que estava à vista volta ao mesmo ponto da tela, antes da pintura.
   useLayoutEffect(restorePlace, [lang])
+  // Endereço com filtro: a lista está invisível (marca do Worker, shared/journey-filters.ts) até o mapa filtrado entrar
+  // na página; então ela aparece de uma vez, antes da pintura, sem o salto dos marcos que somem.
+  useLayoutEffect(() => {
+    if (state === filters.state && filters.search === location.search) {
+      document.documentElement.removeAttribute(FILTERING_ATTR)
+    }
+  }, [state, filters.state, filters.search])
 
   return (
     <>

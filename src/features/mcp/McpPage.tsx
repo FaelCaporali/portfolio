@@ -1,12 +1,10 @@
 import { Fragment } from 'react'
-import { Link } from 'react-router'
 import { mcp } from '../../content/mcp'
-import { profile } from '../../content/profile'
-import { LangSwitch } from '../../i18n/LangSwitch'
-import { localePath, useLang, type Lang } from '../../i18n/lang'
+import { useLang, type Lang } from '../../i18n/lang'
 import { cx } from '../../lib/cx'
+import { PageHeader } from '../../ui/PageHeader'
 import { ContactWidget } from '../contact/ContactWidget'
-import { FOCUS, GRID, H2, LINK, WithArrow, WRAP } from '../overview/parts'
+import { GRID, H2, LINK, WithArrow, WRAP } from '../overview/parts'
 import { Code } from './Code'
 import { CopyButton } from './Copy'
 import '../overview/overview.css'
@@ -21,7 +19,7 @@ export function McpPage() {
   const lang = useLang()
   return (
     <>
-      <Header lang={lang} />
+      <PageHeader lang={lang} />
       <main className="life-ai relative pb-24 text-fg sm:pb-36 lg:pb-40">
         <div aria-hidden className="ov-light pointer-events-none absolute inset-x-0 top-0 h-svh" />
         <div className="relative flex flex-col gap-section">
@@ -39,28 +37,6 @@ export function McpPage() {
 
 /** Rótulo pequeno em caixa alta (o rótulo dos grupos da stack). */
 const EYEBROW = 'text-tag font-medium tracking-[0.14em] text-fg/55 uppercase'
-
-/** Cabeçalho parado (não fixo, sem barra translúcida): a volta à home e o PT/EN, na borda da grade. */
-function Header({ lang }: { lang: Lang }) {
-  return (
-    <header className={cx('flex h-14 items-center justify-between', WRAP)}>
-      <Link
-        to={localePath(lang, '/')}
-        prefetch="intent"
-        className={cx('inline-flex min-h-6 items-center text-sm font-semibold text-fg/85 hover:text-fg', FOCUS)}
-      >
-        <span aria-hidden>←</span>
-        <span className="ml-2">{profile.name}</span>
-      </Link>
-      <LangSwitch
-        className={cx(
-          'flex h-11 min-w-11 items-center justify-center rounded-full text-sm font-semibold tracking-wide text-fg/60 transition-colors hover:text-fg',
-          FOCUS,
-        )}
-      />
-    </header>
-  )
-}
 
 /**
  * Abertura: título, texto e o endereço com o copiar; as perguntas de exemplo à direita a partir de 1280 e abaixo antes

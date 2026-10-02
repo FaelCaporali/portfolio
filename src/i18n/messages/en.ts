@@ -9,21 +9,36 @@ import { stages, type StageId } from '../../content/journey'
 const FALLBACK = "Couldn't send right now. Please reach me directly below."
 
 export const en = {
-  /** Metas de cada página (src/i18n/meta.ts). */
+  /**
+   * Metas de cada página (src/i18n/meta.ts). Título e descrição com as consultas de quem contrata
+   * (.wai/seo-geo/05-palavras-contratacao.md), só com o que o texto da página sustenta; `keywords` (D-SEO2: o Google
+   * ignora, outros buscadores e assistentes podem ler).
+   */
   meta: {
     home: {
-      title: 'Fael Caporali',
-      description: 'Rafael Caporali — senior full-stack developer, Belo Horizonte.',
+      title: 'Fael Caporali · AI Product Engineer & Full-Stack Developer',
+      description:
+        'AI products and agents in production, MVPs turned into products that scale, QA and tech leadership. From Belo Horizonte, Brazil: remote or hybrid.',
+      keywords:
+        'AI product engineer, AI agents, WhatsApp AI agents, RAG, LangChain, n8n, agent evaluation, AI consulting, MVP to product, Lovable MVP, full-stack developer, TypeScript, React, Node.js, monorepo, Terraform, AWS, GCP, QA, test automation, Playwright, Cypress, tech lead, software development, Belo Horizonte, Brazil, remote',
     },
     journey: {
-      title: 'The full journey · Fael Caporali',
+      title: 'The full journey · Fael Caporali, AI Product Engineer',
       description: "Fael Caporali's career, from running his own ventures to QA, tech lead and AI product engineering.",
+      keywords:
+        'Fael Caporali, career, AI product engineer, tech lead, QA, full-stack developer, AI agents, entrepreneur, Belo Horizonte',
     },
     mcp: {
       title: 'Ask your AI assistant · Fael Caporali',
       description:
-        "Connect Claude, ChatGPT or any Model Context Protocol (MCP) client to Fael Caporali's portfolio: profile, filterable journey, delivered work and a direct message.",
+        "Connect Claude, ChatGPT or any MCP (Model Context Protocol) client to Fael Caporali's portfolio: profile, journey, delivered work and a direct message.",
+      keywords:
+        'MCP server, Model Context Protocol, Claude connector, ChatGPT connector, AI assistant, recruiter, Fael Caporali, portfolio',
     },
+    /** O texto alternativo da imagem de compartilhamento (og:image, twitter:image). */
+    imageAlt: 'Fael Caporali, AI Product Engineer, FullStack Dev, QA Analyst and TechLead, Belo Horizonte, Brazil',
+    /** A home no caminho de volta (BreadcrumbList). */
+    breadcrumbHome: 'Fael Caporali',
   },
   /** O controle que leva a ESTE idioma (aparece na página do outro). */
   lang: { short: 'EN', switchTo: 'Read in English' },

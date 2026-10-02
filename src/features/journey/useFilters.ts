@@ -109,7 +109,9 @@ export function useFilters(bounds: Bounds, known: Record<Group, ReadonlySet<stri
 
   const { yearsOn, active } = useMemo(() => summary(state, bounds), [state, bounds])
 
-  return { state, toggle, setYears, clearYears, clear, yearsOn, active }
+  // `search`: o endereço que o estado já leu ('' no HTML do build e na hidratação; JourneyPage tira a marca do Worker
+  // quando ele é o de verdade).
+  return { state, search, toggle, setYears, clearYears, clear, yearsOn, active }
 }
 
 export type Filters = ReturnType<typeof useFilters>

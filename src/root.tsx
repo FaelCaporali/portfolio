@@ -24,6 +24,8 @@ export function Layout({ children }: { children: ReactNode }) {
     <html lang={tag}>
       <head>
         <meta charSet="UTF-8" />
+        {/* A cor da barra do navegador no celular: o fundo da página (--color-page). */}
+        <meta name="theme-color" content="#0b0b0e" />
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content"

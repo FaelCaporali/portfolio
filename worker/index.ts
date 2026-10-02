@@ -10,7 +10,8 @@ import { mcpHousekeeping, retryAndPurge } from './cron'
 import { json } from './http'
 import { drainLog, type LogRow } from './mcp/audit'
 import { langRedirect, withLangVary } from './lang'
-import { SITE_ORIGIN } from '../shared/i18n'
+import { SITE_ORIGIN, stripLang } from '../shared/i18n'
+import { wantsFilteredJourney } from '../shared/journey-filters'
 import { isWorkersDev, limitMcp, MCP_PATH, varyOnAccept, wantsPage } from './mcp/route'
 import { withPageCsp } from './page'
 
@@ -34,7 +35,8 @@ async function sitePage(request: Request, env: Env, pathname: string): Promise<R
     const page = await env.ASSETS.fetch(new URL(NOT_FOUND_PAGE, request.url))
     return withPageCsp(new Response(page.body, { status: 404, headers: page.headers }))
   }
-  return withLangVary(request, withPageCsp(asset))
+  const filtering = wantsFilteredJourney(stripLang(pathname), new URL(request.url).searchParams)
+  return withLangVary(request, withPageCsp(asset, filtering))
 }
 
 export default {

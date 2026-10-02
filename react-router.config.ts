@@ -1,5 +1,5 @@
 import type { Config } from '@react-router/dev/config'
-import { LANGS, localePath, SITE_PAGES } from './shared/i18n'
+import { LANGS, localePath, markdownPath, SITE_PAGES } from './shared/i18n'
 
 /**
  * Um app React só (J87), com o React Router em modo framework e as páginas geradas no build (J89): o HTML de cada
@@ -10,11 +10,18 @@ import { LANGS, localePath, SITE_PAGES } from './shared/i18n'
 export default {
   appDirectory: 'src',
   ssr: false,
-  // Cada página em cada idioma (/, /journey, /pt, /pt/journey: o HTML com o texto e as metas do idioma), o sitemap e o
-  // robots.txt (rotas de recurso, src/routes.ts).
-  prerender: [...SITE_PAGES.flatMap((p) => LANGS.map((l) => localePath(l, p))), '/sitemap.xml', '/robots.txt'],
+  // Cada página em cada idioma (/, /journey, /pt, /pt/journey: o HTML com o texto e as metas do idioma), a versão em
+  // markdown de cada uma, o sitemap, o robots.txt e o llms.txt (rotas de recurso, src/routes.ts).
+  prerender: [
+    ...SITE_PAGES.flatMap((p) => LANGS.flatMap((l) => [localePath(l, p), markdownPath(l, p)])),
+    '/sitemap.xml',
+    '/robots.txt',
+    '/llms.txt',
+  ],
   // O comportamento do React Router v8 já agora (a v8 pede Node 22.22+; a máquina de dev tem 22.21): build por
-  // ambientes do Vite e os padrões novos, que aqui não mudam nada (sem loader, action nem middleware).
+  // ambientes do Vite e os padrões novos, que aqui não mudam nada (sem action nem middleware; os loaders
+  // das rotas de recurso e das páginas de oferta rodam só no pré-render, e com v8_passThroughRequests leem `url`, não
+  // `request.url`, que traz o sufixo .data).
   future: {
     v8_viteEnvironmentApi: true,
     v8_middleware: true,

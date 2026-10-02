@@ -62,9 +62,11 @@ export function HeroCopy({ ref, stage, leaving, loading }: HeroCopyProps) {
   return (
     <div
       ref={ref}
+      data-hero-copy
       className="pointer-events-none absolute inset-x-0 bottom-0 px-5 pb-6 text-fg sm:px-10 wide:inset-y-0 wide:right-auto wide:flex wide:w-[56%] wide:flex-col wide:justify-center wide:pr-6 wide:pb-0 wide:pl-hero wide:short:pt-20 wide:short:pb-3"
     >
-      <h1>
+      {/* A frase da vida é o subtítulo (h2): o h1 é o nome, no topo (Hero.tsx). */}
+      <h2>
         <span className="relative block text-lg text-fg/65 lg:text-2xl">
           <span data-vida-texto>{loading ? m.hero.loadingOpening : abertura(m, stage)}</span>
           {/* Amostras paradas e escondidas de cada vida (#138): a cena 3D pinta o fundo de uma vida antes de ela
@@ -99,7 +101,7 @@ export function HeroCopy({ ref, stage, leaving, loading }: HeroCopyProps) {
               </span>
             ))}
         </span>
-      </h1>
+      </h2>
       {/* Celular: um título por linha. A partir de sm: numa linha só, separados por um ponto apagado. */}
       <ul
         aria-label={m.hero.titlesLabel}

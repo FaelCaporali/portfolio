@@ -34,7 +34,7 @@ function conta(el: Element | null, vida: string | undefined) {
 function lerUi(canvas: HTMLCanvasElement, vida?: string) {
   const sec = canvas.closest('section')
   const c = canvas.getBoundingClientRect()
-  const copia = sec?.querySelector('h1')?.parentElement
+  const copia = sec?.querySelector('[data-hero-copy]')
   if (!sec || !copia) return null
   // O contêiner do texto ocupa a coluna inteira: vale a união do que está desenhado nele (linhas de texto e botões).
   const ui: Quadro = { x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity }

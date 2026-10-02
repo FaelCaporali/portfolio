@@ -44,7 +44,8 @@ const rotas = () => [
   { path: '/', element: <Hero /> },
   { path: '/journey', element: <p>trajetória</p> },
 ]
-const titulo = () => screen.getByRole('heading', { level: 1 })
+// A frase da vida é o h2 do herói; o h1 é o nome (Hero.tsx).
+const titulo = () => screen.getByRole('heading', { level: 2 })
 const indicador = () => within(screen.getByRole('navigation', { name: 'Timeline' }))
 const atuais = () => indicador().queryAllByRole('button', { current: 'step' })
 
@@ -76,8 +77,9 @@ describe('herói: "Today I am loading" até a cena 3D (U2)', () => {
     const html = renderToString(<RouterProvider router={createMemoryRouter(rotas())} />)
     const container = document.createElement('div')
     container.innerHTML = html
-    // O texto do h1 sem as marcas: a frase que buscadores e leitores recebem.
-    expect(container.querySelector('h1')?.textContent).toBe(LOADING)
+    // O texto do h2 sem as marcas: a frase que buscadores e leitores recebem; o h1 é o nome.
+    expect(container.querySelector('h2')?.textContent).toBe(LOADING)
+    expect(container.querySelector('h1')?.textContent).toBe('Fael Caporali')
     expect(html).not.toContain('aria-current')
 
     const error = vi.spyOn(console, 'error').mockImplementation(() => undefined)
@@ -89,7 +91,7 @@ describe('herói: "Today I am loading" até a cena 3D (U2)', () => {
     })
     expect(onRecoverableError).not.toHaveBeenCalled()
     expect(error).not.toHaveBeenCalled()
-    expect(within(container).getByRole('heading', { level: 1 })).toHaveAccessibleName(LOADING)
+    expect(within(container).getByRole('heading', { level: 2 })).toHaveAccessibleName(LOADING)
     container.remove()
   })
 
@@ -123,7 +125,7 @@ describe('herói: "Today I am loading" até a cena 3D (U2)', () => {
     cena.quebra = true
     vi.spyOn(console, 'error').mockImplementation(() => undefined)
     render(<RouterProvider router={createMemoryRouter(rotas())} />)
-    expect(await screen.findByRole('heading', { level: 1, name: VIDA })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { level: 2, name: VIDA })).toBeInTheDocument()
     expect(atuais().map((b) => b.getAttribute('aria-label'))).toEqual([abertura.slot])
   })
 
