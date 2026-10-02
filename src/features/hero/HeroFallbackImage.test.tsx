@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { stages } from '../../content/journey'
 import { HeroFallbackImage } from './HeroFallbackImage'
 
@@ -32,7 +32,10 @@ describe('HeroFallbackImage (Fase 8b: o quadro inteiro do canvas, não o quadrad
     expect(source?.getAttribute('srcset')).not.toMatch(/\/hero-bot\//)
   })
 
-  it('pré-carrega os dois formatos (desktop e celular) da vida seguinte, nunca da atual de novo', () => {
+  it.each([
+    [true, 'desktop'],
+    [false, 'mobile'],
+  ])('pré-carrega só o formato da tela (largo: %s) da vida seguinte, nunca da atual de novo', (largo, variante) => {
     const originalImage = window.Image
     const srcsPedidos: string[] = []
     class ImagemEspia {
@@ -42,12 +45,14 @@ describe('HeroFallbackImage (Fase 8b: o quadro inteiro do canvas, não o quadrad
     }
     // @ts-expect-error -- stub mínimo só para capturar `new Image().src =`, como o componente usa.
     window.Image = ImagemEspia
+    // O jsdom não tem matchMedia: o stub responde à borda de 1024px que o componente consulta.
+    vi.stubGlobal('matchMedia', (query: string) => ({ matches: largo, media: query }))
     try {
       render(<HeroFallbackImage stage={devops} nextStage={ai} alt="Solutions Architect" />)
     } finally {
       window.Image = originalImage
+      vi.unstubAllGlobals()
     }
-    const esperados = [`/hero-fallback/${ai.id}-desktop.webp`, `/hero-fallback/${ai.id}-mobile.webp`]
-    expect([...srcsPedidos].sort((a, b) => a.localeCompare(b))).toEqual(esperados)
+    expect(srcsPedidos).toEqual([`/hero-fallback/${ai.id}-${variante}.webp`])
   })
 })

@@ -33,12 +33,10 @@ interface HeroFallbackImageProps {
 export function HeroFallbackImage({ stage, nextStage, alt }: HeroFallbackImageProps) {
   useEffect(() => {
     if (!nextStage) return
-    // Só no cliente, só neste caminho (sem GPU): o navegador baixa a próxima vida (os dois formatos) enquanto a
-    // atual ainda segura — a troca de tamanho de tela no meio de uma vida é rara, e os dois cabem no orçamento.
-    for (const variante of ['desktop', 'mobile'] as const) {
-      const img = new Image()
-      img.src = srcFor(nextStage.id, variante)
-    }
+    // Só no cliente, só neste caminho (sem GPU): o navegador baixa a próxima vida enquanto a atual ainda segura, no
+    // formato que o <picture> abaixo vai escolher (mesma borda de 1024px), nunca os dois.
+    const variante = window.matchMedia('(min-width: 1024px)').matches ? 'desktop' : 'mobile'
+    new Image().src = srcFor(nextStage.id, variante)
   }, [nextStage])
   return (
     <picture key={stage.id} className="!absolute inset-0 block h-full w-full">
